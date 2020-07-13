@@ -1,0 +1,30 @@
+{
+  "name": "strapi-plugin-comments",
+  "version": "0.0.1",
+  "description": "This is the description of the plugin.",
+  "strapi": {
+    "name": "Comments",
+    "icon": "comments",
+    "description": "Comments & audience engagement"
+  },
+  "dependencies": {
+    "bad-words": "^3.0.3"
+  },
+  "author": {
+    "name": "VirtusLab // Mateusz Ziarko",
+    "email": "mziarko@virtuslab.com",
+    "url": "https://virtuslab.com"
+  },
+  "maintainers": [
+    {
+      "name": "VirtusLab // Mateusz Ziarko",
+      "email": "mziarko@virtuslab.com",
+      "url": "https://virtuslab.com"
+    }
+  ],
+  "engines": {
+    "node": ">=10.16.0",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT"
+}

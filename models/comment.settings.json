@@ -1,0 +1,81 @@
+{
+  "collectionName": "comments",
+  "info": {
+    "name": "comment",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "isDisplayed": false,
+    "comment": ""
+  },
+  "attributes": {
+    "content": {
+      "type": "text",
+      "configurable": false,
+      "required": true
+    },
+    "blocked": {
+      "type": "boolean",
+      "default": false,
+      "configurable": false
+    },
+    "blockedThread": {
+      "type": "boolean",
+      "default": false,
+      "configurable": false
+    },
+    "blockReason": {
+      "type": "string",
+      "configurable": false
+    },
+    "points": {
+      "type": "integer",
+      "default": 0,
+      "configurable": false
+    },
+    "authorUser": {
+      "model": "user",
+      "plugin": "users-permissions",
+      "configurable": false
+    },
+    "authorType": {
+      "type": "string",
+      "configurable": false
+    },
+    "authorId": {
+      "type": "string",
+      "configurable": false
+    },
+    "authorName": {
+      "type": "string",
+      "configurable": false
+    },
+    "authorEmail": {
+      "type": "email",
+      "configurable": false
+    },
+    "authorAvatar": {
+      "type": "string",
+      "configurable": false
+    },
+    "related": {
+      "collection": "*",
+      "filter": "field",
+      "configurable": false
+    },
+    "reports": {
+      "collection": "report",
+      "plugin": "comments",
+      "via": "related",
+      "configurable": false
+    },
+    "threadOf": {
+      "columnName": "threadOf",
+      "model": "comment",
+      "plugin": "comments",
+      "configurable": false
+    }
+  }
+}
