@@ -8,7 +8,23 @@
     "description": "Comments & audience engagement"
   },
   "dependencies": {
-    "bad-words": "^3.0.3"
+    "bad-words": "^3.0.3",
+    "lodash": "^4.17.11",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-intl": "4.5.0",
+    "react-redux": "^7.0.2",
+    "react-router": "^5.0.0",
+    "react-router-dom": "^5.0.0",
+    "reactstrap": "8.4.1",
+    "redux-saga": "^0.16.0",
+    "request": "^2.83.0",
+    "strapi-helper-plugin": "3.0.5",
+    "strapi-utils": "3.0.5",
+    "uuid": "^3.1.0"
+  },
+  "devDependencies": {
+    "koa": "^2.8.0"
   },
   "author": {
     "name": "VirtusLab // Mateusz Ziarko",
