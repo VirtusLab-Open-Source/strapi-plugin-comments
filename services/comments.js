@@ -95,10 +95,10 @@ module.exports = {
             .then(results => relation ? results.filter(result => {
                     const { related } = result || {};
                     if (related && !_.isEmpty(related)) {
-                        if (_.find(related, resultItem => (resultItem.id.toString() === relationId) && (resultItem.__contentType.toLowerCase() === relationType.toLowerCase()))) {
-                            return result;
-                        }
-                        return false;
+                        return _.find(related, item =>
+                                (`${item.id}` === relationId) &&
+                                (item.__contentType.toLowerCase() === relationType.toLowerCase())
+                            );
                     }
                     return false;
                 }) : results
@@ -127,10 +127,17 @@ module.exports = {
     },
 
     // Create a comment
-    create: async (data) => {
+    create: async (data, relation) => {
         const { content, related } = data;
+        const { service, model } = extractMeta(strapi.plugins);
         const parsedRelation = related && related instanceof Array ? related : [related];
-        const singleRelationFulfilled = related && (parsedRelation.length === 1)
+        const singleRelationFulfilled = related && (parsedRelation.length === 1);
+        const linkToThread = data.threadOf ? !!sanitizeEntity(await service.findOne(data.threadOf, relation), { model }) : true;
+        
+        if (!linkToThread) {
+            return new PluginError(400, 'Thread is not existing');
+        }
+        
         if (checkBadWords(content) && singleRelationFulfilled) {
             const { pluginName, model } = extractMeta(strapi.plugins);
             const entity = await strapi.query( model.modelName, pluginName).create({

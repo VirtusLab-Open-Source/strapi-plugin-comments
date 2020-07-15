@@ -44,9 +44,11 @@ module.exports = {
   },
 
   post: async (ctx) => {
+    const { params = {} } = ctx;
+    const { relation } = parseParams(params);
     const { body = {} }  = ctx.request;
     try {
-      const entity = await strapi.plugins.comments.services.comments.create(body);
+      const entity = await strapi.plugins.comments.services.comments.create(body, relation);
 
       if (entity) {
         return entity;

@@ -2,22 +2,6 @@
   "routes": [
     {
       "method": "GET",
-      "path": "/",
-      "handler": "comments.findAll",
-      "config": {
-        "policies": []
-      }
-    },
-    {
-      "method": "POST",
-      "path": "/",
-      "handler": "comments.post",
-      "config": {
-        "policies": []
-      }
-    },
-    {
-      "method": "GET",
       "path": "/:relation",
       "handler": "comments.findAllInHierarchy",
       "config": {
