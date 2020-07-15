@@ -72,8 +72,8 @@ module.exports = {
             _sort: paginationEnabled ? query._sort || 'created_at:desc' : undefined
         };
         const entities = query._q ? 
-            await strapi.query( model.modelName, pluginName).search(params, ['related', 'reports']) :
-            await strapi.query( model.modelName, pluginName).find(params, ['related', 'reports']);
+            await strapi.query( model.modelName, pluginName).search(params, ['authorUser', 'related', 'reports']) :
+            await strapi.query( model.modelName, pluginName).find(params, ['authorUser', 'related', 'reports']);
         const items = entities.map(_ => filterOurResolvedReports(sanitizeEntity(_, { model })));
         const total = paginationEnabled ?
             query._q ?
@@ -91,7 +91,7 @@ module.exports = {
     findAllInHierarchy: async (relation, startingFromId = null, dropBlockedThreads = false) => {
         const [relationType, relationId] = (relation || '').split(':');
         const { pluginName, model } = extractMeta(strapi.plugins);
-        const entities = await strapi.query( model.modelName, pluginName).find({}, ['related', 'reports'])
+        const entities = await strapi.query( model.modelName, pluginName).find({}, ['authorUser', 'related', 'reports'])
             .then(results => relation ? results.filter(result => {
                     const { related } = result || {};
                     if (related && !_.isEmpty(related)) {
