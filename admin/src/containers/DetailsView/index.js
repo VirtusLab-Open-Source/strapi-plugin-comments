@@ -41,12 +41,13 @@ const DetailsView = () => {
   const renderCommentsTree = (selected, items) => {
     return (<CardLevelWrapper>
         { 
-          items.map(item => {
+          items.map((item, n) => {
             const active = item.id === selected.id;
             const threadsCount = item.children && item.children.length;
             const hasThreads = threadsCount > 0;
-            const clickable = !active && hasThreads && selected.threadOf;
+            const clickable = !active && hasThreads && !isNil(selected.threadOf);
             return (<ItemDetails
+              key={`list-item-details-${item.id || n}`}
               {...item}
               active={active}
               root={selected.threadOf === null}

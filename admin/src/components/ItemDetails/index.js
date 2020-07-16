@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import { isEmpty } from 'lodash';
+import { isEmpty, isArray, first } from 'lodash';
 import CardWrapper from './CardWrapper';
 import CardItem from './CardItem';
 import CardLevelCounter from './CardLevelCounter';
@@ -41,7 +41,7 @@ const ItemDetails = ({ id, content, active, clickable, root, threadsCount, autho
   const footerProps = {
     authorName,
     authorUser,
-    related,
+    related: isArray(related) ? first(related) : related,
     created_at,
     updated_at,
     isDelailedView: true,
@@ -116,14 +116,14 @@ ItemDetails.propTypes = {
   authorUser: PropTypes.object, 
   created_at: PropTypes.string.isRequired, 
   updated_at: PropTypes.string, 
-  related: PropTypes.object, 
+  related: PropTypes.array, 
   reports: PropTypes.array, 
   blocked: PropTypes.bool, 
   blockedThread: PropTypes.bool, 
   onClick: PropTypes.func,
-  onBlockClick: PropTypes.func.isRequired,
-  onBlockThreadClick: PropTypes.func.isRequired,
-  onAbuseReportResolve: PropTypes.func.isRequired,
+  onBlockClick: PropTypes.func,
+  onBlockThreadClick: PropTypes.func,
+  onAbuseReportResolve: PropTypes.func,
 };
 
 export default ItemDetails;

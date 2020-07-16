@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useHistory, useParams } from 'react-router-dom';
-import { isEmpty } from 'lodash';
+import { isEmpty, isArray, first } from 'lodash';
 import pluginId from '../../pluginId';
 import CardWrapper from './CardWrapper';
 import CardItem from './CardItem';
@@ -30,7 +30,7 @@ const Item = ({ id, content, authorName, authorUser, created_at, updated_at, rel
   const footerProps = {
     authorName,
     authorUser,
-    related,
+    related: isArray(related) ? first(related) : related,
     created_at,
     updated_at
   };
@@ -56,7 +56,7 @@ Item.propTypes = {
   authorUser: PropTypes.object, 
   created_at: PropTypes.string.isRequired, 
   updated_at: PropTypes.string, 
-  related: PropTypes.object, 
+  related: PropTypes.array, 
   reports: PropTypes.array, 
   blocked: PropTypes.bool, 
   blockedThread: PropTypes.bool, 
