@@ -11,15 +11,13 @@ import pluginId from '../../pluginId';
 import ListView from '../ListView';
 import DetailsView from '../DetailsView';
 
-const Panel = () => {
-  return (
-    <div className="container-fluid">
-      <div className="row">
-        <ListView />
-        <DetailsView />
-      </div>
+const Panel = () => (
+  <div className="container-fluid">
+    <div className="row">
+      <ListView />
+      <DetailsView />
     </div>
-  );
-};
+  </div>
+);
 
 export default memo(Panel);

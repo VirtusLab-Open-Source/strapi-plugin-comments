@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink } from '@fortawesome/free-solid-svg-icons';
@@ -41,6 +42,14 @@ const ItemFooter = ({ authorName, authorUser, related, created_at, isDetailedVie
         </CardItemRelation>)}
     </Wrapper>
   );
+};
+
+ItemFooter.propTypes = {
+  authorName: PropTypes.string, 
+  authorUser: PropTypes.object,  
+  related: PropTypes.object, 
+  created_at: PropTypes.string.isRequired, 
+  isDetailedView: PropTypes.bool,
 };
 
 export default ItemFooter;

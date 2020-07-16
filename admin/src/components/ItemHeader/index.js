@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useGlobalContext } from 'strapi-helper-plugin';
@@ -44,6 +45,17 @@ const ItemHeader = ({ active, isDelailedView, blocked, blockedThread, isNew, isA
       }
     </Wrapper>
   );
+};
+
+ItemHeader.propTypes = {
+  active: PropTypes.bool,
+  isDelailedView: PropTypes.bool,
+  blocked: PropTypes.bool,
+  blockedThread: PropTypes.bool,
+  isNew: PropTypes.bool,
+  isAbuseReported: PropTypes.bool,
+  abuseReports: PropTypes.array,
+  onReportsClick: PropTypes.func.isRequired,
 };
 
 export default ItemHeader;

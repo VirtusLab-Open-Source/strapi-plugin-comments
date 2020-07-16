@@ -5,8 +5,6 @@ const { sanitizeEntity } = require('strapi-utils');
 const BadWordsFilter = require('bad-words');
 const PluginError = require('./utils/error');
 
-const ITEMS_PER_PAGE = 10;
-
 /**
  * comments.js service
  *
@@ -135,7 +133,7 @@ module.exports = {
         const linkToThread = data.threadOf ? !!sanitizeEntity(await service.findOne(data.threadOf, relation), { model }) : true;
         
         if (!linkToThread) {
-            return new PluginError(400, 'Thread is not existing');
+            throw new PluginError(400, 'Thread is not existing');
         }
         
         if (checkBadWords(content) && singleRelationFulfilled) {
@@ -146,7 +144,7 @@ module.exports = {
             });
             return  sanitizeEntity(entity, { model });
         }
-        return new PluginError(400, 'No content received.');
+        throw new PluginError(400, 'No content received.');
     },
 
     // Update a comment

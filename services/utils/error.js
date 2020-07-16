@@ -5,8 +5,6 @@ module.exports = class PluginError extends Error {
         this.status = status || 500;
         this.message = message || 'Internal error'; 
         this.payload = payload;
-
-        console.error(this);
      }
 
      toString(e = this) {

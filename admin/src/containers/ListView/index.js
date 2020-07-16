@@ -48,12 +48,4 @@ const ListView = () => {
   );
 };
 
-ListView.defaultProps = {
-  wait: () => {},
-};
-
-ListView.propTypes = {
-  wait: PropTypes.func,
-};
-
 export default ListView;

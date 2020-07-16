@@ -7,6 +7,8 @@
     "list.item.header.blocked.thread": "This comment and thread have been blocked",
     "list.item.indication.new": "New comment",
     "list.item.indication.abuse": "Abuse reported",
+    "list.item.threads.drilldown": "Drilldown",
+    "list.item.threads.count": "{count, plural, =0 {There is no threads} one {# thread} other {# threads}}",
     "list.item.header.abuse": "{count, plural, =0 {Nothing reported} one {# report waits for review} other {# reports waits for review}}",
     "list.item.moderation.button.comment.restore": "Restore comment",
     "list.item.moderation.button.comment.hide": "Hide comment",

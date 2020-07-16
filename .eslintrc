@@ -1,0 +1,45 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "jsx": true,
+    "useJSXTextNode": true,
+    "sourceType": "module"
+  },
+  "plugins": ["@typescript-eslint", "react-hooks", "import"],
+  "rules": {
+    "no-console": "warn",
+    "curly": "warn",
+    "prefer-template": "warn",
+
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error",
+
+    "import/no-default-export": "warn",
+    "import/newline-after-import": "warn",
+    "import/order": [
+      "warn",
+      {
+        "newlines-between": "always",
+        "alphabetize": { "order": "asc" },
+        "pathGroupsExcludedImportTypes": ["builtin"],
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index"
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.fixture.tsx", "external-types/**"],
+      "rules": {
+        "no-console": "off",
+        "import/no-default-export": "off"
+      }
+    }
+  ]
+}

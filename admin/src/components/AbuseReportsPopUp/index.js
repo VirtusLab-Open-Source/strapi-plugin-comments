@@ -8,7 +8,7 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import { isEmpty, sortBy as sort } from 'lodash';
+import { isEmpty } from 'lodash';
 import {
   ButtonModal,
   HeaderModal,
@@ -16,7 +16,6 @@ import {
   Modal,
   ModalBody,
   ModalForm,
-  InputsIndex as Input,
   useGlobalContext,
 } from 'strapi-helper-plugin';
 import { Table, Button } from '@buffetjs/core';
@@ -29,7 +28,7 @@ import TableContainer from './TableContainer';
 import EmptyView from '../EmptyView';
 import ItemDetails from '../ItemDetails';
 import ItemPreviewContainer from './ItemPreviewContainer';
-import ModalFooter from './ModelFooter';
+import ModalFooter from './ModalFooter';
 import pluginId from '../../pluginId';
 
 // Translations
@@ -131,15 +130,15 @@ const AbuseReportsPopUp = ({ isOpen, reports, comment, blocked, blockedThread, o
 }
 
 AbuseReportsPopUp.propTypes = {
-  actionType: PropTypes.string.isRequired,
-  dataToEdit: PropTypes.string.isRequired,
-  didCheckErrors: PropTypes.bool.isRequired,
-  formErrors: PropTypes.array.isRequired,
-  isOpen: PropTypes.bool.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  settingType: PropTypes.string,
-  values: PropTypes.object.isRequired,
+  blocked: PropTypes.bool,
+  blockedThread: PropTypes.bool,
+  reports: PropTypes.array,
+  comment: PropTypes.object.isRequired,
+  onBlockClick: PropTypes.func.isRequired,
+  onBlockThreadClick: PropTypes.func.isRequired,
+  onAbuseReportResolveClick: PropTypes.func.isRequired,
+  isOpen: PropTypes.bool,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default AbuseReportsPopUp;

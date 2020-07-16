@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useHistory, useParams } from 'react-router-dom';
 import { isEmpty } from 'lodash';
 import pluginId from '../../pluginId';
@@ -46,6 +47,20 @@ const Item = ({ id, content, authorName, authorUser, created_at, updated_at, rel
       </CardItem>
     </CardWrapper>
   );
+};
+
+Item.propTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,  
+  content: PropTypes.string.isRequired, 
+  authorName: PropTypes.string, 
+  authorUser: PropTypes.object, 
+  created_at: PropTypes.string.isRequired, 
+  updated_at: PropTypes.string, 
+  related: PropTypes.object, 
+  reports: PropTypes.array, 
+  blocked: PropTypes.bool, 
+  blockedThread: PropTypes.bool, 
+  isNew: PropTypes.bool,
 };
 
 export default Item;

@@ -94,12 +94,4 @@ const DetailsView = () => {
   );
 };
 
-DetailsView.defaultProps = {
-  wait: () => {},
-};
-
-DetailsView.propTypes = {
-  wait: PropTypes.func,
-};
-
 export default DetailsView;

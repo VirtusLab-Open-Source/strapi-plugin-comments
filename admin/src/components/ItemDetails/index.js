@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { FormattedMessage } from 'react-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { isEmpty } from 'lodash';
@@ -10,6 +12,7 @@ import ItemFooter from '../ItemFooter';
 import ItemModeration from '../ItemModeration';
 import ItemHeader from '../ItemHeader';
 import AbuseReportsPopUp from '../AbuseReportsPopUp';
+import pluginId from '../../pluginId';
 
 const ItemDetails = ({ id, content, active, clickable, root, threadsCount, authorName, authorUser, created_at, updated_at, related, reports, blocked, blockedThread, onClick, onBlockClick, onBlockThreadClick, onAbuseReportResolve }) => {
   const [showPopUp, setPopUpVisibility] = useState(false);
@@ -85,9 +88,9 @@ const ItemDetails = ({ id, content, active, clickable, root, threadsCount, autho
         <ItemFooter {...footerProps} />
       </CardItem>
       { hasThreads && (<CardLevelCounter>
-          <span>{threadsCount}</span> thread{threadsCount > 1 ? 's' : ''}
+          <FormattedMessage id={`${pluginId}.list.item.threads.count`} values={{ count: threadsCount }}/>
           <CardLevelCounterLink onClick={onClick}>
-            Drilldown
+            <FormattedMessage id={`${pluginId}.list.item.threads.drilldown`} />
             <FontAwesomeIcon icon={faArrowRight} />
           </CardLevelCounterLink>
         </CardLevelCounter>
@@ -100,6 +103,27 @@ const ItemDetails = ({ id, content, active, clickable, root, threadsCount, autho
       )}
     </CardWrapper>
   );
+};
+
+ItemDetails.propTypes = {
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,  
+  content: PropTypes.string.isRequired, 
+  active: PropTypes.bool,
+  clickable: PropTypes.bool,
+  root: PropTypes.bool,
+  threadsCount: PropTypes.number,
+  authorName: PropTypes.string, 
+  authorUser: PropTypes.object, 
+  created_at: PropTypes.string.isRequired, 
+  updated_at: PropTypes.string, 
+  related: PropTypes.object, 
+  reports: PropTypes.array, 
+  blocked: PropTypes.bool, 
+  blockedThread: PropTypes.bool, 
+  onClick: PropTypes.func,
+  onBlockClick: PropTypes.func.isRequired,
+  onBlockThreadClick: PropTypes.func.isRequired,
+  onAbuseReportResolve: PropTypes.func.isRequired,
 };
 
 export default ItemDetails;

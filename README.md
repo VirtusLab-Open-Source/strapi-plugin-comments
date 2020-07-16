@@ -31,10 +31,10 @@ Complete installation requirements are exact same as for Strapi itself and can b
 ## Features
 
 - **Comments Public API:** Elegant, entirely customizable and a fully extensible admin panel.
-- **Strapi &amp generic users:** Support for built-in Strapi as well as for generic non-Strapi user as comments authors in a same time, depends on what type is users your UI is handling.
+- **Strapi &amp generic users:** Support for built-in &amp; also generic non-Strapi users that might be the comments authors.
 - **Any Content Type relation:** Comments can by linked to any of your Content Types by default. Simply, you're controlling it.
 - **Moderation Panel:** Search & Filter through the bucket with your auditory comments. Manage them by blocking single ones or full threads. All in combined list &amp; hierarchical tree view of threads.
-- **Automated Bad Words filtering:** By detault end users are not allowed to post abusing comments where bad words has been used.
+- **Automated Bad Words filtering:** By detault end users are not allowed to post abusing comments where bad words have been used.
 - **Abuse Reporting & Reviewing:** Built on top of Node.js, Strapi delivers amazing performance.
 
 ## Public API Comment model

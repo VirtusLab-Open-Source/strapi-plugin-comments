@@ -1,39 +1,20 @@
 import React from 'react';
-import { IconLinks } from '@buffetjs/core';
-import { Card } from '@buffetjs/styles';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faTrashAlt,
-  faPencilAlt,
-} from '@fortawesome/free-solid-svg-icons';
-import pluginId from '../../pluginId';
+import PropTypes from 'prop-types';
 import Item from '../Item';
 import Container from './Container';
 
-const List = ({ items }) => {
+const List = ({ items }) => (
+  <Container>
+    { items.map((item, n) => (
+      <Item
+      key={`list-item-${item.id || n}`}
+      {...item}
+      /> ))}
+  </Container>
+);
 
-  const handleEditClick = e => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log(e);
-  };
-  const handleDeleteClick = e => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log(e);
-  };
-
-  return (
-    <Container>
-      { items.map(item => (
-        <Item
-        {...item}
-        handleEditClick={handleEditClick}
-        handleDeleteClick={handleDeleteClick} 
-        
-        /> ))}
-    </Container>
-  );
+List.propTypes = {
+  items: PropTypes.array,
 };
 
 export default List;
