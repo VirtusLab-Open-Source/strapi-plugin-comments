@@ -11,7 +11,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import useDataManager from '../../hooks/useDataManager';
 import { isEmpty } from 'lodash';
-import PropTypes from 'prop-types';
 import { Header } from '@buffetjs/custom';
 import Footer from './Footer';
 import Wrapper from './Wrapper';

@@ -55,7 +55,7 @@ ItemHeader.propTypes = {
   isNew: PropTypes.bool,
   isAbuseReported: PropTypes.bool,
   abuseReports: PropTypes.array,
-  onReportsClick: PropTypes.func.isRequired,
+  onReportsClick: PropTypes.func,
 };
 
 export default ItemHeader;

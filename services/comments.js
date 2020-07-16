@@ -248,9 +248,7 @@ module.exports = {
             if (changedEntities) {
                 const changedEntitiesList = changedEntities instanceof Array ? changedEntities : [changedEntities];
                 const nestedTransactions = await Promise.all(
-                    changedEntitiesList.map(async _ =>
-                        await service.blockCommentThreadNested(_.id, blockStatus)
-                    )
+                    changedEntitiesList.map(_ => service.blockCommentThreadNested(_.id, blockStatus))
                 );
                 return nestedTransactions.length === changedEntitiesList.length;
             }

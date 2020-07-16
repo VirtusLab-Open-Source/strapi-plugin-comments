@@ -5,9 +5,6 @@
  */
 
 import React, { memo } from 'react';
-import { LeftMenuList, useGlobalContext } from 'strapi-helper-plugin';
-// import PropTypes from 'prop-types';
-import pluginId from '../../pluginId';
 import ListView from '../ListView';
 import DetailsView from '../DetailsView';
 

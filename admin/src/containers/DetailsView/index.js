@@ -9,7 +9,6 @@ import { useHistory } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import { useGlobalContext, LoadingIndicatorPage } from 'strapi-helper-plugin';
 import useDataManager from '../../hooks/useDataManager';
-import PropTypes from 'prop-types';
 import { Header } from '@buffetjs/custom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComments } from '@fortawesome/free-solid-svg-icons';
@@ -19,6 +18,7 @@ import Wrapper from './Wrapper';
 import CardWrapper from '../../components/ItemDetails/CardWrapper';
 import CardLevelWrapper from '../../components/ItemDetails/CardLevelWrapper';
 import EmptyView from '../../components/EmptyView';
+import { isNil } from 'lodash';
 
 const DetailsView = () => {
   const {
