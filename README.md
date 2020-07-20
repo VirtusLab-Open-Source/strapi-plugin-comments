@@ -35,7 +35,7 @@ Complete installation requirements are exact same as for Strapi itself and can b
 - **Any Content Type relation:** Comments can by linked to any of your Content Types by default. Simply, you're controlling it.
 - **Moderation Panel:** Search & Filter through the bucket with your auditory comments. Manage them by blocking single ones or full threads. All in combined list &amp; hierarchical tree view of threads.
 - **Automated Bad Words filtering:** By detault end users are not allowed to post abusing comments where bad words have been used.
-- **Abuse Reporting & Reviewing:** Built on top of Node.js, Strapi delivers amazing performance.
+- **Abuse Reporting & Reviewing:** Don't allow inferior language, react to reports from your community
 
 ## Content Type model relation to Comment
 
