@@ -33,13 +33,13 @@ const extractMeta = plugins => {
 
 const buildNestedStructure = (entities, id = null, field = 'parent', dropBlockedThreads = false, blockNestedThreads = false) =>
     entities
-        .filter(entity => (entity[field] === id) || (entity[field] && (entity[field].id === id)))
+        .filter(entity => (entity[field] === id) || (_.isObject(entity[field]) && (entity[field].id === id)))
         .map(entity => ({ 
             ...entity, 
             [field]: undefined, 
             related: undefined,
             blockedThread: blockNestedThreads || entity.blockedThread,
-            children: entity.blockedThread && dropBlockedThreads ? [] : buildNestedStructure(entities, entity.id, field, dropBlockedThreads, true),
+            children: entity.blockedThread && dropBlockedThreads ? [] : buildNestedStructure(entities, entity.id, field, dropBlockedThreads, entity.blockedThread),
         }));
 
 const checkBadWords = content => {
@@ -241,14 +241,15 @@ module.exports = {
     blockCommentThreadNested: async (id, blockStatus) => {
         const { pluginName, service, model } = extractMeta(strapi.plugins);
         try {
-            const changedEntities = await strapi.query(model.modelName, pluginName).update(
-                { threadOf: id },
+            const entitiesToChange = await strapi.query(model.modelName, pluginName).find({ threadOf: id });
+            const changedEntities = await Promise.all(entitiesToChange.map(item => strapi.query(model.modelName, pluginName).update(
+                { id: item.id },
                 { blockedThread: blockStatus }
-            );
+            )));
             if (changedEntities) {
                 const changedEntitiesList = changedEntities instanceof Array ? changedEntities : [changedEntities];
                 const nestedTransactions = await Promise.all(
-                    changedEntitiesList.map(_ => service.blockCommentThreadNested(_.id, blockStatus))
+                    changedEntitiesList.map(item => service.blockCommentThreadNested(item.id, blockStatus))
                 );
                 return nestedTransactions.length === changedEntitiesList.length;
             }

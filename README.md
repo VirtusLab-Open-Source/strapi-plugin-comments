@@ -37,6 +37,18 @@ Complete installation requirements are exact same as for Strapi itself and can b
 - **Automated Bad Words filtering:** By detault end users are not allowed to post abusing comments where bad words have been used.
 - **Abuse Reporting & Reviewing:** Built on top of Node.js, Strapi delivers amazing performance.
 
+## Content Type model relation to Comment
+
+To enable Content Type to work with Comments, you've to add following field to your model settings.json attribues:
+
+```
+    "comments": {
+      "plugin": "comments",
+      "collection": "comment",
+      "via": "related"
+    }
+```
+
 ## Public API Comment model
 
 ### Generic (non Strapi User)
