@@ -1,0 +1,35 @@
+{
+  "parserOptions": {
+    "jsx": true,
+    "useJSXTextNode": true,
+    "sourceType": "module"
+  },
+  "plugins": ["react-hooks", "import"],
+  "rules": {
+    "no-console": "warn",
+    "curly": "warn",
+    "prefer-template": "warn",
+
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error",
+
+    "import/no-default-export": "warn",
+    "import/newline-after-import": "warn",
+    "import/order": [
+      "warn",
+      {
+        "newlines-between": "always",
+        "alphabetize": { "order": "asc" },
+        "pathGroupsExcludedImportTypes": ["builtin"],
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index"
+        ]
+      }
+    ]
+  }
+}

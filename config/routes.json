@@ -1,0 +1,92 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/:relation",
+      "handler": "comments.findAllInHierarchy",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/:relation",
+      "handler": "comments.post",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/:relation/comment/:commentId",
+      "handler": "comments.put",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/:relation/comment/:commentId/report-abuse",
+      "handler": "comments.reportAbuse",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/:relation/comment/:commentId/like",
+      "handler": "comments.pointsUp",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/all",
+      "handler": "comments.findAll",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/all/:page",
+      "handler": "comments.findAll",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/single/:id",
+      "handler": "comments.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/moderation/block/:id",
+      "handler": "comments.blockComment",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/moderation/block-thread/:id",
+      "handler": "comments.blockCommentThread",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/moderation/abuse-reports/:commentId/resolve/:id",
+      "handler": "comments.resolveAbuseReport",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}
