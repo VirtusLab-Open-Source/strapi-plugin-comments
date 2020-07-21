@@ -13,8 +13,6 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 
 ### ⏳ Installation
 
-Install Strapi with this **Quickstart** command to create a Strapi project instantly:
-
 (Use **yarn** to install this plugin within your Strapi project (recommended). [Install yarn with these docs](https://yarnpkg.com/lang/en/docs/install/).)
 
 ```bash
@@ -40,7 +38,7 @@ Complete installation requirements are exact same as for Strapi itself and can b
 ## Features
 
 - **Comments Public API:** Elegant, entirely customizable and a fully extensible admin panel.
-- **Strapi &amp generic users:** Support for built-in &amp; also generic non-Strapi users that might be the comments authors.
+- **Strapi &amp; generic users:** Support for built-in &amp; also generic non-Strapi users that might be the comments authors.
 - **Any Content Type relation:** Comments can by linked to any of your Content Types by default. Simply, you're controlling it.
 - **Moderation Panel:** Search & Filter through the bucket with your auditory comments. Manage them by blocking single ones or full threads. All in combined list &amp; hierarchical tree view of threads.
 - **Automated Bad Words filtering:** By detault end users are not allowed to post abusing comments where bad words have been used.
@@ -70,7 +68,7 @@ To enable Content Type to work with Comments, you've to add following field to y
     "blockReason": null,
     "points": 1,
     "authorUser": null,
-    "authorId": "PLE12345678",
+    "authorId": "207ccfdc-94ba-45eb-979c-790f6f49c392",
     "authorName": "Joe Doe",
     "authorEmail": "jdoe@sample.com",
     "authorAvatar": null,
