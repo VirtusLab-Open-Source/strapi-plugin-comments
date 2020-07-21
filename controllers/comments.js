@@ -32,6 +32,17 @@ module.exports = {
     return await strapi.plugins.comments.services.comments.findAll(ctx.query, page)
   },
 
+  findAllFlat: async (ctx) => {
+    const { params = {} } = ctx;
+    const { relation } = parseParams(params);
+    try {
+      return await strapi.plugins.comments.services.comments.findAllFlat(relation);
+    }
+    catch (e) {
+      throwError(ctx, e);
+    }
+  },
+
   findAllInHierarchy: async (ctx) => {
     const { params = {} } = ctx;
     const { relation } = parseParams(params);

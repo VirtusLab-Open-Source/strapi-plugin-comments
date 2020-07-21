@@ -134,6 +134,28 @@ Return a hierarchical tree structure of comments for specified instance of Conte
 ]
 ```
 
+### Get Comments (flat structure)
+
+`GET <host>/comments/<content-type>:<id>/flat`
+
+Return a flat structure of comments for specified instance of Content Type like for example `Article` with `ID: 1`
+
+**Example URL**: `https://localhost:1337/comments/article:1/flat`
+
+**Example response body**
+
+```
+[
+    {
+        -- Comment Model fields ---
+    },
+    {
+        -- Comment Model fields ---
+    },
+    ...
+]
+```
+
 **Possible response codes**
 - `200` - Successful. Response with list of comments (can be empty)
 - `400` - Bad Request. Requested list for not valid / not existing Content Type

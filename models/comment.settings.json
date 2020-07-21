@@ -60,6 +60,11 @@
       "type": "string",
       "configurable": false
     },
+    "relatedSlug": {
+      "type": "string",
+      "private": true,
+      "configurable": false
+    },
     "related": {
       "collection": "*",
       "filter": "field",

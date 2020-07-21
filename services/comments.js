@@ -4,6 +4,7 @@ const _ = require('lodash');
 const { sanitizeEntity } = require('strapi-utils');
 const BadWordsFilter = require('bad-words');
 const PluginError = require('./utils/error');
+const { isEmpty } = require('lodash');
 
 /**
  * comments.js service
@@ -85,42 +86,40 @@ module.exports = {
         };
     },
 
-    // Find comments and create relations tree
-    findAllInHierarchy: async (relation, startingFromId = null, dropBlockedThreads = false) => {
-        const [relationType, relationId] = (relation || '').split(':');
+    // Find comments in the flat structure
+    findAllFlat: async (relation) => {
         const { pluginName, model } = extractMeta(strapi.plugins);
-        const entities = await strapi.query( model.modelName, pluginName).find({}, ['authorUser', 'related', 'reports'])
-            .then(results => relation ? results.filter(result => {
-                    const { related } = result || {};
-                    if (related && !_.isEmpty(related)) {
-                        return _.find(related, item =>
-                                (`${item.id}` === relationId) &&
-                                (item.__contentType.toLowerCase() === relationType.toLowerCase())
-                            );
-                    }
-                    return false;
-                }) : results
-            );
-        return buildNestedStructure(entities.map(_ => filterOurResolvedReports(sanitizeEntity(_, { model }))), startingFromId, 'threadOf', dropBlockedThreads);
+        let criteria = {};
+        if (relation) {
+            criteria = {
+                ...criteria,
+                relatedSlug: relation,
+            };
+        }
+        const entities = await strapi.query( model.modelName, pluginName)
+            .find(criteria, ['authorUser', 'related', 'reports']);
+        return entities.map(_ => filterOurResolvedReports(sanitizeEntity(_, { model })));
+    },
+
+    // Find comments and create relations tree structure
+    findAllInHierarchy: async (relation, startingFromId = null, dropBlockedThreads = false) => {
+        const { service } = extractMeta(strapi.plugins);
+        const entities = await service.findAllFlat(relation);
+        return buildNestedStructure(entities, startingFromId, 'threadOf', dropBlockedThreads);
     },
 
     // Find single comment
     findOne: async (id, relation) => {
-        const [relationType, relationId] = (relation || '').split(':');
         const { pluginName, model } = extractMeta(strapi.plugins);
-        const entity = await strapi.query( model.modelName, pluginName).findOne({ id }, ['related', 'reports'])
-            .then(result => {
-                if (relation) {
-                    const { related } = result || {};
-                    if (related && !_.isEmpty(related)) {
-                        if (_.find(related, resultItem => (resultItem.id.toString() === relationId) && (resultItem.__contentType.toLowerCase() === relationType.toLowerCase()))) {
-                            return result;
-                        }
-                        return null;
-                    }
-                }
-                return result;
-            });
+        let criteria = { id };
+        if (relation) {
+            criteria = {
+                ...criteria,
+                relatedSlug: relation,
+            };
+        }
+        const entity = await strapi.query( model.modelName, pluginName)
+            .findOne(criteria, ['related', 'reports']);
         return filterOurResolvedReports(sanitizeEntity(entity, { model }));
     },
 
@@ -140,6 +139,7 @@ module.exports = {
             const { pluginName, model } = extractMeta(strapi.plugins);
             const entity = await strapi.query( model.modelName, pluginName).create({
                 ...data,
+                relatedSlug: `${related.ref}:${related.refId}`,
                 related: parsedRelation
             });
             return  sanitizeEntity(entity, { model });
@@ -149,14 +149,14 @@ module.exports = {
 
     // Update a comment
     update: async (id, relation, data) => {
-        const { content, reports } = data;
+        const { content } = data;
         const { pluginName, service, model } = extractMeta(strapi.plugins);
         const existingEntity = sanitizeEntity(await service.findOne(id, relation), { model });
         if (isEqualEntity(existingEntity, data) && content) {
             if (checkBadWords(content)) {
                 const entity = await strapi.query( model.modelName, pluginName).update(
                     { id },
-                    { content, reports }
+                    { content }
                 );
                 return sanitizeEntity(entity, { model }) ;
             }
@@ -204,7 +204,9 @@ module.exports = {
     findOneAndThread: async (id) => {
         const { pluginName, service, model } = extractMeta(strapi.plugins);
         const entity = await strapi.query( model.modelName, pluginName).findOne({ id }, ['threadOf', 'threadOf.reports', 'authorUser', 'related', 'reports']);
-        const entitiesOnSameLevel = await service.findAllInHierarchy(null, entity.threadOf ? entity.threadOf.id : null)
+        const relatedEntity = !_.isEmpty(entity.related) ? _.first(entity.related) : null;
+        const relation = relatedEntity ? `${relatedEntity.__contentType.toLowerCase()}:${relatedEntity.id}` : null;
+        const entitiesOnSameLevel = await service.findAllInHierarchy(relation, entity.threadOf ? entity.threadOf.id : null)
         const selectedEntity = filterOurResolvedReports(sanitizeEntity(entity, { model }));
         return {
             selected: {
