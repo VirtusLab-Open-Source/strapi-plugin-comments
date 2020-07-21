@@ -1,5 +1,14 @@
 # Strapi - Comments plugin
 
+<p align="center">
+  <a href="https://www.npmjs.org/package/strapi-plugin-comments">
+    <img src="https://img.shields.io/npm/v/strapi-plugin-comments/latest.svg" alt="NPM Version" />
+  </a>
+  <a href="https://www.npmjs.org/package/strapi-plugin-comments">
+    <img src="https://img.shields.io/npm/dm/strapi-plugin-comments.svg" alt="Monthly download on NPM" />
+  </a>
+</p>
+
 A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provides end to end comments feature with their moderation panel, bad words filtering, abuse reporting and more.
 
 ### ⏳ Installation
