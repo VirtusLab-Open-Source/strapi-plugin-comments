@@ -4,6 +4,7 @@ const _ = require('lodash');
 const { sanitizeEntity } = require('strapi-utils');
 const BadWordsFilter = require('bad-words');
 const PluginError = require('./utils/error');
+const { isEmpty } = require('lodash');
 
 /**
  * comments.js service
@@ -85,8 +86,8 @@ module.exports = {
         };
     },
 
-    // Find comments and create relations tree
-    findAllInHierarchy: async (relation, startingFromId = null, dropBlockedThreads = false) => {
+    // Find comments in the flat structure
+    findAllFlat: async (relation) => {
         const { pluginName, model } = extractMeta(strapi.plugins);
         let criteria = {};
         if (relation) {
@@ -97,7 +98,14 @@ module.exports = {
         }
         const entities = await strapi.query( model.modelName, pluginName)
             .find(criteria, ['authorUser', 'related', 'reports']);
-        return buildNestedStructure(entities.map(_ => filterOurResolvedReports(sanitizeEntity(_, { model }))), startingFromId, 'threadOf', dropBlockedThreads);
+        return entities.map(_ => filterOurResolvedReports(sanitizeEntity(_, { model })));
+    },
+
+    // Find comments and create relations tree structure
+    findAllInHierarchy: async (relation, startingFromId = null, dropBlockedThreads = false) => {
+        const { service } = extractMeta(strapi.plugins);
+        const entities = await service.findAllFlat(relation);
+        return buildNestedStructure(entities, startingFromId, 'threadOf', dropBlockedThreads);
     },
 
     // Find single comment
@@ -196,7 +204,9 @@ module.exports = {
     findOneAndThread: async (id) => {
         const { pluginName, service, model } = extractMeta(strapi.plugins);
         const entity = await strapi.query( model.modelName, pluginName).findOne({ id }, ['threadOf', 'threadOf.reports', 'authorUser', 'related', 'reports']);
-        const entitiesOnSameLevel = await service.findAllInHierarchy(null, entity.threadOf ? entity.threadOf.id : null)
+        const relatedEntity = !_.isEmpty(entity.related) ? _.first(entity.related) : null;
+        const relation = relatedEntity ? `${relatedEntity.__contentType.toLowerCase()}:${relatedEntity.id}` : null;
+        const entitiesOnSameLevel = await service.findAllInHierarchy(relation, entity.threadOf ? entity.threadOf.id : null)
         const selectedEntity = filterOurResolvedReports(sanitizeEntity(entity, { model }));
         return {
             selected: {

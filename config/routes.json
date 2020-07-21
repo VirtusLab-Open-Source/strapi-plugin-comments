@@ -17,6 +17,14 @@
       }
     },
     {
+      "method": "GET",
+      "path": "/:relation/flat",
+      "handler": "comments.findAllFlat",
+      "config": {
+        "policies": []
+      }
+    },
+    {
       "method": "PUT",
       "path": "/:relation/comment/:commentId",
       "handler": "comments.put",
