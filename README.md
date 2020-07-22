@@ -46,7 +46,7 @@ Complete installation requirements are exact same as for Strapi itself and can b
 
 ## Content Type model relation to Comment
 
-To enable Content Type to work with Comments, you've to add following field to your model settings.json attribues:
+To enable Content Type to work with Comments, you've to add following field to your model settings.json attributes:
 
 ```
     "comments": {

@@ -1,11 +1,15 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "Comments",
     "icon": "comments",
     "description": "Comments & audience engagement"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VirtusLab/strapi-plugin-comments"
   },
   "dependencies": {
     "bad-words": "^3.0.3",
@@ -42,5 +46,6 @@
     "node": ">=10.16.0",
     "npm": ">=6.0.0"
   },
+  "keywords": ["strapi", "plugin", "comments"],
   "license": "MIT"
 }
