@@ -4,7 +4,6 @@ const _ = require('lodash');
 const { sanitizeEntity } = require('strapi-utils');
 const BadWordsFilter = require('bad-words');
 const PluginError = require('./utils/error');
-const { isEmpty } = require('lodash');
 
 /**
  * comments.js service
@@ -137,9 +136,10 @@ module.exports = {
         
         if (checkBadWords(content) && singleRelationFulfilled) {
             const { pluginName, model } = extractMeta(strapi.plugins);
+            const relatedEntity = !_.isEmpty(related) ? _.first(related) : null;
             const entity = await strapi.query( model.modelName, pluginName).create({
                 ...data,
-                relatedSlug: `${related.ref}:${related.refId}`,
+                relatedSlug: relatedEntity ? `${relatedEntity.ref}:${relatedEntity.refId}` : relation,
                 related: parsedRelation
             });
             return  sanitizeEntity(entity, { model });
