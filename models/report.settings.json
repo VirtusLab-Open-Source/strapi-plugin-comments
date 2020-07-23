@@ -7,7 +7,7 @@
   "options": {
     "increments": true,
     "timestamps": true,
-    "isDisplayed": false,
+    "isManaged": false,
     "comment": ""
   },
   "attributes": {

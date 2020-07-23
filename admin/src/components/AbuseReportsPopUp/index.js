@@ -17,6 +17,7 @@ import {
   ModalBody,
   ModalForm,
   useGlobalContext,
+  CheckPermissions,
 } from 'strapi-helper-plugin';
 import { Table, Button } from '@buffetjs/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -33,6 +34,7 @@ import pluginId from '../../pluginId';
 
 // Translations
 import en from '../../translations/en.json';
+import pluginPermissions from '../../permissions';
 
 const CustomRow = props => {
   const { row, formatMessage, onClick } = props;
@@ -80,52 +82,54 @@ const AbuseReportsPopUp = ({ isOpen, reports, comment, blocked, blockedThread, o
   }));
   
   return (
-    <Modal isOpen={isOpen} onToggle={onClose}>
-      <HeaderModal>
-        <section>
-          <HeaderModalTitle>
-            <FormattedMessage id={`${pluginId}.popup.reports.header`} />
-          </HeaderModalTitle>
-        </section>
-      </HeaderModal>
-      <ModalForm>
-        <ModalBody>
-          <section style={{ width: '100%' }}>
-            <ItemPreviewContainer>
-              <ItemDetails root={true} {...comment} />
-            </ItemPreviewContainer>
-            { isEmpty(reports) && (
-              <EmptyView>
-                <FontAwesomeIcon icon={faSmile} size="5x" />
-                <FormattedMessage id={`${pluginId}.popup.reports.empty`} />
-              </EmptyView>
-            ) }
-            { !isEmpty(reports) && (<TableContainer>
-                <Table
-                customRow={props => (<CustomRow {...props} formatMessage={formatMessage} onClick={(e) => onAbuseReportResolveClick(e, props.row.id)} />)}
-                headers={headers}
-                rows={rows}
-              />
-            </TableContainer>)}
+    <CheckPermissions permissions={pluginPermissions.moderateReports}>
+      <Modal isOpen={isOpen} onToggle={onClose}>
+        <HeaderModal>
+          <section>
+            <HeaderModalTitle>
+              <FormattedMessage id={`${pluginId}.popup.reports.header`} />
+            </HeaderModalTitle>
           </section>
-        </ModalBody>
-      </ModalForm>
-      { !isEmpty(reports) && !blockedThread && !blocked && (<ModalFooter>
-        <section>
-          <label>
-            <FormattedMessage id={`${pluginId}.popup.reports.footer.actions`} />
-          </label>
-          { !blockedThread && (<ButtonModal
-            onClick={e => onBlockClick(comment.id)}
-            isSecondary
-            message={`${pluginId}.list.item.moderation.button.comment.hide`} />)}
-          <ButtonModal 
-            onClick={e => onBlockThreadClick(comment.id)}
-            isSecondary
-            message={`${pluginId}.list.item.moderation.button.thread.hide`} />
-        </section>
-      </ModalFooter>)}
-    </Modal>
+        </HeaderModal>
+        <ModalForm>
+          <ModalBody>
+            <section style={{ width: '100%' }}>
+              <ItemPreviewContainer>
+                <ItemDetails root={true} {...comment} />
+              </ItemPreviewContainer>
+              { isEmpty(reports) && (
+                <EmptyView>
+                  <FontAwesomeIcon icon={faSmile} size="5x" />
+                  <FormattedMessage id={`${pluginId}.popup.reports.empty`} />
+                </EmptyView>
+              ) }
+              { !isEmpty(reports) && (<TableContainer>
+                  <Table
+                  customRow={props => (<CustomRow {...props} formatMessage={formatMessage} onClick={(e) => onAbuseReportResolveClick(e, props.row.id)} />)}
+                  headers={headers}
+                  rows={rows}
+                />
+              </TableContainer>)}
+            </section>
+          </ModalBody>
+        </ModalForm>
+        { !isEmpty(reports) && !blockedThread && !blocked && (<ModalFooter>
+          <section>
+            <label>
+              <FormattedMessage id={`${pluginId}.popup.reports.footer.actions`} />
+            </label>
+            { !blockedThread && (<ButtonModal
+              onClick={e => onBlockClick(comment.id)}
+              isSecondary
+              message={`${pluginId}.list.item.moderation.button.comment.hide`} />)}
+            <ButtonModal 
+              onClick={e => onBlockThreadClick(comment.id)}
+              isSecondary
+              message={`${pluginId}.list.item.moderation.button.thread.hide`} />
+          </section>
+        </ModalFooter>)}
+      </Modal>
+    </CheckPermissions>
   );
 }
 
