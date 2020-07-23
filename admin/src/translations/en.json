@@ -1,4 +1,5 @@
 {
+    "plugin.name": "Comments",
     "components.Search.placeholder": "Search for an entry...",
     "list.header.title": "Comments",
     "list.header.description": "{count, plural, =0 {All available} one {# new comment} other {# new comments}}",
