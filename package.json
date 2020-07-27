@@ -11,6 +11,9 @@
     "type": "git",
     "url": "https://github.com/VirtusLab/strapi-plugin-comments"
   },
+  "scripts": {
+    "test:unit": "jest --verbose"
+  },
   "dependencies": {
     "bad-words": "^3.0.3",
     "lodash": "^4.17.11",
@@ -28,7 +31,10 @@
     "uuid": "^3.1.0"
   },
   "devDependencies": {
-    "koa": "^2.8.0"
+    "koa": "^2.8.0",
+    "jest": "^26.0.1",
+    "jest-cli": "^26.0.1",
+    "jest-styled-components": "^7.0.2"
   },
   "author": {
     "name": "VirtusLab // Mateusz Ziarko",

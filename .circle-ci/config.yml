@@ -26,17 +26,13 @@ jobs:
             node --version
             yarn --version
       - run:
-          name: Bootstrap
+          name: Install
           command: |
             yarn install
       - run:
           name: Test
           command: |
-            yarn test
-      - run:
-          name: Build
-          command: |
-            yarn build
+            yarn test:unit
       - save_cache:
           paths:
             - ./node_modules
