@@ -2,63 +2,14 @@
 
 const _ = require('lodash');
 const { sanitizeEntity } = require('strapi-utils');
-const BadWordsFilter = require('bad-words');
 const PluginError = require('./utils/error');
+const { isEqualEntity, extractMeta, buildNestedStructure, checkBadWords, filterOurResolvedReports } = require('./utils/functions');
 
 /**
  * comments.js service
  *
  * @description: A set of functions similar to controller's actions to avoid code duplication.
  */
-
-const isEqualEntity = (existing, data) => {
-    const { authorUser, authorId } = existing;
-    if (authorUser) {
-        return authorUser.id === data.authorUser;
-    }
-    return authorId === data.authorId;
-}
-
-const extractMeta = plugins => {
-    const { comments: plugin } = plugins;
-    const { comments: service } = plugin.services;
-    const { comment: model} = plugin.models;
-    return {
-        model,
-        service,
-        plugin,
-        pluginName: plugin.package.strapi.name.toLowerCase()
-    };
-};
-
-const buildNestedStructure = (entities, id = null, field = 'parent', dropBlockedThreads = false, blockNestedThreads = false) =>
-    entities
-        .filter(entity => (entity[field] === id) || (_.isObject(entity[field]) && (entity[field].id === id)))
-        .map(entity => ({ 
-            ...entity, 
-            [field]: undefined, 
-            related: undefined,
-            blockedThread: blockNestedThreads || entity.blockedThread,
-            children: entity.blockedThread && dropBlockedThreads ? [] : buildNestedStructure(entities, entity.id, field, dropBlockedThreads, entity.blockedThread),
-        }));
-
-const checkBadWords = content => {
-    const filter = new BadWordsFilter();
-    if (content && filter.isProfane(content)) {
-        throw new PluginError(400, 'Bad language used! Please polite your comment...', {
-            content: {
-                original: content,
-                filtered: content && filter.clean(content),
-            },
-        });
-    }
-    return content;
-}
-
-const filterOurResolvedReports = item => (item ? {
-    ...item,
-    reports: (item.reports || []).filter(report => !report.resolved),
-} : item);
 
 module.exports = {
     // Find all comments
