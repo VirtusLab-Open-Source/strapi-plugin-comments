@@ -3,6 +3,8 @@ orbs:
   codecov: codecov/codecov@1.1.1
 jobs:
   build-and-test:
+    environment:
+      CODECOV_TOKEN: 02e2d4e8-88c4-4e5d-99da-a9a2888634c6
     docker:
       - image: circleci/node:12.13.0
     working_directory: ~/repo
@@ -33,11 +35,8 @@ jobs:
           name: Test
           command: |
             yarn test:unit
-          environment:
-            CODECOV_TOKEN: 02e2d4e8-88c4-4e5d-99da-a9a2888634c6
       - codecov/upload:
           file: './coverage'
-          flags: unittest
       - save_cache:
           paths:
             - ./node_modules

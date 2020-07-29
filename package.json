@@ -12,7 +12,7 @@
     "url": "https://github.com/VirtusLab/strapi-plugin-comments"
   },
   "scripts": {
-    "test:unit": "jest --verbose && codecov"
+    "test:unit": "jest --verbose && codecov -f unittest"
   },
   "dependencies": {
     "bad-words": "^3.0.3",
