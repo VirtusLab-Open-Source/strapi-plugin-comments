@@ -38,8 +38,6 @@ jobs:
       - codecov/upload:
           file: './coverage'
           flags: unittest
-          environment:
-            CODECOV_TOKEN: 02e2d4e8-88c4-4e5d-99da-a9a2888634c6
       - save_cache:
           paths:
             - ./node_modules
