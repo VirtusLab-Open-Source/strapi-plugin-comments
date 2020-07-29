@@ -36,7 +36,7 @@ jobs:
           command: |
             yarn test:unit
       - codecov/upload:
-          flag: unittest
+          flags: unittest
           file:
       - save_cache:
           paths:
