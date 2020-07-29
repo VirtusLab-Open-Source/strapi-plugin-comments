@@ -36,7 +36,8 @@ jobs:
           command: |
             yarn test:unit
       - codecov/upload:
-          file: './coverage'
+          flag: unittest
+          file:
       - save_cache:
           paths:
             - ./node_modules
