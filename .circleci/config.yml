@@ -5,8 +5,6 @@ jobs:
   build-and-test:
     docker:
       - image: circleci/node:12.13.0
-    environment:
-      CODECOV_TOKEN: 02e2d4e8-88c4-4e5d-99da-a9a2888634c6
     working_directory: ~/repo
     steps:
       - checkout
@@ -35,9 +33,13 @@ jobs:
           name: Test
           command: |
             yarn test:unit
+          environment:
+            CODECOV_TOKEN: 02e2d4e8-88c4-4e5d-99da-a9a2888634c6
       - codecov/upload:
           file: './coverage'
           flags: unittest
+          environment:
+            CODECOV_TOKEN: 02e2d4e8-88c4-4e5d-99da-a9a2888634c6
       - save_cache:
           paths:
             - ./node_modules
