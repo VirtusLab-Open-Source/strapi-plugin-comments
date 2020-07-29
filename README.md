@@ -7,6 +7,12 @@
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
     <img src="https://img.shields.io/npm/dm/strapi-plugin-comments.svg" alt="Monthly download on NPM" />
   </a>
+  <a href="https://circleci.com/gh/VirtusLab/strapi-plugin-comments">
+    <img src="https://circleci.com/gh/VirtusLab/strapi-plugin-comments.svg?style=shield" alt="CircleCI" />
+  </a>
+  <a href="https://codecov.io/gh/VirtusLab/strapi-plugin-comments">
+    <img src="https://codecov.io/gh/VirtusLab/strapi-plugin-comments/coverage.svg?branch=master" alt="codecov.io" />
+  </a>
 </p>
 
 A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provides end to end comments feature with their moderation panel, bad words filtering, abuse reporting and more.
@@ -46,7 +52,7 @@ Complete installation requirements are exact same as for Strapi itself and can b
 
 ## Content Type model relation to Comment
 
-To enable Content Type to work with Comments, you've to add following field to your model settings.json attributes:
+To enable Content Type to work with Comments, you've to add following field to your model `*.settings.json`:
 
 ```
     "comments": {
@@ -54,6 +60,20 @@ To enable Content Type to work with Comments, you've to add following field to y
       "collection": "comment",
       "via": "related"
     }
+```
+
+inside the `attributes` section like in example below:
+
+```
+    "attributes": {
+        ...,
+        "comments": {
+            "plugin": "comments",
+            "collection": "comment",
+            "via": "related"
+        },
+        ...
+    },
 ```
 
 ## Public API Comment model

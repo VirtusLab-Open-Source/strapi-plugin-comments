@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  codecov: codecov/codecov@1.1.1
 jobs:
   build-and-test:
     docker:
@@ -31,6 +33,8 @@ jobs:
           name: Test
           command: |
             yarn test:unit
+      - codecov/upload:
+          file: './coverage'
       - save_cache:
           paths:
             - ./node_modules
