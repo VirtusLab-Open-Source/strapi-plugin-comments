@@ -1,9 +1,8 @@
 'use strict';
 
-const _ = require('lodash');
-const { sanitizeEntity } = require('strapi-utils');
+const { first, isEmpty, isNil } = require('lodash');
 const PluginError = require('./utils/error');
-const { isEqualEntity, extractMeta, buildNestedStructure, checkBadWords, filterOurResolvedReports } = require('./utils/functions');
+const { isEqualEntity, extractMeta, buildNestedStructure, checkBadWords, filterOurResolvedReports, convertContentTypeNameToSlug } = require('./utils/functions');
 
 /**
  * comments.js service
@@ -12,10 +11,11 @@ const { isEqualEntity, extractMeta, buildNestedStructure, checkBadWords, filterO
  */
 
 module.exports = {
+
     // Find all comments
     findAll: async (query) => {
         const { pluginName, model } = extractMeta(strapi.plugins);
-        const paginationEnabled = !_.isNil(query._start);
+        const paginationEnabled = !isNil(query._start);
         const params = {
             ...query,
             _sort: paginationEnabled ? query._sort || 'created_at:desc' : undefined
@@ -23,7 +23,7 @@ module.exports = {
         const entities = query._q ? 
             await strapi.query( model.modelName, pluginName).search(params, ['authorUser', 'related', 'reports']) :
             await strapi.query( model.modelName, pluginName).find(params, ['authorUser', 'related', 'reports']);
-        const items = entities.map(_ => filterOurResolvedReports(sanitizeEntity(_, { model })));
+        const items = entities.map(_ => filterOurResolvedReports(_));
         const total = paginationEnabled ?
             query._q ?
                 await strapi.query( model.modelName, pluginName).countSearch(params) : 
@@ -48,7 +48,7 @@ module.exports = {
         }
         const entities = await strapi.query( model.modelName, pluginName)
             .find(criteria, ['authorUser', 'related', 'reports']);
-        return entities.map(_ => filterOurResolvedReports(sanitizeEntity(_, { model })));
+        return entities.map(_ => filterOurResolvedReports(_));
     },
 
     // Find comments and create relations tree structure
@@ -70,7 +70,7 @@ module.exports = {
         }
         const entity = await strapi.query( model.modelName, pluginName)
             .findOne(criteria, ['related', 'reports']);
-        return filterOurResolvedReports(sanitizeEntity(entity, { model }));
+        return filterOurResolvedReports(entity);
     },
 
     // Create a comment
@@ -79,7 +79,7 @@ module.exports = {
         const { service, model } = extractMeta(strapi.plugins);
         const parsedRelation = related && related instanceof Array ? related : [related];
         const singleRelationFulfilled = related && (parsedRelation.length === 1);
-        const linkToThread = data.threadOf ? !!sanitizeEntity(await service.findOne(data.threadOf, relation), { model }) : true;
+        const linkToThread = data.threadOf ? !!await service.findOne(data.threadOf, relation) : true;
         
         if (!linkToThread) {
             throw new PluginError(400, 'Thread is not existing');
@@ -87,13 +87,13 @@ module.exports = {
         
         if (checkBadWords(content) && singleRelationFulfilled) {
             const { pluginName, model } = extractMeta(strapi.plugins);
-            const relatedEntity = !_.isEmpty(related) ? _.first(related) : null;
+            const relatedEntity = !isEmpty(related) ? first(related) : null;
             const entity = await strapi.query( model.modelName, pluginName).create({
                 ...data,
                 relatedSlug: relatedEntity ? `${relatedEntity.ref}:${relatedEntity.refId}` : relation,
                 related: parsedRelation
             });
-            return  sanitizeEntity(entity, { model });
+            return entity;
         }
         throw new PluginError(400, 'No content received.');
     },
@@ -102,14 +102,14 @@ module.exports = {
     update: async (id, relation, data) => {
         const { content } = data;
         const { pluginName, service, model } = extractMeta(strapi.plugins);
-        const existingEntity = sanitizeEntity(await service.findOne(id, relation), { model });
+        const existingEntity = await service.findOne(id, relation);
         if (isEqualEntity(existingEntity, data) && content) {
             if (checkBadWords(content)) {
                 const entity = await strapi.query( model.modelName, pluginName).update(
                     { id },
                     { content }
                 );
-                return sanitizeEntity(entity, { model }) ;
+                return entity;
             }
         }
         throw new PluginError(409, 'Action on that entity is not allowed');
@@ -118,7 +118,7 @@ module.exports = {
     // Points up for comment
     pointsUp: async (id, relation) => {
         const { pluginName, service, model } = extractMeta(strapi.plugins);
-        const existingEntity = sanitizeEntity(await service.findOne(id, relation), { model });
+        const existingEntity = await service.findOne(id, relation);
         if (existingEntity) {
             const entity = await strapi.query( model.modelName, pluginName).update(
                 { id },
@@ -126,7 +126,7 @@ module.exports = {
                     points: (existingEntity.points || 0) + 1,
                 }
             );
-            return sanitizeEntity(entity, { model }) ;
+            return entity;
         }
         throw new PluginError(409, 'Action on that entity is not allowed');
     },
@@ -135,14 +135,14 @@ module.exports = {
     reportAbuse: async (id, relation, payload) => {
         const { pluginName, plugin, model, service  } = extractMeta(strapi.plugins);
         const { report: reportModel } = plugin.models;
-        const existingEntity = sanitizeEntity(await service.findOne(id, relation), { model }); 
+        const existingEntity = await service.findOne(id, relation); 
         if (existingEntity) {
             const entity = await strapi.query(reportModel.modelName, pluginName).create({
                 ...payload,
                 resolved: false,
                 related: id,
             });
-            return sanitizeEntity(entity, { model: reportModel }) ;
+            return entity;
         }
         throw new PluginError(409, 'Action on that entity is not allowed');
     },
@@ -155,16 +155,16 @@ module.exports = {
     findOneAndThread: async (id) => {
         const { pluginName, service, model } = extractMeta(strapi.plugins);
         const entity = await strapi.query( model.modelName, pluginName).findOne({ id }, ['threadOf', 'threadOf.reports', 'authorUser', 'related', 'reports']);
-        const relatedEntity = !_.isEmpty(entity.related) ? _.first(entity.related) : null;
-        const relation = relatedEntity ? `${relatedEntity.__contentType.toLowerCase()}:${relatedEntity.id}` : null;
+        const relatedEntity = !isEmpty(entity.related) ? first(entity.related) : null;
+        const relation = relatedEntity ? `${convertContentTypeNameToSlug(relatedEntity.__contentType).toLowerCase()}:${relatedEntity.id}` : null;
         const entitiesOnSameLevel = await service.findAllInHierarchy(relation, entity.threadOf ? entity.threadOf.id : null)
-        const selectedEntity = filterOurResolvedReports(sanitizeEntity(entity, { model }));
+        const selectedEntity = filterOurResolvedReports(entity);
         return {
             selected: {
                 ...selectedEntity,
                 threadOf: selectedEntity.threadOf ? filterOurResolvedReports(selectedEntity.threadOf) : null,
             },
-            level: entitiesOnSameLevel.map(_ => filterOurResolvedReports(sanitizeEntity(_, { model })))
+            level: entitiesOnSameLevel.map(_ => filterOurResolvedReports(_))
         };
     },
 
@@ -176,7 +176,7 @@ module.exports = {
             { id },
             { blocked: !existingEntity.blocked }
         );
-        return sanitizeEntity(changedEntity, { model });
+        return changedEntity;
     },
 
     // Block / Unblock a comment thread
@@ -188,7 +188,7 @@ module.exports = {
             { blockedThread: !existingEntity.blockedThread }
         );
         await service.blockCommentThreadNested(id, !existingEntity.blockedThread)
-        return sanitizeEntity(changedEntity, { model });
+        return changedEntity;
     },
 
     blockCommentThreadNested: async (id, blockStatus) => {
@@ -222,6 +222,6 @@ module.exports = {
         }, {
             resolved: true,
         });
-        return sanitizeEntity(entity, { model: reportModel }) ;
+        return entity;
     },
 };

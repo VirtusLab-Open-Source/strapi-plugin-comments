@@ -6,10 +6,14 @@ import { faLink } from '@fortawesome/free-solid-svg-icons';
 import CardItemRelation from './CardItemRelation';
 import CardItemAuthor from './CardItemAuthor';
 import Wrapper from './Wrapper';
-import { isNil } from 'lodash';
+import { first, isNil, upperFirst } from 'lodash';
 
 const ENTITY_NAME_PARAMS = ['title', 'Title', 'subject', 'Subject', 'name', 'Name'];
 const resolveEntityName = entity => ENTITY_NAME_PARAMS.map(_ => entity[_]).filter(_ => _)[0] || '';
+const humanizePascalCase = str => {
+  const plainConversion = str.replace(/[A-Z]/g, letter => ` ${letter.toLowerCase()}`);
+  return upperFirst(first(plainConversion) === ' ' ? plainConversion.slice(1, plainConversion.length) : plainConversion);
+};
 
 const ItemFooter = ({ authorName, authorUser, related, created_at, isDetailedView }) => {
   const formatAuthor = () => {
@@ -23,7 +27,7 @@ const ItemFooter = ({ authorName, authorUser, related, created_at, isDetailedVie
     return moment(created_at).format("DD/MM/YYYY, HH:mm:ss");
   }
 
-  const formatRelationType = () => !isNil(related) ? related.__contentType : '';
+  const formatRelationType = () => !isNil(related) ? humanizePascalCase(related.__contentType) : '';
 
   const formatRelationName = () => !isNil(related) ? resolveEntityName(related) : '';
 

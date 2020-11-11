@@ -1,6 +1,17 @@
-const _ = require('lodash');
 const BadWordsFilter = require('bad-words');
 const PluginError = require('./error');
+const { first, isObject } = require('lodash');
+
+const buildNestedStructure = (entities, id = null, field = 'parent', dropBlockedThreads = false, blockNestedThreads = false) =>
+    entities
+        .filter(entity => (entity[field] === id) || (isObject(entity[field]) && (entity[field].id === id)))
+        .map(entity => ({ 
+            ...entity, 
+            [field]: undefined, 
+            related: undefined,
+            blockedThread: blockNestedThreads || entity.blockedThread,
+            children: entity.blockedThread && dropBlockedThreads ? [] : buildNestedStructure(entities, entity.id, field, dropBlockedThreads, entity.blockedThread),
+        }));
 
 module.exports = {
     isEqualEntity: (existing, data) => {
@@ -23,17 +34,6 @@ module.exports = {
         };
     },
 
-    buildNestedStructure: (entities, id = null, field = 'parent', dropBlockedThreads = false, blockNestedThreads = false) =>
-        entities
-            .filter(entity => (entity[field] === id) || (_.isObject(entity[field]) && (entity[field].id === id)))
-            .map(entity => ({ 
-                ...entity, 
-                [field]: undefined, 
-                related: undefined,
-                blockedThread: blockNestedThreads || entity.blockedThread,
-                children: entity.blockedThread && dropBlockedThreads ? [] : buildNestedStructure(entities, entity.id, field, dropBlockedThreads, entity.blockedThread),
-            })),
-
     filterOurResolvedReports: item => (item ? {
         ...item,
         reports: (item.reports || []).filter(report => !report.resolved),
@@ -50,5 +50,11 @@ module.exports = {
             });
         }
         return content;
-    }
+    },
+    convertContentTypeNameToSlug: str => {
+        const plainConversion = str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+        return first(plainConversion) === '-' ? plainConversion.slice(1, plainConversion.length) : plainConversion;
+    },
+
+    buildNestedStructure,
 };
