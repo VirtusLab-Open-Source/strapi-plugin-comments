@@ -1,6 +1,7 @@
 'use strict';
 
 const { first, isEmpty, isNil } = require('lodash');
+const { sanitizeEntity } = require('strapi-utils');
 const PluginError = require('./utils/error');
 const { isEqualEntity, extractMeta, buildNestedStructure, checkBadWords, filterOurResolvedReports, convertContentTypeNameToSlug } = require('./utils/functions');
 
@@ -14,7 +15,7 @@ module.exports = {
 
     // Find all comments
     findAll: async (query) => {
-        const { pluginName, model } = extractMeta(strapi.plugins);
+        const { pluginName, model, service} = extractMeta(strapi.plugins);
         const paginationEnabled = !isNil(query._start);
         const params = {
             ...query,
@@ -23,7 +24,7 @@ module.exports = {
         const entities = query._q ? 
             await strapi.query( model.modelName, pluginName).search(params, ['authorUser', 'related', 'reports']) :
             await strapi.query( model.modelName, pluginName).find(params, ['authorUser', 'related', 'reports']);
-        const items = entities.map(_ => filterOurResolvedReports(_));
+        const items = entities.map(_ => filterOurResolvedReports(service.sanitizeCommentEntity(_)));
         const total = paginationEnabled ?
             query._q ?
                 await strapi.query( model.modelName, pluginName).countSearch(params) : 
@@ -38,7 +39,7 @@ module.exports = {
 
     // Find comments in the flat structure
     findAllFlat: async (relation) => {
-        const { pluginName, model } = extractMeta(strapi.plugins);
+        const { pluginName, model, service } = extractMeta(strapi.plugins);
         let criteria = {};
         if (relation) {
             criteria = {
@@ -48,7 +49,7 @@ module.exports = {
         }
         const entities = await strapi.query( model.modelName, pluginName)
             .find(criteria, ['authorUser', 'related', 'reports']);
-        return entities.map(_ => filterOurResolvedReports(_));
+        return entities.map(_ => filterOurResolvedReports(service.sanitizeCommentEntity(_)));
     },
 
     // Find comments and create relations tree structure
@@ -60,7 +61,7 @@ module.exports = {
 
     // Find single comment
     findOne: async (id, relation) => {
-        const { pluginName, model } = extractMeta(strapi.plugins);
+        const { pluginName, model, service } = extractMeta(strapi.plugins);
         let criteria = { id };
         if (relation) {
             criteria = {
@@ -70,13 +71,13 @@ module.exports = {
         }
         const entity = await strapi.query( model.modelName, pluginName)
             .findOne(criteria, ['related', 'reports']);
-        return filterOurResolvedReports(entity);
+        return filterOurResolvedReports(service.sanitizeCommentEntity(entity));
     },
 
     // Create a comment
     create: async (data, relation) => {
         const { content, related } = data;
-        const { service, model } = extractMeta(strapi.plugins);
+        const { service } = extractMeta(strapi.plugins);
         const parsedRelation = related && related instanceof Array ? related : [related];
         const singleRelationFulfilled = related && (parsedRelation.length === 1);
         const linkToThread = data.threadOf ? !!await service.findOne(data.threadOf, relation) : true;
@@ -93,7 +94,7 @@ module.exports = {
                 relatedSlug: relatedEntity ? `${relatedEntity.ref}:${relatedEntity.refId}` : relation,
                 related: parsedRelation
             });
-            return entity;
+            return service.sanitizeCommentEntity(entity);
         }
         throw new PluginError(400, 'No content received.');
     },
@@ -109,7 +110,7 @@ module.exports = {
                     { id },
                     { content }
                 );
-                return entity;
+                return service.sanitizeCommentEntity(entity);
             }
         }
         throw new PluginError(409, 'Action on that entity is not allowed');
@@ -126,7 +127,7 @@ module.exports = {
                     points: (existingEntity.points || 0) + 1,
                 }
             );
-            return entity;
+            return service.sanitizeCommentEntity(entity);
         }
         throw new PluginError(409, 'Action on that entity is not allowed');
     },
@@ -158,7 +159,7 @@ module.exports = {
         const relatedEntity = !isEmpty(entity.related) ? first(entity.related) : null;
         const relation = relatedEntity ? `${convertContentTypeNameToSlug(relatedEntity.__contentType).toLowerCase()}:${relatedEntity.id}` : null;
         const entitiesOnSameLevel = await service.findAllInHierarchy(relation, entity.threadOf ? entity.threadOf.id : null)
-        const selectedEntity = filterOurResolvedReports(entity);
+        const selectedEntity = filterOurResolvedReports(service.sanitizeCommentEntity(entity));
         return {
             selected: {
                 ...selectedEntity,
@@ -176,7 +177,7 @@ module.exports = {
             { id },
             { blocked: !existingEntity.blocked }
         );
-        return changedEntity;
+        return service.sanitizeCommentEntity(changedEntity);
     },
 
     // Block / Unblock a comment thread
@@ -188,7 +189,7 @@ module.exports = {
             { blockedThread: !existingEntity.blockedThread }
         );
         await service.blockCommentThreadNested(id, !existingEntity.blockedThread)
-        return changedEntity;
+        return service.sanitizeCommentEntity(changedEntity);
     },
 
     blockCommentThreadNested: async (id, blockStatus) => {
@@ -224,4 +225,9 @@ module.exports = {
         });
         return entity;
     },
+
+    sanitizeCommentEntity: (entity) => ({
+        ...entity,
+        authorUser: sanitizeEntity(entity.authorUser, { model: strapi.plugins['users-permissions'].models.user }),
+    }),
 };
