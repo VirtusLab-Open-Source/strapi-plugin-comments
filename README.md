@@ -27,6 +27,19 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 yarn add strapi-plugin-comments@latest
 ```
 
+After successful installation you've to build a fresh package that includes  plugin UI. To archive that simply use:
+
+```bash
+yarn build
+yarn develop
+```
+
+or just run Strapi in the development mode with `--watch-admin` option:
+
+```bash
+yarn develop --watch-admin
+```
+
 The **Comments** plugin should appear in the **Plugins** section of Strapi sidebar after you run app again.
 
 Enjoy 🎉
@@ -37,7 +50,7 @@ Complete installation requirements are exact same as for Strapi itself and can b
 
 **Supported Strapi versions**:
 
-- Strapi v3.1.4 (recently tested)
+- Strapi v3.3.4 (recently tested)
 - Strapi v3.x
 
 (This plugin may work with the older Strapi versions, but these are not tested nor officially supported at this time.)
