@@ -8,7 +8,7 @@
 
  const parseParams = params => Object.keys(params).reduce((prev, curr) => {
    const value = params[curr];
-   const parsedValue = isNaN(parseInt(params[curr], 10)) ? value : parseInt(params[curr], 10);
+   const parsedValue = isNaN(value) ? value : parseInt(value, 10);
    return {
     ...prev,
     [curr]: parsedValue,
