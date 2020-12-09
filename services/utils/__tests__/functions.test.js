@@ -1,6 +1,34 @@
-const functionsUtils = require('../functions');
 const PluginError = require('../error');
-const { extractMeta } = require('../functions');
+const { checkBadWords, extractMeta, isValidUserContext, resolveUserContextError } = require('../functions');
+
+beforeEach(() => {
+  Object.defineProperty(global, 'strapi', {
+    value: {
+      plugins: {
+        comments: {
+          package: require('../../../package.json'),
+          services: {
+            comments: require('../../comments'),
+          },
+          models: {
+            comment: require('../../../models/comment.settings.json'),
+            report: require('../../../models/report.settings.json'),
+          }
+        }
+      },
+      config: {
+        custom: {
+          plugins: {
+            comments: {
+              enableUsers: false,
+            }
+          }
+        }
+      }
+    },
+    writable: true,
+  });
+})
 
 describe('Test Comments service functions utils', () => {
   
@@ -10,7 +38,7 @@ describe('Test Comments service functions utils', () => {
     test('Should find bad words usage and throw error PluginError', () => {
       expect.assertions(6);
       try {
-        functionsUtils.checkBadWords(text);
+        checkBadWords(text);
       } catch (e) {
         expect(e).toBeInstanceOf(PluginError);
         expect(e).toHaveProperty('status', 400);
@@ -28,21 +56,6 @@ describe('Test Comments service functions utils', () => {
   });
 
   describe('Extracting metadata', () => {
-    global.strapi = {
-      plugins: {
-        comments: {
-          package: require('../../../package.json'),
-          services: {
-            comments: require('../../comments'),
-          },
-          models: {
-            comment: require('../../../models/comment.settings.json'),
-            report: require('../../../models/report.settings.json'),
-          }
-        }
-      }
-    };
-
     test('Should extract plugin metadata properly', () => {
       const { model, service, plugin, pluginName } = extractMeta(strapi.plugins);
 
@@ -50,6 +63,40 @@ describe('Test Comments service functions utils', () => {
       expect(service).toHaveProperty('findAll');
       expect(Object.keys(plugin)).toEqual(expect.arrayContaining(['package', 'services', 'models']));
       expect(pluginName).toBe('comments');
+    });
+  });
+
+  describe('Validating user context', () => {
+    test('Context should be skipped based on config', () => {
+      global.strapi.config.custom.plugins.comments.enableUsers = false;
+      expect(isValidUserContext(undefined)).toEqual(true);
+      expect(isValidUserContext({ id: 1 })).toEqual(true);
+    });
+
+    test('Context should be verified based on input', () => {
+      global.strapi.config.custom.plugins.comments.enableUsers = true;
+      expect(isValidUserContext(undefined)).toEqual(false);
+      expect(isValidUserContext({ id: 1 })).toEqual(true);
+    });
+  });
+
+  describe('Resolve user context error', () => {
+    test('Should throw 401', () => {
+      try {
+        resolveUserContextError({ id: 1 });
+      } catch (e) {
+        expect(e).toBeInstanceOf(PluginError);
+        expect(e).toHaveProperty('status', 401);
+      }
+    });
+
+    test('Should throw 403', () => {
+      try {
+        resolveUserContextError();
+      } catch (e) {
+        expect(e).toBeInstanceOf(PluginError);
+        expect(e).toHaveProperty('status', 403);
+      }
     });
   });
 });

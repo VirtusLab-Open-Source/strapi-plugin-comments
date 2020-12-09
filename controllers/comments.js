@@ -1,21 +1,12 @@
 'use strict';
 
+const { parseParams, throwError } = require('./utils/functions');
+
 /**
  * comments.js controller
  *
  * @description: A set of functions called "actions" of the `comments` plugin.
  */
-
- const parseParams = params => Object.keys(params).reduce((prev, curr) => {
-   const value = params[curr];
-   const parsedValue = isNaN(value) ? value : parseInt(value, 10);
-   return {
-    ...prev,
-    [curr]: parsedValue,
-  };
- }, {});
-
-const throwError = (ctx, e) => ctx.throw(e.status, e.getData ? e.getData() : e.message);
 
 module.exports = {
 
@@ -55,11 +46,12 @@ module.exports = {
   },
 
   post: async (ctx) => {
-    const { params = {} } = ctx;
+    const { request, state, params = {} } = ctx;
+    const { user } = state;
     const { relation } = parseParams(params);
-    const { body = {} }  = ctx.request;
+    const { body = {} }  = request;
     try {
-      const entity = await strapi.plugins.comments.services.comments.create(body, relation);
+      const entity = await strapi.plugins.comments.services.comments.create(body, relation, user);
 
       if (entity) {
         return entity;
@@ -71,11 +63,12 @@ module.exports = {
   }, 
 
   put: async (ctx) => {
-    const { request, params = {} } = ctx;
+    const { request, state, params = {} } = ctx;
     const { body = {} }  = request;
+    const { user } = state;
     const { relation, commentId } = parseParams(params);
     try {
-      return await strapi.plugins.comments.services.comments.update(commentId, relation, body);
+      return await strapi.plugins.comments.services.comments.update(commentId, relation, body, user);
     }
     catch (e) {
       throwError(ctx, e);
@@ -83,10 +76,11 @@ module.exports = {
   }, 
 
   pointsUp: async (ctx) => {
-    const { params = {} } = ctx;
+    const { state, params = {} } = ctx;
+    const { user } = state;
     const { relation, commentId } = parseParams(params);
     try {
-      return await strapi.plugins.comments.services.comments.pointsUp(commentId, relation);
+      return await strapi.plugins.comments.services.comments.pointsUp(commentId, relation, user);
     }
     catch (e) {
       throwError(ctx, e);
@@ -94,11 +88,12 @@ module.exports = {
   },
   
   reportAbuse: async (ctx) => {
-    const { request, params = {} } = ctx;
+    const { request, state, params = {} } = ctx;
     const { body = {} }  = request;
+    const { user } = state;
     const { relation, commentId } = parseParams(params);
     try {
-      return await strapi.plugins.comments.services.comments.reportAbuse(commentId, relation, body);
+      return await strapi.plugins.comments.services.comments.reportAbuse(commentId, relation, body, user);
     }
     catch (e) {
       throwError(ctx, e);

@@ -1,6 +1,6 @@
 const BadWordsFilter = require('bad-words');
 const PluginError = require('./error');
-const { first, get, isObject } = require('lodash');
+const { first, get, isObject, isNil } = require('lodash');
 
 const buildNestedStructure = (entities, id = null, field = 'parent', dropBlockedThreads = false, blockNestedThreads = false) =>
     entities
@@ -14,11 +14,12 @@ const buildNestedStructure = (entities, id = null, field = 'parent', dropBlocked
         }));
 
 module.exports = {
-    isEqualEntity: (existing, data) => {
+    isEqualEntity: (existing, data, user) => {
         const { authorUser, authorId } = existing;
         if (authorUser) {
-            const userId = get(authorUser, 'id', authorUser);
-            return userId === data.authorUser;
+            const existingUserId = get(authorUser, 'id', authorUser);
+            const receivedUserId = get(user, 'id', data.authorUser);
+            return existingUserId === receivedUserId;
         }
         return authorId === data.authorId;
     },
@@ -58,4 +59,17 @@ module.exports = {
     },
 
     buildNestedStructure,
+
+    isValidUserContext: (user = {}) => {
+        const builtInContextEnabled = get(strapi.config, 'custom.plugins.comments.enableUsers', false);
+        return builtInContextEnabled ? !isNil(user.id) : true;
+    },
+
+    resolveUserContextError: user => {
+        if (user) {
+            throw new PluginError(401, 'Not authenticated');
+        } else {
+            throw new PluginError(403, 'Not authorized');
+        }
+    },
 };
