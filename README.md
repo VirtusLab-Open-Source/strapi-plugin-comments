@@ -92,6 +92,22 @@ inside the `attributes` section like in example below:
     },
 ```
 
+## Configuration
+To setup amend default plugin configuration we recommend to put following snippet as part of `config/custom.js` or `config/<env>/custom.js` file. If you've got already configurations for other plugins stores by this way, use just the `navigation` part within exising `plugins` item.
+
+```
+    ...
+    plugins: {
+      comments: {
+        enableUsers: true,
+      },
+    },
+    ...
+```
+
+### Properties
+- `enableUsers` - Enabled support for built-in Strapi users, if endpoints are exposed with usage of `Authenticated` policy or JWT tokens are in use by the Client App. Default value: `false`.
+
 ## Public API Comment model
 
 ### Generic (non Strapi User)
@@ -225,7 +241,7 @@ Posts a Comment related to specified instance of Content Type like for example `
 *Strapi user*
 ```
 {
-	"authorUser": 1,
+	"authorUser": 1, // id of a author user. Optional in case of 'enableUsers: true' in the plugin configuration
 	"content": "My sample response",
 	"threadOf": 2, // id of comment we would like to start / continue the thread (Optional)
 	"related": [{
@@ -271,7 +287,7 @@ Updates a specified Comment content based on it `commentId` and related to speci
 *Strapi user*
 ```
 {
-	"authorUser": 1,
+	"authorUser": 1, // id of a author user. Optional in case of 'enableUsers: true' in the plugin configuration
 	"content": "My sample response"
 }
 ```

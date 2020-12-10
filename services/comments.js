@@ -3,7 +3,7 @@
 const { first, isEmpty, isNil } = require('lodash');
 const { sanitizeEntity } = require('strapi-utils');
 const PluginError = require('./utils/error');
-const { isEqualEntity, extractMeta, buildNestedStructure, checkBadWords, filterOurResolvedReports, convertContentTypeNameToSlug } = require('./utils/functions');
+const { isEqualEntity, extractMeta, buildNestedStructure, checkBadWords, filterOurResolvedReports, convertContentTypeNameToSlug, isValidUserContext, resolveUserContextError } = require('./utils/functions');
 
 /**
  * comments.js service
@@ -75,36 +75,66 @@ module.exports = {
     },
 
     // Create a comment
-    create: async (data, relation) => {
+    create: async (data, relation, user = undefined) => {
         const { content, related } = data;
         const { service } = extractMeta(strapi.plugins);
         const parsedRelation = related && related instanceof Array ? related : [related];
         const singleRelationFulfilled = related && (parsedRelation.length === 1);
-        const linkToThread = data.threadOf ? !!await service.findOne(data.threadOf, relation) : true;
+        const linkToThread = !isNil(data.threadOf) ? !!await service.findOne(data.threadOf, relation) : true;
+        const validContext = isValidUserContext(user);
         
         if (!linkToThread) {
-            throw new PluginError(400, 'Thread is not existing');
+            throw new PluginError(400, 'Thread does not exist');
+        }
+
+        if (!validContext) {
+            throw resolveUserContextError(user);
         }
         
         if (checkBadWords(content) && singleRelationFulfilled) {
             const { pluginName, model } = extractMeta(strapi.plugins);
             const relatedEntity = !isEmpty(related) ? first(related) : null;
+            const { authorId, authorEmail, authorName, authorUser, ...rest } = data;
+            let authorData = {};
+            if (validContext && user) {
+                authorData = {
+                    authorUser: user && user.id ? user.id : authorUser,
+                };
+            } else if (authorUser) {
+                authorData = {
+                    authorUser,
+                };
+            } else {
+                authorData = {
+                    authorId,
+                    authorEmail,
+                    authorEmail,
+                };
+            }
+
             const entity = await strapi.query( model.modelName, pluginName).create({
-                ...data,
+                ...rest,
+                ...authorData,
                 relatedSlug: relatedEntity ? `${relatedEntity.ref}:${relatedEntity.refId}` : relation,
                 related: parsedRelation
             });
             return service.sanitizeCommentEntity(entity);
         }
-        throw new PluginError(400, 'No content received.');
+        throw new PluginError(400, 'No content received');
     },
 
     // Update a comment
-    update: async (id, relation, data) => {
+    update: async (id, relation, data, user) => {
         const { content } = data;
         const { pluginName, service, model } = extractMeta(strapi.plugins);
         const existingEntity = await service.findOne(id, relation);
-        if (isEqualEntity(existingEntity, data) && content) {
+        const validContext = isValidUserContext(user);
+
+        if (!validContext) {
+            throw resolveUserContextError(user);
+        }
+
+        if (isEqualEntity(existingEntity, data, user) && content) {
             if (checkBadWords(content)) {
                 const entity = await strapi.query( model.modelName, pluginName).update(
                     { id },
@@ -117,7 +147,11 @@ module.exports = {
     },
 
     // Points up for comment
-    pointsUp: async (id, relation) => {
+    pointsUp: async (id, relation, user) => {
+        if (!isValidUserContext(user)) {
+            throw resolveUserContextError(user);
+        }
+
         const { pluginName, service, model } = extractMeta(strapi.plugins);
         const existingEntity = await service.findOne(id, relation);
         if (existingEntity) {
@@ -133,8 +167,11 @@ module.exports = {
     },
 
     // Report abuse in comment
-    reportAbuse: async (id, relation, payload) => {
-        const { pluginName, plugin, model, service  } = extractMeta(strapi.plugins);
+    reportAbuse: async (id, relation, payload, user) => {
+        if (!isValidUserContext(user)) {
+            throw resolveUserContextError(user);
+        }
+        const { pluginName, plugin, service  } = extractMeta(strapi.plugins);
         const { report: reportModel } = plugin.models;
         const existingEntity = await service.findOne(id, relation); 
         if (existingEntity) {
