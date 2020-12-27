@@ -1,3 +1,4 @@
+const PluginError = require('../../services/utils/error');
 
 module.exports = {
     parseParams: params => Object.keys(params).reduce((prev, curr) => {
@@ -8,6 +9,11 @@ module.exports = {
          [curr]: parsedValue,
        };
       }, {}),
-     
-     throwError: (ctx, e) => ctx.throw(e.status, JSON.stringify(e)),
+
+  throwError: (ctx, e) => {
+    if (e instanceof PluginError){
+      return ctx.throw(e.status, JSON.stringify(e));
+    }
+    throw e;
+  },
 };
