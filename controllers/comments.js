@@ -60,7 +60,7 @@ module.exports = {
     catch (e) {
       throwError(ctx, e);
     }
-  }, 
+  },
 
   put: async (ctx) => {
     const { request, state, params = {} } = ctx;
@@ -73,7 +73,7 @@ module.exports = {
     catch (e) {
       throwError(ctx, e);
     }
-  }, 
+  },
 
   pointsUp: async (ctx) => {
     const { state, params = {} } = ctx;
@@ -86,10 +86,13 @@ module.exports = {
       throwError(ctx, e);
     }
   },
-  
+
   reportAbuse: async (ctx) => {
     const { request, state, params = {} } = ctx;
     const { body = {} }  = request;
+    if (!body.content){
+      return  ctx.badRequest(null, 'Content field is required');
+    }
     const { user } = state;
     const { relation, commentId } = parseParams(params);
     try {
@@ -98,7 +101,7 @@ module.exports = {
     catch (e) {
       throwError(ctx, e);
     }
-  }, 
+  },
 
   //
   // Moderation
@@ -136,7 +139,7 @@ module.exports = {
       throwError(ctx, e);
     }
   },
-  
+
   resolveAbuseReport: async (ctx) => {
     const { params = {} } = ctx;
     const { id, commentId } = parseParams(params);
@@ -146,5 +149,5 @@ module.exports = {
     catch (e) {
       throwError(ctx, e);
     }
-  }, 
+  },
 };
