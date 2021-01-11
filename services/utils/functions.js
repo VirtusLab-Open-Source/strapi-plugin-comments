@@ -42,14 +42,17 @@ module.exports = {
     } : item),
 
     checkBadWords: content => {
-        const filter = new BadWordsFilter();
-        if (content && filter.isProfane(content)) {
-            throw new PluginError(400, 'Bad language used! Please polite your comment...', {
-                content: {
-                    original: content,
-                    filtered: content && filter.clean(content),
-                },
-            });
+        const config = get(strapi.config, 'custom.plugins.comments.badWords', true);
+        if (config) {
+            const filter = new BadWordsFilter(isObject(config) ? config : undefined);
+            if (content && filter.isProfane(content)) {
+                throw new PluginError(400, 'Bad language used! Please polite your comment...', {
+                    content: {
+                        original: content,
+                        filtered: content && filter.clean(content),
+                    },
+                });
+            }
         }
         return content;
     },

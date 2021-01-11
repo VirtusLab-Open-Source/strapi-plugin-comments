@@ -53,6 +53,12 @@ describe('Test Comments service functions utils', () => {
         }));
       }
     });
+
+    test('Should skip bad words filtering because of configuration change', () => {
+      global.strapi.config.custom.plugins.comments.badWords = false;
+
+      expect(checkBadWords(text)).toEqual(text);
+    });
   });
 
   describe('Extracting metadata', () => {
