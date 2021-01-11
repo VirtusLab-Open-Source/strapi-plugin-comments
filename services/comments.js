@@ -38,7 +38,7 @@ module.exports = {
     },
 
     // Find comments in the flat structure
-    async findAllFlat(relation) {
+    async findAllFlat(relation, query) {
         const { pluginName, model } = extractMeta(strapi.plugins);
         let criteria = {};
         if (relation) {
@@ -47,14 +47,23 @@ module.exports = {
                 relatedSlug: relation,
             };
         }
-        const entities = await strapi.query( model.modelName, pluginName)
-            .find(criteria, ['authorUser', 'related', 'reports']);
+        if (query) {
+            criteria = { 
+                ...criteria,
+                ...query,
+            }
+        }
+        const entities = query._q ? 
+            await strapi.query( model.modelName, pluginName)
+                .search(criteria, ['authorUser', 'related', 'reports']) :
+            await strapi.query( model.modelName, pluginName)
+                .find(criteria, ['authorUser', 'related', 'reports']);
         return entities.map(_ => filterOurResolvedReports(this.sanitizeCommentEntity(_)));
     },
 
     // Find comments and create relations tree structure
-    findAllInHierarchy: async (relation, startingFromId = null, dropBlockedThreads = false) => {
-        const entities = await this.findAllFlat(relation);
+    async findAllInHierarchy (relation, query, startingFromId = null, dropBlockedThreads = false) {
+        const entities = await this.findAllFlat(relation, query);
         return buildNestedStructure(entities, startingFromId, 'threadOf', dropBlockedThreads);
     },
 
@@ -106,6 +115,11 @@ module.exports = {
                     authorUser,
                 };
             } else {
+                const emailValidation = new RegExp(/\S+@\S+\.\S+/);
+                if (authorEmail && !emailValidation.test(authorEmail)) {
+                    throw new PluginError(400, 'Author e-mail is not valid value. Key: \'authorEmail\'');
+                }
+
                 authorData = {
                     authorId,
                     authorName,
@@ -209,7 +223,7 @@ module.exports = {
         }
         const relatedEntity = !isEmpty(entity.related) ? first(entity.related) : null;
         const relation = relatedEntity ? `${convertContentTypeNameToSlug(relatedEntity.__contentType).toLowerCase()}:${relatedEntity.id}` : null;
-        const entitiesOnSameLevel = await this.findAllInHierarchy(relation, entity.threadOf ? entity.threadOf.id : null)
+        const entitiesOnSameLevel = await this.findAllInHierarchy(relation, null, entity.threadOf ? entity.threadOf.id : null)
         const selectedEntity = filterOurResolvedReports(this.sanitizeCommentEntity(entity));
         return {
             selected: {

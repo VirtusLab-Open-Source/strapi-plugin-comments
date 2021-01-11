@@ -24,10 +24,10 @@ module.exports = {
   },
 
   findAllFlat: async (ctx) => {
-    const { params = {} } = ctx;
+    const { params = {}, query } = ctx;
     const { relation } = parseParams(params);
     try {
-      return await strapi.plugins.comments.services.comments.findAllFlat(relation);
+      return await strapi.plugins.comments.services.comments.findAllFlat(relation, query);
     }
     catch (e) {
       throwError(ctx, e);
@@ -35,10 +35,10 @@ module.exports = {
   },
 
   findAllInHierarchy: async (ctx) => {
-    const { params = {} } = ctx;
+    const { params = {}, query } = ctx;
     const { relation } = parseParams(params);
     try {
-      return await strapi.plugins.comments.services.comments.findAllInHierarchy(relation, null, true);
+      return await strapi.plugins.comments.services.comments.findAllInHierarchy(relation, query, null, true);
     }
     catch (e) {
       throwError(ctx, e);
