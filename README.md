@@ -100,6 +100,7 @@ To setup amend default plugin configuration we recommend to put following snippe
     plugins: {
       comments: {
         enableUsers: true,
+        badWords: false,
       },
     },
     ...
@@ -107,6 +108,7 @@ To setup amend default plugin configuration we recommend to put following snippe
 
 ### Properties
 - `enableUsers` - Enabled support for built-in Strapi users, if endpoints are exposed with usage of `Authenticated` policy or JWT tokens are in use by the Client App. Default value: `false`.
+- `badWords` - Enabled support for (bad words filtering)[https://www.npmjs.com/package/bad-words]. Can be turned off or overwritten using (options reference)[https://www.npmjs.com/package/bad-words#constructor]. Default value: `true`. 
 
 ## Public API Comment model
 
