@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "1.0.1-beta.5",
+  "version": "1.0.1-beta.6",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "Comments",
@@ -26,8 +26,8 @@
     "reactstrap": "8.4.1",
     "redux-saga": "^0.16.0",
     "request": "^2.83.0",
-    "strapi-helper-plugin": "3.1.0",
-    "strapi-utils": "3.1.0",
+    "strapi-helper-plugin": "3.4.3",
+    "strapi-utils": "3.4.3",
     "uuid": "^3.1.0"
   },
   "devDependencies": {

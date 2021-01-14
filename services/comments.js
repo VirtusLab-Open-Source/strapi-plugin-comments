@@ -21,12 +21,12 @@ module.exports = {
             ...query,
             _sort: paginationEnabled ? query._sort || 'created_at:desc' : 'created_at:desc',
         };
-        const entities = query._q ?
+        const entities = query && query._q ?
             await strapi.query( model.modelName, pluginName).search(params, ['authorUser', 'related', 'reports']) :
             await strapi.query( model.modelName, pluginName).find(params, ['authorUser', 'related', 'reports']);
         const items = entities.map(_ => filterOurResolvedReports(this.sanitizeCommentEntity(_)));
         const total = paginationEnabled ?
-            query._q ?
+            query && query._q ?
                 await strapi.query( model.modelName, pluginName).countSearch(params) :
                 await strapi.query( model.modelName, pluginName).count(params) :
             items.length;
@@ -59,7 +59,7 @@ module.exports = {
             };
         }
 
-        const entitiesRoot = query._q ? 
+        const entitiesRoot = query && query._q ? 
             await strapi.query( model.modelName, pluginName)
                 .search(criteria, ['authorUser', 'related', 'reports']) :
             await strapi.query( model.modelName, pluginName)
