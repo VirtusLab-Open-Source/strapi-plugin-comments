@@ -358,6 +358,10 @@ Reports abuse in specified Comment content based on it `commentId` and related t
 - `200` - Successful. Response with reported abuse.
 - `409` - Conflict. Occurs when trying to report an abuse to a non existing comment.
 
+## Examples
+
+Live example of plugin usage can be found in the [VirtusLab Strapi Examples](https://github.com/VirtusLab/strapi-examples/tree/master/strapi-plugin-comments) repository.
+
 ## Contributing
 
 Feel free to fork and make a Pull Request to this plugin project. All the input is warmly welcome!
