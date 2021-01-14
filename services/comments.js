@@ -40,25 +40,36 @@ module.exports = {
     // Find comments in the flat structure
     async findAllFlat(relation, query) {
         const { pluginName, model } = extractMeta(strapi.plugins);
-        let criteria = {};
+        let baseCriteria = {};
         if (relation) {
-            criteria = {
-                ...criteria,
+            baseCriteria = {
+                ...baseCriteria,
                 relatedSlug: relation,
             };
         }
+
+        let criteria = {
+            ...baseCriteria,
+            threadOf_null: true,
+        };
         if (query) {
-            criteria = { 
+            criteria = {
                 ...criteria,
                 ...query,
-            }
+            };
         }
-        const entities = query._q ? 
+
+        const entitiesRoot = query._q ? 
             await strapi.query( model.modelName, pluginName)
                 .search(criteria, ['authorUser', 'related', 'reports']) :
             await strapi.query( model.modelName, pluginName)
                 .find(criteria, ['authorUser', 'related', 'reports']);
-        return entities.map(_ => filterOurResolvedReports(this.sanitizeCommentEntity(_)));
+        const entitiesNested = await strapi.query( model.modelName, pluginName)
+                .find({
+                    ...baseCriteria,
+                    threadOf_null: false, 
+                }, ['authorUser', 'related', 'reports']);
+        return [...entitiesRoot, ...entitiesNested].map(_ => filterOurResolvedReports(this.sanitizeCommentEntity(_)));
     },
 
     // Find comments and create relations tree structure
