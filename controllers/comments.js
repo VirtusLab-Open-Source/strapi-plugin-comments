@@ -1,6 +1,7 @@
 'use strict';
 
 const { parseParams, throwError } = require('./utils/functions');
+const _ = require('lodash');
 
 /**
  * comments.js controller
@@ -15,90 +16,82 @@ module.exports = {
    *
    * @return {Object}
    */
-
-
-  findAll: async (ctx) => {
+  async findAll(ctx) {
     const { params = {} } = ctx;
     const { page } = parseParams(params);
-    return await strapi.plugins.comments.services.comments.findAll(ctx.query, page)
+    return await strapi.plugins.comments.services.comments.findAll(ctx.query, page);
   },
 
-  findAllFlat: async (ctx) => {
+  async findAllFlat(ctx) {
     const { params = {}, query } = ctx;
     const { relation } = parseParams(params);
     try {
       return await strapi.plugins.comments.services.comments.findAllFlat(relation, query);
-    }
-    catch (e) {
+    } catch (e) {
       throwError(ctx, e);
     }
   },
 
-  findAllInHierarchy: async (ctx) => {
+  async findAllInHierarchy(ctx) {
     const { params = {}, query } = ctx;
     const { relation } = parseParams(params);
     try {
       return await strapi.plugins.comments.services.comments.findAllInHierarchy(relation, query, null, true);
-    }
-    catch (e) {
+    } catch (e) {
       throwError(ctx, e);
     }
   },
 
-  post: async (ctx) => {
+  async post(ctx) {
     const { request, state, params = {} } = ctx;
     const { user } = state;
     const { relation } = parseParams(params);
-    const { body = {} }  = request;
+    const { body = {} } = request;
     try {
       const entity = await strapi.plugins.comments.services.comments.create(body, relation, user);
 
       if (entity) {
         return entity;
       }
-    }
-    catch (e) {
+    } catch (e) {
       throwError(ctx, e);
     }
   },
 
-  put: async (ctx) => {
+  async put(ctx) {
     const { request, state, params = {} } = ctx;
-    const { body = {} }  = request;
+    const { body = {} } = request;
     const { user } = state;
     const { relation, commentId } = parseParams(params);
     try {
       return await strapi.plugins.comments.services.comments.update(commentId, relation, body, user);
-    }
-    catch (e) {
+    } catch (e) {
       throwError(ctx, e);
     }
   },
 
-  pointsUp: async (ctx) => {
+  async pointsUp(ctx) {
     const { state, params = {} } = ctx;
     const { user } = state;
     const { relation, commentId } = parseParams(params);
     try {
       return await strapi.plugins.comments.services.comments.pointsUp(commentId, relation, user);
-    }
-    catch (e) {
+    } catch (e) {
       throwError(ctx, e);
     }
   },
 
-  reportAbuse: async (ctx) => {
+  async reportAbuse(ctx) {
     const { request, state, params = {} } = ctx;
-    const { body = {} }  = request;
-    if (!body.content){
-      return  ctx.badRequest(null, 'Content field is required');
+    const { body = {} } = request;
+    if (!body.content) {
+      return ctx.badRequest(null, 'Content field is required');
     }
     const { user } = state;
     const { relation, commentId } = parseParams(params);
     try {
       return await strapi.plugins.comments.services.comments.reportAbuse(commentId, relation, body, user);
-    }
-    catch (e) {
+    } catch (e) {
       throwError(ctx, e);
     }
   },
@@ -107,46 +100,65 @@ module.exports = {
   // Moderation
   //
 
-  findOne: async (ctx) => {
+  async findOne(ctx) {
     const { params = {} } = ctx;
     const { id } = parseParams(params);
     try {
       return await strapi.plugins.comments.services.comments.findOneAndThread(id);
-    }
-    catch (e) {
+    } catch (e) {
       throwError(ctx, e);
     }
   },
 
-  blockComment: async (ctx) => {
+  async blockComment(ctx) {
     const { params = {} } = ctx;
     const { id } = parseParams(params);
     try {
       return await strapi.plugins.comments.services.comments.blockComment(id);
-    }
-    catch (e) {
+    } catch (e) {
       throwError(ctx, e);
     }
   },
 
-  blockCommentThread: async (ctx) => {
+  async blockCommentThread(ctx) {
     const { params = {} } = ctx;
     const { id } = parseParams(params);
     try {
       return await strapi.plugins.comments.services.comments.blockCommentThread(id);
-    }
-    catch (e) {
+    } catch (e) {
       throwError(ctx, e);
     }
   },
 
-  resolveAbuseReport: async (ctx) => {
+  async resolveAbuseReport(ctx) {
     const { params = {} } = ctx;
     const { id, commentId } = parseParams(params);
     try {
       return await strapi.plugins.comments.services.comments.resolveAbuseReport(id, commentId);
+    } catch (e) {
+      throwError(ctx, e);
     }
-    catch (e) {
+  },
+
+  async contentsTypes(ctx) {
+    const result = Object.entries(strapi.contentTypes)
+      .filter(([, contentType]) => (
+        contentType.associations || []).some(_ => _.plugin === 'comments' && _.collection === 'comment'),
+      )
+      .reduce((acc, [, contentType]) => [
+          ...acc,
+          { key: contentType.globalName, value: contentType.collectionName }],
+        [],
+      );
+    ctx.body = { list: result };
+  },
+
+  async contentTypeName(ctx) {
+    const { params: { contentTypeName } } = ctx;
+    try {
+      const result = await strapi.plugins.comments.services.comments.contentTypeName(contentTypeName);
+      ctx.body = { list: result };
+    } catch (e) {
       throwError(ctx, e);
     }
   },

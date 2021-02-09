@@ -73,6 +73,22 @@
       }
     },
     {
+      "method": "GET",
+      "path": "/moderation/contents-types",
+      "handler": "comments.contentsTypes",
+      "config": {
+        "policies": [["admin::hasPermissions", ["plugins::comments.read"]]]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/contents-types/:contentTypeName",
+      "handler": "comments.contentTypeName",
+      "config": {
+        "policies": [["admin::hasPermissions", ["plugins::comments.read"]]]
+      }
+    },
+    {
       "method": "PUT",
       "path": "/moderation/block/:id",
       "handler": "comments.blockComment",

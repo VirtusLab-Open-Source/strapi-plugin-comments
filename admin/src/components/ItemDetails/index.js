@@ -34,7 +34,7 @@ const ItemDetails = ({ id, content, active, clickable, root, threadsCount, autho
     e.stopPropagation();
     onAbuseReportResolve(reportId, id);
   };
-  
+
   const hasThreads = (threadsCount !== undefined) && (threadsCount > 0);
   const isAbuseReported = !isEmpty(reports);
   const isItemHeaderDisplayed = blocked || blockedThread || isAbuseReported;
@@ -67,7 +67,7 @@ const ItemDetails = ({ id, content, active, clickable, root, threadsCount, autho
     blockedThread,
     reports,
     comment: {
-      id, content, authorName, authorUser, created_at, created_at, updated_at,
+      id, content, authorName, authorUser, created_at, updated_at,
     },
     onBlockClick,
     onBlockThreadClick,
@@ -78,7 +78,7 @@ const ItemDetails = ({ id, content, active, clickable, root, threadsCount, autho
 
   return (
     <CardWrapper root={root} active={active}>
-      <CardItem 
+      <CardItem
         onClick={e => (hasThreads || root) && clickable && !active && onClick(e)}
         clickable={clickable}
         root={root}
@@ -106,20 +106,20 @@ const ItemDetails = ({ id, content, active, clickable, root, threadsCount, autho
 };
 
 ItemDetails.propTypes = {
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,  
-  content: PropTypes.string.isRequired, 
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  content: PropTypes.string.isRequired,
   active: PropTypes.bool,
   clickable: PropTypes.bool,
   root: PropTypes.bool,
   threadsCount: PropTypes.number,
-  authorName: PropTypes.string, 
-  authorUser: PropTypes.object, 
-  created_at: PropTypes.string.isRequired, 
-  updated_at: PropTypes.string, 
-  related: PropTypes.array, 
-  reports: PropTypes.array, 
-  blocked: PropTypes.bool, 
-  blockedThread: PropTypes.bool, 
+  authorName: PropTypes.string,
+  authorUser: PropTypes.object,
+  created_at: PropTypes.string.isRequired,
+  updated_at: PropTypes.string,
+  related: PropTypes.array,
+  reports: PropTypes.array,
+  blocked: PropTypes.bool,
+  blockedThread: PropTypes.bool,
   onClick: PropTypes.func,
   onBlockClick: PropTypes.func,
   onBlockThreadClick: PropTypes.func,

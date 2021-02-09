@@ -1,9 +1,18 @@
 'use strict';
 
-const { first, isEmpty, isNil } = require('lodash');
+const { first, isEmpty, isNil, map, uniq } = require('lodash');
 const { sanitizeEntity } = require('strapi-utils');
 const PluginError = require('./utils/error');
-const { isEqualEntity, extractMeta, buildNestedStructure, checkBadWords, filterOurResolvedReports, convertContentTypeNameToSlug, isValidUserContext, resolveUserContextError } = require('./utils/functions');
+const {
+    isEqualEntity,
+    extractMeta,
+    buildNestedStructure,
+    checkBadWords,
+    filterOurResolvedReports,
+    convertContentTypeNameToSlug,
+    isValidUserContext,
+    resolveUserContextError,
+} = require('./utils/functions');
 
 /**
  * comments.js service
@@ -12,28 +21,72 @@ const { isEqualEntity, extractMeta, buildNestedStructure, checkBadWords, filterO
  */
 
 module.exports = {
+    getAssociationModel(ormModel, related) {
+        const relatedAssociation = ormModel.associations.find(_ => _.alias === 'related');
+        if (relatedAssociation) {
+            return relatedAssociation.related.find(rel => rel.collectionName === related);
+        }
+        return null;
+    },
+
+    getMorphModel() {
+        const { pluginName, model } = extractMeta(strapi.plugins);
+        const ormModel = strapi.query(model.modelName, pluginName);
+        return ormModel.model.morph;
+    },
+
+    getMorphData(query) {
+        return this
+          .getMorphModel()
+          .query(function () {
+              this.where(query);
+          })
+          .fetchAll()
+          .then((entities) => entities.map(entity => entity.toJSON()));
+    },
 
     // Find all comments
-    async findAll(query) {
+    async findAll({ related, entity, ...query }) {
         const { pluginName, model } = extractMeta(strapi.plugins);
         const paginationEnabled = !isNil(query._start);
+        const ormModel = strapi.query(model.modelName, pluginName);
+        let relatedCommentIds = [];
+        if (related) {
+            if (this.getAssociationModel(ormModel, related)) {
+                const morphQuery = entity ? { related_type: related, related_id: entity } : { related_type: related };
+                relatedCommentIds = await this
+                  .getMorphData(morphQuery)
+                  .then(_ => _.map(entity => entity.comments_id));
+            } else {
+                throw strapi.errors.badRequest();
+            }
+        }
+        // we not find any content to related data
+        if (related && relatedCommentIds.length === 0) {
+            return {
+                items: [],
+                total: 0,
+                page: 1,
+            };
+        }
         const params = {
             ...query,
+            id: relatedCommentIds,
             _sort: paginationEnabled ? query._sort || 'created_at:desc' : 'created_at:desc',
         };
         const entities = query && query._q ?
-            await strapi.query( model.modelName, pluginName).search(params, ['authorUser', 'related', 'reports']) :
-            await strapi.query( model.modelName, pluginName).find(params, ['authorUser', 'related', 'reports']);
+            await ormModel.search(params, ['authorUser', 'related', 'reports']) :
+            await ormModel.find(params, ['authorUser', 'related', 'reports']);
         const items = entities.map(_ => filterOurResolvedReports(this.sanitizeCommentEntity(_)));
         const total = paginationEnabled ?
-            query && query._q ?
-                await strapi.query( model.modelName, pluginName).countSearch(params) :
-                await strapi.query( model.modelName, pluginName).count(params) :
-            items.length;
+          query && query._q ?
+            await ormModel.countSearch(params) :
+            await ormModel.count(params) :
+          items.length;
         return {
             items,
             total,
-            page: paginationEnabled ? query._start/query._limit : undefined,
+            page: paginationEnabled ? query._start / query._limit : undefined,
         };
     },
 
@@ -59,7 +112,7 @@ module.exports = {
             };
         }
 
-        const entitiesRoot = query && query._q ? 
+        const entitiesRoot = query && query._q ?
             await strapi.query( model.modelName, pluginName)
                 .search(criteria, ['authorUser', 'related', 'reports']) :
             await strapi.query( model.modelName, pluginName)
@@ -67,7 +120,7 @@ module.exports = {
         const entitiesNested = await strapi.query( model.modelName, pluginName)
                 .find({
                     ...baseCriteria,
-                    threadOf_null: false, 
+                    threadOf_null: false,
                 }, ['authorUser', 'related', 'reports']);
         return [...entitiesRoot, ...entitiesNested].map(_ => filterOurResolvedReports(this.sanitizeCommentEntity(_)));
     },
@@ -96,10 +149,22 @@ module.exports = {
         return filterOurResolvedReports(this.sanitizeCommentEntity(entity));
     },
 
+    checkEntityRelation(parsedRelation) {
+        const result = parsedRelation.some(ref => {
+            const model = strapi.query(ref);
+            return model && model.associations.length &&
+              model.associations.some(_ => _.plugin === 'comments' && _.collection === 'comment');
+        });
+        if (!result) {
+            throw new PluginError(400, 'Comment not have relation to this type content type.');
+        }
+    },
+
     // Create a comment
     async create(data, relation, user = undefined) {
         const { content, related } = data;
         const parsedRelation = related && related instanceof Array ? related : [related];
+        this.checkEntityRelation(map(parsedRelation, 'rel'))
         const singleRelationFulfilled = related && (parsedRelation.length === 1);
         const linkToThread = !isNil(data.threadOf) ? !!await this.findOne(data.threadOf, relation) : true;
         const validContext = isValidUserContext(user);
@@ -287,6 +352,29 @@ module.exports = {
         } catch (e) {
             return false;
         }
+    },
+
+    async contentTypeName(contentTypeName) {
+        const { pluginName, model } = extractMeta(strapi.plugins);
+        const ormModel = strapi.query(model.modelName, pluginName);
+        const associationModel = this.getAssociationModel(ormModel, contentTypeName);
+        const config = get(strapi.config, ['plugins', 'comments', 'relatedContentTypesFields', contentTypeName], []);
+        if (isEmpty(config)) {
+            return [];
+        }
+        if (associationModel) {
+            const relatedIds = await this
+              .getMorphData({ related_type: contentTypeName })
+              .then(_ => uniq(_.map(entity => entity.related_id)));
+            const result = await strapi.query(associationModel.uid).find({ id: relatedIds });
+            const entries = Object.entries(config);
+            return result
+              .map(_ =>
+                entries
+                  .reduce((acc, [key, val]) => ({ ...acc, [key]: _[val] }), {}),
+              );
+        }
+        throw strapi.errors.badRequest();
     },
 
     // Resolve reported abuse for comment
