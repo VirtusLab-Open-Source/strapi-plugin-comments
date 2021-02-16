@@ -164,7 +164,7 @@ module.exports = {
     async create(data, relation, user = undefined) {
         const { content, related } = data;
         const parsedRelation = related && related instanceof Array ? related : [related];
-        this.checkEntityRelation(map(parsedRelation, 'rel'))
+        this.checkEntityRelation(map(parsedRelation, 'ref'));
         const singleRelationFulfilled = related && (parsedRelation.length === 1);
         const linkToThread = !isNil(data.threadOf) ? !!await this.findOne(data.threadOf, relation) : true;
         const validContext = isValidUserContext(user);
