@@ -10,7 +10,21 @@ import ItemFooter from '../ItemFooter';
 import ItemHeader from '../ItemHeader';
 import useDataManager from '../../hooks/useDataManager';
 
-const Item = ({ id, content, authorName, authorUser, created_at, updated_at, related, reports, blocked, blockedThread, isNew }) => {
+const Item = ({
+  id,
+  content,
+  authorName,
+  authorUser,
+  created_at,
+  updated_at,
+  related,
+  reports,
+  blocked,
+  blockedThread,
+  isNew,
+  createdAt,
+  updatedAt
+}) => {
   const { push } = useHistory();
   const { getSearchParams } = useDataManager();
   const { id: activeId } = useParams();
@@ -37,8 +51,8 @@ const Item = ({ id, content, authorName, authorUser, created_at, updated_at, rel
     authorName,
     authorUser,
     related: isArray(related) ? first(related) : related,
-    created_at,
-    updated_at
+    created_at: created_at || createdAt,
+    updated_at: updated_at || updatedAt
   };
 
   return (

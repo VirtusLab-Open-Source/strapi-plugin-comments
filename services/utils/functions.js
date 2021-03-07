@@ -2,16 +2,34 @@ const BadWordsFilter = require('bad-words');
 const PluginError = require('./error');
 const { first, get, isObject, isNil } = require('lodash');
 
-const buildNestedStructure = (entities, id = null, field = 'parent', dropBlockedThreads = false, blockNestedThreads = false) =>
-    entities
-        .filter(entity => (entity[field] === id) || (isObject(entity[field]) && (entity[field].id === id)))
-        .map(entity => ({ 
-            ...entity, 
-            [field]: undefined, 
-            related: undefined,
-            blockedThread: blockNestedThreads || entity.blockedThread,
-            children: entity.blockedThread && dropBlockedThreads ? [] : buildNestedStructure(entities, entity.id, field, dropBlockedThreads, entity.blockedThread),
-        }));
+const buildNestedStructure = (
+  entities,
+  id = null,
+  field = 'parent',
+  dropBlockedThreads = false,
+  blockNestedThreads = false,
+  isMongoDB = false
+) =>
+  entities
+    .filter(entity => {
+        // mongo by default not return `null` for empty data
+        if ((entity[field] === null && id === null) || (isMongoDB && entity[field] === undefined && id === null)) {
+            return true;
+        }
+        let data = entity[field];
+        if (data && typeof id === 'string') {
+            data = data.toString();
+        }
+        return (data && data === id) || (isObject(entity[field]) && (entity[field].id === id));
+    })
+    .map(entity => ({
+        ...entity,
+        [field]: undefined,
+        related: undefined,
+        blockedThread: blockNestedThreads || entity.blockedThread,
+        children: entity.blockedThread && dropBlockedThreads ? [] : buildNestedStructure(entities, entity.id, field,
+          dropBlockedThreads, entity.blockedThread),
+    }));
 
 module.exports = {
     isEqualEntity: (existing, data, user) => {

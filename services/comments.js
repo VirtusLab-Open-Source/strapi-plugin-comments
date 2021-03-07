@@ -1,6 +1,6 @@
 'use strict';
 
-const { first, isEmpty, isNil, map, uniq } = require('lodash');
+const { first, isEmpty, isNil, map, uniq, get } = require('lodash');
 const { sanitizeEntity } = require('strapi-utils');
 const PluginError = require('./utils/error');
 const {
@@ -35,6 +35,12 @@ module.exports = {
         return ormModel.model.morph;
     },
 
+    isMongoDB(){
+        const { pluginName, model } = extractMeta(strapi.plugins);
+        const orm = strapi.query(model.modelName, pluginName).model.orm;
+        return orm === 'mongoose';
+    },
+
     getMorphData(query) {
         return this
           .getMorphModel()
@@ -52,11 +58,29 @@ module.exports = {
         const ormModel = strapi.query(model.modelName, pluginName);
         let relatedCommentIds = [];
         if (related) {
-            if (this.getAssociationModel(ormModel, related)) {
-                const morphQuery = entity ? { related_type: related, related_id: entity } : { related_type: related };
-                relatedCommentIds = await this
-                  .getMorphData(morphQuery)
-                  .then(_ => _.map(entity => entity.comments_id));
+            const associationModel = this.getAssociationModel(ormModel, related);
+            if (associationModel) {
+                if (this.isMongoDB()) {
+                    const [fieldName] = Object.entries(associationModel.allAttributes).find(([, value]) => value.plugin === 'comments' && value.collection === 'comment') || [];
+                    if (!fieldName){
+                        throw strapi.errors.badRequest();
+                    }
+                    const query = { [fieldName]: { $exists: true, $not: { $size: 0 } } };
+                    if (entity){
+                        query._id = entity;
+                    }
+                    relatedCommentIds = await associationModel
+                      .find(query)
+                      .then((entry) => entry.map(_ => _.toJSON()[fieldName]))
+                      .then(entry => entry.flatMap(comments => comments.map(comment => comment.id)));
+                } else {
+                    const morphQuery = entity
+                      ? { related_type: related, related_id: entity }
+                      : { related_type: related };
+                    relatedCommentIds = await this
+                      .getMorphData(morphQuery)
+                      .then(_ => _.map(entity => entity.comments_id));
+                }
             } else {
                 throw strapi.errors.badRequest();
             }
@@ -69,11 +93,14 @@ module.exports = {
                 page: 1,
             };
         }
+
         const params = {
             ...query,
-            id: relatedCommentIds,
             _sort: paginationEnabled ? query._sort || 'created_at:desc' : 'created_at:desc',
         };
+        if (relatedCommentIds.length) {
+            params.id = relatedCommentIds;
+        }
         const entities = query && query._q ?
             await ormModel.search(params, ['authorUser', 'related', 'reports']) :
             await ormModel.find(params, ['authorUser', 'related', 'reports']);
@@ -128,7 +155,7 @@ module.exports = {
     // Find comments and create relations tree structure
     async findAllInHierarchy (relation, query, startingFromId = null, dropBlockedThreads = false) {
         const entities = await this.findAllFlat(relation, query);
-        return buildNestedStructure(entities, startingFromId, 'threadOf', dropBlockedThreads);
+        return buildNestedStructure(entities, startingFromId, 'threadOf', dropBlockedThreads, false, this.isMongoDB());
     },
 
     // Find single comment
@@ -363,16 +390,29 @@ module.exports = {
             return [];
         }
         if (associationModel) {
-            const relatedIds = await this
-              .getMorphData({ related_type: contentTypeName })
-              .then(_ => uniq(_.map(entity => entity.related_id)));
-            const result = await strapi.query(associationModel.uid).find({ id: relatedIds });
+            let relatedIds = [];
+            let result = [];
+            if (this.isMongoDB()) {
+                const [fieldName] = Object.entries(associationModel.allAttributes).find(([, value]) => value.plugin === 'comments' && value.collection === 'comment') || [];
+                if (!fieldName){
+                    throw strapi.errors.badRequest();
+                }
+                result = await associationModel
+                  .find({ [fieldName]: { $exists: true, $not: { $size: 0 } } })
+                  .then((entities) => entities.map(_ => _.toJSON()));
+            } else {
+                relatedIds = await this
+                  .getMorphData({ related_type: contentTypeName })
+                  .then(_ => uniq(_.map(entity => entity.related_id)));
+                result = await strapi.query(associationModel.uid).find({ id: relatedIds });
+            }
             const entries = Object.entries(config);
             return result
               .map(_ =>
                 entries
                   .reduce((acc, [key, val]) => ({ ...acc, [key]: _[val] }), {}),
               );
+
         }
         throw strapi.errors.badRequest();
     },

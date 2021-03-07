@@ -14,7 +14,28 @@ import ItemHeader from '../ItemHeader';
 import AbuseReportsPopUp from '../AbuseReportsPopUp';
 import pluginId from '../../pluginId';
 
-const ItemDetails = ({ id, content, active, clickable, root, threadsCount, authorName, authorUser, created_at, updated_at, related, reports, blocked, blockedThread, onClick, onBlockClick, onBlockThreadClick, onAbuseReportResolve }) => {
+const ItemDetails = ({
+  id,
+  content,
+  active,
+  clickable,
+  root,
+  threadsCount,
+  authorName,
+  authorUser,
+  created_at,
+  createdAt,
+  updated_at,
+  updatedAt,
+  related,
+  reports,
+  blocked,
+  blockedThread,
+  onClick,
+  onBlockClick,
+  onBlockThreadClick,
+  onAbuseReportResolve,
+}) => {
   const [showPopUp, setPopUpVisibility] = useState(false);
 
   const onPopUpOpen = e => {
@@ -42,8 +63,8 @@ const ItemDetails = ({ id, content, active, clickable, root, threadsCount, autho
     authorName,
     authorUser,
     related: isArray(related) ? first(related) : related,
-    created_at,
-    updated_at,
+    created_at: created_at || createdAt,
+    updated_at: updated_at || updatedAt,
     isDelailedView: true,
   };
   const headerProps = {
