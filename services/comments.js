@@ -124,12 +124,14 @@ module.exports = {
         if (relation) {
             baseCriteria = {
                 ...baseCriteria,
+                removed_null: true,
                 relatedSlug: relation,
             };
         }
 
         let criteria = {
             ...baseCriteria,
+            removed_null: true,
             threadOf_null: true,
         };
         if (query) {
@@ -311,6 +313,22 @@ module.exports = {
             return entity;
         }
         throw new PluginError(409, 'Action on that entity is not allowed');
+    },
+
+    async markAsRemoved(relationId, commentId, authorId){
+        const { pluginName, model } = extractMeta(strapi.plugins);
+        const entity = await this.findOne(
+          commentId,
+          relationId,
+          { _or: [{ authorUser: authorId }, { authorId }] },
+        );
+        if (!entity){
+            throw strapi.errors.notFound('Entity not exist');
+        }
+        return strapi
+          .query(model.modelName, pluginName)
+          .update({ id: commentId, relatedSlug: relationId }, { removed: true })
+          .then(() => ({}));
     },
 
     //

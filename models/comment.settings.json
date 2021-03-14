@@ -60,6 +60,10 @@
       "type": "string",
       "configurable": false
     },
+    "removed": {
+      "type": "boolean",
+      "configurable": false
+    },
     "relatedSlug": {
       "type": "string",
       "private": true,

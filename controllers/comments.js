@@ -11,6 +11,10 @@ const _ = require('lodash');
 
 module.exports = {
 
+  getService() {
+    return strapi.plugins.comments.services.comments;
+  },
+
   /**
    * Default action.
    *
@@ -94,6 +98,25 @@ module.exports = {
     } catch (e) {
       throwError(ctx, e);
     }
+  },
+
+  async removeComment(ctx) {
+    const { params: { relationId, commentId }, query: { authorId } } = ctx;
+    if (authorId) {
+      try {
+        return await this.getService().markAsRemoved(
+          relationId,
+          commentId,
+          authorId
+        );
+      } catch (e) {
+        if (!e.isBoom){
+          throwError(ctx, e);
+        }
+        throw e;
+      }
+    }
+    return ctx.badRequest('Not provided authorId');
   },
 
   //

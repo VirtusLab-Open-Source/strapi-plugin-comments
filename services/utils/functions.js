@@ -28,7 +28,7 @@ const buildNestedStructure = (
         related: undefined,
         blockedThread: blockNestedThreads || entity.blockedThread,
         children: entity.blockedThread && dropBlockedThreads ? [] : buildNestedStructure(entities, entity.id, field,
-          dropBlockedThreads, entity.blockedThread),
+        dropBlockedThreads, entity.blockedThread),
     }));
 
 module.exports = {
@@ -94,3 +94,4 @@ module.exports = {
         }
     },
 };
+
