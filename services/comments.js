@@ -124,14 +124,14 @@ module.exports = {
         if (relation) {
             baseCriteria = {
                 ...baseCriteria,
-                removed_null: true,
+                _or: [{ removed_null: true }, { removed: false }],
                 relatedSlug: relation,
             };
         }
 
         let criteria = {
             ...baseCriteria,
-            removed_null: true,
+            _or: [{ removed_null: true }, { removed: false }],
             threadOf_null: true,
         };
         if (query) {
