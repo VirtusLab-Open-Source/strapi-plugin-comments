@@ -3,10 +3,10 @@ const PluginError = require('../../services/utils/error');
 module.exports = {
     parseParams: params => Object.keys(params).reduce((prev, curr) => {
         const value = params[curr];
-        const parsedValue = isNaN(value) ? value : parseInt(value, 10);
+        const parsedValue = Number(value);
         return {
          ...prev,
-         [curr]: parsedValue,
+         [curr]: isNaN(parsedValue) ? value : parsedValue
        };
       }, {}),
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -6,7 +6,7 @@ import { faLink } from '@fortawesome/free-solid-svg-icons';
 import CardItemRelation from './CardItemRelation';
 import CardItemAuthor from './CardItemAuthor';
 import Wrapper from './Wrapper';
-import { first, isNil, upperFirst } from 'lodash';
+import { first, isNil, isObject, upperFirst } from 'lodash';
 
 const ENTITY_NAME_PARAMS = ['title', 'Title', 'subject', 'Subject', 'name', 'Name'];
 const resolveEntityName = entity => ENTITY_NAME_PARAMS.map(_ => entity[_]).filter(_ => _)[0] || '';
@@ -22,14 +22,16 @@ const ItemFooter = ({ authorName, authorUser, related, created_at, isDetailedVie
     }
     return authorName;
   }
-  
+
   const formatDateTime = () => {
     return moment(created_at).format("DD/MM/YYYY, HH:mm:ss");
   }
 
-  const formatRelationType = () => !isNil(related) ? humanizePascalCase(related.__contentType) : '';
+  const relatedExist = useMemo(() => !isNil(related) && isObject(related), [related]);
 
-  const formatRelationName = () => !isNil(related) ? resolveEntityName(related) : '';
+  const formatRelationType = () => relatedExist ? humanizePascalCase(related.__contentType) : '';
+
+  const formatRelationName = () => relatedExist ? resolveEntityName(related) : '';
 
   return (
     <Wrapper>
@@ -42,10 +44,10 @@ const ItemFooter = ({ authorName, authorUser, related, created_at, isDetailedVie
 };
 
 ItemFooter.propTypes = {
-  authorName: PropTypes.string, 
-  authorUser: PropTypes.object,  
-  related: PropTypes.object, 
-  created_at: PropTypes.string.isRequired, 
+  authorName: PropTypes.string,
+  authorUser: PropTypes.object,
+  related: PropTypes.object,
+  created_at: PropTypes.string.isRequired,
   isDetailedView: PropTypes.bool,
 };
 
