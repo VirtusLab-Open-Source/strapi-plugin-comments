@@ -40,7 +40,11 @@ module.exports = {
     const { params = {}, query } = ctx;
     const { relation } = parseParams(params);
     try {
-      return await strapi.plugins.comments.services.comments.findAllInHierarchy(relation, query, null, true);
+      return await strapi.plugins.comments.services.comments.findAllInHierarchy({
+        relation,
+        query,
+        dropBlockedThreads: true,
+      });
     } catch (e) {
       throwError(ctx, e);
     }
@@ -107,10 +111,10 @@ module.exports = {
         return await this.getService().markAsRemoved(
           relationId,
           commentId,
-          authorId
+          authorId,
         );
       } catch (e) {
-        if (!e.isBoom){
+        if (!e.isBoom) {
           throwError(ctx, e);
         }
         throw e;

@@ -22,6 +22,7 @@ const Item = ({
   blocked,
   blockedThread,
   isNew,
+  removed,
   createdAt,
   updatedAt
 }) => {
@@ -39,12 +40,13 @@ const Item = ({
   };
 
   const isAbuseReported = !isEmpty(reports);
-  const isItemHeaderDisplayed = blocked || blockedThread || isNew || isAbuseReported;
+  const isItemHeaderDisplayed = blocked || blockedThread || isNew || removed || isAbuseReported;
   const headerProps = {
     blocked,
     blockedThread,
     isNew,
     isAbuseReported,
+    isRemoved: removed,
   };
 
   const footerProps = {
