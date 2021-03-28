@@ -19,8 +19,8 @@ import { Container } from './index.styled';
 import {
   GET_CONTENT_LIST_CONTENT_TYPE,
   GET_CONTENT_LIST_CONTENT_TYPE_SUCCEEDED,
-  GET_CONTENT_TYPES,
-  GET_CONTENT_TYPES_SUCCEEDED,
+  GET_CONFIG,
+  GET_CONFIG_SUCCESS,
 } from './actions';
 import pluginId from '../../pluginId';
 import reducer, { initialState } from './reducer';
@@ -28,9 +28,9 @@ import getTrad from '../../utils/getTrad';
 
 const getContentTypes = async (dispatch) => {
   try {
-    dispatch({ type: GET_CONTENT_TYPES });
-    const { list: contentsTypes } = await request(`/${pluginId}/moderation/contents-types`, { method: 'GET' });
-    dispatch({ type: GET_CONTENT_TYPES_SUCCEEDED, contentsTypes });
+    dispatch({ type: GET_CONFIG });
+    const { contentsTypes , relations } = await request(`/${pluginId}/moderation/config`, { method: 'GET' });
+    dispatch({ type: GET_CONFIG_SUCCESS, contentsTypes, relations });
   } catch (err) {
     console.log('err', err);
   }
@@ -60,6 +60,7 @@ const Panel = () => {
   const [reducerState, dispatch] = useReducer(reducer, initialState);
   const {
     contentsTypes,
+    relations,
     isLoadingContentsTypes,
     isLoadingEntries,
     availableEntriesMap,
@@ -179,7 +180,7 @@ const Panel = () => {
       </Container>
       <div className="container-fluid">
         <div className="row">
-          <ListView />
+          <ListView relations={relations} />
           <DetailsView />
         </div>
       </div>

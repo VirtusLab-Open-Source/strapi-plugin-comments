@@ -3,13 +3,14 @@ import PropTypes from 'prop-types';
 import Item from '../Item';
 import Container from './Container';
 
-const List = ({ items }) => (
+const List = ({ items, relations }) => (
   <Container>
-    { items.map((item, n) => (
+    {items.map((item, n) => (
       <Item
-      key={`list-item-${item.id || n}`}
-      {...item}
-      /> ))}
+        key={`list-item-${item.id || n}`}
+        relations={relations}
+        {...item}
+      />))}
   </Container>
 );
 

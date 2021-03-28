@@ -23,7 +23,8 @@ const Item = ({
   blockedThread,
   isNew,
   createdAt,
-  updatedAt
+  updatedAt,
+  relations,
 }) => {
   const { push } = useHistory();
   const { getSearchParams } = useDataManager();
@@ -31,11 +32,13 @@ const Item = ({
   const parsedId = typeof activeId === 'number' ? Number(activeId) : activeId;
 
   const onClick = e => {
-    e.preventDefault();
-    push({
-      pathname: `/plugins/${pluginId}/display/${id}`,
-      search: generateSearchFromFilters(getSearchParams()),
-    });
+    if (!e.target.href) {
+      e.preventDefault();
+      push({
+        pathname: `/plugins/${pluginId}/display/${id}`,
+        search: generateSearchFromFilters(getSearchParams()),
+      });
+    }
   };
 
   const isAbuseReported = !isEmpty(reports);
@@ -52,7 +55,8 @@ const Item = ({
     authorUser,
     related: isArray(related) ? first(related) : related,
     created_at: created_at || createdAt,
-    updated_at: updated_at || updatedAt
+    updated_at: updated_at || updatedAt,
+    relations
   };
 
   return (
