@@ -10,7 +10,7 @@ export const initialState = fromJS({
   isLoadingContentsTypes: false,
   isLoadingEntries: false,
   contentsTypes: [],
-  relations: {},
+  relatedContentTypes: {},
   availableEntriesMap: Set(),
 });
 
@@ -24,7 +24,7 @@ const reducer = (state, action) => {
       return state
         .update('isLoadingContentsTypes', () => false)
         .update('contentsTypes', () => action.contentsTypes)
-        .update('relations', () => action.relations);
+        .update('relatedContentTypes', () => action.relatedContentTypes);
     }
     case GET_CONTENT_LIST_CONTENT_TYPE: {
       return state

@@ -24,7 +24,7 @@ const Item = ({
   isNew,
   createdAt,
   updatedAt,
-  relations,
+  relatedContentTypes,
 }) => {
   const { push } = useHistory();
   const { getSearchParams } = useDataManager();
@@ -56,7 +56,7 @@ const Item = ({
     related: isArray(related) ? first(related) : related,
     created_at: created_at || createdAt,
     updated_at: updated_at || updatedAt,
-    relations
+    relatedContentTypes
   };
 
   return (

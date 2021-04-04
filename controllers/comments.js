@@ -141,15 +141,31 @@ module.exports = {
   },
 
   async config(ctx) {
-    const relations = _.get(strapi.config, ['plugins', 'comments', 'relations'], {});
+    const configRelatedContentTypes = _.get(strapi.config, ['plugins', 'comments', 'relatedContentTypes'], {});
+    const contentsTypes = this.getContentsTypes();
+    const relatedContentTypes = Object
+      .keys(configRelatedContentTypes)
+      .reduce((acc, currentKey) => {
+          const current = configRelatedContentTypes[currentKey];
+          const { key } = contentsTypes.find(content => content.value === currentKey) || {};
+          return {
+            ...acc,
+            [currentKey]: {
+              ...current,
+              globalName: _.snakeCase(key)
+            },
+          };
+        },
+        {},
+      );
     ctx.body = {
-      relations,
-      contentsTypes: this.getContentsTypes(),
+      relatedContentTypes,
+      contentsTypes,
     };
   },
 
   getContentsTypes() {
-    const result = Object.entries(strapi.contentTypes)
+    return Object.entries(strapi.contentTypes)
       .filter(([, contentType]) => (
         contentType.associations || []).some(_ => _.plugin === 'comments' && _.collection === 'comment'),
       )
@@ -158,7 +174,6 @@ module.exports = {
           { key: contentType.globalName, value: contentType.collectionName }],
         [],
       );
-    return result;
   },
 
   async contentTypeName(ctx) {

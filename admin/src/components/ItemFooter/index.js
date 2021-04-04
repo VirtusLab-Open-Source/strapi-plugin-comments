@@ -6,7 +6,7 @@ import { faLink } from '@fortawesome/free-solid-svg-icons';
 import CardItemRelation from './CardItemRelation';
 import CardItemAuthor from './CardItemAuthor';
 import Wrapper from './Wrapper';
-import { get, isNil, isObject, kebabCase, startCase } from 'lodash';
+import { find, isNil, isObject, kebabCase, snakeCase, startCase } from 'lodash';
 import { Link } from 'react-router-dom';
 
 const ENTITY_NAME_PARAMS = ['title', 'Title', 'subject', 'Subject', 'name', 'Name'];
@@ -21,7 +21,7 @@ const getContentTypeLink = (name) => `application::${name}.${name}`;
 
 const resolveEntityName = entity => ENTITY_NAME_PARAMS.map(_ => entity[_]).filter(_ => _)[0] || '';
 
-const ItemFooter = ({ authorName, authorUser, related, created_at, isDetailedView, relations }) => {
+const ItemFooter = ({ authorName, authorUser, related, created_at, isDetailedView, relatedContentTypes }) => {
   const formatAuthor = () => {
     if (authorUser) {
       return authorUser.username;
@@ -38,21 +38,22 @@ const ItemFooter = ({ authorName, authorUser, related, created_at, isDetailedVie
   const formatRelationType = () => {
     if (relatedExist) {
       const { id, __contentType: contentType } = related;
-      const name = kebabCase(contentType);
-      const relation = get(relations, name);
+      const name = snakeCase(contentType);
+      const relation = find(relatedContentTypes, ({ globalName }) => globalName === name);
       if (relation && relation.contentManager) {
         const contentManagerRoot = `/plugins/content-manager`;
         if (relation.isSingle) {
           return getLink(
-            relation.url || `${contentManagerRoot}/singleType/${getContentTypeLink(name)}`,
+            relation.url || `${contentManagerRoot}/singleType/${getContentTypeLink(kebabCase(name))}`,
             related.__contentType,
           );
         } else if (relation.url) {
           const url = `${relation.url.replace(':id', id)}'?_sort=id:ASC&_where[0][id]=${id}`;
-          return getLink(url, related.__contentType);
+          return getLink(url, related[relation.key] || related.__contentType);
         } else {
-          const url = `${contentManagerRoot}/collectionType/${getContentTypeLink(name)}?_sort=id:ASC&_where[0][id]=${id}`;
-          return getLink(url, related.__contentType);
+          const url = `${contentManagerRoot}/collectionType/${getContentTypeLink(
+            kebabCase(name))}?_sort=id:ASC&_where[0][id]=${id}`;
+          return getLink(url, related[relation.key] || related.__contentType);
         }
       }
       return startCase(related.__contentType);

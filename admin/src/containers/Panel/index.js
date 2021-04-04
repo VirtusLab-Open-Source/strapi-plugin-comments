@@ -29,8 +29,8 @@ import getTrad from '../../utils/getTrad';
 const getContentTypes = async (dispatch) => {
   try {
     dispatch({ type: GET_CONFIG });
-    const { contentsTypes , relations } = await request(`/${pluginId}/moderation/config`, { method: 'GET' });
-    dispatch({ type: GET_CONFIG_SUCCESS, contentsTypes, relations });
+    const { contentsTypes , relatedContentTypes } = await request(`/${pluginId}/moderation/config`, { method: 'GET' });
+    dispatch({ type: GET_CONFIG_SUCCESS, contentsTypes, relatedContentTypes });
   } catch (err) {
     console.log('err', err);
   }
@@ -60,7 +60,7 @@ const Panel = () => {
   const [reducerState, dispatch] = useReducer(reducer, initialState);
   const {
     contentsTypes,
-    relations,
+    relatedContentTypes,
     isLoadingContentsTypes,
     isLoadingEntries,
     availableEntriesMap,
@@ -180,7 +180,7 @@ const Panel = () => {
       </Container>
       <div className="container-fluid">
         <div className="row">
-          <ListView relations={relations} />
+          <ListView relatedContentTypes={relatedContentTypes} />
           <DetailsView />
         </div>
       </div>

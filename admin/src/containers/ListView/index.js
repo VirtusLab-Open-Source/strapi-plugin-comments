@@ -22,7 +22,7 @@ import useDataManager from '../../hooks/useDataManager';
 
 import getTrad from '../../utils/getTrad';
 
-const ListView = ({ relations }) => {
+const ListView = ({ relatedContentTypes }) => {
   const { items, isLoadingForDataToBeSet } = useDataManager();
 
   return (
@@ -35,7 +35,7 @@ const ListView = ({ relations }) => {
             <FormattedMessage id={getTrad('list.content.empty')} />
           </EmptyView>
         )}
-        {!isEmpty(items) && <List items={[...items]} relations={relations} />}
+        {!isEmpty(items) && <List items={[...items]} relatedContentTypes={relatedContentTypes} />}
       </FadedWrapper>
       <Footer />
     </Wrapper>

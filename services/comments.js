@@ -385,7 +385,7 @@ module.exports = {
         const { pluginName, model } = extractMeta(strapi.plugins);
         const ormModel = strapi.query(model.modelName, pluginName);
         const associationModel = this.getAssociationModel(ormModel, contentTypeName);
-        const config = get(strapi.config, ['plugins', 'comments', 'relatedContentTypesFields', contentTypeName], []);
+        const config = get(strapi.config, ['plugins', 'comments', 'relatedContentTypes', contentTypeName], []);
         if (isEmpty(config)) {
             return [];
         }
