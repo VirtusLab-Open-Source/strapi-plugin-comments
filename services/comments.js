@@ -118,20 +118,27 @@ module.exports = {
     },
 
     // Find comments in the flat structure
-    async findAllFlat(relation, query) {
+    async findAllFlat(relation, query, isAdmin = false) {
         const { pluginName, model } = extractMeta(strapi.plugins);
         let baseCriteria = {};
         if (relation) {
             baseCriteria = {
                 ...baseCriteria,
+                _or: [{ removed_null: true }, { removed: false }],
                 relatedSlug: relation,
             };
         }
-
         let criteria = {
             ...baseCriteria,
+            _or: [{ removed_null: true }, { removed: false }],
             threadOf_null: true,
         };
+
+        if (isAdmin){
+            delete baseCriteria._or;
+            delete criteria._or;
+        }
+
         if (query) {
             criteria = {
                 ...criteria,
@@ -153,8 +160,14 @@ module.exports = {
     },
 
     // Find comments and create relations tree structure
-    async findAllInHierarchy (relation, query, startingFromId = null, dropBlockedThreads = false) {
-        const entities = await this.findAllFlat(relation, query);
+    async findAllInHierarchy ({
+        relation,
+        query,
+        startingFromId = null,
+        dropBlockedThreads = false,
+        isAdmin = false,
+    }) {
+        const entities = await this.findAllFlat(relation, query, isAdmin);
         return buildNestedStructure(entities, startingFromId, 'threadOf', dropBlockedThreads, false, this.isMongoDB());
     },
 
@@ -313,6 +326,23 @@ module.exports = {
         throw new PluginError(409, 'Action on that entity is not allowed');
     },
 
+    async markAsRemoved(relationId, commentId, authorId){
+        const { pluginName, model } = extractMeta(strapi.plugins);
+        const entity = await this.findOne(
+          commentId,
+          relationId,
+          { _or: [{ authorUser: authorId }, { authorId }] },
+        );
+        if (!entity){
+            throw strapi.errors.notFound('Entity not exist');
+        }
+        return strapi
+          .query(model.modelName, pluginName)
+          .update({ id: commentId, relatedSlug: relationId }, { removed: true })
+          .then(({ id }) => this.markAsRemovedNested(id, true))
+          .then(() => ({}));
+    },
+
     //
     // Moderation
     //
@@ -326,7 +356,11 @@ module.exports = {
         }
         const relatedEntity = !isEmpty(entity.related) ? first(entity.related) : null;
         const relation = relatedEntity ? `${convertContentTypeNameToSlug(relatedEntity.__contentType).toLowerCase()}:${relatedEntity.id}` : null;
-        const entitiesOnSameLevel = await this.findAllInHierarchy(relation, null, entity.threadOf ? entity.threadOf.id : null)
+        const entitiesOnSameLevel = await this.findAllInHierarchy({
+            relation,
+            startingFromId: entity.threadOf ? entity.threadOf.id : null,
+            isAdmin: true
+        })
         const selectedEntity = filterOurResolvedReports(this.sanitizeCommentEntity(entity));
         return {
             selected: {
@@ -356,24 +390,31 @@ module.exports = {
             { id },
             { blockedThread: !existingEntity.blockedThread }
         );
-        await this.blockCommentThreadNested(id, !existingEntity.blockedThread)
+        await this.blockNestedThreads(id, changedEntity.blockedThread)
         return this.sanitizeCommentEntity(changedEntity);
     },
 
-    async blockCommentThreadNested(id, blockStatus) {
+    markAsRemovedNested(id, status){
+        return this.modifiedNestedNestedComments(id, 'removed', status);
+    },
+
+    blockNestedThreads(id, blockStatus){
+        return this.modifiedNestedNestedComments(id, 'blockedThread', blockStatus)
+    },
+
+    async modifiedNestedNestedComments(id, fieldName, value) {
         const { pluginName, model } = extractMeta(strapi.plugins);
         try {
             const entitiesToChange = await strapi.query(model.modelName, pluginName).find({ threadOf: id });
             const changedEntities = await Promise.all(entitiesToChange.map(item => strapi.query(model.modelName, pluginName).update(
                 { id: item.id },
-                { blockedThread: blockStatus }
+                { [fieldName]: value }
             )));
-            if (changedEntities) {
-                const changedEntitiesList = changedEntities instanceof Array ? changedEntities : [changedEntities];
+            if (changedEntities.length) {
                 const nestedTransactions = await Promise.all(
-                    changedEntitiesList.map(item => this.blockCommentThreadNested(item.id, blockStatus))
+                  changedEntities.map(item => this.modifiedNestedNestedComments(item.id, fieldName, value))
                 );
-                return nestedTransactions.length === changedEntitiesList.length;
+                return nestedTransactions.length === changedEntities.length;
             }
             return true;
         } catch (e) {

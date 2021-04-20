@@ -31,6 +31,7 @@ const ItemDetails = ({
   reports,
   blocked,
   blockedThread,
+  removed,
   onClick,
   onBlockClick,
   onBlockThreadClick,
@@ -55,10 +56,9 @@ const ItemDetails = ({
     e.stopPropagation();
     onAbuseReportResolve(reportId, id);
   };
-
   const hasThreads = (threadsCount !== undefined) && (threadsCount > 0);
   const isAbuseReported = !isEmpty(reports);
-  const isItemHeaderDisplayed = blocked || blockedThread || isAbuseReported;
+  const isItemHeaderDisplayed = blocked || blockedThread || removed || isAbuseReported;
   const footerProps = {
     authorName,
     authorUser,
@@ -71,6 +71,7 @@ const ItemDetails = ({
     active,
     blocked,
     blockedThread,
+    isRemoved: removed,
     abuseReports: reports || [],
     isAbuseReported: !isEmpty(reports),
     isDelailedView: true,
@@ -116,7 +117,7 @@ const ItemDetails = ({
           </CardLevelCounterLink>
         </CardLevelCounter>
       )}
-      { active && (<ItemModeration { ...moderationProps } />) }
+      { active && !removed && (<ItemModeration { ...moderationProps } />) }
       { (!isEmpty(reports) && active) && (
         <AbuseReportsPopUp
           {...reportsPopUpProps}

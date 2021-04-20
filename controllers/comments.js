@@ -11,6 +11,10 @@ const _ = require('lodash');
 
 module.exports = {
 
+  getService() {
+    return strapi.plugins.comments.services.comments;
+  },
+
   /**
    * Default action.
    *
@@ -36,7 +40,11 @@ module.exports = {
     const { params = {}, query } = ctx;
     const { relation } = parseParams(params);
     try {
-      return await strapi.plugins.comments.services.comments.findAllInHierarchy(relation, query, null, true);
+      return await strapi.plugins.comments.services.comments.findAllInHierarchy({
+        relation,
+        query,
+        dropBlockedThreads: true,
+      });
     } catch (e) {
       throwError(ctx, e);
     }
@@ -94,6 +102,25 @@ module.exports = {
     } catch (e) {
       throwError(ctx, e);
     }
+  },
+
+  async removeComment(ctx) {
+    const { params: { relationId, commentId }, query: { authorId } } = ctx;
+    if (authorId) {
+      try {
+        return await this.getService().markAsRemoved(
+          relationId,
+          commentId,
+          authorId,
+        );
+      } catch (e) {
+        if (!e.isBoom) {
+          throwError(ctx, e);
+        }
+        throw e;
+      }
+    }
+    return ctx.badRequest('Not provided authorId');
   },
 
   //

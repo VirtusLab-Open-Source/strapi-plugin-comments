@@ -49,6 +49,14 @@
       }
     },
     {
+      "method": "DELETE",
+      "path": "/:relationId/:commentId",
+      "handler": "comments.removeComment",
+      "config": {
+        "policies": []
+      }
+    },
+    {
       "method": "GET",
       "path": "/moderation/all",
       "handler": "comments.findAll",

@@ -13,13 +13,13 @@ import CardHeaderIndicatorRed from './CardHeaderIndicatorRed';
 import CardHeaderReports from './CardHeaderReports';
 import pluginPermissions from '../../permissions';
 
-const ItemHeader = ({ active, isDelailedView, blocked, blockedThread, isNew, isAbuseReported, abuseReports, onReportsClick }) => {
+const ItemHeader = ({ active, isDelailedView, blocked, blockedThread, isNew, isAbuseReported, isRemoved, abuseReports, onReportsClick }) => {
   const { formatMessage } = useGlobalContext();
   const isBlocked = blocked || blockedThread;
   const hasAnyIndicators = isNew || (isAbuseReported && !isDelailedView);
 
   return (
-    <Wrapper hasMargin={isBlocked || (isAbuseReported && isDelailedView)}>
+    <Wrapper hasMargin={isBlocked || isRemoved || (isAbuseReported && isDelailedView)}>
       { isBlocked && (
         <CheckPermissions permissions={pluginPermissions.moderate}>
           <CardHeaderBlocked>
@@ -29,6 +29,17 @@ const ItemHeader = ({ active, isDelailedView, blocked, blockedThread, isNew, isA
           </CardHeaderBlocked>
         </CheckPermissions>
       ) }
+      {
+        isRemoved && (
+          <CheckPermissions permissions={pluginPermissions.moderate}>
+            <CardHeaderBlocked>
+              <FontAwesomeIcon icon={faLock} />
+              {blockedThread && <FontAwesomeIcon icon={faStream} />}
+              <FormattedMessage id={`${pluginId}.list.item.header.removed`} />
+            </CardHeaderBlocked>
+          </CheckPermissions>
+        )
+      }
       { (isDelailedView && active) && (<>
         { isAbuseReported && (
           <CheckPermissions permissions={pluginPermissions.moderateReports}>
@@ -60,6 +71,7 @@ ItemHeader.propTypes = {
   blocked: PropTypes.bool,
   blockedThread: PropTypes.bool,
   isNew: PropTypes.bool,
+  removed: PropTypes.bool,
   isAbuseReported: PropTypes.bool,
   abuseReports: PropTypes.array,
   onReportsClick: PropTypes.func,
