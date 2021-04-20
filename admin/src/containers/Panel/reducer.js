@@ -1,28 +1,30 @@
 import { fromJS, Set } from 'immutable';
 import {
+  GET_CONFIG,
+  GET_CONFIG_SUCCESS,
   GET_CONTENT_LIST_CONTENT_TYPE,
   GET_CONTENT_LIST_CONTENT_TYPE_SUCCEEDED,
-  GET_CONTENT_TYPES,
-  GET_CONTENT_TYPES_SUCCEEDED,
 } from './actions';
 
 export const initialState = fromJS({
   isLoadingContentsTypes: false,
   isLoadingEntries: false,
   contentsTypes: [],
+  relatedContentTypes: {},
   availableEntriesMap: Set(),
 });
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case GET_CONTENT_TYPES: {
+    case GET_CONFIG: {
       return state
         .update('isLoadingContentsTypes', () => true);
     }
-    case GET_CONTENT_TYPES_SUCCEEDED: {
+    case GET_CONFIG_SUCCESS: {
       return state
         .update('isLoadingContentsTypes', () => false)
-        .update('contentsTypes', () => action.contentsTypes);
+        .update('contentsTypes', () => action.contentsTypes)
+        .update('relatedContentTypes', () => action.relatedContentTypes);
     }
     case GET_CONTENT_LIST_CONTENT_TYPE: {
       return state

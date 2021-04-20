@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { useGlobalContext, LoadingIndicatorPage } from 'strapi-helper-plugin';
+import { LoadingIndicatorPage } from 'strapi-helper-plugin';
 import { FormattedMessage } from 'react-intl';
 import { isEmpty } from 'lodash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -22,7 +22,7 @@ import useDataManager from '../../hooks/useDataManager';
 
 import getTrad from '../../utils/getTrad';
 
-const ListView = () => {
+const ListView = ({ relatedContentTypes }) => {
   const { items, isLoadingForDataToBeSet } = useDataManager();
 
   return (
@@ -35,7 +35,7 @@ const ListView = () => {
             <FormattedMessage id={getTrad('list.content.empty')} />
           </EmptyView>
         )}
-        {!isEmpty(items) && <List items={[...items]} />}
+        {!isEmpty(items) && <List items={[...items]} relatedContentTypes={relatedContentTypes} />}
       </FadedWrapper>
       <Footer />
     </Wrapper>

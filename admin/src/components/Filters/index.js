@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Collapse } from 'reactstrap';
 import { Select } from '@buffetjs/core';
-import { map, noop } from 'lodash';
+import { map, noop, startCase } from 'lodash';
 
 import { FilterButton, getFilterType } from 'strapi-helper-plugin';
 
@@ -35,7 +35,7 @@ const Filters = ({
   );
 
   const contentsTypesOptions = useMemo(
-    () => [{ key: '', value: '' }, ...(contentsTypes || [])],
+    () => [{ key: '', value: '' }, ...(contentsTypes || []).map(_ => ({ ..._, key: startCase(_.key) }))],
     [contentsTypes],
   );
   const availableEntriesOptions = useMemo(
@@ -128,7 +128,9 @@ const Filters = ({
                 }
                 const label = {
                   ...filter,
-                  value: (isEntityFilter(filter.name) ? availableEntriesMap[filter.contentType] || [] : contentsTypesOptions).find(isMatch(filter.value))?.key,
+                  value: (isEntityFilter(filter.name)
+                    ? availableEntriesMap[filter.contentType] || []
+                    : contentsTypesOptions).find(isMatch(filter.value))?.key,
                 };
                 return (
                   <FilterButton

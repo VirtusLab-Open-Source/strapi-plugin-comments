@@ -82,8 +82,8 @@
     },
     {
       "method": "GET",
-      "path": "/moderation/contents-types",
-      "handler": "comments.contentsTypes",
+      "path": "/moderation/config",
+      "handler": "comments.config",
       "config": {
         "policies": [["admin::hasPermissions", ["plugins::comments.read"]]]
       }
