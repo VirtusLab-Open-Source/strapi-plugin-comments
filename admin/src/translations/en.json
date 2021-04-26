@@ -6,6 +6,7 @@
     "list.content.empty": "Nothing found, lift your search criteria and try again",
     "list.item.header.blocked": "This comment has been blocked",
     "list.item.header.blocked.thread": "This comment and thread have been blocked",
+    "list.item.header.removed": "This comment and thread have been removed by author",
     "list.item.indication.new": "New comment",
     "list.item.indication.abuse": "Abuse reported",
     "list.item.threads.drilldown": "Drilldown",

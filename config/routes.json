@@ -49,6 +49,14 @@
       }
     },
     {
+      "method": "DELETE",
+      "path": "/:relationId/:commentId",
+      "handler": "comments.removeComment",
+      "config": {
+        "policies": []
+      }
+    },
+    {
       "method": "GET",
       "path": "/moderation/all",
       "handler": "comments.findAll",
@@ -68,6 +76,22 @@
       "method": "GET",
       "path": "/moderation/single/:id",
       "handler": "comments.findOne",
+      "config": {
+        "policies": [["admin::hasPermissions", ["plugins::comments.read"]]]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/config",
+      "handler": "comments.config",
+      "config": {
+        "policies": [["admin::hasPermissions", ["plugins::comments.read"]]]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/moderation/contents-types/:contentTypeName",
+      "handler": "comments.contentTypeName",
       "config": {
         "policies": [["admin::hasPermissions", ["plugins::comments.read"]]]
       }

@@ -50,7 +50,7 @@ Complete installation requirements are exact same as for Strapi itself and can b
 
 **Supported Strapi versions**:
 
-- Strapi v3.3.4 (recently tested)
+- Strapi v3.6.0 (recently tested)
 - Strapi v3.x
 
 (This plugin may work with the older Strapi versions, but these are not tested nor officially supported at this time.)
@@ -91,6 +91,24 @@ inside the `attributes` section like in example below:
         ...
     },
 ```
+
+## Configuration
+To setup amend default plugin configuration we recommend to put following snippet as part of `config/custom.js` or `config/<env>/custom.js` file. If you've got already configurations for other plugins stores by this way, use just the `navigation` part within exising `plugins` item.
+
+```
+    ...
+    plugins: {
+      comments: {
+        enableUsers: true,
+        badWords: false,
+      },
+    },
+    ...
+```
+
+### Properties
+- `enableUsers` - Enabled support for built-in Strapi users, if endpoints are exposed with usage of `Authenticated` policy or JWT tokens are in use by the Client App. Default value: `false`.
+- `badWords` - Enabled support for (bad words filtering)[https://www.npmjs.com/package/bad-words]. Can be turned off or overwritten using (options reference)[https://www.npmjs.com/package/bad-words#constructor]. Default value: `true`. 
 
 ## Public API Comment model
 
@@ -225,7 +243,7 @@ Posts a Comment related to specified instance of Content Type like for example `
 *Strapi user*
 ```
 {
-	"authorUser": 1,
+	"authorUser": 1, // id of a author user. Optional in case of 'enableUsers: true' in the plugin configuration
 	"content": "My sample response",
 	"threadOf": 2, // id of comment we would like to start / continue the thread (Optional)
 	"related": [{
@@ -271,7 +289,7 @@ Updates a specified Comment content based on it `commentId` and related to speci
 *Strapi user*
 ```
 {
-	"authorUser": 1,
+	"authorUser": 1, // id of a author user. Optional in case of 'enableUsers: true' in the plugin configuration
 	"content": "My sample response"
 }
 ```
@@ -339,6 +357,10 @@ Reports abuse in specified Comment content based on it `commentId` and related t
 **Possible response codes**
 - `200` - Successful. Response with reported abuse.
 - `409` - Conflict. Occurs when trying to report an abuse to a non existing comment.
+
+## Examples
+
+Live example of plugin usage can be found in the [VirtusLab Strapi Examples](https://github.com/VirtusLab/strapi-examples/tree/master/strapi-plugin-comments) repository.
 
 ## Contributing
 

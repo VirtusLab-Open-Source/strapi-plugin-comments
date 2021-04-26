@@ -11,14 +11,14 @@ module.exports = class PluginError extends Error {
         return `${e.name} - ${e.message}`;
      }
 
-     getData() {
-         if (this.payload) {
-            return JSON.stringify({
-                name: this.name,
-                message: this.message,
-                ...(this.payload || {}),
-            });
-        }
-        return this.toString();
-     }
+     toJSON() {
+        if (this.payload) {
+           return {
+               name: this.name,
+               message: this.message,
+               ...(this.payload || {}),
+           };
+       }
+       return this;
+    }
 }; 
