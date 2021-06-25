@@ -21,9 +21,7 @@ module.exports = {
    * @return {Object}
    */
   async findAll(ctx) {
-    const { params = {} } = ctx;
-    const { page } = parseParams(params);
-    return await strapi.plugins.comments.services.comments.findAll(ctx.query, page);
+    return strapi.plugins.comments.services.comments.findAll(ctx.query);
   },
 
   async findAllFlat(ctx) {
@@ -179,13 +177,13 @@ module.exports = {
             ...acc,
             [currentKey]: {
               ...current,
-              globalName: _.snakeCase(key)
+              globalName: _.snakeCase(key),
             },
           };
         },
         {},
       );
-    ctx.body = {
+    return {
       relatedContentTypes,
       contentsTypes,
     };
@@ -207,7 +205,7 @@ module.exports = {
     const { params: { contentTypeName } } = ctx;
     try {
       const result = await strapi.plugins.comments.services.comments.contentTypeName(contentTypeName);
-      ctx.body = { list: result };
+      return { list: result };
     } catch (e) {
       throwError(ctx, e);
     }

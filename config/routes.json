@@ -66,14 +66,6 @@
     },
     {
       "method": "GET",
-      "path": "/moderation/all/:page",
-      "handler": "comments.findAll",
-      "config": {
-        "policies": [["admin::hasPermissions", ["plugins::comments.read"]]]
-      }
-    },
-    {
-      "method": "GET",
       "path": "/moderation/single/:id",
       "handler": "comments.findOne",
       "config": {

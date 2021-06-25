@@ -316,12 +316,11 @@ module.exports = {
         const { report: reportModel } = plugin.models;
         const existingEntity = await this.findOne(id, relation);
         if (existingEntity) {
-            const entity = await strapi.query(reportModel.modelName, pluginName).create({
+            return strapi.query(reportModel.modelName, pluginName).create({
                 ...payload,
                 resolved: false,
                 related: id,
             });
-            return entity;
         }
         throw new PluginError(409, 'Action on that entity is not allowed');
     },
