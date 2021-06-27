@@ -49,13 +49,11 @@ module.exports = {
   },
 
   async post(ctx) {
-    const { request, state, params = {} } = ctx;
+    const { request, state = {} } = ctx;
     const { user } = state;
-    const { relation } = parseParams(params);
     const { body = {} } = request;
     try {
-      const entity = await strapi.plugins.comments.services.comments.create(body, relation, user);
-
+      const entity = await strapi.plugins.comments.services.comments.create(body, user);
       if (entity) {
         return entity;
       }
@@ -68,9 +66,9 @@ module.exports = {
     const { request, state, params = {} } = ctx;
     const { body = {} } = request;
     const { user } = state;
-    const { relation, commentId } = parseParams(params);
+    const { commentId } = parseParams(params);
     try {
-      return await strapi.plugins.comments.services.comments.update(commentId, relation, body, user);
+      return await strapi.plugins.comments.services.comments.update(commentId, body, user);
     } catch (e) {
       throwError(ctx, e);
     }

@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const BASE_COMMENTS = `
   id: ID!
   content: String!
@@ -43,8 +42,9 @@ module.exports = {
           resolved: Boolean!
           related: Comment
       }
+
       type Comment {
-        ${BASE_COMMENTS}
+         ${BASE_COMMENTS}
       }
 
       type CommentsInHierarchy {
@@ -92,6 +92,26 @@ module.exports = {
         key: String!
         value: String
       }
+      
+      type CommentRemove {
+        id: ID!
+      }
+
+      input NewCommentRelated {
+        refId: String!
+        ref: String!
+        field: String!
+      }
+
+      input CommentNew {
+        authorId: String
+        authorName: String
+        authorEmail: String
+        content: String!
+        authorUsername: String
+        threadOf: String
+        related: [NewCommentRelated!]!
+      }
   `,
   // language=GraphQL
   query: `
@@ -105,7 +125,17 @@ module.exports = {
   type: {
     Relation: 'It is related slug given when comment was created',
   },
-  mutation: ``,
+  // language=GraphQL
+  mutation: `
+      commentAdd(comment: CommentNew): Comment!
+      commentUpdate(id: ID!, content: String!, related: NewCommentRelated): Comment!
+      commentReportAbuse(id: ID!, relation: Relation!, reason: CommentReportReason!, content: String!): CommentReport
+      commentLike(id: ID!, relation: Relation!): Comment
+      commentRemove(id: ID!, relation: Relation!, authorId: ID!): CommentRemove
+      commentBlock(id: ID!): Comment
+      commentThreadBlock(id: ID!): Comment
+      commentResolveReport(reportId: ID!, commentId: ID!): CommentReport
+  `,
   resolver: {
     Query: {
       findAllInHierarchy: {
@@ -161,7 +191,80 @@ module.exports = {
         },
       },
     },
-    Mutation: {},
+    Mutation: {
+      commentAdd: {
+        resolverOf: 'plugins::comments.comments.post',
+        policies: ['plugins::users-permissions.isAuthenticated'],
+        resolver(obj, options, { context }) {
+          const user = context.state.user;
+          const { comment } = options;
+          return strapi.plugins.comments.services.comments
+            .create(comment, user);
+        },
+      },
+      commentUpdate: {
+        resolverOf: 'plugins::comments.comments.put',
+        policies: ['plugins::users-permissions.isAuthenticated'],
+        resolver(obj, options, { context }) {
+          const user = context.state.user;
+          const { id, ...data } = options;
+          return strapi.plugins.comments.services.comments
+            .update(id, data, user);
+        },
+      },
+      commentReportAbuse: {
+        resolverOf: 'plugins::comments.comments.reportAbuse',
+        policies: ['plugins::users-permissions.isAuthenticated'],
+        resolver(obj, options, { context }) {
+          const user = context.state.user;
+          const { id, relation, reason, content } = options;
+          return strapi.plugins.comments.services.comments
+            .reportAbuse(id, relation, { reason, content }, user);
+        },
+      },
+      commentLike: {
+        resolverOf: 'plugins::comments.comments.pointsUp',
+        policies: ['plugins::users-permissions.isAuthenticated'],
+        resolver(obj, options, { context }) {
+          const user = context.state.user;
+          const { id, relation } = options;
+          return strapi.plugins.comments.services.comments
+            .pointsUp(id, relation, user);
+        },
+      },
+      commentRemove: {
+        resolverOf: 'plugins::comments.comments.removeComment',
+        resolver(obj, options) {
+          const { id, relation, authorId } = options;
+          return strapi.plugins.comments.services.comments
+            .markAsRemoved(relation, id, authorId);
+        },
+      },
+      commentBlock: {
+        resolverOf: 'plugins::comments.comments.blockComment',
+        resolver(obj, options) {
+          const { id } = options;
+          return strapi.plugins.comments.services.comments
+            .blockComment(id);
+        },
+      },
+      commentThreadBlock: {
+        resolverOf: 'plugins::comments.comments.blockCommentThread',
+        resolver(obj, options) {
+          const { id } = options;
+          return strapi.plugins.comments.services.comments
+            .blockCommentThread(id);
+        },
+      },
+      commentResolveReport: {
+        resolverOf: 'plugins::comments.comments.resolveAbuseReport',
+        resolver(obj, options) {
+          const { reportId, commentId } = options;
+          return strapi.plugins.comments.services.comments
+            .resolveAbuseReport(reportId, commentId);
+        },
+      },
+    },
   },
 };
 
