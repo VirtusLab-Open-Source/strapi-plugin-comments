@@ -307,6 +307,26 @@ Updates a specified Comment content based on it `commentId` and related to speci
 - `400` - Bad Request. Missing field values or bad words check fails. Error message will provide relevant reason.
 - `409` - Conflict. Occurs when trying to update a non existing or not own comment. Possible cause might be that `authorId` or `authorUser` mismatch with existing comment.
 
+### Delete Comment
+
+`DELETE <host>/comments/<content-type>:<id>/<commentId>?authorId=<authorId>`
+
+Deletes a specified Comment based on it `commentId` and related to specified instance of Content Type like for example `Article` with `ID: 1`.
+
+**Example URL**: `https://localhost:1337/comments/article:1/1?authorId=1`
+
+**Example response body**
+
+```
+{
+    -- Empty Response ---
+}
+```
+
+**Possible response codes**
+- `200` - Successful with blank Response.
+- `409` - Conflict. Occurs when trying to delete a non existing comment.
+
 ### Like Comment
 
 `PATCH <host>/comments/<content-type>:<id>/comment/<commentId>/like`
