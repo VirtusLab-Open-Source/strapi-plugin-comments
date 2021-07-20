@@ -201,12 +201,17 @@ module.exports = {
     },
 
     // Create a comment
-    async create(data, relation, user = undefined) {
+    async create(data, user = undefined) {
         const { content, related } = data;
         const parsedRelation = related && related instanceof Array ? related : [related];
-        this.checkEntityRelation(map(parsedRelation, 'ref'));
         const singleRelationFulfilled = related && (parsedRelation.length === 1);
-        const linkToThread = !isNil(data.threadOf) ? !!await this.findOne(data.threadOf, relation) : true;
+        if(!singleRelationFulfilled){
+            throw new PluginError(400, 'Can relate only one content type');
+        }
+        const relation = parsedRelation.map(({refId, ref})=> `${ref}:${refId}`).toString();
+        this.checkEntityRelation(map(parsedRelation, 'ref'));
+
+        const linkToThread = !isNil(data.threadOf) ? !!await this.findOne(data.threadOf,relation) : true;
         const validContext = isValidUserContext(user);
 
         if (!linkToThread) {
@@ -219,7 +224,6 @@ module.exports = {
 
         if (checkBadWords(content) && singleRelationFulfilled) {
             const { pluginName, model } = extractMeta(strapi.plugins);
-            const relatedEntity = !isEmpty(related) ? first(related) : null;
             const { authorId, authorEmail, authorName, authorUser, ...rest } = data;
             let authorData = {};
             if (validContext && user) {
@@ -256,7 +260,7 @@ module.exports = {
             const entity = await strapi.query( model.modelName, pluginName).create({
                 ...rest,
                 ...authorData,
-                relatedSlug: relatedEntity ? `${relatedEntity.ref}:${relatedEntity.refId}` : relation,
+                relatedSlug: relation,
                 related: parsedRelation
             });
             return this.sanitizeCommentEntity(entity);
@@ -265,9 +269,15 @@ module.exports = {
     },
 
     // Update a comment
-    async update(id, relation, data, user) {
-        const { content } = data;
+    async update(id, data, user) {
+        const { content, related } = data;
         const { pluginName, model } = extractMeta(strapi.plugins);
+        const parsedRelation = related && related instanceof Array ? related : [related];
+        const singleRelationFulfilled = related && (parsedRelation.length === 1);
+        if(!singleRelationFulfilled){
+            throw new PluginError(400, 'Can relate only one content type');
+        }
+        const relation = parsedRelation.map(({refId, ref})=> `${ref}:${refId}`).toString();
         const existingEntity = await this.findOne(id, relation);
         const validContext = isValidUserContext(user);
 
@@ -316,12 +326,11 @@ module.exports = {
         const { report: reportModel } = plugin.models;
         const existingEntity = await this.findOne(id, relation);
         if (existingEntity) {
-            const entity = await strapi.query(reportModel.modelName, pluginName).create({
+            return strapi.query(reportModel.modelName, pluginName).create({
                 ...payload,
                 resolved: false,
                 related: id,
             });
-            return entity;
         }
         throw new PluginError(409, 'Action on that entity is not allowed');
     },
@@ -340,7 +349,7 @@ module.exports = {
           .query(model.modelName, pluginName)
           .update({ id: commentId, relatedSlug: relationId }, { removed: true })
           .then(({ id }) => this.markAsRemovedNested(id, true))
-          .then(() => ({}));
+          .then(() => ({ id: commentId }));
     },
 
     //
@@ -462,13 +471,12 @@ module.exports = {
     async resolveAbuseReport(id, commentId) {
         const { pluginName, plugin } = extractMeta(strapi.plugins);
         const { report: reportModel } = plugin.models;
-        const entity = await strapi.query(reportModel.modelName, pluginName).update({
+        return strapi.query(reportModel.modelName, pluginName).update({
             id,
             related: commentId,
         }, {
             resolved: true,
         });
-        return entity;
     },
 
     sanitizeCommentEntity: (entity) => ({

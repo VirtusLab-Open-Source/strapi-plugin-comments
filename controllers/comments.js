@@ -21,9 +21,7 @@ module.exports = {
    * @return {Object}
    */
   async findAll(ctx) {
-    const { params = {} } = ctx;
-    const { page } = parseParams(params);
-    return await strapi.plugins.comments.services.comments.findAll(ctx.query, page);
+    return strapi.plugins.comments.services.comments.findAll(ctx.query);
   },
 
   async findAllFlat(ctx) {
@@ -51,13 +49,11 @@ module.exports = {
   },
 
   async post(ctx) {
-    const { request, state, params = {} } = ctx;
+    const { request, state = {} } = ctx;
     const { user } = state;
-    const { relation } = parseParams(params);
     const { body = {} } = request;
     try {
-      const entity = await strapi.plugins.comments.services.comments.create(body, relation, user);
-
+      const entity = await strapi.plugins.comments.services.comments.create(body, user);
       if (entity) {
         return entity;
       }
@@ -70,9 +66,9 @@ module.exports = {
     const { request, state, params = {} } = ctx;
     const { body = {} } = request;
     const { user } = state;
-    const { relation, commentId } = parseParams(params);
+    const { commentId } = parseParams(params);
     try {
-      return await strapi.plugins.comments.services.comments.update(commentId, relation, body, user);
+      return await strapi.plugins.comments.services.comments.update(commentId, body, user);
     } catch (e) {
       throwError(ctx, e);
     }
@@ -179,13 +175,13 @@ module.exports = {
             ...acc,
             [currentKey]: {
               ...current,
-              globalName: _.snakeCase(key)
+              globalName: _.snakeCase(key),
             },
           };
         },
         {},
       );
-    ctx.body = {
+    return {
       relatedContentTypes,
       contentsTypes,
     };
@@ -207,7 +203,7 @@ module.exports = {
     const { params: { contentTypeName } } = ctx;
     try {
       const result = await strapi.plugins.comments.services.comments.contentTypeName(contentTypeName);
-      ctx.body = { list: result };
+      return { list: result };
     } catch (e) {
       throwError(ctx, e);
     }
