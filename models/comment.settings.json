@@ -93,6 +93,10 @@
       "model": "comment",
       "plugin": "comments",
       "configurable": false
+    },
+    "approvalStatus": {
+      "type": "string",
+      "configurable": false
     }
   }
 }

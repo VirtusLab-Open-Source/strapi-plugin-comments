@@ -111,6 +111,32 @@
       "config": {
         "policies": [["admin::hasPermissions", ["plugins::comments.moderate.reports"]]]
       }
+    },
+    {
+      "method": "PUT",
+      "path": "/moderation/approve/:id",
+      "handler": "comments.approveComment",
+      "config": {
+        "policies": [
+          [
+            "admin::hasPermissions",
+            ["plugins::comments.moderate.approve.comment"]
+          ]
+        ]
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/moderation/reject/:id",
+      "handler": "comments.rejectComment",
+      "config": {
+        "policies": [
+          [
+            "admin::hasPermissions",
+            ["plugins::comments.moderate.reject.comment"]
+          ]
+        ]
+      }
     }
   ]
 }

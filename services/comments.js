@@ -13,6 +13,7 @@ const {
     isValidUserContext,
     resolveUserContextError,
 } = require('./utils/functions');
+const { APPROVAL_STATUS } = require('./utils/constants')
 
 /**
  * comments.js service
@@ -255,6 +256,12 @@ module.exports = {
                 if (!rel) {
                     throw new PluginError(404, 'Related entity not found');
                 }
+                if (
+                    rel.requireCommentsApproval &&
+                    data.approvalStatus !== APPROVAL_STATUS.PENDING
+                ) {
+                    throw new PluginError(400, 'Invalid approval status');
+                }
             });
 
             const entity = await strapi.query( model.modelName, pluginName).create({
@@ -400,6 +407,25 @@ module.exports = {
             { blockedThread: !existingEntity.blockedThread }
         );
         await this.blockNestedThreads(id, changedEntity.blockedThread)
+        return this.sanitizeCommentEntity(changedEntity);
+    },
+
+    // Approve comment
+    async approveComment(id) {
+        const { pluginName, model } = extractMeta(strapi.plugins);
+        const changedEntity = await strapi
+          .query(model.modelName, pluginName)
+          .update({ id }, { approvalStatus: APPROVAL_STATUS.APPROVED });
+    
+        return this.sanitizeCommentEntity(changedEntity);
+    },
+    
+    async rejectComment(id) {
+        const { pluginName, model } = extractMeta(strapi.plugins);
+        const changedEntity = await strapi
+            .query(model.modelName, pluginName)
+            .update({ id }, { approvalStatus: APPROVAL_STATUS.REJECTED });
+
         return this.sanitizeCommentEntity(changedEntity);
     },
 

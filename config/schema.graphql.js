@@ -13,6 +13,7 @@ const BASE_COMMENTS = `
   removed: Boolean
   relatedSlug: String
   reports: [CommentReport]
+  approvalStatus: CommentApprovalStatus
 `;
 const jsonParse = (json) => {
   try {
@@ -34,6 +35,11 @@ module.exports = {
           BAD_LANGAUGE
           DISCRIMINATION
           OTHER
+      }
+      enum CommentApprovalStatus {
+          PENDING
+          APPROVED
+          REJECTED
       }
       type CommentReport {
           id: ID!
@@ -111,6 +117,7 @@ module.exports = {
         authorUsername: String
         threadOf: String
         related: [NewCommentRelated!]!
+        approvalStatus: CommentApprovalStatus
       }
   `,
   // language=GraphQL
