@@ -425,10 +425,10 @@ Feel free to fork and make a Pull Request to this plugin project. All the input 
 
 For general help using Strapi, please refer to [the official Strapi documentation](https://strapi.io/documentation/). For additional help, you can use one of these channels to ask a question:
 
-- [Slack](http://slack.strapi.io) We're present on official Strapi slack workspace. Look for @cyp3r and DM.
+- [Discord](https://discord.strapi.io/) We're present on official Strapi Discord workspace. Look for @cyp3r and DM.
 - [Slack - VirtusLab Open Source](https://virtuslab-oss.slack.com) We're present on a public channel #strapi-molecules
-- [GitHub](https://github.com/VirtusLab/strapi-plugin-comments/issues) (Bug reports, Contributions, Questions and Discussions)
+- [GitHub](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/issues) (Bug reports, Contributions, Questions and Discussions)
 
 ## License
 
-[MIT License](LICENSE.md) Copyright (c) 2020 [VirtusLab Sp. z o.o.](https://virtuslab.com/) &amp; [Strapi Solutions](https://strapi.io/).
+[MIT License](LICENSE.md) Copyright (c) [VirtusLab Sp. z o.o.](https://virtuslab.com/) &amp; [Strapi Solutions](https://strapi.io/).
