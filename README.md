@@ -7,11 +7,11 @@
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
     <img src="https://img.shields.io/npm/dm/strapi-plugin-comments.svg" alt="Monthly download on NPM" />
   </a>
-  <a href="https://circleci.com/gh/VirtusLab/strapi-plugin-comments">
-    <img src="https://circleci.com/gh/VirtusLab/strapi-plugin-comments.svg?style=shield" alt="CircleCI" />
+  <a href="https://circleci.com/gh/VirtusLab-Open-Source/strapi-plugin-comments">
+    <img src="https://circleci.com/gh/VirtusLab-Open-Source/strapi-plugin-comments.svg?style=shield" alt="CircleCI" />
   </a>
-  <a href="https://codecov.io/gh/VirtusLab/strapi-plugin-comments">
-    <img src="https://codecov.io/gh/VirtusLab/strapi-plugin-comments/coverage.svg?branch=master" alt="codecov.io" />
+  <a href="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments">
+    <img src="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments/coverage.svg?branch=master" alt="codecov.io" />
   </a>
 </p>
 
