@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "1.0.3",
+  "version": "1.0.3-beta.1",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "Comments",
