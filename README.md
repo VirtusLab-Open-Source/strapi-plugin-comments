@@ -100,7 +100,7 @@ To setup amend default plugin configuration we recommend to put following snippe
     plugins: {
       comments: {
         enableUsers: true,
-        badWords: false,
+        badWords: false
       },
     },
     ...
@@ -109,6 +109,41 @@ To setup amend default plugin configuration we recommend to put following snippe
 ### Properties
 - `enableUsers` - Enabled support for built-in Strapi users, if endpoints are exposed with usage of `Authenticated` policy or JWT tokens are in use by the Client App. Default value: `false`.
 - `badWords` - Enabled support for (bad words filtering)[https://www.npmjs.com/package/bad-words]. Can be turned off or overwritten using (options reference)[https://www.npmjs.com/package/bad-words#constructor]. Default value: `true`. 
+
+## Additional GQL Configuration
+
+> **Note**
+> Introduced in `v1.0.2`
+
+```
+    ...
+    plugins: {
+      comments: {
+        enableUsers: true,
+        badWords: false,
+        relatedContentTypes: {
+          pages: {
+            uuid: 'application::pages.pages',
+            contentManager: true,
+            isSingle: true, // optional
+            __contentType: '',
+            key: 'title',
+            value: 'id',
+            url: 'my-custom-url/:id' // optional
+          }
+        }
+      },
+    },
+    ...
+```
+
+### Properties
+- `relatedContentTypes` - list of properties where each single one reflects the related collection like `pages`, `posts`, etc. Each of collection properties should contain following set:
+    - `uuid` - strapi content type `uuid`
+    - `contentManager` - boolean to mark if element taken from **Strapi Content Manager** or maybe custom plugin
+    - `isSingle` (optional) - boolean to identify collection type or single type
+    - `key/value` - will be used to take id and example title to display link on the list
+    - `url` (optional) - to be defined if `contentManager` is set to **false**. Reflects the custom url that returns the content type items. With id as identifier - which is dynamically replaced
 
 ## Public API Comment model
 
