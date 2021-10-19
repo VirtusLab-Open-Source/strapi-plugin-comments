@@ -163,6 +163,23 @@ module.exports = {
     }
   },
 
+  async approveComment(ctx) {
+    const { id } = parseParams(ctx.params || {});
+    try {
+      return await strapi.plugins.comments.services.comments.approveComment(id);
+    } catch (e) {
+      throwError(ctx, e);
+    }
+  },
+
+  async rejectComment(ctx) {
+    const { id } = parseParams(ctx.params || {});
+    try {
+      return await strapi.plugins.comments.services.comments.rejectComment(id);
+    } catch (e) {
+      throwError(ctx, e);
+    }
+  },
   async config(ctx) {
     const configRelatedContentTypes = _.get(strapi.config, ['plugins', 'comments', 'relatedContentTypes'], {});
     const contentsTypes = this.getContentsTypes();

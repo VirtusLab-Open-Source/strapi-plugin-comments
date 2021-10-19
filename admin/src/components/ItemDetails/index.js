@@ -13,6 +13,7 @@ import ItemModeration from '../ItemModeration';
 import ItemHeader from '../ItemHeader';
 import AbuseReportsPopUp from '../AbuseReportsPopUp';
 import pluginId from '../../pluginId';
+import { APPROVAL_STATUS } from "../../utils/constants";
 
 const ItemDetails = ({
   id,
@@ -36,6 +37,9 @@ const ItemDetails = ({
   onBlockClick,
   onBlockThreadClick,
   onAbuseReportResolve,
+  onApproveCommentClick,
+  onRejectCommentClick,
+  approvalStatus,
 }) => {
   const [showPopUp, setPopUpVisibility] = useState(false);
 
@@ -58,14 +62,15 @@ const ItemDetails = ({
   };
   const hasThreads = (threadsCount !== undefined) && (threadsCount > 0);
   const isAbuseReported = !isEmpty(reports);
-  const isItemHeaderDisplayed = blocked || blockedThread || removed || isAbuseReported;
+  const isPending = approvalStatus === APPROVAL_STATUS.PENDING;
+  const isItemHeaderDisplayed = blocked || blockedThread || removed || isAbuseReported || isPending;
   const footerProps = {
     authorName,
     authorUser,
     related: isArray(related) ? first(related) : related,
     created_at: created_at || createdAt,
     updated_at: updated_at || updatedAt,
-    isDelailedView: true,
+    isDetailedView: true,
   };
   const headerProps = {
     active,
@@ -74,8 +79,9 @@ const ItemDetails = ({
     isRemoved: removed,
     abuseReports: reports || [],
     isAbuseReported: !isEmpty(reports),
-    isDelailedView: true,
+    isDetailedView: true,
     onReportsClick: onPopUpOpen,
+    approvalStatus,
   };
   const moderationProps = {
     id,
@@ -83,6 +89,9 @@ const ItemDetails = ({
     blockedThread,
     onBlockClick,
     onBlockThreadClick,
+    onApproveCommentClick,
+    onRejectCommentClick,
+    approvalStatus,
   };
   const reportsPopUpProps = {
     blocked,
@@ -105,11 +114,11 @@ const ItemDetails = ({
         clickable={clickable}
         root={root}
         active={active}>
-        { isItemHeaderDisplayed && (<ItemHeader { ...headerProps } />) }
+        {isItemHeaderDisplayed && (<ItemHeader { ...headerProps } />) }
         <p>{content}</p>
         <ItemFooter {...footerProps} />
       </CardItem>
-      { hasThreads && (<CardLevelCounter>
+      {hasThreads && (<CardLevelCounter>
           <FormattedMessage id={`${pluginId}.list.item.threads.count`} values={{ count: threadsCount }}/>
           <CardLevelCounterLink onClick={onClick}>
             <FormattedMessage id={`${pluginId}.list.item.threads.drilldown`} />
@@ -117,8 +126,8 @@ const ItemDetails = ({
           </CardLevelCounterLink>
         </CardLevelCounter>
       )}
-      { active && !removed && (<ItemModeration { ...moderationProps } />) }
-      { (!isEmpty(reports) && active) && (
+      {active && !removed && (<ItemModeration { ...moderationProps } />)}
+      {(!isEmpty(reports) && active) && (
         <AbuseReportsPopUp
           {...reportsPopUpProps}
         />
@@ -146,6 +155,13 @@ ItemDetails.propTypes = {
   onBlockClick: PropTypes.func,
   onBlockThreadClick: PropTypes.func,
   onAbuseReportResolve: PropTypes.func,
+  approvalStatus: PropTypes.oneOf([
+    APPROVAL_STATUS.APPROVED,
+    APPROVAL_STATUS.PENDING,
+    APPROVAL_STATUS
+  ]),
+  onApproveCommentClick: PropTypes.func,
+  onRejectCommentClick: PropTypes.func,
 };
 
 export default ItemDetails;

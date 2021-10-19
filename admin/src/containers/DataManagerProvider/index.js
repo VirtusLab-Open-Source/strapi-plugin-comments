@@ -31,6 +31,10 @@ import {
   GET_SINGLE_DATA_SUCCEEDED,
   RESOLVE_ABUSE_REPORT,
   RESOLVE_ABUSE_REPORT_SUCCESS,
+  APPROVE_COMMENT,
+  APPROVE_COMMENT_SUCCESS,
+  REJECT_COMMENT,
+  REJECT_COMMENT_SUCCESS,
 } from './actions';
 
 const RECENTLY_VIEVEW_KEY = `${pluginId}-recently-viewed`;
@@ -203,6 +207,52 @@ const DataManagerProvider = ({ children }) => {
     }
   };
 
+  const approveComment = async (id) => {
+    try {
+      dispatch({ type: APPROVE_COMMENT });
+      emitEvent('willApprove');
+
+      await request(`/${pluginId}/moderation/approve/${id}`, {
+        method: 'PUT',
+      });
+
+      getCurrent(dispatch, getSearchParams());
+      getDetails(dispatch, activeId);
+
+      dispatch({ type: APPROVE_COMMENT_SUCCESS });
+      emitEvent('didApprove');
+
+      strapi.notification.success(`${pluginId}.notification.comment.approval`);
+    } catch (err) {
+      console.error({ err: err.response });
+      strapi.notification.error('notification.error');
+      emitEvent('didNotApprove');
+    }
+  };
+
+  const rejectComment = async (id) => {
+    try {
+      dispatch({ type: REJECT_COMMENT });
+      emitEvent('willReject');
+
+      await request(`/${pluginId}/moderation/reject/${id}`, {
+        method: 'PUT',
+      });
+
+      getCurrent(dispatch, getSearchParams());
+      getDetails(dispatch, activeId);
+
+      dispatch({ type: REJECT_COMMENT_SUCCESS });
+      emitEvent('didReject');
+
+      strapi.notification.success(`${pluginId}.notification.comment.approval`);
+    } catch (err) {
+      console.error({ err: err.response });
+      strapi.notification.error('notification.error');
+      emitEvent('didNotReject');
+    }
+  };
+
   const getSearchParams = useCallback(
     (updatedParams = {}) => {
       return {
@@ -252,6 +302,8 @@ const DataManagerProvider = ({ children }) => {
         resolveAbuseReport,
         isInDevelopmentMode,
         handleChangeParams,
+        approveComment,
+        rejectComment,
       }}
     >
       {isLoading ? (

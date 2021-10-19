@@ -9,6 +9,7 @@ import CardItem from './CardItem';
 import ItemFooter from '../ItemFooter';
 import ItemHeader from '../ItemHeader';
 import useDataManager from '../../hooks/useDataManager';
+import { APPROVAL_STATUS } from '../../utils/constants';
 
 const Item = ({
   id,
@@ -26,6 +27,9 @@ const Item = ({
   createdAt,
   updatedAt,
   relatedContentTypes,
+  onApproveCommentClick,
+  onRejectCommentClick,
+  approvalStatus,
 }) => {
   const { push } = useHistory();
   const { getSearchParams } = useDataManager();
@@ -43,13 +47,17 @@ const Item = ({
   };
 
   const isAbuseReported = !isEmpty(reports);
-  const isItemHeaderDisplayed = blocked || blockedThread || isNew || removed || isAbuseReported;
+  const isPending =  approvalStatus === APPROVAL_STATUS.PENDING;
+  const isItemHeaderDisplayed = blocked || blockedThread || isNew || removed || isAbuseReported || isPending;
   const headerProps = {
     blocked,
     blockedThread,
     isNew,
     isAbuseReported,
     isRemoved: removed,
+    onApproveCommentClick,
+    onRejectCommentClick,
+    approvalStatus,
   };
 
   const footerProps = {
@@ -67,7 +75,7 @@ const Item = ({
         onClick={onClick}
         active={id === parsedId}
       >
-        { isItemHeaderDisplayed && (<ItemHeader { ...headerProps } />) }
+        {isItemHeaderDisplayed && (<ItemHeader { ...headerProps } />) }
         <p>{content}</p>
         <ItemFooter {...footerProps} />
       </CardItem>
@@ -87,6 +95,13 @@ Item.propTypes = {
   blocked: PropTypes.bool,
   blockedThread: PropTypes.bool,
   isNew: PropTypes.bool,
+  approvalStatus: PropTypes.oneOf([
+    APPROVAL_STATUS.APPROVED,
+    APPROVAL_STATUS.PENDING,
+    APPROVAL_STATUS
+  ]),
+  onApproveCommentClick: PropTypes.func,
+  onRejectCommentClick: PropTypes.func,
 };
 
 export default Item;

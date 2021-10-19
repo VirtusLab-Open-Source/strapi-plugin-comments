@@ -33,6 +33,8 @@ const DetailsView = () => {
     blockComment,
     blockCommentThread,
     resolveAbuseReport,
+    approveComment,
+    rejectComment,
   } = useDataManager();
 
   const { formatMessage } = useGlobalContext();
@@ -63,6 +65,8 @@ const DetailsView = () => {
               onBlockClick={blockComment}
               onBlockThreadClick={blockCommentThread}
               onClick={e => onCommentClick(e, hasThreads ? item.children[0].id : item.id)}
+              onApproveCommentClick={approveComment}
+              onRejectCommentClick={rejectComment}
               />)
           })
         }
@@ -73,19 +77,21 @@ const DetailsView = () => {
 
   return (
     <Wrapper className="col-md-8">
-      { isLoadingForDetailsDataToBeSet && <LoadingIndicatorPage />}
-      { !isLoadingForDetailsDataToBeSet && !activeItem && (<EmptyView fixPosition>
+      {isLoadingForDetailsDataToBeSet && <LoadingIndicatorPage />}
+      {!isLoadingForDetailsDataToBeSet && !activeItem && (<EmptyView fixPosition>
           <FontAwesomeIcon icon={faComments} size="5x" />
           <FormattedMessage id={getTrad('moderation.content.empty')} />
         </EmptyView>)}
-      { activeItem && (<>
-        { selected.threadOf && (<CardLevelWrapper>
+      {activeItem && (<>
+        {selected.threadOf && (<CardLevelWrapper>
             <ItemDetails
               {...selected.threadOf}
               clickable={true}
               root={true}
               onAbuseReportResolve={resolveAbuseReport}
               onClick={e => onCommentClick(e, selected.threadOf.id)}
+              onApproveCommentClick={approveComment}
+              onRejectCommentClick={rejectComment}
             />
             <CardWrapper root={true}>
               {renderCommentsTree(selected, level)}

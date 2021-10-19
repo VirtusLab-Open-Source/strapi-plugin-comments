@@ -16,10 +16,14 @@ const pluginPermissions = {
     { action: 'plugins::comments.read', subject: null },
     { action: 'plugins::comments.moderate.block.comment', subject: null },
     { action: 'plugins::comments.moderate.block.thread', subject: null },
+    { action: 'plugins::comments.moderate.approve.comment', subject: null },
+    { action: 'plugins::comments.moderate.reject.comment', subject: null },
   ],
   moderateComments: [
     { action: 'plugins::comments.read', subject: null },
     { action: 'plugins::comments.moderate.block.comment', subject: null },
+    { action: 'plugins::comments.moderate.approve.comment', subject: null },
+    { action: 'plugins::comments.moderate.reject.comment', subject: null },
   ],
   moderateThreads: [
     { action: 'plugins::comments.read', subject: null },

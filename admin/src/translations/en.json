@@ -5,6 +5,7 @@
     "list.header.description": "{count, plural, =0 {All available} one {# new comment} other {# new comments}}",
     "list.content.empty": "Nothing found, lift your search criteria and try again",
     "list.item.header.blocked": "This comment has been blocked",
+    "list.item.header.pending": "Pending",
     "list.item.header.blocked.thread": "This comment and thread have been blocked",
     "list.item.header.removed": "This comment and thread have been removed by author",
     "list.item.indication.new": "New comment",
@@ -16,6 +17,8 @@
     "list.item.moderation.button.comment.hide": "Hide comment",
     "list.item.moderation.button.thread.restore": "Restore thread",
     "list.item.moderation.button.thread.hide": "Hide thread",
+    "list.item.moderation.button.comment.approval.approve": "Approve",
+    "list.item.moderation.button.comment.approval.reject": "Reject",
     "moderation.header.title": "Moderation",
     "moderation.header.description": "Discussion thread",
     "moderation.content.empty": "Choose a comment to start moderating",
@@ -31,5 +34,6 @@
     "popup.reports.empty": "All good, no issues reported",
     "notification.comment.visibility": "Comment visibility has been changed",
     "notification.thread.visibility": "Comment thread visibility has been changed",
-    "notification.abuse-report.resolution": "Abuse report has been resolved"
+    "notification.abuse-report.resolution": "Abuse report has been resolved",
+    "notification.comment.approval": "Comment approval status has been changed"
 }
