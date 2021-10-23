@@ -15,13 +15,7 @@ const BASE_COMMENTS = `
   reports: [CommentReport]
   approvalStatus: CommentApprovalStatus
 `;
-const jsonParse = (json) => {
-  try {
-    return JSON.parse(json);
-  } catch (e) {
-    return {};
-  }
-};
+
 const configRelatedContentTypes = Object.keys(strapi.config
   .get('plugins.comments.relatedContentTypes') || {})
   .map(key => `${key}: CommentsRelatedContentType`)
@@ -149,10 +143,9 @@ module.exports = {
         resolverOf: 'plugins::comments.comments.findAllInHierarchy',
         resolver(obj, options) {
           const { relation, where } = options;
-          const query = jsonParse(where);
           return strapi.plugins.comments.services.comments.findAllInHierarchy({
             relation,
-            query,
+            where,
             dropBlockedThreads: true,
           });
         },
@@ -161,17 +154,15 @@ module.exports = {
         resolverOf: 'plugins::comments.comments.findAllFlat',
         resolver(obj, options) {
           const { relation, where } = options;
-          const query = jsonParse(where);
-          return strapi.plugins.comments.services.comments.findAllFlat(relation, query);
+          return strapi.plugins.comments.services.comments.findAllFlat(relation, where);
         },
       },
       findAll: {
         resolverOf: 'plugins::comments.comments.findAll',
         resolver(obj, options) {
           const { related, entity, where } = options;
-          const query = jsonParse(where);
           return strapi.plugins.comments.services.comments.findAll({
-            ...query,
+            ...where,
             related,
             entity,
           });
