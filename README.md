@@ -46,7 +46,7 @@ Enjoy 🎉
 
 ### 🖐 Requirements
 
-Complete installation requirements are exact same as for Strapi itself and can be found in the documentation under <a href="https://strapi.io/documentation/v3.x/installation/cli.html#step-1-make-sure-requirements-are-met">Installation Requirements</a>.
+Complete installation requirements are exact same as for Strapi itself and can be found in the documentation under [Installation Requirements](https://strapi.io/documentation/v3.x/installation/cli.html#step-1-make-sure-requirements-are-met).
 
 **Supported Strapi versions**:
 
@@ -64,13 +64,13 @@ Complete installation requirements are exact same as for Strapi itself and can b
 - **Any Content Type relation:** Comments can by linked to any of your Content Types by default. Simply, you're controlling it.
 - **Moderation Panel:** Search & Filter through the bucket with your auditory comments. Manage them by blocking single ones or full threads. All in combined list &amp; hierarchical tree view of threads.
 - **Automated Bad Words filtering:** By detault end users are not allowed to post abusing comments where bad words have been used.
-- **Abuse Reporting & Reviewing:** Don't allow inferior language, react to reports from your community
+- **Abuse Reporting & Reviewing:** Don't allow inferior language, react to reports from your community, send email notifiactions about abuse reports
 
 ## Content Type model relation to Comment
 
 To enable Content Type to work with Comments, you've to add following field to your model `*.settings.json`:
 
-```
+```json
     "comments": {
       "plugin": "comments",
       "collection": "comment",
@@ -80,7 +80,7 @@ To enable Content Type to work with Comments, you've to add following field to y
 
 inside the `attributes` section like in example below:
 
-```
+```json
     "attributes": {
         ...,
         "comments": {
@@ -93,14 +93,15 @@ inside the `attributes` section like in example below:
 ```
 
 ## Configuration
-To setup amend default plugin configuration we recommend to put following snippet as part of `config/custom.js` or `config/<env>/custom.js` file. If you've got already configurations for other plugins stores by this way, use just the `navigation` part within exising `plugins` item.
+To setup amend default plugin configuration we recommend to put following snippet as part of `config/custom.js` or `config/<env>/custom.js` file. If you've got already configurations for other plugins stores by this way, use just the `comments` part within exising `plugins` item.
 
-```
+```js
     ...
     plugins: {
       comments: {
         enableUsers: true,
-        badWords: false
+        badWords: false,
+		moderatorRoles: ["Authenticated"]
       },
     },
     ...
@@ -108,14 +109,15 @@ To setup amend default plugin configuration we recommend to put following snippe
 
 ### Properties
 - `enableUsers` - Enabled support for built-in Strapi users, if endpoints are exposed with usage of `Authenticated` policy or JWT tokens are in use by the Client App. Default value: `false`.
-- `badWords` - Enabled support for (bad words filtering)[https://www.npmjs.com/package/bad-words]. Can be turned off or overwritten using (options reference)[https://www.npmjs.com/package/bad-words#constructor]. Default value: `true`. 
+- `badWords` - Enabled support for [bad words filtering](https://www.npmjs.com/package/bad-words). Can be turned off or overwritten using [options reference](https://www.npmjs.com/package/bad-words#constructor). Default value: `true`. 
+- `moderatorRoles` - Optional list of names of roles. Users with those roles will be notified by email when a new abuse report is created. This feature requires a built-in [Strapi email plugin](https://strapi.io/documentation/developer-docs/latest/development/plugins/email.html) configured.
 
 ## Additional GQL Configuration
 
 > **Note**
 > Introduced in `v1.0.2`
 
-```
+```js
     ...
     plugins: {
       comments: {
@@ -148,7 +150,7 @@ To setup amend default plugin configuration we recommend to put following snippe
 ## Public API Comment model
 
 ### Generic (non Strapi User)
-```
+```json
 {
     "id": 1,
     "content": "My comment content",
@@ -166,7 +168,7 @@ To setup amend default plugin configuration we recommend to put following snippe
 }
 ```
 ### Strapi User
-```
+```json
 {
     "id": 1,
     "content": "My comment content",

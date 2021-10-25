@@ -512,7 +512,7 @@ module.exports = {
 	}),
 	
 	async sendAbuseReportEmail(reason, content) {
-		const rolesToBeNotified = get(strapi.config.plugins, "comments.emailNotification.roles", []);
+		const rolesToBeNotified = get(strapi.config, "custom.plugins.comments.moderatorRoles", []);
 		const allUsers = await strapi.plugins['users-permissions'].services.user.fetchAll();
 
 		const moderatorsEmails = allUsers.reduce((prev, user) => {
@@ -523,7 +523,7 @@ module.exports = {
 		}, []);
 
 		if (moderatorsEmails.length > 0) {
-			await strapi.plugins['email'].services.email.send({
+			strapi.plugins['email'].services.email.send({
 				to: moderatorsEmails,
 				from: 'admin@strapi.io',
 				subject: 'New abuse report on comment',
