@@ -60,7 +60,7 @@ module.exports = {
     } : item),
 
     checkBadWords: content => {
-        const config = get(strapi.config, 'custom.plugins.comments.badWords', true);
+        const config = get(strapi.config, 'plugins.comments.badWords', true);
         if (config) {
             const filter = new BadWordsFilter(isObject(config) ? config : undefined);
             if (content && filter.isProfane(content)) {
@@ -82,7 +82,7 @@ module.exports = {
     buildNestedStructure,
 
     isValidUserContext: (user = {}) => {
-        const builtInContextEnabled = get(strapi.config, 'custom.plugins.comments.enableUsers', false);
+		const builtInContextEnabled = get(strapi.config, 'plugins.comments.enableUsers', false);
         return builtInContextEnabled ? !isNil(user.id) : true;
     },
 
