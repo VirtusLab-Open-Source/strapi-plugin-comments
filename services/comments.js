@@ -512,27 +512,28 @@ module.exports = {
 	}),
 	
 	async sendAbuseReportEmail(reason, content) {
-		const rolesToBeNotified = get(strapi.config, "custom.plugins.comments.moderatorRoles", []);
-		const allUsers = await strapi.plugins['users-permissions'].services.user.fetchAll();
+		const pluginName = 'users-permissions';
+		const userModel = 'user';
+		const rolesToBeNotified = get(strapi.config, "plugins.comments.moderatorRoles", []);
 
-		const moderatorsEmails = allUsers.reduce((prev, user) => {
-			if (rolesToBeNotified.includes(user.role.name))
-				return prev.concat(user.email);
-			else
-				return prev;
-		}, []);
+		const ormModel = strapi.query('user', pluginName);
+		const query = { 'role.name': rolesToBeNotified } 
+		const users = await ormModel.find(query);
 
+		const moderatorsEmails = users.map(user => user.email);
+		const superAdmins = await strapi.query('user', 'admin').find({'roles.id': 1})
+		
 		if (moderatorsEmails.length > 0) {
 			strapi.plugins['email'].services.email.send({
 				to: moderatorsEmails,
-				from: 'admin@strapi.io',
+				from: superAdmins[0].email,
 				subject: 'New abuse report on comment',
 				text: `
 					There was a new abuse report on your app. 
 					Reason: ${reason}
 					Message: ${content}
 				`,
-			});
+			}).catch(err => strapi.log(err));
 		}
 	}
 };

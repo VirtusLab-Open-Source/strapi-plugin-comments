@@ -101,7 +101,7 @@ To setup amend default plugin configuration we recommend to put following snippe
       comments: {
         enableUsers: true,
         badWords: false,
-		moderatorRoles: ["Authenticated"]
+		    moderatorRoles: ["Authenticated"]
       },
     },
     ...
