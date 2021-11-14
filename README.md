@@ -93,16 +93,15 @@ inside the `attributes` section like in example below:
 ```
 
 ## Configuration
-To setup amend default plugin configuration we recommend to put following snippet as part of `config/custom.js` or `config/<env>/custom.js` file. If you've got already configurations for other plugins stores by this way, use just the `comments` part within exising `plugins` item.
+To setup amend default plugin configuration we recommend to put following snippet as part of `config/plugins.js` or `config/<env>/plugins.js` file. If the file does not exist yet, you have to create it manually. If you've got already configurations for other plugins stores by this way, use just the `comments` part within exising `plugins` item.
+
 
 ```js
     ...
-    plugins: {
-      comments: {
-        enableUsers: true,
-        badWords: false,
-		    moderatorRoles: ["Authenticated"]
-      },
+    comments: {
+      enableUsers: true,
+      badWords: false,
+		  moderatorRoles: ["Authenticated"]
     },
     ...
 ```
@@ -119,22 +118,20 @@ To setup amend default plugin configuration we recommend to put following snippe
 
 ```js
     ...
-    plugins: {
-      comments: {
-        enableUsers: true,
-        badWords: false,
-        relatedContentTypes: {
-          pages: {
-            uuid: 'application::pages.pages',
-            contentManager: true,
-            isSingle: true, // optional
-            __contentType: '',
-            key: 'title',
-            value: 'id',
-            url: 'my-custom-url/:id' // optional
-          }
+    comments: {
+      enableUsers: true,
+      badWords: false,
+      relatedContentTypes: {
+        pages: {
+          uuid: 'application::pages.pages',
+          contentManager: true,
+          isSingle: true, // optional
+          __contentType: '',
+          key: 'title',
+          value: 'id',
+          url: 'my-custom-url/:id' // optional
         }
-      },
+      }
     },
     ...
 ```

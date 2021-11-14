@@ -17,11 +17,9 @@ beforeEach(() => {
         }
       },
       config: {
-        custom: {
-          plugins: {
-            comments: {
-              enableUsers: false,
-            }
+        plugins: {
+          comments: {
+            enableUsers: false,
           }
         }
       }
@@ -31,7 +29,7 @@ beforeEach(() => {
 })
 
 describe('Test Comments service functions utils', () => {
-  
+
   describe('Bad Words filtering', () => {
     const text = 'Lorem ipsum dolor sit fuck amet';
 
@@ -55,7 +53,7 @@ describe('Test Comments service functions utils', () => {
     });
 
     test('Should skip bad words filtering because of configuration change', () => {
-      global.strapi.config.custom.plugins.comments.badWords = false;
+      global.strapi.config.plugins.comments.badWords = false;
 
       expect(checkBadWords(text)).toEqual(text);
     });
@@ -74,13 +72,13 @@ describe('Test Comments service functions utils', () => {
 
   describe('Validating user context', () => {
     test('Context should be skipped based on config', () => {
-      global.strapi.config.custom.plugins.comments.enableUsers = false;
+      global.strapi.config.plugins.comments.enableUsers = false;
       expect(isValidUserContext(undefined)).toEqual(true);
       expect(isValidUserContext({ id: 1 })).toEqual(true);
     });
 
     test('Context should be verified based on input', () => {
-      global.strapi.config.custom.plugins.comments.enableUsers = true;
+      global.strapi.config.plugins.comments.enableUsers = true;
       expect(isValidUserContext(undefined)).toEqual(false);
       expect(isValidUserContext({ id: 1 })).toEqual(true);
     });
