@@ -325,14 +325,15 @@ module.exports = {
     },
 
     // Report abuse in comment
-    async reportAbuse(id, relation, payload, user) {
+	async reportAbuse(id, relation, payload, user) {
         if (!isValidUserContext(user)) {
             throw resolveUserContextError(user);
         }
         const { pluginName, plugin } = extractMeta(strapi.plugins);
         const { report: reportModel } = plugin.models;
-        const existingEntity = await this.findOne(id, relation);
-        if (existingEntity) {
+		const existingEntity = await this.findOne(id, relation);
+		if (existingEntity) {
+			await this.sendAbuseReportEmail(payload.reason, payload.content); // Could also add some info about relation
             return strapi.query(reportModel.modelName, pluginName).create({
                 ...payload,
                 resolved: false,
@@ -508,5 +509,31 @@ module.exports = {
     sanitizeCommentEntity: (entity) => ({
         ...entity,
         authorUser: sanitizeEntity(entity.authorUser, { model: strapi.plugins['users-permissions'].models.user }),
-    }),
+	}),
+	
+	async sendAbuseReportEmail(reason, content) {
+		const pluginName = 'users-permissions';
+		const userModel = 'user';
+		const rolesToBeNotified = get(strapi.config, "plugins.comments.moderatorRoles", []);
+
+		const ormModel = strapi.query('user', pluginName);
+		const query = { 'role.name': rolesToBeNotified } 
+		const users = await ormModel.find(query);
+
+		const moderatorsEmails = users.map(user => user.email);
+		const superAdmins = await strapi.query('user', 'admin').find({'roles.id': 1})
+		
+		if (moderatorsEmails.length > 0) {
+			strapi.plugins['email'].services.email.send({
+				to: moderatorsEmails,
+				from: superAdmins[0].email,
+				subject: 'New abuse report on comment',
+				text: `
+					There was a new abuse report on your app. 
+					Reason: ${reason}
+					Message: ${content}
+				`,
+			}).catch(err => strapi.log(err));
+		}
+	}
 };
