@@ -14,6 +14,10 @@ const BASE_COMMENTS = `
   relatedSlug: String
   reports: [CommentReport]
   approvalStatus: CommentApprovalStatus
+  created_at: DateTime!
+  updated_at: DateTime!
+  created_by: ID
+  updated_by: ID
 `;
 
 const configRelatedContentTypes = Object.keys(strapi.config
