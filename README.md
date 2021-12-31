@@ -1,4 +1,4 @@
-# Strapi - Comments plugin
+# Strapi v4 - Comments plugin - BETA
 
 <p align="center">
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
@@ -17,7 +17,9 @@
 
 A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provides end to end comments feature with their moderation panel, bad words filtering, abuse reporting and more.
 
-<img src="public/assets/preview.png" alt="UI preview" />
+### Versions
+- **Stable** - [v1.0.4](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
+- **Beta** - v4 support - [v2.0.0-beta.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/feat/strapi-v4)
 
 ### ⏳ Installation
 
@@ -46,14 +48,13 @@ Enjoy 🎉
 
 ### 🖐 Requirements
 
-Complete installation requirements are exact same as for Strapi itself and can be found in the documentation under [Installation Requirements](https://strapi.io/documentation/v3.x/installation/cli.html#step-1-make-sure-requirements-are-met).
+Complete installation requirements are exact same as for Strapi itself and can be found in the documentation under [Installation Requirements](https://docs.strapi.io/developer-docs/latest/getting-started/introduction.html).
 
 **Supported Strapi versions**:
 
-- Strapi v3.6.8 (recently tested)
-- Strapi v3.x
+- Strapi v4.0.2 (recently tested)
 
-(This plugin may work with the older Strapi versions, but these are not tested nor officially supported at this time.)
+(This plugin is not working with v3.x and not may work with the older Strapi v4 versions, but these are not tested nor officially supported at this time.)
 
 **We recommend always using the latest version of Strapi to start your new projects**.
 
@@ -66,32 +67,6 @@ Complete installation requirements are exact same as for Strapi itself and can b
 - **Automated Bad Words filtering:** By detault end users are not allowed to post abusing comments where bad words have been used.
 - **Abuse Reporting & Reviewing:** Don't allow inferior language, react to reports from your community, send email notifiactions about abuse reports
 
-## Content Type model relation to Comment
-
-To enable Content Type to work with Comments, you've to add following field to your model `*.settings.json`:
-
-```json
-    "comments": {
-      "plugin": "comments",
-      "collection": "comment",
-      "via": "related"
-    }
-```
-
-inside the `attributes` section like in example below:
-
-```json
-    "attributes": {
-        ...,
-        "comments": {
-            "plugin": "comments",
-            "collection": "comment",
-            "via": "related"
-        },
-        ...
-    },
-```
-
 ## Configuration
 To setup amend default plugin configuration we recommend to put following snippet as part of `config/plugins.js` or `config/<env>/plugins.js` file. If the file does not exist yet, you have to create it manually. If you've got already configurations for other plugins stores by this way, use just the `comments` part within exising `plugins` item.
 
@@ -99,7 +74,6 @@ To setup amend default plugin configuration we recommend to put following snippe
 ```js
     ...
     comments: {
-      enableUsers: true,
       badWords: false,
       moderatorRoles: ["Authenticated"]
     },
@@ -107,42 +81,12 @@ To setup amend default plugin configuration we recommend to put following snippe
 ```
 
 ### Properties
-- `enableUsers` - Enabled support for built-in Strapi users, if endpoints are exposed with usage of `Authenticated` policy or JWT tokens are in use by the Client App. Default value: `false`.
 - `badWords` - Enabled support for [bad words filtering](https://www.npmjs.com/package/bad-words). Can be turned off or overwritten using [options reference](https://www.npmjs.com/package/bad-words#constructor). Default value: `true`. 
-- `moderatorRoles` - Optional list of names of roles. Users with those roles will be notified by email when a new abuse report is created. This feature requires a built-in [Strapi email plugin](https://strapi.io/documentation/developer-docs/latest/development/plugins/email.html) configured.
+- `moderatorRoles` - Optional list of names of roles. Users with those roles will be notified by email when a new abuse report is created. This feature requires a built-in [Strapi email plugin](https://docs.strapi.io/developer-docs/latest/plugins/email.html) configured.
 
 ## Additional GQL Configuration
 
-> **Note**
-> Introduced in `v1.0.2`
-
-```js
-    ...
-    comments: {
-      enableUsers: true,
-      badWords: false,
-      relatedContentTypes: {
-        pages: {
-          uuid: 'application::pages.pages',
-          contentManager: true,
-          isSingle: true, // optional
-          __contentType: '',
-          key: 'title',
-          value: 'id',
-          url: 'my-custom-url/:id' // optional
-        }
-      }
-    },
-    ...
-```
-
-### Properties
-- `relatedContentTypes` - list of properties where each single one reflects the related collection like `pages`, `posts`, etc. Each of collection properties should contain following set:
-    - `uuid` - strapi content type `uuid`
-    - `contentManager` - boolean to mark if element taken from **Strapi Content Manager** or maybe custom plugin
-    - `isSingle` (optional) - boolean to identify collection type or single type
-    - `key/value` - will be used to take id and example title to display link on the list
-    - `url` (optional) - to be defined if `contentManager` is set to **false**. Reflects the custom url that returns the content type items. With id as identifier - which is dynamically replaced
+> To be done
 
 ## Public API Comment model
 
@@ -154,14 +98,15 @@ To setup amend default plugin configuration we recommend to put following snippe
     "blocked": null,
     "blockedThread": true,
     "blockReason": null,
-    "points": 1,
     "authorUser": null,
     "authorId": "207ccfdc-94ba-45eb-979c-790f6f49c392",
     "authorName": "Joe Doe",
     "authorEmail": "jdoe@sample.com",
     "authorAvatar": null,
-    "created_at": "2020-07-14T20:13:01.649Z",
-    "updated_at": "2020-07-14T20:13:01.670Z"
+    "createdAt": "2020-07-14T20:13:01.649Z",
+    "updatedAt": "2020-07-14T20:13:01.670Z",
+    "related": {}, // Related content type entity
+    "reports": [] // Reports issued against this comment
 }
 ```
 ### Strapi User
@@ -172,7 +117,6 @@ To setup amend default plugin configuration we recommend to put following snippe
     "blocked": true,
     "blockedThread": null,
     "blockReason": null,
-    "points": null,
     "authorUser": {
         "id": 1,
         "username": "Sample User",
@@ -188,8 +132,10 @@ To setup amend default plugin configuration we recommend to put following snippe
     "authorName": null,
     "authorEmail": null,
     "authorAvatar": null,
-    "created_at": "2020-07-14T20:13:01.649Z",
-    "updated_at": "2020-07-14T20:13:01.670Z"
+    "createdAt": "2020-07-14T20:13:01.649Z",
+    "updatedAt": "2020-07-14T20:13:01.670Z",
+    "related": {}, // Related content type entity
+    "reports": [] // Reports issued against this comment
 }
 
 ```
@@ -198,11 +144,11 @@ To setup amend default plugin configuration we recommend to put following snippe
 
 ### Get Comments
 
-`GET <host>/comments/<content-type>:<id>`
+`GET <host>/comments/api::<collection name>.<content type name>:<entity id>`
 
-Return a hierarchical tree structure of comments for specified instance of Content Type like for example `Article` with `ID: 1`
+Return a hierarchical tree structure of comments for specified instance of Content Type like for example `Page` with `ID: 1`
 
-**Example URL**: `https://localhost:1337/comments/article:1`
+**Example URL**: `https://localhost:1337/comments/api::page.page:1`
 
 **Example response body**
 
@@ -224,11 +170,11 @@ Return a hierarchical tree structure of comments for specified instance of Conte
 
 ### Get Comments (flat structure)
 
-`GET <host>/comments/<content-type>:<id>/flat`
+`GET <host>/comments/api::<collection name>.<content type name>:<entity id>/flat`
 
-Return a flat structure of comments for specified instance of Content Type like for example `Article` with `ID: 1`
+Return a flat structure of comments for specified instance of Content Type like for example `Page` with `ID: 1`
 
-**Example URL**: `https://localhost:1337/comments/article:1/flat`
+**Example URL**: `https://localhost:1337/comments/api::page.page:1/flat`
 
 **Example response body**
 
@@ -250,27 +196,26 @@ Return a flat structure of comments for specified instance of Content Type like 
 
 ### Post a Comment
 
-`POST <host>/comments/<content-type>:<id>`
+`POST <host>/comments/api::<collection name>.<content type name>:<entity id>`
 
-Posts a Comment related to specified instance of Content Type like for example `Article` with `ID: 1`
+Posts a Comment related to specified instance of Content Type like for example `Page` with `ID: 1`
 
-**Example URL**: `https://localhost:1337/comments/article:1`
+**Example URL**: `https://localhost:1337/comments/api::page.page:1`
 
 **Example request body**
 
 *Generic (non Strapi User)*
 ```
 {
-	"authorId": "<any ID like value>",
-	"authorName": "Joe Doe",
-	"authorEmail": "jdoe@sample.com",
+    "author": {
+        "id": "<any ID like value>",
+        "name": "Joe Doe",
+        "email": "jdoe@sample.com",
+        "avatar": "<any image url>"
+    },
 	"content": "My sample response",
 	"threadOf": 2, // id of comment we would like to start / continue the thread (Optional)
-	"related": [{
-		"refId": 1,
-		"ref": "article",
-		"field": "comments"
-	}] 
+	"related": "api::page.page:1"
 }
 ```
 
@@ -280,11 +225,7 @@ Posts a Comment related to specified instance of Content Type like for example `
 	"authorUser": 1, // id of a author user. Optional in case of 'enableUsers: true' in the plugin configuration
 	"content": "My sample response",
 	"threadOf": 2, // id of comment we would like to start / continue the thread (Optional)
-	"related": [{
-		"refId": 1,
-		"ref": "article",
-		"field": "comments"
-	}] 
+	"related": "api::page.page:1"
 }
 ```
 
@@ -302,20 +243,20 @@ Posts a Comment related to specified instance of Content Type like for example `
 
 ### Update Comment
 
-`PUT <host>/comments/<content-type>:<id>/comment/<commentId>`
+`PUT <host>/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>`
 
-Updates a specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Article` with `ID: 1`
+Updates a specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1`
 
-**Example URL**: `https://localhost:1337/comments/article:1/comment/2`
+**Example URL**: `https://localhost:1337/comments/api::page.page:1/comment/2`
 
 **Example request body**
 
 *Generic (non Strapi User)*
 ```
 {
-	"authorId": "<any ID like value>",
-	"authorName": "Joe Doe",
-	"authorEmail": "jdoe@sample.com",
+    "author": {
+        "id": "<any ID like value>"
+    },
 	"content": "My sample response"
 }
 ```
@@ -343,11 +284,11 @@ Updates a specified Comment content based on it `commentId` and related to speci
 
 ### Delete Comment
 
-`DELETE <host>/comments/<content-type>:<id>/<commentId>?authorId=<authorId>`
+`DELETE <host>/comments/api::<collection name>.<content type name>:<entity id>/<commentId>?authorId=<authorId>`
 
-Deletes a specified Comment based on it `commentId` and related to specified instance of Content Type like for example `Article` with `ID: 1`.
+Deletes a specified Comment based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1`.
 
-**Example URL**: `https://localhost:1337/comments/article:1/1?authorId=1`
+**Example URL**: `https://localhost:1337/comments/api::page.page:1/comment/1?authorId=1`
 
 **Example response body**
 
@@ -361,33 +302,14 @@ Deletes a specified Comment based on it `commentId` and related to specified ins
 - `200` - Successful with blank Response.
 - `409` - Conflict. Occurs when trying to delete a non existing comment.
 
-### Like Comment
-
-`PATCH <host>/comments/<content-type>:<id>/comment/<commentId>/like`
-
-Likes a specified Comment based on it `commentId` and related to specified instance of Content Type like for example `Article` with `ID: 1`.
-
-**Example URL**: `https://localhost:1337/comments/article:1/comment/2/like`
-
-**Example response body**
-
-```
-{
-    -- Comment Model fields ---
-}
-```
-
-**Possible response codes**
-- `200` - Successful. Response with liked Comment Model.
-- `409` - Conflict. Occurs when trying to like a non existing comment.
 
 ### Report abuse in the Comment
 
-`POST <host>/comments/<content-type>:<id>/comment/<commentId>/report-abuse`
+`POST <host>/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>/report-abuse`
 
-Reports abuse in specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Article` with `ID: 1` and requests moderator attention.
+Reports abuse in specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1` and requests moderator attention.
 
-**Example URL**: `https://localhost:1337/comments/article:1/comment/2/report-abuse`
+**Example URL**: `https://localhost:1337/comments/api::page.page:1/comment/2/report-abuse`
 
 **Example request body**
 

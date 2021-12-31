@@ -1,49 +1,63 @@
+import { prefixPluginTranslations } from '@strapi/helper-plugin';
 import pluginPkg from '../../package.json';
 import pluginId from './pluginId';
+import Initializer from './components/Initializer';
+import PluginIcon from './components/PluginIcon';
 import pluginPermissions from './permissions';
-import pluginLogo from './assets/images/logo.svg';
-import App from './containers/App';
-import Initializer from './containers/Initializer';
-import lifecycles from './lifecycles';
-import trads from './translations';
 
-export default strapi => {
-  const pluginDescription = pluginPkg.strapi.description || pluginPkg.description;
+const name = pluginPkg.strapi.name;
 
-  const icon = pluginPkg.strapi.icon;
-  const name = pluginPkg.strapi.name;
-  const plugin = {
-    blockerComponent: null,
-    blockerComponentProps: {},
-    description: pluginDescription,
-    icon,
-    id: pluginId,
-    initializer: Initializer,
-    injectedComponents: [],
-    isReady: false,
-    isRequired: pluginPkg.strapi.required || false,
-    layout: null,
-    lifecycles,
-    mainComponent: App,
-    name,
-    pluginLogo,
-    preventComponentRendering: false,
-    trads,
-    menu: {
-      pluginsSectionLinks: [
-        {
-          destination: `/plugins/${pluginId}`,
-          icon,
-          name,
-          label: {
-            id: `${pluginId}.plugin.name`,
-            defaultMessage: 'COMMENTS',
-          },
-          permissions: pluginPermissions.main,
-        },
-      ],
-    },
-  };
+export default {
+  register(app) {
+    app.addMenuLink({
+      to: `/plugins/${pluginId}/discover`,
+      badgeContent: 1,
+      icon: PluginIcon,
+      intlLabel: {
+        id: `${pluginId}.plugin.name`,
+        defaultMessage: name,
+      },
+      Component: async () => {
+        const component = await import(/* webpackChunkName: "[request]" */ './pages/App');
 
-  return strapi.registerPlugin(plugin);
+        return component;
+      },
+      permissions: pluginPermissions,
+    });
+    app.registerPlugin({
+      id: pluginId,
+      initializer: Initializer,
+      isReady: false,
+      name,
+    });
+  },
+
+  bootstrap(app) {
+    app.injectContentManagerComponent('editView', 'informations', {
+        name: 'comments-link',
+        Component: () => 'TODO: Comments count',
+    });
+  },
+  
+  async registerTrads({ locales }) {
+    const importedTrads = await Promise.all(
+      locales.map(locale => {
+        return import(`./translations/${locale}.json`)
+          .then(({ default: data }) => {
+            return {
+              data: prefixPluginTranslations(data, pluginId),
+              locale,
+            };
+          })
+          .catch(() => {
+            return {
+              data: {},
+              locale,
+            };
+          });
+      })
+    );
+
+    return Promise.resolve(importedTrads);
+  },
 };
