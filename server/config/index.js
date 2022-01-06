@@ -1,6 +1,10 @@
 'use strict';
 
 module.exports = {
-  default: {},
+  default: {
+    entryLabel: {
+      '*': ['Title', 'title', 'Name', 'name', 'Subject', 'subject']
+    }
+  },
   validator() {},
 };

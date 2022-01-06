@@ -5,6 +5,9 @@
  */
 
 import React, { memo, useRef, useMemo } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators, compose } from 'redux';
+import isEqual from 'react-fast-compare';
 import { useIntl } from 'react-intl';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router-dom';
@@ -41,8 +44,10 @@ import { COMMENT_STATUS } from '../../utils/constants';
 import TablePagination from '../../components/TablePagination';
 import filtersSchema from './utils/filtersSchema';
 import TableFilters from '../../components/TableFilters';
+import appReducer from '../App/reducer';
+import makeAppView, { selectConfig } from '../App/reducer/selectors';
 
-const Discover = () => {
+const Discover = ({ config }) => {
   useFocusWhenNavigate();
 
   const { push } = useHistory();
@@ -182,4 +187,17 @@ const Discover = () => {
         </Box>;
 }
 
-export default memo(Discover);
+const mapStateToProps = makeAppView();
+
+export function mapDispatchToProps(dispatch) {
+  return bindActionCreators(
+    { },
+    dispatch
+  );
+}
+const withConnect = connect(
+  mapStateToProps,
+  mapDispatchToProps
+);
+
+export default compose(withConnect)(memo(Discover, isEqual));

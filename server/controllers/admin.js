@@ -102,27 +102,11 @@ module.exports = {
   },
 
   async config() {
-    const configRelatedContentTypes = _.get(strapi.config, ['plugins', 'comments', 'relatedContentTypes'], {});
-    const contentsTypes = this.getContentsTypes();
-    const relatedContentTypes = Object
-      .keys(configRelatedContentTypes)
-      .reduce((acc, currentKey) => {
-          const current = configRelatedContentTypes[currentKey];
-          const { key } = contentsTypes.find(content => content.value === currentKey) || {};
-          return {
-            ...acc,
-            [currentKey]: {
-              ...current,
-              globalName: _.snakeCase(key),
-            },
-          };
-        },
-        {},
-      );
-    return {
-      relatedContentTypes,
-      contentsTypes,
-    };
+    try {
+      return await this.getService().config();
+    } catch (e) {
+      throwError(ctx, e);
+    }
   },
 
   getContentsTypes() {

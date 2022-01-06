@@ -4,6 +4,7 @@ import pluginId from './pluginId';
 import Initializer from './components/Initializer';
 import PluginIcon from './components/PluginIcon';
 import pluginPermissions from './permissions';
+import reducers from './reducers';
 
 const name = pluginPkg.strapi.name;
 
@@ -24,6 +25,7 @@ export default {
       },
       permissions: pluginPermissions,
     });
+    app.addReducers(reducers);
     app.registerPlugin({
       id: pluginId,
       initializer: Initializer,
@@ -33,10 +35,10 @@ export default {
   },
 
   bootstrap(app) {
-    app.injectContentManagerComponent('editView', 'informations', {
-        name: 'comments-link',
-        Component: () => 'TODO: Comments count',
-    });
+    // app.injectContentManagerComponent('editView', 'informations', {
+    //     name: 'comments-link',
+    //     Component: () => 'TODO: Comments count',
+    // });
   },
   
   async registerTrads({ locales }) {

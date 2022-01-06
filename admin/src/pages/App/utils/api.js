@@ -4,9 +4,9 @@ import { isEmpty } from 'lodash';
 import { getApiURL, axiosInstance } from '../../../utils';
 
 // eslint-disable-next-line import/prefer-default-export
-export const fetchData = async (queryParams, toggleNotification) => {
+export const fetchConfig = async (toggleNotification) => {
   try {
-    const { data } = await axiosInstance.get(getApiURL(`moderate/all${queryParams ? `?${stringify(queryParams, { encode: false })}` : ''}`));
+    const { data } = await axiosInstance.get(getApiURL(`moderate/config`));
 
     return data;
   } catch (err) {

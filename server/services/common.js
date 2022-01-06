@@ -93,7 +93,7 @@ module.exports = ({ strapi }) => ({
             return { id: _.id, itemsInTread: count, firstThreadItemId: first(nestedEntries)?.id }
         }));
 
-        const relatedEntities = relatedEntity !== null ? [relatedEntity] : await this.findRelatedEntitiesFor([...entitiesRoot, ...entitiesNested]);
+        const relatedEntities = relatedEntity !== null ? [relatedEntity] : await this.findRelatedEntitiesFor([...entries]);
         const result = entries
             .map(_ => {
                 const threadedItem = entriesWithThreads.find(item => item.id === _.id);

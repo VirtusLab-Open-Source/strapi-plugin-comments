@@ -22,6 +22,14 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
         return getPluginService('common');
     },
 
+    // Config
+    async config() {
+        const entryLabel = this.getCommonService().getConfig('entryLabel');
+        return {
+            entryLabel,
+        };
+    },
+
     // Find all comments
     async findAll({ related, entity, ...query }) {
         const { _q, orderBy, pageSize = 10, page = 1, filters, ...rest } = parseParams(query);
@@ -56,8 +64,6 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
         const result = entities
             .map(_ => filterOurResolvedReports(this.getCommonService().sanitizeCommentEntity(_)))
             .map(_ => this.getCommonService().mergeRelatedEntityTo(_, relatedEntities));
-
-            console.log(relatedEntities);
 
         return {
             result,
