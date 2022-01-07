@@ -1,7 +1,4 @@
-import { stringify } from 'qs';
-import { isEmpty } from 'lodash';
-
-import { getApiURL, axiosInstance } from '../../../utils';
+import { getApiURL, axiosInstance, handleAPIError } from '../../../utils';
 
 // eslint-disable-next-line import/prefer-default-export
 export const fetchConfig = async (toggleNotification) => {
@@ -10,11 +7,6 @@ export const fetchConfig = async (toggleNotification) => {
 
     return data;
   } catch (err) {
-    toggleNotification({
-      type: 'warning',
-      message: { id: 'notification.error' },
-    });
-
-    throw new Error('error');
+    handleAPIError(err, toggleNotification);
   }
 };

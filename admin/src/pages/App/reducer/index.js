@@ -18,7 +18,6 @@ const reducer = (state = initialState, action) =>
         return draftState?.config;
       }
       default:
-        console.log('draftState', draftState);
         return draftState;
     }
   });

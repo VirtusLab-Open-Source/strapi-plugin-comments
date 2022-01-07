@@ -83,7 +83,7 @@ const Details = () => {
               <HeaderLayout 
                 navigationAction={
                 <Link startIcon={<ArrowLeft />} to={getUrl(`discover`)}>
-                  { getMessage('button.back.label', '', false) }
+                  { getMessage('HeaderLayout.link.go-back', 'Back', false) }
                 </Link>}
                 title={ getMessage('page.details.header') } 
                 subtitle={ getMessage('page.details.header.description') } as="h2" />

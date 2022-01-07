@@ -63,7 +63,7 @@ module.exports = ({ strapi }) => ({
     },
 
     // Find comments in the flat structure
-    async findAllFlat(query, isAdmin = false, relatedEntity = null) {
+    async findAllFlat({ query, populate = {} }, isAdmin = false, relatedEntity = null) {
         const criteria = { 
             ...query,
             $or: [{ removed: { $null: true } }, { removed: false }],
@@ -73,14 +73,19 @@ module.exports = ({ strapi }) => ({
             delete criteria.$or;
         }
 
-        const populate = { authorUser: true, reports: true };
+        const defaultPopulate = {
+            authorUser: true,
+        };
 
         const entries = await strapi.db.query(getModelUid('comment'))
         .findMany({
             where: {
                 ...criteria,
             },
-            populate,
+            populate: {
+                ...defaultPopulate,
+                ...populate,
+            },
         });
 
         const entriesWithThreads = await Promise.all(entries.map(async _ => {
@@ -97,12 +102,12 @@ module.exports = ({ strapi }) => ({
         const result = entries
             .map(_ => {
                 const threadedItem = entriesWithThreads.find(item => item.id === _.id);
-                return filterOurResolvedReports(this.sanitizeCommentEntity({
+                return this.sanitizeCommentEntity({
                     ..._,
                     threadOf: query.threadOf || _.threadOf || null,
                     gotThread: (threadedItem?.itemsInTread || 0) > 0,
                     threadFirstItemId: threadedItem?.firstThreadItemId,
-                }))
+                });
             });
 
         if (relatedEntities.filter(_ => _).length > 0) {
@@ -114,11 +119,12 @@ module.exports = ({ strapi }) => ({
     // Find comments and create relations tree structure
     async findAllInHierarchy ({
         query,
+        populate = {},
         startingFromId = null,
         dropBlockedThreads = false,
         isAdmin = false,
     }, relatedEntity) {
-        const entities = await this.findAllFlat(query, isAdmin, relatedEntity);
+        const entities = await this.findAllFlat({ query, populate }, isAdmin, relatedEntity);
         return buildNestedStructure(entities, startingFromId, 'threadOf', dropBlockedThreads, false);
     },
 

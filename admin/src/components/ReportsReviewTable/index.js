@@ -23,7 +23,8 @@ import { REPORT_REASON, REPORT_STATUS } from '../../utils/constants';
 const ReportsReviewTable = ({ 
     commentId,
     items,
-    mutation
+    mutation,
+    onBlockButtonsStateChange,
 }) => {
 
     const [storedItems, setStoredItems] = useState([]);
@@ -65,10 +66,12 @@ const ReportsReviewTable = ({
         });
         console.log(item);
         if (item) {
-            setStoredItems(storedItems.map(_ => ({
-                ..._,
-                resolved: reportId === _.id ? true : _.resolved,
-            })));
+          const updatedItems = storedItems.map(_ => ({
+              ..._,
+              resolved: reportId === _.id ? true : _.resolved,
+          }));
+          setStoredItems(updatedItems);
+          onBlockButtonsStateChange(updatedItems.filter(_ => !_.resolved).length === 0);
         }
     }
 
@@ -137,6 +140,7 @@ ReportsReviewTable.propTypes = {
     commentId: PropTypes.string.isRequired,
     items: PropTypes.array.isRequired,
     mutation: PropTypes.func.isRequired,
+    onBlockButtonsStateChange: PropTypes.func.isRequired,
 };
 
   export default ReportsReviewTable;

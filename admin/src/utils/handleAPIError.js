@@ -2,7 +2,7 @@
 const handleAPIError = (err = null, toggleNotification = null) => {
     toggleNotification({
         type: 'warning',
-        message: { id: 'notification.error' },
+        message: 'app.components.notification.error',
     });
 
     if (err) {

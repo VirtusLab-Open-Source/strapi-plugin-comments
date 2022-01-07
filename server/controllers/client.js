@@ -16,8 +16,13 @@ module.exports = {
     try {
       return this.getService('common')
         .findAllFlat({
-          ...query,
-          related: relation,
+          query: {
+            ...query,
+            related: relation,
+          },
+          populate: {
+            threadOf: true,
+          },
         });
     } catch (e) {
       throwError(ctx, e);
@@ -33,6 +38,9 @@ module.exports = {
           query: {
             ...query,
             related: relation,
+          },
+          populate: {
+            threadOf: true,
           },
           dropBlockedThreads: true,
         });

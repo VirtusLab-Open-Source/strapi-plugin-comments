@@ -55,7 +55,17 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
         }
     
         const entities = await strapi.db.query(getModelUid('comment'))
-            .findMany(params, ['authorUser', 'reports']);
+            .findMany({
+                ...params, 
+                populate: {
+                    authorUser: true,
+                    reports: {
+                        where: { 
+                            resolved: false
+                        },
+                    },
+                },
+            });
         const total = await strapi.db.query(getModelUid('comment'))
             .count({
                 where: params.where,
@@ -78,11 +88,27 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
 
     // Find single comment
     async findOneAndThread(id) {
+        const reportsPopulation = {
+            reports: {
+                where: { 
+                    resolved: false,
+                },
+            }
+        };
+
         const entity = await strapi.db.query(getModelUid('comment')).findOne({ 
             where: {
                 id
             },
-            populate: ['threadOf', 'threadOf.reports', 'authorUser', 'reports'] 
+            populate: {
+                authorUser: true,
+                threadOf: {
+                    populate: { 
+                        ...reportsPopulation
+                    },
+                },
+                ...reportsPopulation,
+            },
         });
 
         if (!entity){
@@ -109,19 +135,22 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
                     threadOf: levelThreadId,
                     related: entity.related,
                 },
+                populate: {
+                    ...reportsPopulation,
+                },
                 startingFromId: levelThreadId,
                 isAdmin: true
             }, false);
 
-        const selectedEntity = filterOurResolvedReports(this.getCommonService().sanitizeCommentEntity(entity));
+        const selectedEntity = this.getCommonService().sanitizeCommentEntity(entity);
         
         return {
             entity: relatedEntity,
             selected: {
                 ...selectedEntity,
-                threadOf: selectedEntity.threadOf ? filterOurResolvedReports(selectedEntity.threadOf) : null,
+                threadOf: selectedEntity.threadOf ? selectedEntity.threadOf : null,
             },
-            level: entitiesOnSameLevel.map(_ => filterOurResolvedReports(_))
+            level: entitiesOnSameLevel,
         };
     },
 

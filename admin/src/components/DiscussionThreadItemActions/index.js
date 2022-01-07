@@ -11,12 +11,14 @@ import { isNil } from 'lodash';
 import { Button } from '@strapi/design-system/Button';
 import { Flex } from '@strapi/design-system/Flex';
 import { IconButton } from '@strapi/design-system/IconButton';
-import { Lock, Check, Cross, Key } from '@strapi/icons';
+import { Check, Cross } from '@strapi/icons';
 import { useNotification, useOverlayBlocker } from '@strapi/helper-plugin';
 import { getMessage, handleAPIError } from '../../utils';
 import { DiscussionThreadItemActionsBadge, DiscussionThreadItemActionsGroupWrapper, DiscussionThreadItemActionsWrapper } from './styles';
 import ConfirmationDialog from '../ConfirmationDialog';
 import { blockItem, blockItemThread, unblockItem, unblockItemThread } from '../../pages/Details/utils/api';
+import pluginId from '../../pluginId';
+import { LockIcon, UnlockIcon } from '../icons';
 
 const DiscussionThreadItemActions = ({ id, blocked, blockedThread, approvalStatus, root }) => {
 
@@ -31,7 +33,7 @@ const DiscussionThreadItemActions = ({ id, blocked, blockedThread, approvalStatu
         await queryClient.invalidateQueries('get-details-data');
         toggleNotification({
             type: 'success',
-            message,
+            message: `${pluginId}.${message}`,
         });
         stateAction(false);
         unlockApp();
@@ -130,10 +132,10 @@ const DiscussionThreadItemActions = ({ id, blocked, blockedThread, approvalStatu
     return (<>
         <DiscussionThreadItemActionsWrapper as={Flex} direction="row">
             { badgeVisible && (<DiscussionThreadItemActionsBadge color={badgeColor} backgroundColor={`${badgeColor}100`} textColor={`${badgeColor}600`}>{getMessage(`page.details.panel.discussion.status.${badgeLabel}`, badgeLabel)}</DiscussionThreadItemActionsBadge>)}
-            { !blockedThread && !(blocked || needsApproval) && (<IconButton onClick={handleBlockClick} loading={blockItemMutation.isLoading} icon={<Lock />} label={getMessage('page.details.actions.comment.block', 'Block')} />)}
-            { !blockedThread && blocked && (<IconButton onClick={handleUnblockClick} loading={unblockItemMutation.isLoading} icon={<Key />} label={getMessage('page.details.actions.comment.unblock', 'Unblock')} />)}
-            { (!blockedThread && root) && (<Button onClick={handleBlockThreadClick} startIcon={<Lock />} loading={blockItemThreadMutation.isLoading} variant="danger">{ getMessage('page.details.actions.thread.block', 'Block thread') }</Button>) }
-            { (blockedThread && root) && (<Button onClick={handleUnblockThreadClick} startIcon={<Key />} loading={unblockItemThreadMutation.isLoading} variant="success">{ getMessage('page.details.actions.thread.unblock', 'Unblock thread') }</Button>) }
+            { !blockedThread && !(blocked || needsApproval) && (<IconButton onClick={handleBlockClick} loading={blockItemMutation.isLoading} icon={<LockIcon />} label={getMessage('page.details.actions.comment.block', 'Block')} style={(!blockedThread && root) ? { marginTop: '1px', marginRight: '.5rem' } : {}} />)}
+            { !blockedThread && blocked && (<IconButton onClick={handleUnblockClick} loading={unblockItemMutation.isLoading} icon={<UnlockIcon />} label={getMessage('page.details.actions.comment.unblock', 'Unblock')} />)}
+            { (!blockedThread && root) && (<Button onClick={handleBlockThreadClick} startIcon={<LockIcon />} loading={blockItemThreadMutation.isLoading} variant="danger">{ getMessage('page.details.actions.thread.block', 'Block thread') }</Button>) }
+            { blockedThread && (<Button onClick={handleUnblockThreadClick} startIcon={<UnlockIcon />} loading={unblockItemThreadMutation.isLoading} variant="success">{ getMessage('page.details.actions.thread.unblock', 'Unblock thread') }</Button>) }
             { needsApproval && (<DiscussionThreadItemActionsGroupWrapper>
                 <IconButton icon={<Check />} label={getMessage('page.details.actions.comment.approve', 'Approve')} />
                 <IconButton icon={<Cross />} label={getMessage('page.details.actions.comment.reject', 'Reject')} />
@@ -144,7 +146,7 @@ const DiscussionThreadItemActions = ({ id, blocked, blockedThread, approvalStatu
             isActionAsync={blockItemMutation.isLoading}
             header={getMessage('page.details.actions.comment.block.confirmation.header')}
             labelConfirm={getMessage('page.details.actions.comment.block.confirmation.button.confirm')}
-            iconConfirm={<Lock />}
+            iconConfirm={<LockIcon />}
             onConfirm={handleBlockConfirm} 
             onCancel={handleBlockCancel}>
                 { getMessage('page.details.actions.comment.block.confirmation.description') }
@@ -154,7 +156,7 @@ const DiscussionThreadItemActions = ({ id, blocked, blockedThread, approvalStatu
             isActionAsync={blockItemThreadMutation.isLoading}
             header={getMessage('page.details.actions.thread.block.confirmation.header')}
             labelConfirm={getMessage('page.details.actions.thread.block.confirmation.button.confirm')}
-            iconConfirm={<Lock />}
+            iconConfirm={<LockIcon />}
             onConfirm={handleBlockThreadConfirm} 
             onCancel={handleBlockThreadCancel}>
                 { getMessage('page.details.actions.thread.block.confirmation.description') }

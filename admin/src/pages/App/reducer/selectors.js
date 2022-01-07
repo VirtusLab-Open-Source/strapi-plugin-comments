@@ -26,7 +26,7 @@ const makeAppView = () =>
   );
 
 const selectConfig = state => {
-  const { config } = state[REDUCER_NAME];
+  const { config } = state;
 
   return config;
 };

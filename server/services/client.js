@@ -160,7 +160,7 @@ module.exports = ({ strapi }) => ({
                 try {
                     await this.sendAbuseReportEmail(entity.reason, entity.content); // Could also add some info about relation
                 } catch (err) {
-                    throw err;
+                    return entity;
                 }
             } else {
                 throw new PluginError(500, 'Report cannot be created');

@@ -8,21 +8,15 @@ import React, { memo, useRef, useMemo } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, compose } from 'redux';
 import isEqual from 'react-fast-compare';
-import { useIntl } from 'react-intl';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router-dom';
 import { isEmpty } from 'lodash';
-import { Badge } from '@strapi/design-system/Badge';
-import { BaseCheckbox } from '@strapi/design-system/BaseCheckbox'; 
 import { Box } from '@strapi/design-system/Box';
-import { Flex } from '@strapi/design-system/Flex'; 
-import { IconButton } from '@strapi/design-system/IconButton';
 import { Layout, HeaderLayout, ActionLayout, ContentLayout } from '@strapi/design-system/Layout';
 import { Table, Thead, Tbody, Tr, Th, Td } from '@strapi/design-system/Table'; 
 import { Typography } from '@strapi/design-system/Typography'; 
 import { VisuallyHidden } from '@strapi/design-system/VisuallyHidden'; 
 import { useNotifyAT } from '@strapi/design-system/LiveRegions';
-import { Eye } from '@strapi/icons';
 
 import {
   EmptyStateLayout,
@@ -40,12 +34,11 @@ import pluginPermissions from '../../permissions';
 
 import getUrl from '../../utils/getUrl';
 import Nav from '../../components/Nav';
-import { COMMENT_STATUS } from '../../utils/constants';
 import TablePagination from '../../components/TablePagination';
 import filtersSchema from './utils/filtersSchema';
 import TableFilters from '../../components/TableFilters';
-import appReducer from '../App/reducer';
-import makeAppView, { selectConfig } from '../App/reducer/selectors';
+import makeAppView from '../App/reducer/selectors';
+import DiscoverTableRow from './components/DiscoverTableRow';
 
 const Discover = ({ config }) => {
   useFocusWhenNavigate();
@@ -55,7 +48,6 @@ const Discover = ({ config }) => {
   const { trackUsage } = useTracking();
   const trackUsageRef = useRef(trackUsage);
   const toggleNotification = useNotification();
-  const { formatDate } = useIntl();
   const [{ query: queryParams }] = useQueryParams();
   const _q = queryParams?._q || '';
 
@@ -69,7 +61,7 @@ const Discover = ({ config }) => {
   } = useRBAC(viewPermissions);
 
   const { isLoading: isLoadingForData, data: { result, pagination = {} }, isFetching } = useQuery(
-    ['get-providers', queryParams],
+    ['get-data', queryParams],
     () => fetchData(queryParams, toggleNotification),
     {
       initialData: { },
@@ -94,22 +86,11 @@ const Discover = ({ config }) => {
     },
   };
 
-  const renderStatus = ({ blocked, blockedThread }) => {
-    const status = blocked || blockedThread ? COMMENT_STATUS.BLOCKED : COMMENT_STATUS.OPEN;
-    let color = 'secondary';
-    switch (status) {
-        case COMMENT_STATUS.OPEN:
-            color = 'success';
-            break;
-        case COMMENT_STATUS.BLOCKED:
-            color = 'danger';
-    };
-    return (<Badge backgroundColor={`${color}100`} textColor={`${color}600`}>{ getMessage(`page.discover.table.header.status.${status}`, status) }</Badge>);
-  };
+
 
   const emptyContent = _q ? 'search' : 'comments';
   
-  const COL_COUNT = 7;
+  const COL_COUNT = 6;
 
   return <Box background="neutral100">
           <Layout sideNav={<Nav />}>
@@ -128,9 +109,6 @@ const Discover = ({ config }) => {
                 <Table colCount={COL_COUNT} rowCount={result.length}>
                   <Thead>
                     <Tr>
-                      <Th>
-                        <BaseCheckbox aria-label="Select all entries" />
-                      </Th>
                       <Th>
                         <Typography variant="sigma">{ getMessage('page.discover.table.header.message') }</Typography>
                       </Th>
@@ -152,31 +130,7 @@ const Discover = ({ config }) => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {result.map(entry => <Tr key={entry.id}>
-                        <Td>
-                          <BaseCheckbox aria-label={`Select ${entry.content}`} />
-                        </Td>
-                        <Td style={{ maxWidth: '40vw' }}>
-                          <Typography textColor="neutral800" ellipsis>{entry.content}</Typography>
-                        </Td>
-                        <Td>
-                          <Typography textColor="neutral800">{entry.threadOf?.id || '-'}</Typography>
-                        </Td>
-                        <Td>
-                          <Typography textColor="neutral800">{entry.related?.id}</Typography>
-                        </Td>
-                        <Td>
-                          <Typography textColor="neutral800">{ formatDate(entry.updatedAt || entry.createdAt, { dateStyle: 'long', timeStyle: 'short' }) }</Typography>
-                        </Td>
-                        <Td>
-                          <Typography textColor="neutral800">{ renderStatus(entry) }</Typography>
-                        </Td>
-                        <Td>
-                          <Flex direction="column" alignItems="flex-end">
-                            <IconButton onClick={() => handleClickDisplay(entry.id)} label={ getMessage('page.discover.table.action.display') } icon={<Eye />} />
-                          </Flex>
-                        </Td>
-                      </Tr>)}
+                    {result.map(entry => (<DiscoverTableRow config={config} item={entry} onClick={() => handleClickDisplay(entry.id)}/>))}
                   </Tbody>
                 </Table>
                 <TablePagination pagination={{ pageCount: pagination?.pageCount || 1 }} />

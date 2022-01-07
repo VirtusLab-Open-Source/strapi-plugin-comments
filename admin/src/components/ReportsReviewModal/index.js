@@ -13,7 +13,6 @@ import DiscussionThreadItem from '../DiscussionThreadItem';
 
 const ReportsReviewModal = ({ 
     isVisible = false,
-    isActionAsync = false,
     item,
     children, 
     onClose, 
@@ -34,7 +33,6 @@ const ReportsReviewModal = ({
 
   ReportsReviewModal.propTypes = {
     isVisible: PropTypes.bool,
-    isActionAsync: PropTypes.bool,
     startActions: PropTypes.array,
     endActions: PropTypes.array,
     item: PropTypes.object.isRequired,

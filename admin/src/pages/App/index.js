@@ -5,7 +5,9 @@
  *
  */
 
-import React, { useReducer } from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators, compose } from 'redux';
 import { Switch, Route } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { 
@@ -18,23 +20,19 @@ import getUrl from '../../utils/getUrl';
 import Discover from '../Discover';
 import Details from '../Details';
 import { fetchConfig } from './utils/api';
-import initReducer from './reducer/init';
-import reducer, { initialState } from './reducer';
 import { setConfig } from './reducer/actions';
+import makeAppView from './reducer/selectors';
 
-const App = () => {
+const App = ({ setConfig }) => {
 
   const toggleNotification = useNotification();
-  const [reducerState, dispatch] = useReducer(reducer, initialState, () =>
-    initReducer(initialState)
-  );
 
   const { isLoading, isFetching } = useQuery(
     'get-config', () => fetchConfig(toggleNotification),
     {
       initialData: { },
       onSuccess: (response) => {
-        dispatch(setConfig(response));
+        setConfig(response);
       }
     }
   );
@@ -57,4 +55,17 @@ const App = () => {
   );
 };
 
-export default App;
+const mapStateToProps = makeAppView();
+
+export function mapDispatchToProps(dispatch) {
+  return bindActionCreators(
+    { setConfig },
+    dispatch
+  );
+}
+const withConnect = connect(
+  mapStateToProps,
+  mapDispatchToProps
+);
+
+export default compose(withConnect)(App);

@@ -5,7 +5,6 @@
  */
 
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { useMutation, useQueryClient } from 'react-query';
 import { isEmpty, orderBy } from 'lodash';
 import { Badge } from '@strapi/design-system/Badge';
@@ -14,18 +13,20 @@ import { Button } from '@strapi/design-system/Button';
 import { Divider } from '@strapi/design-system/Divider';
 import { Flex } from '@strapi/design-system/Flex';
 import { Typography } from '@strapi/design-system/Typography';
-import { ArrowRight, Lock } from '@strapi/icons';
 import { useNotification, useOverlayBlocker } from '@strapi/helper-plugin';
 import { getMessage, handleAPIError } from '../../utils';
 import { blockItem, blockItemThread, resolveReport } from '../../pages/Details/utils/api';
 import { DiscussionThreadItemWarningsWrapper } from './styles';
 import ReportsReviewModal from '../ReportsReviewModal';
 import ReportsReviewTable from '../ReportsReviewTable';
+import pluginId from '../../pluginId';
+import { LockIcon, ReviewIcon } from '../icons';
 
 const DiscussionThreadItemWarnings = (item) => {
-    const { id, reports } = item;
+    const { id, reports, gotThread } = item;
 
     const [reportsReviewVisible, setReportsReviewVisible] = useState(false);
+    const [blockButtonsDisabled, setBlockButtonsDisabled] = useState(false);
 
     const toggleNotification = useNotification();
     const queryClient = useQueryClient();
@@ -37,7 +38,7 @@ const DiscussionThreadItemWarnings = (item) => {
         }
         toggleNotification({
             type: 'success',
-            message,
+            message: `${pluginId}.${message}`,
         });
         stateAction(false);
         unlockApp();
@@ -82,6 +83,8 @@ const DiscussionThreadItemWarnings = (item) => {
         setReportsReviewVisible(false);
     };
 
+    const handleBlockButtonsStateChange = disabled => setBlockButtonsDisabled(disabled);
+
     const isLoading = blockItemMutation.isLoading || blockItemThreadMutation.isLoading || resolveReportMutation.isLoading;
     const openReports = reports?.filter(_ => !_.resolved);
 
@@ -97,7 +100,7 @@ const DiscussionThreadItemWarnings = (item) => {
                     <Typography textColor="warning600" fontWeight="bold">{getMessage(`page.details.panel.discussion.warnings.reports.description`, 'abuse reports')}</Typography>
                 </Box>
             </Box>
-            <Button onClick={handleReportsReviewClick} variant="ghost" endIcon={<ArrowRight />}>
+            <Button onClick={handleReportsReviewClick} variant="ghost" endIcon={<ReviewIcon />}>
                 { getMessage(`page.details.actions.comment.report.review`, 'review') }
             </Button>
         </DiscussionThreadItemWarningsWrapper>
@@ -106,12 +109,12 @@ const DiscussionThreadItemWarnings = (item) => {
             isActionAsync={isLoading}
             onClose={handleReportsReviewClose}
             startActions={<>
-                <Button onClick={handleBlockItemClick} variant="danger-light" startIcon={<Lock />}>
+                <Button onClick={handleBlockItemClick} variant="danger-light" startIcon={<LockIcon />} disabled={blockButtonsDisabled}>
                     { getMessage(`page.details.actions.comment.block`, 'Block comment') }
                 </Button>
-                <Button onClick={handleBlockItemThreadClick} variant="danger" startIcon={<Lock />}>
+                { gotThread && (<Button onClick={handleBlockItemThreadClick} variant="danger" startIcon={<LockIcon />} disabled={blockButtonsDisabled}>
                     { getMessage(`page.details.actions.thread.block`, 'Block thread') }
-                </Button>
+                </Button>) }
             </>}
             item={item}>
                 <Typography variant="sigma" textColor="neutral600" id="reports-list">
@@ -124,6 +127,7 @@ const DiscussionThreadItemWarnings = (item) => {
                     commentId={item.id} 
                     items={orderBy(reports, ['resolved', 'createdAt'], ['DESC', 'DESC'])} 
                     mutation={resolveReportMutation}
+                    onBlockButtonsStateChange={handleBlockButtonsStateChange}
                 />
         </ReportsReviewModal>
     </>);
