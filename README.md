@@ -74,8 +74,12 @@ To setup amend default plugin configuration we recommend to put following snippe
 ```js
     ...
     comments: {
-      badWords: false,
-      moderatorRoles: ["Authenticated"]
+        badWords: false,
+        moderatorRoles: ["Authenticated"],
+        entryLabel: {
+            '*': ['Title', 'title', 'Name', 'name', 'Subject', 'subject'],
+            'api::page.page': ['MyField'],
+        },
     },
     ...
 ```
@@ -83,6 +87,7 @@ To setup amend default plugin configuration we recommend to put following snippe
 ### Properties
 - `badWords` - Enabled support for [bad words filtering](https://www.npmjs.com/package/bad-words). Can be turned off or overwritten using [options reference](https://www.npmjs.com/package/bad-words#constructor). Default value: `true`. 
 - `moderatorRoles` - Optional list of names of roles. Users with those roles will be notified by email when a new abuse report is created. This feature requires a built-in [Strapi email plugin](https://docs.strapi.io/developer-docs/latest/plugins/email.html) configured.
+- `entryLabel` - ordered list of property names per Content Type to generate related entity label. Default set as `*`.
 
 ## Additional GQL Configuration
 
