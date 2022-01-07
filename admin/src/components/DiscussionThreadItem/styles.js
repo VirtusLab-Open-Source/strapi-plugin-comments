@@ -6,6 +6,7 @@ export const AvatarWrapper = styled(Box)``;
 export const InitialsWrapper = styled(Box)``;
 
 export const DiscussionThreadItemLinkBox = styled(Flex)`
+    width: 100%;
     margin-top: .5rem;
     margin-bottom: .5rem;
 `

@@ -34,12 +34,13 @@ const DiscussionThread = ({ level = [], selected = {}, isReloading }) => {
             <Divider />
         </Box>
         <Flex as="ul" direction="column" alignItems="flex-start">
-            { rootThread && (<DiscussionThreadItem {...rootThread} isThreadAuthor root />) }
+            { rootThread && (<DiscussionThreadItem {...rootThread} isThreadAuthor root pinned />) }
             { level.map(item => {
                 const isSelected = selected.id === item.id;
                 const isThreadAuthor = !isNil(selected?.threadOf?.authorId) && (selected?.threadOf?.authorId === item.authorId);
                 return (<DiscussionThreadItem 
                     {...item} 
+                    root={isNil(rootThread)}
                     blockedThread={rootThread?.blockedThread || item.blockedThread}
                     isSelected={isSelected} 
                     isThreadAuthor={isThreadAuthor} 

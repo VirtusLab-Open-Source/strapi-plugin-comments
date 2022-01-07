@@ -20,7 +20,7 @@ import { blockItem, blockItemThread, unblockItem, unblockItemThread } from '../.
 import pluginId from '../../pluginId';
 import { LockIcon, UnlockIcon } from '../icons';
 
-const DiscussionThreadItemActions = ({ id, blocked, blockedThread, approvalStatus, root }) => {
+const DiscussionThreadItemActions = ({ id, blocked, blockedThread, gotThread, pinned, approvalStatus, root }) => {
 
     const [blockConfirmationVisible, setBlockConfirmationVisible] = useState(false);
     const [blockThreadConfirmationVisible, setBlockThreadConfirmationVisible] = useState(false);
@@ -134,8 +134,8 @@ const DiscussionThreadItemActions = ({ id, blocked, blockedThread, approvalStatu
             { badgeVisible && (<DiscussionThreadItemActionsBadge color={badgeColor} backgroundColor={`${badgeColor}100`} textColor={`${badgeColor}600`}>{getMessage(`page.details.panel.discussion.status.${badgeLabel}`, badgeLabel)}</DiscussionThreadItemActionsBadge>)}
             { !blockedThread && !(blocked || needsApproval) && (<IconButton onClick={handleBlockClick} loading={blockItemMutation.isLoading} icon={<LockIcon />} label={getMessage('page.details.actions.comment.block', 'Block')} style={(!blockedThread && root) ? { marginTop: '1px', marginRight: '.5rem' } : {}} />)}
             { !blockedThread && blocked && (<IconButton onClick={handleUnblockClick} loading={unblockItemMutation.isLoading} icon={<UnlockIcon />} label={getMessage('page.details.actions.comment.unblock', 'Unblock')} />)}
-            { (!blockedThread && root) && (<Button onClick={handleBlockThreadClick} startIcon={<LockIcon />} loading={blockItemThreadMutation.isLoading} variant="danger">{ getMessage('page.details.actions.thread.block', 'Block thread') }</Button>) }
-            { blockedThread && (<Button onClick={handleUnblockThreadClick} startIcon={<UnlockIcon />} loading={unblockItemThreadMutation.isLoading} variant="success">{ getMessage('page.details.actions.thread.unblock', 'Unblock thread') }</Button>) }
+            { (!blockedThread && (gotThread || pinned)) && (<Button onClick={handleBlockThreadClick} startIcon={<LockIcon />} loading={blockItemThreadMutation.isLoading} variant="danger">{ getMessage('page.details.actions.thread.block', 'Block thread') }</Button>) }
+            { (blockedThread && (gotThread || pinned)) && (<Button onClick={handleUnblockThreadClick} startIcon={<UnlockIcon />} loading={unblockItemThreadMutation.isLoading} variant="success">{ getMessage('page.details.actions.thread.unblock', 'Unblock thread') }</Button>) }
             { needsApproval && (<DiscussionThreadItemActionsGroupWrapper>
                 <IconButton icon={<Check />} label={getMessage('page.details.actions.comment.approve', 'Approve')} />
                 <IconButton icon={<Cross />} label={getMessage('page.details.actions.comment.reject', 'Reject')} />
