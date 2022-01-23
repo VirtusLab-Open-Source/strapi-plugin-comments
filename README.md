@@ -82,6 +82,7 @@ To setup amend default plugin configuration we recommend to put following snippe
     comments: {
         badWords: false,
         moderatorRoles: ["Authenticated"],
+        approvalFlow: ['api::page.page'],
         entryLabel: {
             '*': ['Title', 'title', 'Name', 'name', 'Subject', 'subject'],
             'api::page.page': ['MyField'],
@@ -93,7 +94,8 @@ To setup amend default plugin configuration we recommend to put following snippe
 ### Properties
 - `badWords` - Enabled support for [bad words filtering](https://www.npmjs.com/package/bad-words). Can be turned off or overwritten using [options reference](https://www.npmjs.com/package/bad-words#constructor). Default value: `true`. 
 - `moderatorRoles` - Optional list of names of roles. Users with those roles will be notified by email when a new abuse report is created. This feature requires a built-in [Strapi email plugin](https://docs.strapi.io/developer-docs/latest/plugins/email.html) configured.
-- `entryLabel` - ordered list of property names per Content Type to generate related entity label. Default set as `*`.
+- `approvalFlow` - list of Content Types which are supporting approval flow. Values must be in format like `'api::<collection name>.<content type name>'`. For not included, posted comments are going to be immediately visible. 
+- `entryLabel` - ordered list of property names per Content Type to generate related entity label. Keys must be in format like `'api::<collection name>.<content type name>'`. Default formatting set as `*`.
 
 ## Additional GQL Configuration
 
@@ -226,7 +228,6 @@ Posts a Comment related to specified instance of Content Type like for example `
     },
 	"content": "My sample response",
 	"threadOf": 2, // id of comment we would like to start / continue the thread (Optional)
-	"related": "api::page.page:1"
 }
 ```
 
@@ -236,7 +237,6 @@ Posts a Comment related to specified instance of Content Type like for example `
 	"authorUser": 1, // id of a author user. Optional in case of 'enableUsers: true' in the plugin configuration
 	"content": "My sample response",
 	"threadOf": 2, // id of comment we would like to start / continue the thread (Optional)
-	"related": "api::page.page:1"
 }
 ```
 
