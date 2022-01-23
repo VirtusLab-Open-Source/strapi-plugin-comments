@@ -1,6 +1,6 @@
 'use strict';
 
-const config = require('./../config');
+const config = require('../config');
 const { getPluginService } = require('./../utils/functions');
 const { isNil, isEmpty } = require('lodash');
 const PluginError = require('./../utils/error');
