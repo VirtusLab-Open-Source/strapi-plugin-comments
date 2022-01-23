@@ -1,0 +1,72 @@
+/**
+ *
+ * Approval Flow Actions
+ *
+ */
+
+import React from 'react';
+import PropTypes from 'prop-types';
+import { useMutation, useQueryClient } from 'react-query';
+import { IconButton } from '@strapi/design-system/IconButton';
+import { Check, Cross } from '@strapi/icons';
+import { useNotification, useOverlayBlocker } from '@strapi/helper-plugin';
+import { getMessage, handleAPIError } from '../../utils';
+import { DiscussionThreadItemActionsGroupWrapper } from './styles';
+import { approveItem, rejectItem } from '../../pages/utils/api';
+import pluginId from '../../pluginId';
+
+const DiscussionThreadItemApprovalFlowActions = ({ id, queryToInvalidate }) => {
+
+    const toggleNotification = useNotification();
+    const queryClient = useQueryClient();
+    const { lockApp, unlockApp } = useOverlayBlocker();
+
+    const onSuccess = (message, stateAction = () => {}) => async () => {
+        if (queryToInvalidate) {
+            await queryClient.invalidateQueries(queryToInvalidate);
+        }
+        toggleNotification({
+            type: 'success',
+            message: `${pluginId}.${message}`,
+        });
+        unlockApp();
+    };
+
+    const onError = err => { handleAPIError(err, toggleNotification); };
+
+    const approveItemMutation = useMutation(approveItem, {
+        onSuccess: onSuccess('page.details.actions.comment.approve.confirmation.success'),
+        onError,
+        refetchActive: false,
+    });
+    const rejectItemMutation = useMutation(rejectItem, {
+        onSuccess: onSuccess('page.details.actions.comment.reject.confirmation.success'),
+        onError,
+        refetchActive: false,
+    });
+
+
+    const handleApproveClick = () => {
+        lockApp();
+        approveItemMutation.mutate(id);
+    };
+
+    const handleRejectClick = () => {
+        lockApp();
+        rejectItemMutation.mutate(id);
+    };
+
+    return (<DiscussionThreadItemActionsGroupWrapper>
+        <IconButton icon={<Check />} label={getMessage('page.details.actions.comment.approve', 'Approve')} onClick={handleApproveClick} />
+        <IconButton icon={<Cross />} label={getMessage('page.details.actions.comment.reject', 'Reject')} onClick={handleRejectClick} />
+    </DiscussionThreadItemActionsGroupWrapper>);
+};
+
+DiscussionThreadItemApprovalFlowActions.propTypes = {
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    queryToInvalidate: PropTypes.string,
+    wrapped: PropTypes.bool,
+};
+
+export default DiscussionThreadItemApprovalFlowActions;
+ 

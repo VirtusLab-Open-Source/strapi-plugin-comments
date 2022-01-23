@@ -1,14 +1,12 @@
 'use strict';
 
 const { getPluginService, parseParams } = require('./../utils/functions');
-const { getAssociationModel } = require('./common');
-const { first, isEmpty, isNil, uniq, get } = require('lodash');
+const { isEmpty, isNil } = require('lodash');
 const PluginError = require('./../utils/error');
 const {
     getModelUid,
     getRelatedGroups,
     filterOurResolvedReports,
-    convertContentTypeNameToSlug
 } = require('./utils/functions');
 const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
 
@@ -25,8 +23,14 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
     // Config
     async config() {
         const entryLabel = this.getCommonService().getConfig('entryLabel');
+        const approvalFlow = this.getCommonService().getConfig('approvalFlow');
         return {
             entryLabel,
+            approvalFlow,
+            regex: Object.keys(REGEX).reduce((prev, curr) => ({
+                ...prev,
+                [curr]: REGEX[curr].toString(),
+            }), {}),
         };
     },
 
@@ -34,10 +38,18 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
     async findAll({ related, entity, ...query }) {
         const { _q, orderBy, pageSize = 10, page = 1, filters, ...rest } = parseParams(query);
 
+        const defaultWhere = {
+            $or: [
+                { removed: false },
+                { removed: null },
+            ],
+        };
+
         let params = {
             where: !isEmpty(filters) ? {
+                ...defaultWhere,
                 ...filters,
-            } : undefined,
+            } : { ...defaultWhere },
             offset: (page - 1)*pageSize, 
             limit: pageSize,
             orderBy: orderBy || [{ createdAt: 'desc' }],
@@ -59,6 +71,7 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
                 ...params, 
                 populate: {
                     authorUser: true,
+                    threadOf: true,
                     reports: {
                         where: { 
                             resolved: false
@@ -87,7 +100,14 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
     },
 
     // Find single comment
-    async findOneAndThread(id) {
+    async findOneAndThread(id, { removed, ...query }) {
+        const defaultWhere = !removed ? {
+            $or: [
+                { removed: false },
+                { removed: null },
+            ],
+        } : {};
+        
         const reportsPopulation = {
             reports: {
                 where: { 
@@ -98,7 +118,7 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
 
         const entity = await strapi.db.query(getModelUid('comment')).findOne({ 
             where: {
-                id
+                id,
             },
             populate: {
                 authorUser: true,
@@ -132,6 +152,8 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
         const entitiesOnSameLevel = await this.getCommonService()
             .findAllInHierarchy({
                 query: {
+                    ...defaultWhere,
+                    ...query,
                     threadOf: levelThreadId,
                     related: entity.related,
                 },
@@ -167,9 +189,13 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
     // Block / Unblock a comment thread
     async blockCommentThread(id, forceStatus) {
         const existingEntity = await this.getCommonService().findOne({ id });
+        const status = !isNil(forceStatus) ? forceStatus : !existingEntity.blockedThread;
         const changedEntity = await strapi.db.query(getModelUid('comment')).update({ 
             where: { id },
-            data: { blockedThread: !isNil(forceStatus) ? forceStatus : !existingEntity.blockedThread }
+            data: { 
+                blocked: status,
+                blockedThread: status,
+            },
         });
         await this.blockNestedThreads(id, changedEntity.blockedThread);
 

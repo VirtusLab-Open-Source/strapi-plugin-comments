@@ -18,6 +18,7 @@ module.exports = {
         .findAllFlat({
           query: {
             ...query,
+            $or: [{ removed: { $null: true } }, { removed: false }],
             related: relation,
           },
           populate: {

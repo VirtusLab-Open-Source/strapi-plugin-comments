@@ -26,18 +26,14 @@ module.exports = ({ strapi }) => ({
 
     // Create a comment
     async create(relation, data, user = undefined) {
-        const { content, threadOf, related } = data;
-        const singleRelationFulfilled = related && REGEX.relatedUid.test(related);
-
-        if (relation !== related) {
-            throw new PluginError(400, `Insonsistent relation uid`);
-        }
-
+        const { content, threadOf } = data;
+        const singleRelationFulfilled = relation && REGEX.relatedUid.test(relation);
+        
         if(!singleRelationFulfilled) {
             throw new PluginError(400, `Field "related" got incorrect format, use format like "api::<collection name>.<content type name>:<entity id>"`);
         }
 
-        const [ uid, relatedStringId ] = getRelatedGroups(related);
+        const [ uid, relatedStringId ] = getRelatedGroups(relation);
         const relatedId = parseInt(relatedStringId, 10);
 
         const relatedEntity = await strapi.db.query(uid).findOne(relatedId);
@@ -45,9 +41,12 @@ module.exports = ({ strapi }) => ({
             throw new PluginError(400, `Relation for field "related" does not exist. Check your payload please.`);
         }
 
+        const isApprovalFlowEnabled = this.getCommonService().getConfig('approvalFlow', []).includes(uid) ||
+            relatedEntity.requireCommentsApproval;
+
         const linkToThread = !isNil(threadOf) ? !!await this.getCommonService().findOne({
             id: threadOf,
-            related,
+            related: relation,
         }) : true;
         const validContext = isValidUserContext(user);
 
@@ -87,7 +86,8 @@ module.exports = ({ strapi }) => ({
                 throw new PluginError(400, 'Object: "author" is invalid. Check your payload');
             }
 
-            if (relatedEntity.requireCommentsApproval && data.approvalStatus !== APPROVAL_STATUS.PENDING) {
+            if (isApprovalFlowEnabled && 
+                (!isNil(data.approvalStatus) && (data.approvalStatus !== APPROVAL_STATUS.PENDING))) {
                 throw new PluginError(400, 'Invalid approval status');
             }
 
@@ -95,7 +95,8 @@ module.exports = ({ strapi }) => ({
                 data: {
                     ...rest,
                     ...authorData,
-                    related,
+                    related: relation,
+                    approvalStatus: isApprovalFlowEnabled ? APPROVAL_STATUS.PENDING : null,
                 }
             });
             return this.getCommonService().sanitizeCommentEntity(entity);
@@ -177,10 +178,17 @@ module.exports = ({ strapi }) => ({
           $or: [{ authorUser: authorId }, { authorId }],
         });
         if (!entity){
-            throw strapi.errors.notFound('Entity not exist');
+            throw new PluginError(404, 'Entity not exist');
         }
+
         return strapi.db.query(getModelUid('comment'))
-          .update({ id: commentId, relatedSlug: relationId }, { removed: true })
+          .update({
+              where: { 
+                  id: commentId, 
+                  related: relationId
+                },
+                data: { removed: true }
+          })
           .then(({ id }) => this.markAsRemovedNested(id, true))
           .then(() => ({ id: commentId }));
     },

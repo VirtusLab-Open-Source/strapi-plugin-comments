@@ -1,10 +1,9 @@
 'use strict';
 
-const { isArray, isEmpty, uniq, get, first } = require('lodash');
+const { isArray, uniq, first } = require('lodash');
 // const { sanitizeEntity } = require('strapi-utils');
 const PluginError = require('./../utils/error');
 const {
-    extractMeta,
     getModelUid,
     getRelatedGroups,
     buildNestedStructure,
@@ -16,62 +15,17 @@ const {
  */
 
 module.exports = ({ strapi }) => ({
-    getAssociationModel(ormModel, related) {
-        const relatedAssociation = ormModel.associations.find(_ => _.alias === 'related');
-        if (relatedAssociation) {
-            return relatedAssociation.related.find(rel => rel.collectionName === related);
-        }
-        return null;
-    },
 
-    getMorphModel() {
-        const ormModel = strapi.query(getModelUid('comment'));
-        return ormModel.model.morph;
-    },
-
-    isMongoDB(){
-        return strapi.query(getModelUid('comment'))?.model?.orm === 'mongoose';
-    },
-
-    getMorphData(query) {
-        return this
-          .getMorphModel()
-          .query(function () {
-              this.where(query);
-          })
-          .fetchAll()
-          .then((entities) => entities.map(entity => entity.toJSON()));
-    },
-
-    checkEntityRelation(uid, entityId) {
-        const result = parsedRelation.some(ref => {
-            const model = strapi.query(ref);
-            return model && model.associations.length &&
-              model.associations.some(_ => _.plugin === 'comments' && _.collection === 'comment');
-        });
-        if (!result) {
-            throw new PluginError(400, 'Comment not have relation to this type content type.');
-        }
-    },
-
-    getConfig(prop) {
+    getConfig(prop, defaultValue) {
         let queryProp = prop;
         if (prop && isArray(prop)) {
             queryProp = prop.join('.');
         }
-        return strapi.config.get(`plugin.comments${ queryProp ? '.' + queryProp : ''}`);
+        return strapi.config.get(`plugin.comments${ queryProp ? '.' + queryProp : ''}`) || defaultValue;
     },
 
     // Find comments in the flat structure
-    async findAllFlat({ query, populate = {} }, isAdmin = false, relatedEntity = null) {
-        const criteria = { 
-            ...query,
-            $or: [{ removed: { $null: true } }, { removed: false }],
-        }
-
-        if (isAdmin){
-            delete criteria.$or;
-        }
+    async findAllFlat({ query = {}, populate = {} }, relatedEntity = null) {
 
         const defaultPopulate = {
             authorUser: true,
@@ -80,7 +34,7 @@ module.exports = ({ strapi }) => ({
         const entries = await strapi.db.query(getModelUid('comment'))
         .findMany({
             where: {
-                ...criteria,
+                ...query,
             },
             populate: {
                 ...defaultPopulate,
@@ -122,9 +76,8 @@ module.exports = ({ strapi }) => ({
         populate = {},
         startingFromId = null,
         dropBlockedThreads = false,
-        isAdmin = false,
     }, relatedEntity) {
-        const entities = await this.findAllFlat({ query, populate }, isAdmin, relatedEntity);
+        const entities = await this.findAllFlat({ query, populate }, relatedEntity);
         return buildNestedStructure(entities, startingFromId, 'threadOf', dropBlockedThreads, false);
     },
 
@@ -135,24 +88,36 @@ module.exports = ({ strapi }) => ({
                 where: criteria
             }, ['related', 'reports']);
         if (!entity){
-            throw strapi.errors.notFound();
+            throw new PluginError(404, 'Not found');
         }
         return filterOurResolvedReports(this.sanitizeCommentEntity(entity));
     },
 
     // Find all related entiries
     async findRelatedEntitiesFor(entities = []) {
-        return Promise.all(uniq(entities.map(_ => _.related)).map(async _ => {
-            const [relatedUid, relatedStringId] = getRelatedGroups(_);
-            const relatedId = parseInt(relatedStringId, 10);
-            const relatedEntity = await strapi.db.query(relatedUid).findOne({ 
-                where: { id: relatedId }
-            });
-            return {
-                ...relatedEntity,
-                uid: relatedUid,
-            };
-        }))
+        const data = entities.reduce((acc, cur) => {
+                const [relatedUid, relatedStringId] = getRelatedGroups(cur.related);
+                return {
+                    ...acc,
+                    [relatedUid]: [...(acc[relatedUid] || []), parseInt(relatedStringId, 10)]
+                };
+            },
+            {}
+        );
+        return Promise.all(
+            Object.entries(data)
+            .map(async ([relatedUid, relatedStringIds]) => 
+                strapi.db.query(relatedUid).findMany({ 
+                    where: { id: Array.from(new Set(relatedStringIds)) } 
+                }).then(relatedEntities => relatedEntities.map(_ => 
+                    ({
+                        ..._,
+                        uid: relatedUid,
+                    })
+                ))
+            )
+        )
+        .then(result => result.flat(2));
     },
 
     // Merge related entity with comment

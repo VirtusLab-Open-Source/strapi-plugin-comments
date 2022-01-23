@@ -16,11 +16,11 @@ module.exports = {
   },
 
   async findOne(ctx) {
-    const { params = {} } = ctx;
+    const { params = {}, query } = ctx;
     const { id } = parseParams(params);
     try {
       return await this.getService()
-        .findOneAndThread(id);
+        .findOneAndThread(id, query);
     } catch (e) {
       throwError(ctx, e);
     }
@@ -101,7 +101,7 @@ module.exports = {
     }
   },
 
-  async config() {
+  async config(ctx) {
     try {
       return await this.getService().config();
     } catch (e) {

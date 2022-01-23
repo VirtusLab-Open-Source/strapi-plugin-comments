@@ -4,23 +4,23 @@
  *
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQueryClient } from 'react-query';
 import { isNil } from 'lodash';
 import { Button } from '@strapi/design-system/Button';
 import { Flex } from '@strapi/design-system/Flex';
 import { IconButton } from '@strapi/design-system/IconButton';
-import { Check, Cross } from '@strapi/icons';
 import { useNotification, useOverlayBlocker } from '@strapi/helper-plugin';
-import { getMessage, handleAPIError } from '../../utils';
-import { DiscussionThreadItemActionsBadge, DiscussionThreadItemActionsGroupWrapper, DiscussionThreadItemActionsWrapper } from './styles';
+import { getMessage, handleAPIError, resolveCommentStatus, resolveCommentStatusColor } from '../../utils';
+import { DiscussionThreadItemActionsBadge, DiscussionThreadItemActionsWrapper } from './styles';
 import ConfirmationDialog from '../ConfirmationDialog';
-import { blockItem, blockItemThread, unblockItem, unblockItemThread } from '../../pages/Details/utils/api';
+import { blockItem, blockItemThread, unblockItem, unblockItemThread } from '../../pages/utils/api';
 import pluginId from '../../pluginId';
 import { LockIcon, UnlockIcon } from '../icons';
+import DiscussionThreadItemApprovalFlowActions from '../DiscussionThreadItemApprovalFlowActions';
 
-const DiscussionThreadItemActions = ({ id, blocked, blockedThread, gotThread, pinned, approvalStatus, root }) => {
+const DiscussionThreadItemActions = ({ id, blocked, removed, blockedThread, gotThread, pinned, approvalStatus, root }) => {
 
     const [blockConfirmationVisible, setBlockConfirmationVisible] = useState(false);
     const [blockThreadConfirmationVisible, setBlockThreadConfirmationVisible] = useState(false);
@@ -71,35 +71,16 @@ const DiscussionThreadItemActions = ({ id, blocked, blockedThread, gotThread, pi
     const gotApprovalFlow = !isNil(approvalStatus);
     const needsApproval = gotApprovalFlow && (approvalStatus === 'PENDING');
     const isBlocked = blocked || blockedThread;
+    const isRejected = gotApprovalFlow && (approvalStatus === 'REJECTED');
 
     const resolveStatusBadge = () => {
-        let color = 'primary';
-        let label = '';
-
-        if (isBlocked) {
-            color = 'danger';
-            label = 'blocked';
-        } else if (gotApprovalFlow) {
-            label = approvalStatus.toLowerCase();
-            switch (approvalStatus) {
-                case 'APPROVED': 
-                    color = 'success';
-                    break;
-                case 'REJECTED': 
-                    color = 'danger';
-                    break;
-                default: 
-                    color = 'alternative';
-                    break;
-            };
-        }
-
+        const status = resolveCommentStatus({ removed, blocked, blockedThread, approvalStatus });
         return {
-            badgeVisible: isBlocked || gotApprovalFlow,
-            badgeColor: color,
-            badgeLabel: label,
-        }
-    }
+            badgeVisible: isBlocked || gotApprovalFlow || removed,
+            badgeColor: resolveCommentStatusColor(status),
+            badgeLabel: status,
+        };
+    };
 
     const {badgeVisible, badgeColor, badgeLabel } = resolveStatusBadge();
 
@@ -129,17 +110,20 @@ const DiscussionThreadItemActions = ({ id, blocked, blockedThread, gotThread, pi
         unblockItemThreadMutation.mutate(id);
     };
 
+    if (removed || isRejected) {
+        return (<DiscussionThreadItemActionsWrapper as={Flex} direction="row">
+            <DiscussionThreadItemActionsBadge color={badgeColor} backgroundColor={`${badgeColor}100`} textColor={`${badgeColor}600`}>{getMessage(`page.common.item.status.${badgeLabel}`, badgeLabel)}</DiscussionThreadItemActionsBadge>
+        </DiscussionThreadItemActionsWrapper>);
+    }
+
     return (<>
         <DiscussionThreadItemActionsWrapper as={Flex} direction="row">
-            { badgeVisible && (<DiscussionThreadItemActionsBadge color={badgeColor} backgroundColor={`${badgeColor}100`} textColor={`${badgeColor}600`}>{getMessage(`page.details.panel.discussion.status.${badgeLabel}`, badgeLabel)}</DiscussionThreadItemActionsBadge>)}
+            { badgeVisible && (<DiscussionThreadItemActionsBadge color={badgeColor} backgroundColor={`${badgeColor}100`} textColor={`${badgeColor}600`}>{getMessage(`page.common.item.status.${badgeLabel}`, badgeLabel)}</DiscussionThreadItemActionsBadge>)}
             { !blockedThread && !(blocked || needsApproval) && (<IconButton onClick={handleBlockClick} loading={blockItemMutation.isLoading} icon={<LockIcon />} label={getMessage('page.details.actions.comment.block', 'Block')} style={(!blockedThread && root) ? { marginTop: '1px', marginRight: '.5rem' } : {}} />)}
-            { !blockedThread && blocked && (<IconButton onClick={handleUnblockClick} loading={unblockItemMutation.isLoading} icon={<UnlockIcon />} label={getMessage('page.details.actions.comment.unblock', 'Unblock')} />)}
+            { !blockedThread && blocked && (<IconButton onClick={handleUnblockClick} loading={unblockItemMutation.isLoading} icon={<UnlockIcon />} label={getMessage('page.details.actions.comment.unblock', 'Unblock')}  style={(blocked && !blockedThread) ? { marginTop: '1px', marginRight: '.5rem' } : {}} />)}
             { (!blockedThread && (gotThread || pinned)) && (<Button onClick={handleBlockThreadClick} startIcon={<LockIcon />} loading={blockItemThreadMutation.isLoading} variant="danger">{ getMessage('page.details.actions.thread.block', 'Block thread') }</Button>) }
             { (blockedThread && (gotThread || pinned)) && (<Button onClick={handleUnblockThreadClick} startIcon={<UnlockIcon />} loading={unblockItemThreadMutation.isLoading} variant="success">{ getMessage('page.details.actions.thread.unblock', 'Unblock thread') }</Button>) }
-            { needsApproval && (<DiscussionThreadItemActionsGroupWrapper>
-                <IconButton icon={<Check />} label={getMessage('page.details.actions.comment.approve', 'Approve')} />
-                <IconButton icon={<Cross />} label={getMessage('page.details.actions.comment.reject', 'Reject')} />
-            </DiscussionThreadItemActionsGroupWrapper>) }
+            { needsApproval && (<DiscussionThreadItemApprovalFlowActions id={id} queryToInvalidate="get-details-data" />) }
         </DiscussionThreadItemActionsWrapper>
         { !blocked && (<ConfirmationDialog 
             isVisible={blockConfirmationVisible}

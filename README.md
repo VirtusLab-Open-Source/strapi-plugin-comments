@@ -50,9 +50,15 @@ Enjoy 🎉
 
 Complete installation requirements are exact same as for Strapi itself and can be found in the documentation under [Installation Requirements](https://docs.strapi.io/developer-docs/latest/getting-started/introduction.html).
 
+**Minimum environment requirements**
+- Node.js `>=14.x.x`
+- NPM `>=7.x.x`
+
+In our minimum support we're following [official Node.js releases timelines](https://nodejs.org/en/about/releases/).
+
 **Supported Strapi versions**:
 
-- Strapi v4.0.2 (recently tested)
+- Strapi v4.0.4 (recently tested)
 
 (This plugin is not working with v3.x and not may work with the older Strapi v4 versions, but these are not tested nor officially supported at this time.)
 

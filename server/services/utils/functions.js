@@ -34,27 +34,20 @@ const buildNestedStructure = (
 module.exports = {
     isEqualEntity: (existing, data, user) => {
         const { authorUser, authorId } = existing;
-        console.log('data', data);
-        console.log(existing);
         const { author } = data;
+
+        // Disallow approval status change by Client
+        if (data.approvalStatus && (existing.approvalStatus !== data.approvalStatus)) {
+            return false;
+        }
+
+        // Make sure that author is exact the same
         if (authorUser) {
             const existingUserId = authorUser?.id || authorUser;
             const receivedUserId = user?.id || author;
             return existingUserId === receivedUserId;
         }
         return authorId === author?.id;
-    },
-
-    extractMeta: plugins => {
-        const { comments: plugin } = plugins;
-        const { comments: service } = plugin.services;
-        const { comment: model} = plugin.models;
-        return {
-            model,
-            service,
-            plugin,
-            pluginName: plugin.package.strapi.name.toLowerCase()
-        };
     },
 
     getRelatedGroups: related => related.split(REGEX.relatedUid).filter(s => s && s.length > 0),

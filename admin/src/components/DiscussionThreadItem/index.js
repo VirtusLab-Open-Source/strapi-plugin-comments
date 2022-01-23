@@ -21,7 +21,7 @@ import { getMessage, getUrl } from '../../utils';
 import DiscussionThreadItemWarnings from '../DiscussionThreadItemWarnings';
 
 const DiscussionThreadItem = (item) => {
-    const { id, isSelected, isThreadAuthor, content, root, preview, pinned, blocked, blockedThread, gotThread, threadFirstItemId, authorUser, authorAvatar, authorName } = item;
+    const { id, isSelected, isThreadAuthor, content, root, preview, pinned, blocked, removed, blockedThread, gotThread, threadFirstItemId, authorUser, authorAvatar, authorName } = item;
 
     let background = 'neutral100';
     let borderColor = 'neutral200';
@@ -64,14 +64,14 @@ const DiscussionThreadItem = (item) => {
                         </Box>
                         { !preview && (<DiscussionThreadItemActions { ...item } root={root || pinned} />) }
                     </DiscussionThreadItemBoxContent>
-                    { !(preview || isBlocked) && (<DiscussionThreadItemWarnings { ...item } gotThread={gotThread || root} />) }
+                    { !(preview || isBlocked || removed) && (<DiscussionThreadItemWarnings { ...item } gotThread={gotThread || root} />) }
                 </Flex>
                 <Divider background={dividerColor} />
                 <DiscussionThreadItemMeta { ...item } />
             </DiscussionThreadItemBox>
         </DiscussionThreadItemContent>
 
-        { (gotThread && !(preview || pinned)) && (<DiscussionThreadItemLinkBox direction="column" alignItems="flex-end">
+        { (gotThread && !(removed || preview || pinned)) && (<DiscussionThreadItemLinkBox direction="column" alignItems="flex-end">
             <Link to={getUrl(`discover/${threadFirstItemId}`)} endIcon={<ArrowRight />}>
                 { getMessage('page.details.panel.discussion.nav.drilldown') }
             </Link>

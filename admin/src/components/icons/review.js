@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-const initSize = 24;
+const initSize = 16;
 
 const ReviewIcon = ({ width, height, size = 16 }) =>     
   <svg 
@@ -11,7 +11,7 @@ const ReviewIcon = ({ width, height, size = 16 }) =>
     style={{ width: `${width || size}px`, height: `${height || size}px`, }} 
     xmlns="http://www.w3.org/2000/svg">
     <g style={ {transform: `scale(${(width || size)/initSize})` } }>
-      <path strokeWidth="1" d="M5.5,21 C7.98528137,21 10,18.9852814 10,16.5 C10,14.0147186 7.98528137,12 5.5,12 C3.01471863,12 1,14.0147186 1,16.5 C1,18.9852814 3.01471863,21 5.5,21 Z M1,16 L1,7 L1,6.5 C1,4.01471863 3.01471863,2 5.5,2 L6,2 M23,16 L23,7 L23,6.5 C23,4.01471863 20.9852814,2 18.5,2 L18,2 M18.5,21 C20.9852814,21 23,18.9852814 23,16.5 C23,14.0147186 20.9852814,12 18.5,12 C16.0147186,12 14,14.0147186 14,16.5 C14,18.9852814 16.0147186,21 18.5,21 Z M10,17 C10,17 10,15 12,15 C14,15 14,17 14,17"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M0 4a4 4 0 014-4h8a4 4 0 014 4v8a4 4 0 01-4 4H4a4 4 0 01-4-4V4zm6.996.165a1.017 1.017 0 112.012 0L8 11 6.996 4.165zM8 11a1 1 0 110 2 1 1 0 010-2z" />
     </g>
   </svg>
 

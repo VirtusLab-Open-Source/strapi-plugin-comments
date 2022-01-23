@@ -90,10 +90,10 @@ const Discover = ({ config }) => {
 
   const emptyContent = _q ? 'search' : 'comments';
   
-  const COL_COUNT = 6;
+  const COL_COUNT = 7;
 
   return <Box background="neutral100">
-          <Layout sideNav={<Nav />}>
+          <Layout>
             {isLoading || isLoadingForPermissions ? (<LoadingIndicatorPage />) : (
             <>
               <HeaderLayout title={ getMessage('page.discover.header') } subtitle={ `${total} ${ getMessage('page.discover.header.count')}` } as="h2" />
@@ -109,6 +109,9 @@ const Discover = ({ config }) => {
                 <Table colCount={COL_COUNT} rowCount={result.length}>
                   <Thead>
                     <Tr>
+                      <Th>
+                        <Typography variant="sigma">{ getMessage('page.discover.table.header.id') }</Typography>
+                      </Th>
                       <Th>
                         <Typography variant="sigma">{ getMessage('page.discover.table.header.message') }</Typography>
                       </Th>
@@ -130,7 +133,7 @@ const Discover = ({ config }) => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {result.map(entry => (<DiscoverTableRow config={config} item={entry} onClick={() => handleClickDisplay(entry.id)}/>))}
+                    {result.map(entry => (<DiscoverTableRow key={`comment-${entry.id}`} config={config} item={entry} onClick={() => handleClickDisplay(entry.id)}/>))}
                   </Tbody>
                 </Table>
                 <TablePagination pagination={{ pageCount: pagination?.pageCount || 1 }} />

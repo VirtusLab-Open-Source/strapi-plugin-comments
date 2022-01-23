@@ -16,7 +16,3 @@ export const DiscussionThreadItemActionsWrapper = styled(Box)`
         margin-right: .5rem;
     }
 `;
-
-export const DiscussionThreadItemActionsGroupWrapper = styled(IconButtonGroup)`
-    margin-left: .5rem;
-`;

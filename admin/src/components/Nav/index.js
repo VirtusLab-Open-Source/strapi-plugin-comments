@@ -18,7 +18,11 @@ import getMessage from '../../utils/getMessage';
 // import PropTypes from 'prop-types';
 import getUrl from '../../utils/getUrl';
 
-const Nav = ({ hasNewComments, hasNewReports }) => {
+const Nav = ({ visible = false, hasNewComments, hasNewReports }) => {
+  if (!visible) {
+    return null;
+  }
+
   return <SubNav ariaLabel="Comments sub nav">
     <SubNavHeader label={getMessage('plugin.name')} />
     <SubNavSections>

@@ -15,7 +15,7 @@ import { Flex } from '@strapi/design-system/Flex';
 import { Typography } from '@strapi/design-system/Typography';
 import { useNotification, useOverlayBlocker } from '@strapi/helper-plugin';
 import { getMessage, handleAPIError } from '../../utils';
-import { blockItem, blockItemThread, resolveReport } from '../../pages/Details/utils/api';
+import { blockItem, blockItemThread, resolveReport } from '../../pages/utils/api';
 import { DiscussionThreadItemWarningsWrapper } from './styles';
 import ReportsReviewModal from '../ReportsReviewModal';
 import ReportsReviewTable from '../ReportsReviewTable';

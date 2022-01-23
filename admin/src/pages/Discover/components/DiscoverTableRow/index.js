@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useMutation, useQueryClient } from 'react-query';
-import { first, isEmpty, orderBy } from 'lodash';
+import { isNil, isEmpty, orderBy } from 'lodash';
 import { Badge } from '@strapi/design-system/Badge';
 import { Box } from '@strapi/design-system/Box'; 
 import { Button } from '@strapi/design-system/Button'; 
@@ -13,15 +13,17 @@ import { Link } from '@strapi/design-system/Link';
 import { Stack } from '@strapi/design-system/Stack';
 import { Tr, Td } from '@strapi/design-system/Table'; 
 import { Typography } from '@strapi/design-system/Typography'; 
-import { Eye, Lock } from '@strapi/icons';
+import { Eye } from '@strapi/icons';
 import { useNotification, useOverlayBlocker } from '@strapi/helper-plugin';
-import { getMessage, handleAPIError } from '../../../../utils';
-import { COMMENT_STATUS } from '../../../../utils/constants';
+import { getMessage, getUrl, handleAPIError, resolveCommentStatus, resolveCommentStatusColor } from '../../../../utils';
 import ReportsReviewModal from '../../../../components/ReportsReviewModal';
 import ReportsReviewTable from '../../../../components/ReportsReviewTable';
-import { blockItem, blockItemThread, resolveReport } from '../../../Details/utils/api';
+import { blockItem, blockItemThread, resolveReport } from '../../../utils/api';
 import pluginId from '../../../../pluginId';
 import { ReviewIcon, LockIcon } from '../../../../components/icons';
+import { TableLink } from './styles';
+import renderEntryTitle from '../../../../utils/renderEntryTitle';
+import DiscussionThreadItemApprovalFlowActions from '../../../../components/DiscussionThreadItemApprovalFlowActions';
 
 const DiscoverTableRow = ({ config, item, onClick }) => {
 
@@ -94,54 +96,45 @@ const DiscoverTableRow = ({ config, item, onClick }) => {
     const handleClick = () => onClick();
     const handleBlockButtonsStateChange = disabled => setBlockButtonsDisabled(disabled);
 
-    const renderStatus = ({ blocked, blockedThread }) => {
-        let status = blocked || blockedThread ? COMMENT_STATUS.BLOCKED : COMMENT_STATUS.OPEN;
-        if (reviewFlowEnabled) {
-            status = COMMENT_STATUS.TO_REVIEW;
-        }
-        let color = 'secondary';
-        switch (status) {
-            case COMMENT_STATUS.OPEN:
-                color = 'success';
-                break;
-            case COMMENT_STATUS.TO_REVIEW:
-                color = 'warning';
-                break;
-            case COMMENT_STATUS.BLOCKED:
-                color = 'danger';
-                break;
-        };
+    const renderStatus = (props) => {
+        const status = resolveCommentStatus({ ...props, reviewFlowEnabled });
+        const color = resolveCommentStatusColor(status);
+   
         return (<Badge backgroundColor={`${color}100`} textColor={`${color}600`}>{ getMessage({
-            id: `page.discover.table.header.status.${status}`,
+            id: `page.common.item.status.${status}`,
             props: {
                 count: openReports.length
             }
         }, status) }</Badge>);
       };
     
-      const renderEntryTitle = entry => {
-        const { entryLabel } = config;
-        const rule = entry.uid in entryLabel ? entryLabel[entry.uid] : entryLabel['*'];
-        return first(
-          Object.keys(entry)
-            .filter(_ => (rule === _) || rule.includes(_))
-            .map(_ => entry[_])
-            .filter(_ => _)
-        );
-      };
-    
       const renderEntryUrl = entry => `/content-manager/collectionType/${entry.uid}/${entry.id}`;
+      const renderDetailsUrl = entry => getUrl(`discover/${entry.id}`);
+
+      const gotApprovalFlow = !isNil(item.approvalStatus);
+      const needsApproval = gotApprovalFlow && (item.approvalStatus === 'PENDING');
+
+      let actionItemsCount = 1;
+      if(reviewFlowEnabled || needsApproval) {
+        actionItemsCount = 2;
+      }
 
     return (
         <Tr key={item.id}>
-            <Td style={{ maxWidth: '40vw' }}>
+            <Td>
+                <Typography textColor="neutral800" fontWeight="bold">#{ item.id }</Typography>
+            </Td>
+            <Td style={{ maxWidth: '30vw' }}>
                 <Typography textColor="neutral800" ellipsis>{item.content}</Typography>
             </Td>
             <Td>
-                <Typography textColor="neutral800">{item.threadOf?.id || '-'}</Typography>
+                { item.threadOf?.id ? (<Link to={ renderDetailsUrl(item.threadOf) }>{ getMessage({
+                    id: 'page.discover.table.cell.thread',
+                    props: { id: item.threadOf.id },
+                }, '#' + item.threadOf.id) }</Link>) : '-' }
             </Td>
-            <Td>
-                <Link to={ renderEntryUrl(item.related) }>{ renderEntryTitle(item.related) }</Link>
+            <Td style={{ maxWidth: '15vw' }}>
+                <TableLink to={ renderEntryUrl(item.related) }>{ renderEntryTitle(item.related, config) }</TableLink>
             </Td>
             <Td>
                 <Typography textColor="neutral800">{ formatDate(item.updatedAt || item.createdAt, { dateStyle: 'long', timeStyle: 'short' }) }</Typography>
@@ -151,8 +144,9 @@ const DiscoverTableRow = ({ config, item, onClick }) => {
             </Td>
             <Td>
                 <Flex direction="column" alignItems="flex-end">
-                    <Stack size={reviewFlowEnabled ? 2 : 1} horizontal>
+                    <Stack size={actionItemsCount} horizontal>
                         { reviewFlowEnabled && (<IconButton onClick={handleReportsReviewClick} label={ getMessage('page.discover.table.reports.review') } icon={<ReviewIcon />} />)}
+                        { needsApproval &&  (<DiscussionThreadItemApprovalFlowActions id={item.id} queryToInvalidate="get-data" />)}
                         <IconButton onClick={handleClick} label={ getMessage('page.discover.table.action.display') } icon={<Eye />} />
                     </Stack>
                 </Flex>

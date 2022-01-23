@@ -5,9 +5,9 @@ const APPROVAL_STATUS = {
 };
 
 const REGEX = {
-  uid: new RegExp(/^(?<type>[a-z]+)\:{2}(?<api>[a-z]+)\.{1}(?<contentType>[a-z]+)$/gmi),
-  relatedUid: new RegExp(/^(?<uid>[a-z]+\:{2}[a-z]+\.[a-z]+)\:{1}(?<id>[0-9]+)$/gmi),
-  email: new RegExp(/\S+@\S+\.\S+/),
+  uid: /^(?<type>[a-z0-9-]+)\:{2}(?<api>[a-z0-9-]+)\.{1}(?<contentType>[a-z0-9-]+)$/i,
+  relatedUid: /^(?<uid>[a-z0-9-]+\:{2}[a-z0-9-]+\.[a-z0-9-]+)\:{1}(?<id>[a-z0-9-]+)$/i,
+  email: /\S+@\S+\.\S+/,
 };
 
 module.exports = {

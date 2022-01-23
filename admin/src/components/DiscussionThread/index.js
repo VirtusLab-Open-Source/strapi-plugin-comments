@@ -39,6 +39,7 @@ const DiscussionThread = ({ level = [], selected = {}, isReloading }) => {
                 const isSelected = selected.id === item.id;
                 const isThreadAuthor = !isNil(selected?.threadOf?.authorId) && (selected?.threadOf?.authorId === item.authorId);
                 return (<DiscussionThreadItem 
+                    key={`comment-${item.id}`}
                     {...item} 
                     root={isNil(rootThread)}
                     blockedThread={rootThread?.blockedThread || item.blockedThread}
