@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useMutation, useQueryClient } from 'react-query';
 import { isEmpty, orderBy } from 'lodash';
 import { Badge } from '@strapi/design-system/Badge';
@@ -23,7 +24,7 @@ import pluginId from '../../pluginId';
 import { LockIcon, ReviewIcon } from '../icons';
 
 const DiscussionThreadItemWarnings = (item) => {
-    const { id, reports, gotThread } = item;
+    const { id, reports, gotThread, allowedActions: { canModerate, canAccessReports, canReviewReports }} = item;
 
     const [reportsReviewVisible, setReportsReviewVisible] = useState(false);
     const [blockButtonsDisabled, setBlockButtonsDisabled] = useState(false);
@@ -93,7 +94,7 @@ const DiscussionThreadItemWarnings = (item) => {
     }
 
     return (<>
-        <DiscussionThreadItemWarningsWrapper as={Flex} direction="row" padding={2} background="danger100" borderColor="danger200" border={1} hasRadius>
+        { canAccessReports && (<DiscussionThreadItemWarningsWrapper as={Flex} direction="row" padding={2} background="danger100" borderColor="danger200" border={1} hasRadius>
             <Box as={Flex} paddingRight={2} direction="row" grow={1}>
                 <Badge textColor="neutral0" backgroundColor="warning600">{ openReports.length }</Badge>
                 <Box paddingLeft={2}>
@@ -103,19 +104,19 @@ const DiscussionThreadItemWarnings = (item) => {
             <Button onClick={handleReportsReviewClick} variant="ghost" endIcon={<ReviewIcon />}>
                 { getMessage(`page.details.actions.comment.report.review`, 'review') }
             </Button>
-        </DiscussionThreadItemWarningsWrapper>
-        <ReportsReviewModal 
+        </DiscussionThreadItemWarningsWrapper>) }
+        { (canAccessReports || canReviewReports) && (<ReportsReviewModal 
             isVisible={reportsReviewVisible}
             isActionAsync={isLoading}
             onClose={handleReportsReviewClose}
-            startActions={<>
+            startActions={canModerate && (<>
                 <Button onClick={handleBlockItemClick} variant="danger-light" startIcon={<LockIcon />} disabled={blockButtonsDisabled}>
                     { getMessage(`page.details.actions.comment.block`, 'Block comment') }
                 </Button>
                 { gotThread && (<Button onClick={handleBlockItemThreadClick} variant="danger" startIcon={<LockIcon />} disabled={blockButtonsDisabled}>
                     { getMessage(`page.details.actions.thread.block`, 'Block thread') }
                 </Button>) }
-            </>}
+            </>)}
             item={item}>
                 <Typography variant="sigma" textColor="neutral600" id="reports-list">
                     { getMessage('page.details.panel.discussion.warnings.reports.list', 'List') }
@@ -124,17 +125,22 @@ const DiscussionThreadItemWarnings = (item) => {
                     <Divider />
                 </Box>
                 <ReportsReviewTable
-                    commentId={item.id} 
+                    commentId={id} 
                     items={orderBy(reports, ['resolved', 'createdAt'], ['DESC', 'DESC'])} 
                     mutation={resolveReportMutation}
+                    allowedActions={{ canAccessReports, canReviewReports }}
                     onBlockButtonsStateChange={handleBlockButtonsStateChange}
                 />
-        </ReportsReviewModal>
+        </ReportsReviewModal>) }
     </>);
 };
 
 DiscussionThreadItemWarnings.propTypes = {
-
+    allowedActions: PropTypes.shape({
+        canModerate: PropTypes.bool,
+        canAccessReports: PropTypes.bool,
+        canReviewReports: PropTypes.bool,
+    }),
 };
 
 export default DiscussionThreadItemWarnings;

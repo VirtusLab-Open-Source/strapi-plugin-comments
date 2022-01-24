@@ -25,7 +25,7 @@ import { TableLink } from './styles';
 import renderEntryTitle from '../../../../utils/renderEntryTitle';
 import DiscussionThreadItemApprovalFlowActions from '../../../../components/DiscussionThreadItemApprovalFlowActions';
 
-const DiscoverTableRow = ({ config, item, onClick }) => {
+const DiscoverTableRow = ({ config, item, allowedActions: { canModerate, canAccessReports, canReviewReports }, onClick }) => {
 
     const { id, reports } = item;
 
@@ -74,14 +74,22 @@ const DiscoverTableRow = ({ config, item, onClick }) => {
         refetchActive: false,
     });
 
-    const handleReportsReviewClick = () => setReportsReviewVisible(true);
+    const handleReportsReviewClick = () => {
+        if (canAccessReports) {
+            setReportsReviewVisible(true);
+        }
+    };
     const handleBlockItemClick = async () => {
-        lockApp();
-        blockItemMutation.mutate(id);
+        if (canModerate) {
+            lockApp();
+            blockItemMutation.mutate(id);
+        }
     };
     const handleBlockItemThreadClick = async () => {
-        lockApp();
-        blockItemThreadMutation.mutate(id);
+        if (canModerate) {
+            lockApp();
+            blockItemThreadMutation.mutate(id);
+        }
     };
     const handleReportsReviewClose = async () => {
         await queryClient.invalidateQueries('get-data');
@@ -91,7 +99,7 @@ const DiscoverTableRow = ({ config, item, onClick }) => {
     const isLoading = blockItemMutation.isLoading || blockItemThreadMutation.isLoading || resolveReportMutation.isLoading;
     const openReports = reports?.filter(_ => !_.resolved);
     const hasReports = !isEmpty(openReports);
-    const reviewFlowEnabled = hasReports && !(item.blocked || item.blockedThread);
+    const reviewFlowEnabled = (canAccessReports && hasReports) && !(item.blocked || item.blockedThread);
 
     const handleClick = () => onClick();
     const handleBlockButtonsStateChange = disabled => setBlockButtonsDisabled(disabled);
@@ -146,22 +154,28 @@ const DiscoverTableRow = ({ config, item, onClick }) => {
                 <Flex direction="column" alignItems="flex-end">
                     <Stack size={actionItemsCount} horizontal>
                         { reviewFlowEnabled && (<IconButton onClick={handleReportsReviewClick} label={ getMessage('page.discover.table.reports.review') } icon={<ReviewIcon />} />)}
-                        { needsApproval &&  (<DiscussionThreadItemApprovalFlowActions id={item.id} queryToInvalidate="get-data" />)}
+                        { (canModerate && needsApproval) &&  (
+                        <DiscussionThreadItemApprovalFlowActions 
+                            id={item.id} 
+                            allowedActions={{ canModerate }}
+                            queryToInvalidate="get-data" />
+                        )}
                         <IconButton onClick={handleClick} label={ getMessage('page.discover.table.action.display') } icon={<Eye />} />
                     </Stack>
                 </Flex>
                 { reviewFlowEnabled && (<ReportsReviewModal 
                     isVisible={reportsReviewVisible}
                     isActionAsync={isLoading}
+                    allowedActions={{ canModerate, canAccessReports, canReviewReports }}
                     onClose={handleReportsReviewClose}
-                    startActions={<>
+                    startActions={canModerate && (<>
                         <Button onClick={handleBlockItemClick} variant="danger-light" startIcon={<LockIcon />} disabled={blockButtonsDisabled}>
                             { getMessage(`page.details.actions.comment.block`, 'Block comment') }
                         </Button>
                         { item.gotThread && (<Button onClick={handleBlockItemThreadClick} variant="danger" startIcon={<LockIcon />} disabled={blockButtonsDisabled}>
                             { getMessage(`page.details.actions.thread.block`, 'Block thread') }
                         </Button>) }
-                    </>}
+                    </>)}
                     item={item}>
                         <Typography variant="sigma" textColor="neutral600" id="reports-list">
                             { getMessage('page.details.panel.discussion.warnings.reports.list', 'List') }
@@ -173,6 +187,7 @@ const DiscoverTableRow = ({ config, item, onClick }) => {
                                 commentId={item.id} 
                                 items={orderBy(reports, ['resolved', 'createdAt'], ['DESC', 'DESC'])} 
                                 mutation={resolveReportMutation}
+                                allowedActions={{ canAccessReports, canReviewReports }}
                                 onBlockButtonsStateChange={handleBlockButtonsStateChange}
                             />
                 </ReportsReviewModal>) }
@@ -184,6 +199,11 @@ const DiscoverTableRow = ({ config, item, onClick }) => {
 DiscoverTableRow.propTypes = {
     config: PropTypes.object.isRequired,
     item: PropTypes.object.isRequired,
+    allowedActions: PropTypes.shape({
+        canModerate: PropTypes.bool, 
+        canAccessReports: PropTypes.bool,
+        canReviewReports: PropTypes.bool, 
+    }),
     onClick: PropTypes.func.isRequired,
 };
 

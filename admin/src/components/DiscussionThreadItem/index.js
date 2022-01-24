@@ -20,8 +20,22 @@ import DiscussionThreadItemActions from '../DiscussionThreadItemActions';
 import { getMessage, getUrl } from '../../utils';
 import DiscussionThreadItemWarnings from '../DiscussionThreadItemWarnings';
 
-const DiscussionThreadItem = (item) => {
-    const { id, isSelected, isThreadAuthor, content, root, preview, pinned, blocked, removed, blockedThread, gotThread, threadFirstItemId, authorUser, authorAvatar, authorName } = item;
+const DiscussionThreadItem = (props) => {
+    const { 
+        isSelected, 
+        isThreadAuthor, 
+        content, 
+        root, 
+        preview, 
+        pinned, 
+        blocked, 
+        removed, 
+        blockedThread, 
+        gotThread, 
+        threadFirstItemId, 
+        authorUser, 
+        authorAvatar, 
+        authorName } = props;
 
     let background = 'neutral100';
     let borderColor = 'neutral200';
@@ -62,12 +76,12 @@ const DiscussionThreadItem = (item) => {
                         <Box as={Flex} grow={1} alignItems="center">
                             <Typography variant="omega">{ content }</Typography>
                         </Box>
-                        { !preview && (<DiscussionThreadItemActions { ...item } root={root || pinned} />) }
+                        { !preview && (<DiscussionThreadItemActions { ...props } root={root || pinned} />) }
                     </DiscussionThreadItemBoxContent>
-                    { !(preview || isBlocked || removed) && (<DiscussionThreadItemWarnings { ...item } gotThread={gotThread || root} />) }
+                    { !(preview || isBlocked || removed) && (<DiscussionThreadItemWarnings { ...props } gotThread={gotThread || root} />) }
                 </Flex>
                 <Divider background={dividerColor} />
-                <DiscussionThreadItemMeta { ...item } />
+                <DiscussionThreadItemMeta { ...props } />
             </DiscussionThreadItemBox>
         </DiscussionThreadItemContent>
 
@@ -81,6 +95,11 @@ const DiscussionThreadItem = (item) => {
 
 DiscussionThreadItem.propTypes = {
     content: PropTypes.string.isRequired,
+    allowedActions: PropTypes.shape({
+        canModerate: PropTypes.bool,
+        canAccessReports: PropTypes.bool,
+        canReviewReports: PropTypes.bool,
+    }),
 };
 
 export default DiscussionThreadItem;

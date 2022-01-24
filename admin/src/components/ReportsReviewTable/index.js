@@ -24,9 +24,9 @@ const ReportsReviewTable = ({
     commentId,
     items,
     mutation,
+    allowedActions: { canAccessReports, canReviewReports },
     onBlockButtonsStateChange,
 }) => {
-
     const [storedItems, setStoredItems] = useState([]);
 
     const { formatDate } = useIntl();
@@ -59,12 +59,12 @@ const ReportsReviewTable = ({
     };
 
     const handleClickResolve = async (reportId) => {
+      if (canReviewReports) {
         lockApp();
         const item = await mutation.mutateAsync({
             id: commentId,
             reportId,
         });
-        console.log(item);
         if (item) {
           const updatedItems = storedItems.map(_ => ({
               ..._,
@@ -73,6 +73,7 @@ const ReportsReviewTable = ({
           setStoredItems(updatedItems);
           onBlockButtonsStateChange(updatedItems.filter(_ => !_.resolved).length === 0);
         }
+      }
     }
 
     useEffect(() => {
@@ -85,61 +86,68 @@ const ReportsReviewTable = ({
 
     const COL_COUNT = 6;
 
-    return (<Table colCount={COL_COUNT} rowCount={storedItems.length}>
-        <Thead>
-          <Tr>
-            <Th>
-              <BaseCheckbox aria-label="Select all entries" />
-            </Th>
-            <Th>
-              <Typography variant="sigma">{ getMessage('page.details.panel.discussion.warnings.reports.dialog.reason') }</Typography>
-            </Th>
-            <Th>
-              <Typography variant="sigma">{ getMessage('page.details.panel.discussion.warnings.reports.dialog.content') }</Typography>
-            </Th>
-            <Th>
-              <Typography variant="sigma">{ getMessage('page.details.panel.discussion.warnings.reports.dialog.createdAt') }</Typography>
-            </Th>
-            <Th>
-              <Typography variant="sigma">{ getMessage('page.details.panel.discussion.warnings.reports.dialog.status') }</Typography>
-            </Th>
-            <Th>
-              <VisuallyHidden>{ getMessage('page.details.panel.discussion.warnings.reports.dialog.actions') }</VisuallyHidden>
-            </Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {storedItems.map(entry => <Tr key={entry.id}>
-              <Td>
-                <BaseCheckbox aria-label={`Select report`} />
-              </Td>
-              <Td>
-                <Typography textColor="neutral800">{renderReason(entry.reason)}</Typography>
-              </Td>
-              <Td>
-                <Typography textColor="neutral800">{entry.content}</Typography>
-              </Td>
-              <Td>
-                <Typography textColor="neutral800">{ formatDate(entry.createdAt, { dateStyle: 'short', timeStyle: 'short' }) }</Typography>
-              </Td>
-              <Td>
-                <Typography textColor="neutral800">{ renderStatus(entry.resolved) }</Typography>
-              </Td>
-              <Td>
-                  { !entry.resolved && (<Flex direction="column" alignItems="flex-end">
-                        <Button onClick={() => handleClickResolve(entry.id)} startIcon={<Check />} variant="success">{ getMessage('page.details.panel.discussion.warnings.reports.dialog.actions.resolve', 'resolve') }</Button>
-                    </Flex>) }
-              </Td>
-            </Tr>)}
-        </Tbody>
-        {/* <TFooter /> */}
-      </Table>)
+    if (canAccessReports) {
+      return (<Table colCount={COL_COUNT} rowCount={storedItems.length}>
+          <Thead>
+            <Tr>
+              <Th>
+                <BaseCheckbox aria-label="Select all entries" />
+              </Th>
+              <Th>
+                <Typography variant="sigma">{ getMessage('page.details.panel.discussion.warnings.reports.dialog.reason') }</Typography>
+              </Th>
+              <Th>
+                <Typography variant="sigma">{ getMessage('page.details.panel.discussion.warnings.reports.dialog.content') }</Typography>
+              </Th>
+              <Th>
+                <Typography variant="sigma">{ getMessage('page.details.panel.discussion.warnings.reports.dialog.createdAt') }</Typography>
+              </Th>
+              <Th>
+                <Typography variant="sigma">{ getMessage('page.details.panel.discussion.warnings.reports.dialog.status') }</Typography>
+              </Th>
+              { canReviewReports && (<Th>
+                <VisuallyHidden>{ getMessage('page.details.panel.discussion.warnings.reports.dialog.actions') }</VisuallyHidden>
+              </Th>)}
+            </Tr>
+          </Thead>
+          <Tbody>
+            {storedItems.map(entry => <Tr key={entry.id}>
+                <Td>
+                  <BaseCheckbox aria-label={`Select report`} />
+                </Td>
+                <Td>
+                  <Typography textColor="neutral800">{renderReason(entry.reason)}</Typography>
+                </Td>
+                <Td>
+                  <Typography textColor="neutral800">{entry.content}</Typography>
+                </Td>
+                <Td>
+                  <Typography textColor="neutral800">{ formatDate(entry.createdAt, { dateStyle: 'short', timeStyle: 'short' }) }</Typography>
+                </Td>
+                <Td>
+                  <Typography textColor="neutral800">{ renderStatus(entry.resolved) }</Typography>
+                </Td>
+                { canReviewReports && (<Td>
+                    { !entry.resolved && (<Flex direction="column" alignItems="flex-end">
+                          <Button onClick={() => handleClickResolve(entry.id)} startIcon={<Check />} variant="success">{ getMessage('page.details.panel.discussion.warnings.reports.dialog.actions.resolve', 'resolve') }</Button>
+                      </Flex>) }
+                </Td>)}
+              </Tr>)}
+          </Tbody>
+          {/* <TFooter /> */}
+        </Table>);
+    }
+    return null;
 };
 
 ReportsReviewTable.propTypes = {
-    commentId: PropTypes.string.isRequired,
+    commentId: PropTypes.oneOfType(PropTypes.string, PropTypes.number).isRequired,
     items: PropTypes.array.isRequired,
     mutation: PropTypes.func.isRequired,
+    allowedActions: PropTypes.shape({
+      canAccessReports: PropTypes.bool,
+      canReviewReports: PropTypes.bool, 
+    }),
     onBlockButtonsStateChange: PropTypes.func.isRequired,
 };
 

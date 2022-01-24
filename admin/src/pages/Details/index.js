@@ -50,13 +50,16 @@ const Details = ({ config }) => {
   const trackUsageRef = useRef(trackUsage);
   const toggleNotification = useNotification();
 
-  const viewPermissions = useMemo(() => {
-    return { view: pluginPermissions.view };
-  }, []);
+  const viewPermissions = useMemo(() => ({ 
+    access: pluginPermissions.access,
+    moderate: pluginPermissions.moderate,
+    accessReports:  pluginPermissions.reports,
+    reviewReports: pluginPermissions.reportsReview,
+  }), []);
 
   const {
     isLoading: isLoadingForPermissions,
-    allowedActions: { canView },
+    allowedActions: { canAccess, canModerate, canAccessReports, canReviewReports },
   } = useRBAC(viewPermissions);
 
   const [filters, setFilters] = useState({});
@@ -64,7 +67,7 @@ const Details = ({ config }) => {
   const regexUID = new RegExp(config.regex.uid);
 
   const { isLoading: isLoadingForData, data, isFetching } = useQuery(
-    ['get-details-data', id, filters],
+    ['get-details-data', id, filters, canAccess],
     () => fetchDetailsData(id, filters, toggleNotification),
     {
       initialData: { },
@@ -75,7 +78,7 @@ const Details = ({ config }) => {
   const entityUidValid = entity?.uid && regexUID.test(entity.uid);
 
   const { data: contentTypeData } = useQuery(
-    ['get-additional-data', entity?.uid],
+    ['get-additional-data', entity?.uid, canAccess],
     () => fetchContentTypeData(entity?.uid, toggleNotification),
     {
       enabled: !!entity?.uid, 
@@ -87,37 +90,40 @@ const Details = ({ config }) => {
 
   const isLoading = isLoadingForData || isFetching;
 
-  return <Box background="neutral100">
-          <Layout>
-            {(isLoading || isLoadingForPermissions) && isEmpty(data) ? (<LoadingIndicatorPage />) : (
-            <>
-              <HeaderLayout 
-                navigationAction={
-                <Link startIcon={<ArrowLeft />} to={getUrl(`discover`)}>
-                  { getMessage('HeaderLayout.link.go-back', 'Back', false) }
-                </Link>}
-                title={ getMessage('page.details.header') } 
-                subtitle={ getMessage('page.details.header.description') } 
-                primaryAction={<DetailsFilters data={filters} onChange={handleChangeFilters} />}
-                secondaryAction={<Box as={Flex}>&nbsp;</Box>}
-                as="h2" />
-              <ContentLayout>
-                <TwoColsLayout 
-                  startCol={<DiscussionThread level={level} selected={selected} isReloading={isLoading} />} 
-                  endCol={ <Stack size={2}>
-                    <DiscussionStatus item={selected} />
-                    { !contentTypeData?.schema ? (<Box padding={4}>
-                        <Loader small>{ getMessage('page.details.panel.loading', 'Loading...') }</Loader>
-                      </Box>) : 
-                      (<DetailsEntity data={entity} schema={contentTypeData?.schema} config={config} />)
-                    }
-                  </Stack>
-                  } 
-                />
-              </ContentLayout>
-            </>) }
-          </Layout>
-        </Box>;
+  if (canAccess) {
+    return <Box background="neutral100">
+            <Layout>
+              {(isLoading || isLoadingForPermissions) && isEmpty(data) ? (<LoadingIndicatorPage />) : (
+              <>
+                <HeaderLayout 
+                  navigationAction={
+                  <Link startIcon={<ArrowLeft />} to={getUrl(`discover`)}>
+                    { getMessage('HeaderLayout.link.go-back', 'Back', false) }
+                  </Link>}
+                  title={ getMessage('page.details.header') } 
+                  subtitle={ getMessage('page.details.header.description') } 
+                  primaryAction={<DetailsFilters data={filters} onChange={handleChangeFilters} />}
+                  secondaryAction={<Box as={Flex}>&nbsp;</Box>}
+                  as="h2" />
+                <ContentLayout>
+                  <TwoColsLayout 
+                    startCol={<DiscussionThread level={level} selected={selected} isReloading={isLoading} allowedActions={{ canModerate, canAccessReports, canReviewReports }} />} 
+                    endCol={ <Stack size={2}>
+                      <DiscussionStatus item={selected} />
+                      { !contentTypeData?.schema ? (<Box padding={4}>
+                          <Loader small>{ getMessage('page.details.panel.loading', 'Loading...') }</Loader>
+                        </Box>) : 
+                        (<DetailsEntity data={entity} schema={contentTypeData?.schema} config={config} />)
+                      }
+                    </Stack>
+                    } 
+                  />
+                </ContentLayout>
+              </>) }
+            </Layout>
+          </Box>;
+  }
+  return null;
 }
 
 const mapStateToProps = makeAppView();

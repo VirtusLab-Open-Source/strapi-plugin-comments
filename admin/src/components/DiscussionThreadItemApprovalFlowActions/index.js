@@ -15,13 +15,13 @@ import { DiscussionThreadItemActionsGroupWrapper } from './styles';
 import { approveItem, rejectItem } from '../../pages/utils/api';
 import pluginId from '../../pluginId';
 
-const DiscussionThreadItemApprovalFlowActions = ({ id, queryToInvalidate }) => {
+const DiscussionThreadItemApprovalFlowActions = ({ id, allowedActions: { canModerate }, queryToInvalidate }) => {
 
     const toggleNotification = useNotification();
     const queryClient = useQueryClient();
     const { lockApp, unlockApp } = useOverlayBlocker();
 
-    const onSuccess = (message, stateAction = () => {}) => async () => {
+    const onSuccess = (message) => async () => {
         if (queryToInvalidate) {
             await queryClient.invalidateQueries(queryToInvalidate);
         }
@@ -45,26 +45,35 @@ const DiscussionThreadItemApprovalFlowActions = ({ id, queryToInvalidate }) => {
         refetchActive: false,
     });
 
-
     const handleApproveClick = () => {
-        lockApp();
-        approveItemMutation.mutate(id);
+        if (canModerate) {
+            lockApp();
+            approveItemMutation.mutate(id);
+        }
     };
 
     const handleRejectClick = () => {
-        lockApp();
-        rejectItemMutation.mutate(id);
+        if (canModerate) {
+            lockApp();
+            rejectItemMutation.mutate(id);
+        }
     };
 
-    return (<DiscussionThreadItemActionsGroupWrapper>
-        <IconButton icon={<Check />} label={getMessage('page.details.actions.comment.approve', 'Approve')} onClick={handleApproveClick} />
-        <IconButton icon={<Cross />} label={getMessage('page.details.actions.comment.reject', 'Reject')} onClick={handleRejectClick} />
-    </DiscussionThreadItemActionsGroupWrapper>);
+    if (canModerate) {
+        return (<DiscussionThreadItemActionsGroupWrapper>
+            <IconButton icon={<Check />} label={getMessage('page.details.actions.comment.approve', 'Approve')} onClick={handleApproveClick} />
+            <IconButton icon={<Cross />} label={getMessage('page.details.actions.comment.reject', 'Reject')} onClick={handleRejectClick} />
+        </DiscussionThreadItemActionsGroupWrapper>);
+        }
+    return null;
 };
 
 DiscussionThreadItemApprovalFlowActions.propTypes = {
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     queryToInvalidate: PropTypes.string,
+    allowedActions: PropTypes.shape({
+        canModerate: PropTypes.bool,
+    }),
     wrapped: PropTypes.bool,
 };
 

@@ -58,7 +58,8 @@ In our minimum support we're following [official Node.js releases timelines](htt
 
 **Supported Strapi versions**:
 
-- Strapi v4.0.4 (recently tested)
+- Strapi v4.0.5 (recently tested)
+- Strapi v4.x
 
 (This plugin is not working with v3.x and not may work with the older Strapi v4 versions, but these are not tested nor officially supported at this time.)
 
@@ -100,6 +101,20 @@ To setup amend default plugin configuration we recommend to put following snippe
 ## Additional GQL Configuration
 
 > To be done
+
+## RBAC
+Plugin provides granular permissions based on Strapi RBAC functionality.
+
+### Mandatory permissions
+For any role different than **Super Admin**, to access the **Comments panel** you must set following permissions:
+- _Plugins_ -> _Content-type-builder_ -> _Read_ - gives you ability to fetch Content Type schema
+- _Plugins_ -> _Comments_ -> _Comments: Read_ - gives you the basic read access to **Comments Panel**
+
+### Optional permissions
+Feature / Capability focused permissions:
+- _Plugins_ -> _Comments_ -> _Comments: Moderate_ - allows you to block, unblock, approve &amp; reject comments
+- _Plugins_ -> _Comments_ -> _Reports: Read_ - allows you to see the list of issued abuse reports against comments
+- _Plugins_ -> _Comments_ -> _Reports: Moderate_ - allows you to review (resolve) issued abuse reports against comments
 
 ## Public API Comment model
 

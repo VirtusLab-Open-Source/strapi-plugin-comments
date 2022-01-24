@@ -30,7 +30,7 @@ const DetailsEntity = ({ data = {}, schema = {}, config = {} }) => {
         FIELDS_LIMIT
     );
 
-    const formatLabel = label => label.split('_')
+    const formatLabel = (label = '') => label.split('_')
         .map(_ => capitalize(_))
         .join(' ');
 
@@ -47,7 +47,7 @@ const DetailsEntity = ({ data = {}, schema = {}, config = {} }) => {
                 <Typography>{ data[entityLabelKey] }</Typography>
             </Flex>
             {  itemKeys.map(_ => 
-                (<Flex direction="column" alignItems="flex-start">
+                (<Flex key={`prop_${_}`} direction="column" alignItems="flex-start">
                     <Typography fontWeight="bold">{ formatLabel(_) }</Typography>
                     <Typography>{ data[_] }</Typography>
                 </Flex>))

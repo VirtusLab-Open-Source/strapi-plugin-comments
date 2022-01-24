@@ -37,6 +37,11 @@ const ReportsReviewModal = ({
     endActions: PropTypes.array,
     item: PropTypes.object.isRequired,
     children: PropTypes.array.isRequired,
+    allowedActions: PropTypes.shape({
+        canModerate: PropTypes.bool, 
+        canAccessReports: PropTypes.bool,
+        canReviewReports: PropTypes.bool, 
+    }),
     onClose: PropTypes.func.isRequired,
 };
 

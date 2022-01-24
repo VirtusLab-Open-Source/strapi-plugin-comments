@@ -18,7 +18,7 @@ import { getMessage, getUrl } from '../../utils';
 import LoadingIndicatorOverlay from '../LoadingIndicatorOverlay';
 import { LoadingIndicatorContainer } from '../LoadingIndicatorOverlay/styles';
 
-const DiscussionThread = ({ level = [], selected = {}, isReloading }) => {
+const DiscussionThread = ({ level = [], selected = {}, allowedActions, isReloading }) => {
     const rootThread = selected?.threadOf;
     return (<LoadingIndicatorContainer as={Box} padding={4}>
         { isReloading && <LoadingIndicatorOverlay />}
@@ -34,13 +34,14 @@ const DiscussionThread = ({ level = [], selected = {}, isReloading }) => {
             <Divider />
         </Box>
         <Flex as="ul" direction="column" alignItems="flex-start">
-            { rootThread && (<DiscussionThreadItem {...rootThread} isThreadAuthor root pinned />) }
+            { rootThread && (<DiscussionThreadItem {...rootThread} allowedActions={allowedActions} isThreadAuthor root pinned />) }
             { level.map(item => {
                 const isSelected = selected.id === item.id;
                 const isThreadAuthor = !isNil(selected?.threadOf?.authorId) && (selected?.threadOf?.authorId === item.authorId);
                 return (<DiscussionThreadItem 
                     key={`comment-${item.id}`}
                     {...item} 
+                    allowedActions={allowedActions}
                     root={isNil(rootThread)}
                     blockedThread={rootThread?.blockedThread || item.blockedThread}
                     isSelected={isSelected} 
@@ -54,6 +55,11 @@ const DiscussionThread = ({ level = [], selected = {}, isReloading }) => {
 DiscussionThread.propTypes = {
     level: PropTypes.array.isRequired,
     selected: PropTypes.object.isRequired,
+    allowedActions: PropTypes.shape({
+        canModerate: PropTypes.bool,
+        canAccessReports: PropTypes.bool,
+        canReviewReports: PropTypes.bool,
+    }),
     isReloading: PropTypes.bool,
 };
 

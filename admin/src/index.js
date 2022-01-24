@@ -23,7 +23,7 @@ export default {
 
         return component;
       },
-      permissions: pluginPermissions,
+      permissions: pluginPermissions.access,
     });
     app.addReducers(reducers);
     app.registerPlugin({

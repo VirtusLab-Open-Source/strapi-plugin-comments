@@ -88,12 +88,13 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
             .map(_ => filterOurResolvedReports(this.getCommonService().sanitizeCommentEntity(_)))
             .map(_ => this.getCommonService().mergeRelatedEntityTo(_, relatedEntities));
 
+        const pageCount = Math.floor(total / pageSize);
         return {
             result,
             pagination: {
                 page: page,
                 pageSize: pageSize,
-                pageCount: Math.floor(total / pageSize) + 1,
+                pageCount: total % pageSize === 0 ? pageCount : pageCount + 1,
                 total,
             },
         };

@@ -20,6 +20,7 @@ const DetailsFilters = ({ data, onChange }) => {
         <Stack size={2} horizontal>
             <Typography variant="epsilon">{getMessage('page.details.filters.label', '')}</Typography>
             <Switch 
+                label={getMessage('page.details.filters.removed.label', 'Comments visibility')} 
                 onLabel={getMessage('page.details.filters.removed.show', 'Show')} 
                 offLabel={getMessage('page.details.filters.removed.hide', 'Hide')}
                 selected={removed} onChange={() => handleOnChange('removed', !removed)} 

@@ -76,6 +76,7 @@
     "page.details.actions.comment.approve.confirmation.success": "Comment has been approved",
     "page.details.actions.comment.reject.confirmation.success": "Comment has been rejected",
     "page.details.filters.label": "View",
+    "page.details.filters.removed.visibility": "Comments visibility",
     "page.details.filters.removed.show": "Show removed",
     "page.details.filters.removed.hide": "Hide removed",
     "page.coming.soon": "Wait for what is coming soon...",
