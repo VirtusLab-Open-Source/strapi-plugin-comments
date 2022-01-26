@@ -1,0 +1,115 @@
+const BadWordsFilter = require('bad-words');
+const PluginError = require('./../../utils/error');
+const { REGEX } = require('./../../utils/constants')
+const { first, get, isObject, isNil } = require('lodash');
+
+const buildNestedStructure = (
+  entities,
+  id = null,
+  field = 'threadOf',
+  dropBlockedThreads = false,
+  blockNestedThreads = false,
+) =>
+  entities
+    .filter(entity => {
+        // mongo by default not return `null` for empty data
+        if (entity[field] === null && id === null) {
+            return true;
+        }
+        let data = entity[field];
+        if (data && typeof id === 'string') {
+            data = data.toString();
+        }
+        return (data && data === id) || (isObject(entity[field]) && (entity[field].id === id));
+    })
+    .map(entity => ({
+        ...entity,
+        [field]: undefined,
+        related: undefined,
+        blockedThread: blockNestedThreads || entity.blockedThread,
+        children: entity.blockedThread && dropBlockedThreads ? [] : buildNestedStructure(entities, entity.id, field,
+        dropBlockedThreads, entity.blockedThread),
+    }));
+
+module.exports = {
+    isEqualEntity: (existing, data, user) => {
+        const { authorUser, author: existingAuthor } = existing;
+        const { author } = data;
+
+        // Disallow approval status change by Client
+        if (data.approvalStatus && (existing.approvalStatus !== data.approvalStatus)) {
+            return false;
+        }
+
+        // Make sure that author is exact the same
+        if (authorUser) {
+            const existingUserId = authorUser?.id || authorUser;
+            const receivedUserId = user?.id || author;
+            return existingUserId === receivedUserId;
+        }
+        return existingAuthor.id === author?.id;
+    },
+
+    getRelatedGroups: related => related.split(REGEX.relatedUid).filter(s => s && s.length > 0),
+
+    getModelUid: name => {
+        return strapi
+            .plugin('comments')
+            .contentTypes[name]?.uid;
+    },
+
+    filterOurResolvedReports: item => (item ? {
+        ...item,
+        reports: (item.reports || []).filter(report => !report.resolved),
+    } : item),
+
+    checkBadWords: content => {
+        const config = get(strapi.config, 'plugins.comments.badWords', true);
+        if (config) {
+            const filter = new BadWordsFilter(isObject(config) ? config : undefined);
+            if (content && filter.isProfane(content)) {
+                throw new PluginError(400, 'Bad language used! Please polite your comment...', {
+                    content: {
+                        original: content,
+                        filtered: content && filter.clean(content),
+                    },
+                });
+            }
+        }
+        return content;
+    },
+    convertContentTypeNameToSlug: str => {
+        const plainConversion = str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+        return first(plainConversion) === '-' ? plainConversion.slice(1, plainConversion.length) : plainConversion;
+    },
+
+    buildNestedStructure,
+
+    isValidUserContext: (user = {}) => {
+		const builtInContextEnabled = get(strapi.config, 'plugins.comments.enableUsers', false);
+        return builtInContextEnabled ? !isNil(user.id) : true;
+    },
+
+    buildAuthorModel: (item) => {
+        const { authorUser, authorId, authorName, authorEmail, authorAvatar, ...rest } = item;
+        const author = authorUser || {
+            id: authorId,
+            name: authorName,
+            email: authorEmail,
+            avatar: authorAvatar,
+        };
+        return {
+            ...rest,
+            author,
+        };
+    },
+
+    resolveUserContextError: user => {
+        if (user) {
+            throw new PluginError(401, 'Not authenticated');
+        } else {
+            throw new PluginError(403, 'Not authorized');
+        }
+    },
+};
+

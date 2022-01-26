@@ -1,41 +1,32 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "1.0.4",
+  "version": "2.0.0-beta.7",
   "description": "Strapi - Comments plugin",
   "strapi": {
-    "name": "Comments",
-    "icon": "comments",
-    "description": "Comments & audience engagement"
+    "name": "comments",
+    "description": "Comments & audience engagement",
+    "kind": "plugin"
+  },
+  "scripts": {
+    "test:unit": "jest --verbose --coverage"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/VirtusLab-Open-Source/strapi-plugin-comments"
   },
-  "scripts": {
-    "test:unit": "jest --verbose --coverage"
-  },
   "dependencies": {
-    "bad-words": "^3.0.3",
-    "lodash": "^4.17.11",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0",
-    "react-intl": "4.5.0",
-    "react-redux": "^7.0.2",
-    "react-router": "^5.0.0",
-    "react-router-dom": "^5.0.0",
-    "reactstrap": "8.4.1",
-    "redux-saga": "^0.16.0",
-    "request": "^2.83.0",
-    "strapi-helper-plugin": "3.6.8",
-    "strapi-utils": "3.6.8",
-    "uuid": "^3.1.0"
+    "@strapi/utils": "^4.0.5",
+    "@strapi/plugin-graphql": "^4.0.5",
+    "bad-words": "^3.0.4"
   },
   "devDependencies": {
-    "koa": "^2.8.0",
+    "codecov": "^3.7.2",
     "jest": "^26.0.1",
     "jest-cli": "^26.0.1",
-    "jest-styled-components": "^7.0.2",
-    "codecov": "^3.7.2"
+    "jest-styled-components": "^7.0.2"
+  },
+  "peerDependencies": {
+    "@strapi/strapi": "4.x"
   },
   "author": {
     "name": "VirtusLab // Mateusz Ziarko",
@@ -55,8 +46,8 @@
     }
   ],
   "engines": {
-    "node": ">=10.16.0",
-    "npm": ">=6.0.0"
+    "node": ">=14.x.x <=17.x.x",
+    "npm": ">=7.x.x"
   },
   "keywords": ["strapi", "plugin", "comments"],
   "license": "MIT"
