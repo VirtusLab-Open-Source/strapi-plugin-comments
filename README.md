@@ -20,8 +20,8 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 <img src="public/assets/preview.png" alt="UI preview" />
 
 ### Versions
-- **Stable** - [v1.0.4](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
-- **Beta** - v4 support - [v2.0.0-beta.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/feat/strapi-v4)
+- **Strapi v4** - (current) - [v2.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
+- **Strapi v3** - [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3)
 
 ### ⏳ Installation
 
