@@ -2,7 +2,7 @@
 
 const { getPluginService } = require('./../utils/functions');
 const { parseParams, throwError } = require('./utils/functions');
-const _ = require('lodash');
+const { flatInput } = require('./utils/parsers');
 
 module.exports = {
 
@@ -15,16 +15,7 @@ module.exports = {
     const { relation } = parseParams(params);
     try {
       return this.getService('common')
-        .findAllFlat({
-          query: {
-            ...query,
-            $or: [{ removed: { $null: true } }, { removed: false }],
-            related: relation,
-          },
-          populate: {
-            threadOf: true,
-          },
-        });
+        .findAllFlat(flatInput(relation, query));
     } catch (e) {
       throwError(ctx, e);
     }
@@ -36,13 +27,7 @@ module.exports = {
     try {
       return await this.getService('common')
         .findAllInHierarchy({
-          query: {
-            ...query,
-            related: relation,
-          },
-          populate: {
-            threadOf: true,
-          },
+          ...flatInput(relation, query),
           dropBlockedThreads: true,
         });
     } catch (e) {
@@ -102,8 +87,8 @@ module.exports = {
       try {
         return await this.getService()
           .markAsRemoved(
-            relationId,
             commentId,
+            relationId,
             authorId,
           );
       } catch (e) {

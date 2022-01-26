@@ -17,6 +17,7 @@
     "page.discover.header": "Discover threads",
     "page.discover.header.count": "entries found",
     "page.discover.table.header.id": "ID",
+    "page.discover.table.header.author": "Author",
     "page.discover.table.header.message": "Message",
     "page.discover.table.header.thread": "Thread of",
     "page.discover.table.header.entry": "Entry",

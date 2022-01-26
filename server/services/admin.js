@@ -1,7 +1,7 @@
 'use strict';
 
 const { getPluginService, parseParams } = require('./../utils/functions');
-const { isEmpty, isNil } = require('lodash');
+const { isEmpty, isNil, isNumber, parseInt } = require('lodash');
 const PluginError = require('./../utils/error');
 const {
     getModelUid,
@@ -137,7 +137,8 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
         }
 
         const [relatedUid, relatedStringId] = getRelatedGroups(entity.related);
-        const relatedId = parseInt(relatedStringId, 10);
+        const parsedRelatedId = parseInt(relatedStringId);
+        const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
         const relatedEntity = await strapi.db.query(relatedUid).findOne({ 
             where: { id: relatedId }
         }).then(_ => ({
@@ -164,15 +165,14 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
                 startingFromId: levelThreadId,
                 isAdmin: true
             }, false);
-
-        const selectedEntity = this.getCommonService().sanitizeCommentEntity(entity);
+        const selectedEntity = this.getCommonService().sanitizeCommentEntity({
+            ...entity,
+            threadOf: entity.threadOf || null,
+        });
         
         return {
             entity: relatedEntity,
-            selected: {
-                ...selectedEntity,
-                threadOf: selectedEntity.threadOf ? selectedEntity.threadOf : null,
-            },
+            selected: selectedEntity,
             level: entitiesOnSameLevel,
         };
     },

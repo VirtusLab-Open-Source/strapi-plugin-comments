@@ -91,7 +91,7 @@ const Discover = ({ config }) => {
 
   const emptyContent = _q ? 'search' : 'comments';
   
-  const COL_COUNT = 7;
+  const COL_COUNT = 8;
 
   if (canAccess) {
     return <Box background="neutral100">
@@ -113,6 +113,9 @@ const Discover = ({ config }) => {
                       <Tr>
                         <Th>
                           <Typography variant="sigma">{ getMessage('page.discover.table.header.id') }</Typography>
+                        </Th>
+                        <Th>
+                          <Typography variant="sigma">{ getMessage('page.discover.table.header.author') }</Typography>
                         </Th>
                         <Th>
                           <Typography variant="sigma">{ getMessage('page.discover.table.header.message') }</Typography>

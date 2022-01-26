@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@strapi/utils": "^4.0.5",
+    "@strapi/plugin-graphql": "^4.0.5",
     "bad-words": "^3.0.4"
   },
   "devDependencies": {

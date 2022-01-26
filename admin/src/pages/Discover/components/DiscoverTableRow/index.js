@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useIntl } from 'react-intl';
 import { useMutation, useQueryClient } from 'react-query';
 import { isNil, isEmpty, orderBy } from 'lodash';
+import { Avatar, Initials } from '@strapi/design-system/Avatar';
 import { Badge } from '@strapi/design-system/Badge';
 import { Box } from '@strapi/design-system/Box'; 
 import { Button } from '@strapi/design-system/Button'; 
@@ -15,7 +16,7 @@ import { Tr, Td } from '@strapi/design-system/Table';
 import { Typography } from '@strapi/design-system/Typography'; 
 import { Eye } from '@strapi/icons';
 import { useNotification, useOverlayBlocker } from '@strapi/helper-plugin';
-import { getMessage, getUrl, handleAPIError, resolveCommentStatus, resolveCommentStatusColor } from '../../../../utils';
+import { getMessage, getUrl, handleAPIError, renderInitials, resolveCommentStatus, resolveCommentStatusColor } from '../../../../utils';
 import ReportsReviewModal from '../../../../components/ReportsReviewModal';
 import ReportsReviewTable from '../../../../components/ReportsReviewTable';
 import { blockItem, blockItemThread, resolveReport } from '../../../utils/api';
@@ -131,6 +132,12 @@ const DiscoverTableRow = ({ config, item, allowedActions: { canModerate, canAcce
         <Tr key={item.id}>
             <Td>
                 <Typography textColor="neutral800" fontWeight="bold">#{ item.id }</Typography>
+            </Td>
+            <Td>
+                <Stack size={2} horizontal>
+                    { item.author?.avatar ? <Avatar src={item.author?.avatar} alt={item.author.name} /> : <Initials>{ renderInitials(item.author.name) }</Initials> }
+                    <Typography textColor="neutral800" variant="pi">{ item.author.name }</Typography>
+                </Stack>
             </Td>
             <Td style={{ maxWidth: '30vw' }}>
                 <Typography textColor="neutral800" ellipsis>{item.content}</Typography>

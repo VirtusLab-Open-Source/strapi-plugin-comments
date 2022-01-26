@@ -2,7 +2,7 @@
 
 const config = require('../config');
 const { getPluginService } = require('./../utils/functions');
-const { isNil, isEmpty } = require('lodash');
+const { isNil, isEmpty, isNumber, parseInt } = require('lodash');
 const PluginError = require('./../utils/error');
 const {
     isEqualEntity,
@@ -34,7 +34,8 @@ module.exports = ({ strapi }) => ({
         }
 
         const [ uid, relatedStringId ] = getRelatedGroups(relation);
-        const relatedId = parseInt(relatedStringId, 10);
+        const parsedRelatedId = parseInt(relatedStringId);
+        const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
 
         const relatedEntity = await strapi.db.query(uid).findOne(relatedId);
         if (!relatedEntity) {
@@ -44,7 +45,7 @@ module.exports = ({ strapi }) => ({
         const isApprovalFlowEnabled = this.getCommonService().getConfig('approvalFlow', []).includes(uid) ||
             relatedEntity.requireCommentsApproval;
 
-        const linkToThread = !isNil(threadOf) ? !!await this.getCommonService().findOne({
+        const linkToThread = !isNil(threadOf) ? await this.getCommonService().findOne({
             id: threadOf,
             related: relation,
         }) : true;
@@ -99,20 +100,19 @@ module.exports = ({ strapi }) => ({
                     approvalStatus: isApprovalFlowEnabled ? APPROVAL_STATUS.PENDING : null,
                 }
             });
-            return this.getCommonService().sanitizeCommentEntity(entity);
+            return this.getCommonService().sanitizeCommentEntity({
+                ...entity,
+                threadOf: !isNil(threadOf) ? linkToThread : null,
+            });
         }
         throw new PluginError(400, 'No content received');
     },
 
     // Update a comment
     async update(id, relation, data, user) {
-        const { content, related } = data;
+        const { content } = data;
 
-        const singleRelationFulfilled = related && REGEX.relatedUid.test(related)
-
-        if (relation !== related) {
-            throw new PluginError(400, `Insonsistent relation uid`);
-        }
+        const singleRelationFulfilled = relation && REGEX.relatedUid.test(relation)
 
         if(!singleRelationFulfilled) {
             throw new PluginError(400, `Field "related" got incorrect format, use format like "api::<collection name>.<content type name>:<entity id>"`);
@@ -120,7 +120,7 @@ module.exports = ({ strapi }) => ({
 
         const existingEntity = await this.getCommonService().findOne({
             id,
-            related,
+            related: relation,
         });
         const validContext = isValidUserContext(user);
 
@@ -133,6 +133,7 @@ module.exports = ({ strapi }) => ({
                 const entity = await strapi.db.query(getModelUid('comment')).update({
                     where: { id },
                     data: { content },
+                    populate: { threadOf: true },
                 });
                 return this.getCommonService().sanitizeCommentEntity(entity);
             }
@@ -145,11 +146,11 @@ module.exports = ({ strapi }) => ({
         if (!isValidUserContext(user)) {
             throw resolveUserContextError(user);
         }
-		const existingEntity = await this.getCommonService().findOne({
+		const reportAgainstEntity = await this.getCommonService().findOne({
             id, 
             related: relation,
         });
-		if (existingEntity) {
+		if (reportAgainstEntity) {
             const entity = await strapi.db.query(getModelUid('comment-report')).create({
                 data: {
                     ...payload,
@@ -158,39 +159,46 @@ module.exports = ({ strapi }) => ({
                 }
             });
 			if (entity) {
+                const response = {
+                    ...entity,
+                    related: reportAgainstEntity,
+                };
                 try {
                     await this.sendAbuseReportEmail(entity.reason, entity.content); // Could also add some info about relation
+                    return response
                 } catch (err) {
-                    return entity;
+                    return response;
                 }
             } else {
                 throw new PluginError(500, 'Report cannot be created');
             }
-            return entity;
         }
         throw new PluginError(409, 'Action on that entity is not allowed');
     },
 
-    async markAsRemoved(relationId, commentId, authorId){
+    async markAsRemoved(id, relation, authorId){
         const entity = await this.getCommonService().findOne({
-          id: commentId,
-          related: relationId,
-          $or: [{ authorUser: authorId }, { authorId }],
+            id,
+            related: relation,
+            $or: [{ authorUser: authorId }, { authorId }],
         });
-        if (!entity){
+
+        if (!entity) {
             throw new PluginError(404, 'Entity not exist');
         }
 
-        return strapi.db.query(getModelUid('comment'))
+        const removedEntity = await strapi.db.query(getModelUid('comment'))
           .update({
               where: { 
-                  id: commentId, 
-                  related: relationId
+                  id, 
+                  related: relation
                 },
-                data: { removed: true }
+                data: { removed: true },
+                populate: { threadOf: true },
           })
-          .then(({ id }) => this.markAsRemovedNested(id, true))
-          .then(() => ({ id: commentId }));
+        await this.markAsRemovedNested(id, true);
+
+        return this.getCommonService().sanitizeCommentEntity(removedEntity);
     },
 
 	async sendAbuseReportEmail(reason, content) {
@@ -229,7 +237,7 @@ module.exports = ({ strapi }) => ({
 		}
 	},
 
-    markAsRemovedNested(id, status){
+    async markAsRemovedNested(id, status){
         return this.getCommonService().modifiedNestedNestedComments(id, 'removed', status);
     },
 });

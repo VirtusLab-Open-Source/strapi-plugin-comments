@@ -6,7 +6,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { first } from 'lodash';
 import { Avatar, Initials } from '@strapi/design-system/Avatar';
 import { Box } from '@strapi/design-system/Box';
 import { Divider } from '@strapi/design-system/Divider';
@@ -17,7 +16,7 @@ import { ArrowRight } from '@strapi/icons';
 import DiscussionThreadItemMeta from '../DiscussionThreadItemMeta';
 import { AvatarWrapper, DiscussionThreadItemBox, DiscussionThreadItemBoxContent, DiscussionThreadItemContent, DiscussionThreadItemLeft, DiscussionThreadItemLinkBox, DiscussionThreadItemRight, DiscussionThreadItemRoot } from './styles';
 import DiscussionThreadItemActions from '../DiscussionThreadItemActions';
-import { getMessage, getUrl } from '../../utils';
+import { getMessage, getUrl, renderInitials } from '../../utils';
 import DiscussionThreadItemWarnings from '../DiscussionThreadItemWarnings';
 
 const DiscussionThreadItem = (props) => {
@@ -34,8 +33,7 @@ const DiscussionThreadItem = (props) => {
         gotThread, 
         threadFirstItemId, 
         authorUser, 
-        authorAvatar, 
-        authorName } = props;
+        author } = props;
 
     let background = 'neutral100';
     let borderColor = 'neutral200';
@@ -59,11 +57,9 @@ const DiscussionThreadItem = (props) => {
         StyledComponent = DiscussionThreadItemRoot;
     }
 
-    const avatar = authorAvatar || authorUser?.avatar;
-    const name = authorName || `${authorUser?.firstName} ${authorUser?.lastName}`;
+    const avatar = author?.avatar || authorUser?.avatar;
+    const name = author?.name || `${authorUser?.firstName} ${authorUser?.lastName}`;
     const isBlocked = blocked || blockedThread;
-
-    const renderInitials = value => value.split(' ').map(_ => first(_)).join('').toUpperCase();
     
     return (<StyledComponent as="li">
         <DiscussionThreadItemContent as={Flex} direction="row">

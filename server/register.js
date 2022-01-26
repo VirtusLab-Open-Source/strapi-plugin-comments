@@ -1,5 +1,7 @@
 'use strict';
 
 module.exports = ({ strapi }) => {
-  // registeration phase
+  if (strapi.plugin('graphql')) {
+    require('./graphql')({ strapi });
+  }
 };

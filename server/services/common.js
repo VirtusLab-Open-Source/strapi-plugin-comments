@@ -1,13 +1,14 @@
 'use strict';
 
-const { isArray, uniq, first } = require('lodash');
+const { isArray, isNumber, isObject, first, parseInt } = require('lodash');
 // const { sanitizeEntity } = require('strapi-utils');
 const PluginError = require('./../utils/error');
 const {
     getModelUid,
     getRelatedGroups,
     buildNestedStructure,
-    filterOurResolvedReports
+    filterOurResolvedReports,
+    buildAuthorModel,
 } = require('./utils/functions');
 
 /**
@@ -97,9 +98,11 @@ module.exports = ({ strapi }) => ({
     async findRelatedEntitiesFor(entities = []) {
         const data = entities.reduce((acc, cur) => {
                 const [relatedUid, relatedStringId] = getRelatedGroups(cur.related);
+                const parsedRelatedId = parseInt(relatedStringId);
+                const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
                 return {
                     ...acc,
-                    [relatedUid]: [...(acc[relatedUid] || []), parseInt(relatedStringId, 10)]
+                    [relatedUid]: [...(acc[relatedUid] || []), relatedId]
                 };
             },
             {}
@@ -152,7 +155,10 @@ module.exports = ({ strapi }) => ({
     },
 
     sanitizeCommentEntity: (entity) => ({
-        ...entity,
+        ...buildAuthorModel({
+            ...entity,
+            threadOf: isObject(entity.threadOf) ? buildAuthorModel(entity.threadOf) : entity.threadOf,
+        }),
 	}),
 
     // sanitizeCommentEntity: (entity) => ({

@@ -6,7 +6,7 @@ const { first, get, isObject, isNil } = require('lodash');
 const buildNestedStructure = (
   entities,
   id = null,
-  field = 'parent',
+  field = 'threadOf',
   dropBlockedThreads = false,
   blockNestedThreads = false,
 ) =>
@@ -33,7 +33,7 @@ const buildNestedStructure = (
 
 module.exports = {
     isEqualEntity: (existing, data, user) => {
-        const { authorUser, authorId } = existing;
+        const { authorUser, author: existingAuthor } = existing;
         const { author } = data;
 
         // Disallow approval status change by Client
@@ -47,7 +47,7 @@ module.exports = {
             const receivedUserId = user?.id || author;
             return existingUserId === receivedUserId;
         }
-        return authorId === author?.id;
+        return existingAuthor.id === author?.id;
     },
 
     getRelatedGroups: related => related.split(REGEX.relatedUid).filter(s => s && s.length > 0),
@@ -88,6 +88,20 @@ module.exports = {
     isValidUserContext: (user = {}) => {
 		const builtInContextEnabled = get(strapi.config, 'plugins.comments.enableUsers', false);
         return builtInContextEnabled ? !isNil(user.id) : true;
+    },
+
+    buildAuthorModel: (item) => {
+        const { authorUser, authorId, authorName, authorEmail, authorAvatar, ...rest } = item;
+        const author = authorUser || {
+            id: authorId,
+            name: authorName,
+            email: authorEmail,
+            avatar: authorAvatar,
+        };
+        return {
+            ...rest,
+            author,
+        };
     },
 
     resolveUserContextError: user => {

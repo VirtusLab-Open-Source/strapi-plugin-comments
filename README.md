@@ -88,6 +88,9 @@ To setup amend default plugin configuration we recommend to put following snippe
             '*': ['Title', 'title', 'Name', 'name', 'Subject', 'subject'],
             'api::page.page': ['MyField'],
         },
+        reportReasons: {
+            'MY_CUSTOM_REASON': 'MY_CUSTOM_REASON',
+        },
     },
     ...
 ```
@@ -97,10 +100,12 @@ To setup amend default plugin configuration we recommend to put following snippe
 - `moderatorRoles` - Optional list of names of roles. Users with those roles will be notified by email when a new abuse report is created. This feature requires a built-in [Strapi email plugin](https://docs.strapi.io/developer-docs/latest/plugins/email.html) configured.
 - `approvalFlow` - list of Content Types which are supporting approval flow. Values must be in format like `'api::<collection name>.<content type name>'`. For not included, posted comments are going to be immediately visible. 
 - `entryLabel` - ordered list of property names per Content Type to generate related entity label. Keys must be in format like `'api::<collection name>.<content type name>'`. Default formatting set as `*`.
+- `reportReasons` - set of enums you would like to use for issuing abuse reports. Provided by default `'BAD_LANGUAGE'`, `'DISCRIMINATION'` and `'OTHER'`.
 
 ## Additional GQL Configuration
+All you need to do is to install and enable `@strapi/plugin-graphql` for you instance based on the **[official Strapi v4 docs](https://docs.strapi.io/developer-docs/latest/plugins/graphql.html#configurations)**.
 
-> To be done
+See [available GQL specification section](#public-graphql-specification).
 
 ## RBAC
 Plugin provides granular permissions based on Strapi RBAC functionality.
@@ -127,10 +132,14 @@ Feature / Capability focused permissions:
     "blockedThread": true,
     "blockReason": null,
     "authorUser": null,
-    "authorId": "207ccfdc-94ba-45eb-979c-790f6f49c392",
-    "authorName": "Joe Doe",
-    "authorEmail": "jdoe@sample.com",
-    "authorAvatar": null,
+    "removed": null,
+    "approvalStatus": "APPROVED", // Only in case of enabled approval flow. Default: null
+    "author": {
+        "id": "207ccfdc-94ba-45eb-979c-790f6f49c392",
+        "name": "Joe Doe",
+        "email": "jdoe@sample.com",
+        "avatar": null,
+    },
     "createdAt": "2020-07-14T20:13:01.649Z",
     "updatedAt": "2020-07-14T20:13:01.670Z",
     "related": {}, // Related content type entity
@@ -145,6 +154,8 @@ Feature / Capability focused permissions:
     "blocked": true,
     "blockedThread": null,
     "blockReason": null,
+    "removed": null,
+    "approvalStatus": "REJECTED", // Only in case of enabled approval flow. Default: null
     "authorUser": {
         "id": 1,
         "username": "Sample User",
@@ -329,7 +340,7 @@ Deletes a specified Comment based on it `commentId` and related to specified ins
 - `409` - Conflict. Occurs when trying to delete a non existing comment.
 
 
-### Report abuse in the Comment
+### Issue Abuse Report against specified Comment
 
 `POST <host>/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>/report-abuse`
 
@@ -346,7 +357,7 @@ Reports abuse in specified Comment content based on it `commentId` and related t
 }
 ```
 
-*Available reason enums:* `OTHER`, `BAD_WORDS`, `DISCRIMINATION`
+*Available reason enums:* `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See [configuration section](#configuration).)
 
 **Example response body**
 
@@ -359,6 +370,298 @@ Reports abuse in specified Comment content based on it `commentId` and related t
 **Possible response codes**
 - `200` - Successful. Response with reported abuse.
 - `409` - Conflict. Occurs when trying to report an abuse to a non existing comment.
+
+## Public GraphQL specification
+
+> *To test all queries and understand the schemas use GraphQL Playground exposed by `@strapi/plugin-graphql` on `http://localhost:1337/graphql`*
+
+### Get Comments
+
+*REST API equivalent: [Public API -> Get Comments](#get-comments)*
+
+**Example request**
+
+```graphql
+query {
+  findAllFlat(
+    relation: "api::page.page:1"
+    filters: { content: { contains: "Test" } }
+  ) {
+        id
+        content
+        blocked
+        threadOf {
+            id
+        }
+        author {
+            id
+            name
+        }
+    }
+}
+```
+
+**Example response**
+
+```json
+{
+  "data": {
+    "findAllFlat": [
+      {
+        "id": 3,  
+        "content": "Test",
+        "blocked": false,
+        "threadOf": null,
+        "author": {
+          "id": "123456",
+          "name": "Joe Doe"
+        }
+      },
+      //...
+    ]
+  }
+```
+
+### Get Comments (flat structure)
+
+*REST API equivalent: [Public API -> Get Comments (flat structure)](#get-comments-flat-structure)*
+
+**Example request**
+
+```graphql
+query {
+  findAllInHierarchy(relation: "api::page.page:1") {
+    id
+    content
+    blocked
+    children {
+      id
+      content
+    }
+    threadOf {
+      id
+    }
+    author {
+      id
+      name
+    }
+  }
+}
+```
+
+**Example response**
+
+```json
+{
+  "data": {
+    "findAllInHierarchy": [
+      {
+        "id": 1,
+        "content": "Test",
+        "blocked": false,
+        "children": [
+          {
+            "id": 6,
+            "content": "Text to search for"
+          },
+          //...
+        ],
+        "threadOf": null,
+        "author": {
+          "id": "123456",
+          "name": "Joe Doe"
+        }
+      },
+      //...
+    ]
+  }
+}
+```
+
+### Post a Comment
+
+*REST API equivalent: [Public API -> Post a Comment](#post-a-comment)*
+
+**Example request**
+
+```graphql
+mutation createComment {
+  createComment(
+    input: {
+      relation: "api::page.page:1"
+      content: "Hello World!"
+      threadOf: 3
+      author: { id: "12345678", name: "John Wick", email: "test@test.pl" }
+    }
+  ) {
+    id
+    content
+    threadOf {
+      id
+    }
+    author {
+      id
+      name
+    }
+  }
+}
+```
+
+**Example response**
+
+```json
+{
+  "data": {
+    "createComment": {
+      "id": 34,
+      "content": "Hello World!",
+      "threadOf": {
+        "id": 3
+      },
+      "author": {
+        "id": "12345678",
+        "name": "John Wick"
+      }
+    }
+  }
+}
+```
+
+### Update Comment
+
+*REST API equivalent: [Public API -> Update Comment](#update-comment)*
+
+**Example request**
+
+```graphql
+mutation updateComment {
+  updateComment(
+    input: {
+      id: 34
+      relation: "api::page.page:1"
+      content: "I've changed it!"
+      author: { id: "12345678" }
+    }
+  ) {
+    id
+    content
+    threadOf {
+      id
+    }
+    author {
+      id
+      name
+    }
+    createdAt
+    updatedAt
+  }
+}
+```
+
+**Example response**
+
+```json
+{
+  "data": {
+    "updateComment": {
+      "id": 34,
+      "content": "I've changed it!",
+      "threadOf": {
+        "id": 3
+      },
+      "author": {
+        "id": "12345678",
+        "name": "John Wick"
+      },
+      "createdAt": "2022-01-26T07:45:35.978Z",
+      "updatedAt": "2022-01-26T07:47:44.659Z"
+    }
+  }
+}
+```
+
+### Delete Comment
+
+*REST API equivalent: [Public API -> Delete Comment](#delete-comment)*
+
+**Example request**
+
+```graphql
+mutation removeComment {
+  removeComment(
+    input: { id: 33, relation: "api::page.page:1", author: { id: "12345678" } }
+  ) {
+    id
+    removed
+  }
+}
+```
+
+**Example response**
+
+```json
+{
+  "data": {
+    "removeComment": {
+      "id": 33,
+      "removed": true
+    }
+  }
+}
+```
+
+### Issue Abuse Report against specified Comment
+
+*REST API equivalent: [Public API -> Issue Abuse Report against specified Comment](#issue-abuse-report-against-specified-comment)*
+
+**Example request body**
+
+```graphql
+mutation createAbuseReport {
+  createAbuseReport(
+    input: {
+      commentId: 34
+      relation: "api::page.page:1"
+      reason: BAD_LANGUAGE
+      content: "Rude language"
+    }
+  ) {
+    id
+    reason
+    content
+    related {
+      id
+      author {
+        id
+        name
+      }
+    }
+  }
+}
+```
+
+*Available reason enums:* `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See [configuration section](#configuration).)
+
+**Example response**
+
+```json
+{
+  "data": {
+    "createAbuseReport": {
+      "id": 28,
+      "content": "Rude language",
+      "reason": "DISCRIMINATION",
+      "related": {
+        "id": 34,
+        "author": {
+          "id": "12345678",
+          "name": "John Wick"
+        }
+      }
+    }
+  }
+}
+```
 
 ## Examples
 
