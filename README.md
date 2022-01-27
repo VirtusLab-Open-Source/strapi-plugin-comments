@@ -1,4 +1,5 @@
 <div align="center">
+  <img style="width: 150px; height: auto;" src="public/assets/logo.png" alt="Logo - Strapi Comments plugin" />
   <h1>Strapi v4 - Comments plugin</h1>
   <p>Powerfull Strapi based comments moderation tool for you and your users</p>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
@@ -16,6 +17,11 @@
 </div>
 
 ---
+
+<div style="margin: 20px 0" align="center">
+  <img style="width: 100%; height: auto;" src="public/assets/preview.png" alt="UI preview" />
+</div>
+
 
 A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provides end to end comments feature with their moderation panel, bad words filtering, abuse reporting and much more.
 
