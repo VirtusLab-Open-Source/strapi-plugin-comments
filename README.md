@@ -3,7 +3,7 @@
   <h1>Strapi v4 - Comments plugin</h1>
   <p>Powerfull Strapi based comments moderation tool for you and your users</p>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
-    <img src="https://img.shields.io/npm/v/strapi-plugin-comments/latest.svg" alt="NPM Version" />
+    <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/VirtusLab-Open-Source/strapi-plugin-comments?label=npm&logo=npm">
   </a>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
     <img src="https://img.shields.io/npm/dm/strapi-plugin-comments.svg" alt="Monthly download on NPM" />
