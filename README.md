@@ -24,8 +24,8 @@
 A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provides end to end comments feature with their moderation panel, bad words filtering, abuse reporting and more.
 
 ### Versions
-- **Strapi v4** - (current) - [v2.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
-- **Strapi v3** - [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3)
+- **Strapi v4** - [v2.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
+- **Strapi v3** - (current) - [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3)
 
 ### ⏳ Installation
 
