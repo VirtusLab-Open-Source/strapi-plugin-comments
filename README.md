@@ -1,8 +1,8 @@
-# Strapi - Comments plugin
-
-<p align="center">
+<div align="center">
+  <h1>Strapi v3 - Comments plugin</h1>
+  <p>Powerfull Strapi based comments moderation tool for you and your users</p>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
-    <img src="https://img.shields.io/npm/v/strapi-plugin-comments/latest.svg" alt="NPM Version" />
+    <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/VirtusLab-Open-Source/strapi-plugin-comments/strapi-v3?label=npm&logo=npm">
   </a>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
     <img src="https://img.shields.io/npm/dm/strapi-plugin-comments.svg" alt="Monthly download on NPM" />
@@ -13,11 +13,15 @@
   <a href="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments">
     <img src="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments/coverage.svg?branch=master" alt="codecov.io" />
   </a>
-</p>
+</div>
+
+---
+
+<div style="margin: 20px 0" align="center">
+  <img style="width: 100%; height: auto;" src="public/assets/preview.png" alt="UI preview" />
+</div>
 
 A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provides end to end comments feature with their moderation panel, bad words filtering, abuse reporting and more.
-
-<img src="public/assets/preview.png" alt="UI preview" />
 
 ### Versions
 - **Strapi v4** - (current) - [v2.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
