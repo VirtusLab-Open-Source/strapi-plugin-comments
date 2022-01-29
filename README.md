@@ -196,7 +196,7 @@ Feature / Capability focused permissions:
 
 *GraphQL equivalent: [Public GraphQL API -> Get Comments](#get-comments-1)*
 
-`GET <host>/comments/api::<collection name>.<content type name>:<entity id>`
+`GET <host>/api/comments/api::<collection name>.<content type name>:<entity id>`
 
 Return a hierarchical tree structure of comments for specified instance of Content Type like for example `Page` with `ID: 1`
 
@@ -226,7 +226,7 @@ Return a hierarchical tree structure of comments for specified instance of Conte
 
 *GraphQL equivalent: [Public GraphQL API -> Get Comments (flat structure)](#get-comments-flat-structure-1)*
 
-`GET <host>/comments/api::<collection name>.<content type name>:<entity id>/flat`
+`GET <host>/api/comments/api::<collection name>.<content type name>:<entity id>/flat`
 
 Return a flat structure of comments for specified instance of Content Type like for example `Page` with `ID: 1`
 
@@ -254,7 +254,7 @@ Return a flat structure of comments for specified instance of Content Type like 
 
 *GraphQL equivalent: [Public GraphQL API -> Post a Comments](#post-a-comment-1)*
 
-`POST <host>/comments/api::<collection name>.<content type name>:<entity id>`
+`POST <host>/api/comments/api::<collection name>.<content type name>:<entity id>`
 
 Posts a Comment related to specified instance of Content Type like for example `Page` with `ID: 1`
 
@@ -301,7 +301,7 @@ Posts a Comment related to specified instance of Content Type like for example `
 
 *GraphQL equivalent: [Public GraphQL API -> Update Comments](#update-comment-1)*
 
-`PUT <host>/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>`
 
 Updates a specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1`
 
@@ -344,7 +344,7 @@ Updates a specified Comment content based on it `commentId` and related to speci
 
 *GraphQL equivalent: [Public GraphQL API -> Delete Comment](#delete-comment-1)*
 
-`DELETE <host>/comments/api::<collection name>.<content type name>:<entity id>/<commentId>?authorId=<authorId>`
+`DELETE <host>/api/comments/api::<collection name>.<content type name>:<entity id>/<commentId>?authorId=<authorId>`
 
 Deletes a specified Comment based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1`.
 
@@ -367,7 +367,7 @@ Deletes a specified Comment based on it `commentId` and related to specified ins
 
 *GraphQL equivalent: [Public GraphQL API -> Issue Abuse Report against specified Comment](#issue-abuse-report-against-specified-comment-1)*
 
-`POST <host>/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>/report-abuse`
+`POST <host>/api/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>/report-abuse`
 
 Reports abuse in specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1` and requests moderator attention.
 
