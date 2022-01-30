@@ -1,5 +1,7 @@
-<div align="center">
+<div align="center" width="150px">
   <img style="width: 150px; height: auto;" src="public/assets/logo.png" alt="Logo - Strapi Comments plugin" />
+</div>
+<div align="center">
   <h1>Strapi v4 - Comments plugin</h1>
   <p>Powerfull Strapi based comments moderation tool for you and your users</p>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
