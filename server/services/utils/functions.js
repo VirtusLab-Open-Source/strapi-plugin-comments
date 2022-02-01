@@ -92,12 +92,22 @@ module.exports = {
 
     buildAuthorModel: (item) => {
         const { authorUser, authorId, authorName, authorEmail, authorAvatar, ...rest } = item;
-        const author = authorUser || {
-            id: authorId,
-            name: authorName,
-            email: authorEmail,
-            avatar: authorAvatar,
-        };
+        let author;
+        if (authorUser) {
+            author = {
+                id: authorUser.id,
+                name: authorUser.username,
+                email: authorUser.email,
+                avatar: authorUser.avatar,
+            };
+        } else {
+            author = {
+                id: authorId,
+                name: authorName,
+                email: authorEmail,
+                avatar: authorAvatar,
+            };
+        }
         return {
             ...rest,
             author,

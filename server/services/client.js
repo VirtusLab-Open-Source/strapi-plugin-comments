@@ -60,15 +60,11 @@ module.exports = ({ strapi }) => ({
         }
 
         if (checkBadWords(content) && singleRelationFulfilled) {
-            const { author, authorUser, ...rest } = data;
+            const { author, ...rest } = data;
             let authorData = {};
             if (validContext && user) {
                 authorData = {
-                    authorUser: user?.id || authorUser,
-                };
-            } else if (authorUser) {
-                authorData = {
-                    authorUser,
+                    authorUser: user?.id,
                 };
             } else {
                 if (author.email && !REGEX.email.test(author.email)) {
@@ -83,7 +79,7 @@ module.exports = ({ strapi }) => ({
                 };
             }
             
-            if (!isEmpty(authorData) && !authorData.authorId) {
+            if (!isEmpty(authorData) && !(authorData.authorId || authorData.authorUser)) {
                 throw new PluginError(400, 'Object: "author" is invalid. Check your payload');
             }
 
@@ -98,7 +94,10 @@ module.exports = ({ strapi }) => ({
                     ...authorData,
                     related: relation,
                     approvalStatus: isApprovalFlowEnabled ? APPROVAL_STATUS.PENDING : null,
-                }
+                },
+                populate: {
+                    authorUser: true,
+                },
             });
             return this.getCommonService().sanitizeCommentEntity({
                 ...entity,
@@ -109,7 +108,7 @@ module.exports = ({ strapi }) => ({
     },
 
     // Update a comment
-    async update(id, relation, data, user) {
+    async update(id, relation, data, user = undefined) {
         const { content } = data;
 
         const singleRelationFulfilled = relation && REGEX.relatedUid.test(relation)
@@ -133,7 +132,7 @@ module.exports = ({ strapi }) => ({
                 const entity = await strapi.db.query(getModelUid('comment')).update({
                     where: { id },
                     data: { content },
-                    populate: { threadOf: true },
+                    populate: { threadOf: true, authorUser: true },
                 });
                 return this.getCommonService().sanitizeCommentEntity(entity);
             }

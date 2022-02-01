@@ -8,6 +8,7 @@
     "kind": "plugin"
   },
   "scripts": {
+    "publish": "npm publish --tag latest",
     "test:unit": "jest --verbose --coverage"
   },
   "repository": {
@@ -15,8 +16,8 @@
     "url": "https://github.com/VirtusLab-Open-Source/strapi-plugin-comments"
   },
   "dependencies": {
-    "@strapi/utils": "^4.0.5",
-    "@strapi/plugin-graphql": "^4.0.5",
+    "@strapi/utils": "^4.0.6",
+    "@strapi/plugin-graphql": "^4.0.6",
     "bad-words": "^3.0.4"
   },
   "devDependencies": {

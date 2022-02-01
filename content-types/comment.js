@@ -48,10 +48,6 @@ module.exports = {
       target: 'plugin::users-permissions.user',
       configurable: false,
     },
-    authorType: {
-      type: 'string',
-      configurable: false
-    },
     authorId: {
       type: 'string',
       configurable: false

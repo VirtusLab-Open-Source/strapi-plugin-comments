@@ -86,8 +86,12 @@ module.exports = ({ strapi }) => ({
     async findOne(criteria) {
         const entity = await strapi.db.query(getModelUid('comment'))
             .findOne({
-                where: criteria
-            }, ['related', 'reports']);
+                where: criteria,
+                populate: {
+                    reports: true,
+                    authorUser: true,
+                },
+            });
         if (!entity){
             throw new PluginError(404, 'Not found');
         }
