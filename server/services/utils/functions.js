@@ -1,7 +1,6 @@
-const BadWordsFilter = require('bad-words');
 const PluginError = require('./../../utils/error');
 const { REGEX } = require('./../../utils/constants')
-const { first, get, isObject, isEmpty } = require('lodash');
+const { first, isObject, isEmpty } = require('lodash');
 
 const buildNestedStructure = (
   entities,
@@ -63,21 +62,6 @@ module.exports = {
         reports: (item.reports || []).filter(report => !report.resolved),
     } : item),
 
-    checkBadWords: content => {
-        const config = get(strapi.config, 'plugins.comments.badWords', true);
-        if (config) {
-            const filter = new BadWordsFilter(isObject(config) ? config : undefined);
-            if (content && filter.isProfane(content)) {
-                throw new PluginError(400, 'Bad language used! Please polite your comment...', {
-                    content: {
-                        original: content,
-                        filtered: content && filter.clean(content),
-                    },
-                });
-            }
-        }
-        return content;
-    },
     convertContentTypeNameToSlug: str => {
         const plainConversion = str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
         return first(plainConversion) === '-' ? plainConversion.slice(1, plainConversion.length) : plainConversion;

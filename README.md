@@ -3,7 +3,7 @@
 </div>
 <div align="center">
   <h1>Strapi v4 - Comments plugin</h1>
-  <p>Powerfull Strapi based comments moderation tool for you and your users</p>
+  <p>Powerful Strapi based comments moderation tool for you and your users</p>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
     <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/VirtusLab-Open-Source/strapi-plugin-comments?label=npm&logo=npm">
   </a>

@@ -4,7 +4,8 @@
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
-    "description": "Comments & audience engagement",
+    "displayName": "Comments",
+    "description": "Powerful Strapi based comments moderation tool for you and your users",
     "kind": "plugin"
   },
   "scripts": {
@@ -24,7 +25,8 @@
     "codecov": "^3.7.2",
     "jest": "^26.0.1",
     "jest-cli": "^26.0.1",
-    "jest-styled-components": "^7.0.2"
+    "jest-styled-components": "^7.0.2",
+    "koa": "2.13.3"
   },
   "peerDependencies": {
     "@strapi/strapi": "4.x"

@@ -1,6 +1,6 @@
-const PluginError = require('../../../services/utils/error');
+const PluginError = require('../../../utils/error');
 const ctx = require('koa/lib/context');
-const { parseParams, throwError } = require('../functions');
+const { throwError } = require('../functions');
 
 jest.mock
 

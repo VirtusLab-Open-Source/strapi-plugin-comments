@@ -6,6 +6,7 @@ module.exports = ({ nexus }) => nexus.objectType({
     t.boolean("blocked")
     t.boolean("blockedThread")
     t.string("approvalStatus")
+    t.boolean("removed")
     t.field("threadOf", { type: 'CommentSingle' })
     t.list.field("children", { type: 'CommentNested' })
     t.field("author", { type: 'CommentAuthor' })

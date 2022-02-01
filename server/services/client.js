@@ -8,7 +8,6 @@ const {
     isEqualEntity,
     getModelUid,
     getRelatedGroups,
-    checkBadWords,
     resolveUserContextError,
 } = require('./utils/functions');
 const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
@@ -58,7 +57,7 @@ module.exports = ({ strapi }) => ({
             throw resolveUserContextError(user);
         }
 
-        if (checkBadWords(content) && singleRelationFulfilled) {
+        if (this.getCommonService().checkBadWords(content) && singleRelationFulfilled) {
             const { author = {}, ...rest } = data;
             let authorData = {};
             if (validContext && user) {
@@ -128,7 +127,7 @@ module.exports = ({ strapi }) => ({
         }
 
         if (isEqualEntity(existingEntity, data, user) && content) {
-            if (checkBadWords(content)) {
+            if (this.getCommonService().checkBadWords(content)) {
                 const entity = await strapi.db.query(getModelUid('comment')).update({
                     where: { id },
                     data: { content },

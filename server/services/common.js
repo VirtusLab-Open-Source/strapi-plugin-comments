@@ -1,5 +1,6 @@
 'use strict';
 
+const BadWordsFilter = require('bad-words');
 const { isArray, isNumber, isObject, isNil, first, parseInt } = require('lodash');
 // const { sanitizeEntity } = require('strapi-utils');
 const PluginError = require('./../utils/error');
@@ -169,5 +170,21 @@ module.exports = ({ strapi }) => ({
 
     isValidUserContext(user) {
         return user ? !isNil(user?.id) : true;
+    },
+
+    checkBadWords(content) {
+        const config = this.getConfig('badWords', true);
+        if (config) {
+            const filter = new BadWordsFilter(isObject(config) ? config : undefined);
+            if (content && filter.isProfane(content)) {
+                throw new PluginError(400, 'Bad language used! Please polite your comment...', {
+                    content: {
+                        original: content,
+                        filtered: content && filter.clean(content),
+                    },
+                });
+            }
+        }
+        return content;
     },
 });
