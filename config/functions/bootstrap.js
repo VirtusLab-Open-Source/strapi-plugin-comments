@@ -10,7 +10,7 @@ module.exports = async () => {
   const actions = [
     {
       section: 'plugins',
-      displayName: 'Access the Comments',
+      displayName: 'Access',
       uid: 'read',
       pluginName: 'comments',
     },
@@ -22,14 +22,14 @@ module.exports = async () => {
     },
     {
       section: 'plugins',
-      displayName: 'Single comments',
+      displayName: 'Block single comment',
       uid: 'moderate.block.comment',
       subCategory: 'moderate',
       pluginName: 'comments',
     },
     {
       section: 'plugins',
-      displayName: 'Comments threads',
+      displayName: 'Block comments threads',
       uid: 'moderate.block.thread',
       subCategory: 'moderate',
       pluginName: 'comments',
@@ -43,14 +43,14 @@ module.exports = async () => {
     },
     {
       section: 'plugins',
-      displayName: 'Single comments',
+      displayName: 'Approving comments',
       uid: 'moderate.approve.comment',
       subCategory: 'moderate',
       pluginName: 'comments',
     },
     {
       section: 'plugins',
-      displayName: 'Single comments',
+      displayName: 'Rejecting comments',
       uid: 'moderate.reject.comment',
       subCategory: 'moderate',
       pluginName: 'comments',
