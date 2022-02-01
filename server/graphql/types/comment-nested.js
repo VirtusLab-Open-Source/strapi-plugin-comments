@@ -8,7 +8,6 @@ module.exports = ({ nexus }) => nexus.objectType({
     t.string("approvalStatus")
     t.field("threadOf", { type: 'CommentSingle' })
     t.list.field("children", { type: 'CommentNested' })
-    t.field("authorUser", { type: 'CommentAuthorUser' })
     t.field("author", { type: 'CommentAuthor' })
     t.string("createdAt")
     t.string("updatedAt")

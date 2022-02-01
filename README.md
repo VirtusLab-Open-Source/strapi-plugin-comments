@@ -103,6 +103,9 @@ To setup amend default plugin configuration we recommend to put following snippe
             reportReasons: {
                 'MY_CUSTOM_REASON': 'MY_CUSTOM_REASON',
             },
+            gql: { 
+              // ...
+            },
         },
         //...
     });
@@ -114,11 +117,35 @@ To setup amend default plugin configuration we recommend to put following snippe
 - `approvalFlow` - list of Content Types which are supporting approval flow. Values must be in format like `'api::<collection name>.<content type name>'`. For not included, posted comments are going to be immediately visible. 
 - `entryLabel` - ordered list of property names per Content Type to generate related entity label. Keys must be in format like `'api::<collection name>.<content type name>'`. Default formatting set as `*`.
 - `reportReasons` - set of enums you would like to use for issuing abuse reports. Provided by default `'BAD_LANGUAGE'`, `'DISCRIMINATION'` and `'OTHER'`.
+- `gql` - specific configuration for GraphQL. See [Additional GQL Configuration](#additional-gql-configuration)
 
 ## Additional GQL Configuration
-All you need to do is to install and enable `@strapi/plugin-graphql` for you instance based on the **[official Strapi v4 docs](https://docs.strapi.io/developer-docs/latest/plugins/graphql.html#configurations)**.
+All you need to do is to install and enable `@strapi/plugin-graphql` for you instance based on the **[official Strapi v4 docs](https://docs.strapi.io/developer-docs/latest/plugins/graphql.html#configurations)** and decide if you would like to call it by anyone (open for world) or only by authenticated users (Strapi users).
+
+```json
+  {
+    // ...
+    gql: {
+      auth: true, // Default: false
+    },
+    // ...
+  }
+```
+
+### Properties
+- `auth` - does GraphQL Queries should be authenticated or not? Default: `false`
+
+### Queries
 
 See [available GQL specification section](#public-graphql-specification).
+
+>  If `auth` is set to `true` you must provide relevant authentication headers to all requests like for example:
+>  
+> ```json
+> {
+>  "Authorization": "Bearer <your token here>"
+> }
+> ```
 
 ## 👤 RBAC
 Plugin provides granular permissions based on Strapi RBAC functionality.
@@ -136,7 +163,6 @@ Feature / Capability focused permissions:
 
 ## Base Comment model
 
-### Generic (non Strapi User)
 ```json
 {
     "id": 1,
@@ -148,8 +174,8 @@ Feature / Capability focused permissions:
     "removed": null,
     "approvalStatus": "APPROVED", // Only in case of enabled approval flow. Default: null
     "author": {
-        "id": "207ccfdc-94ba-45eb-979c-790f6f49c392",
-        "name": "Joe Doe",
+        "id": "207ccfdc-94ba-45eb-979c-790f6f49c392", // For Strapi users id reflects to the format used by your Strapi
+        "name": "Joe Doe", // For Strapi users it is equal to 'username' field
         "email": "jdoe@sample.com",
         "avatar": null,
     },
@@ -159,40 +185,11 @@ Feature / Capability focused permissions:
     "reports": [] // Reports issued against this comment
 }
 ```
-### Strapi User
-```json
-{
-    "id": 1,
-    "content": "My comment content",
-    "blocked": true,
-    "blockedThread": null,
-    "blockReason": null,
-    "removed": null,
-    "approvalStatus": "REJECTED", // Only in case of enabled approval flow. Default: null
-    "authorUser": {
-        "id": 1,
-        "username": "Sample User",
-        "email": "user@sample.com",
-        "provider": "local",
-        "confirmed": true,
-        "blocked": false,
-        "role": 1,
-        "created_at": "2020-07-10T08:38:03.157Z",
-        "updated_at": "2020-07-10T08:38:03.170Z"
-    },
-    "authorId": null,
-    "authorName": null,
-    "authorEmail": null,
-    "authorAvatar": null,
-    "createdAt": "2020-07-14T20:13:01.649Z",
-    "updatedAt": "2020-07-14T20:13:01.670Z",
-    "related": {}, // Related content type entity
-    "reports": [] // Reports issued against this comment
-}
-
-```
 
 ## 🕸️ Public REST API specification
+
+**Strapi Users vs. Generic authors**
+> Keep in mind that if you're using auth / authz your requests to setup proper user contexts it has got higher priority in order to take author data comparing to `author` property provided as part of your payload.
 
 ### Get Comments
 
@@ -267,21 +264,23 @@ Posts a Comment related to specified instance of Content Type like for example `
 *Generic (non Strapi User)*
 ```json
 {
-    "author": {
-        "id": "<any ID like value>",
-        "name": "Joe Doe",
-        "email": "jdoe@sample.com",
-        "avatar": "<any image url>"
-    },
+  "author": {
+      "id": "<any ID like value>",
+      "name": "Joe Doe",
+      "email": "jdoe@sample.com",
+      "avatar": "<any image url>"
+  },
 	"content": "My sample response",
 	"threadOf": 2, // id of comment we would like to start / continue the thread (Optional)
 }
 ```
 
 *Strapi user*
+
+> Author is taken directly from the request context
+
 ```json
 {
-	"authorUser": 1, // id of a author user. Optional in case of 'enableUsers: true' in the plugin configuration
 	"content": "My sample response",
 	"threadOf": 2, // id of comment we would like to start / continue the thread (Optional)
 }
@@ -314,17 +313,19 @@ Updates a specified Comment content based on it `commentId` and related to speci
 *Generic (non Strapi User)*
 ```json
 {
-    "author": {
-        "id": "<any ID like value>"
-    },
+  "author": {
+      "id": "<any ID like value>"
+  },
 	"content": "My sample response"
 }
 ```
 
 *Strapi user*
+
+> Author is taken directly from the request context
+
 ```json
 {
-	"authorUser": 1, // id of a author user. Optional in case of 'enableUsers: true' in the plugin configuration
 	"content": "My sample response"
 }
 ```
@@ -400,7 +401,11 @@ Reports abuse in specified Comment content based on it `commentId` and related t
 
 ## 🕸️ Public GraphQL specification
 
-> *To test all queries and understand the schemas use GraphQL Playground exposed by `@strapi/plugin-graphql` on `http://localhost:1337/graphql`*
+**Strapi Users vs. Generic authors**
+> Keep in mind that if you're using auth / authz your requests to setup proper user contexts it has got higher priority in order to take author data comparing to `author` property provided as part of your payload.
+
+**Testing**
+> To test all queries and understand the schemas use GraphQL Playground exposed by `@strapi/plugin-graphql` on `http://localhost:1337/graphql`
 
 ### Get Comments
 
@@ -518,7 +523,7 @@ mutation createComment {
       relation: "api::page.page:1"
       content: "Hello World!"
       threadOf: 3
-      author: { id: "12345678", name: "John Wick", email: "test@test.pl" }
+      author: { id: "12345678", name: "John Wick", email: "test@test.pl" } # Optional if using auth / authz requests
     }
   ) {
     id
@@ -567,7 +572,7 @@ mutation updateComment {
       id: 34
       relation: "api::page.page:1"
       content: "I've changed it!"
-      author: { id: "12345678" }
+      author: { id: "12345678" } # Optional if using auth / authz requests
     }
   ) {
     id
@@ -616,7 +621,11 @@ mutation updateComment {
 ```graphql
 mutation removeComment {
   removeComment(
-    input: { id: 33, relation: "api::page.page:1", author: { id: "12345678" } }
+    input: { 
+      id: 33, 
+      relation: "api::page.page:1", 
+      author: { id: "12345678" } # Optional if using auth / authz requests
+    }
   ) {
     id
     removed

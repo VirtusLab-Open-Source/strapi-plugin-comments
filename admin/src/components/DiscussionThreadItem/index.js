@@ -32,8 +32,7 @@ const DiscussionThreadItem = (props) => {
         blockedThread, 
         gotThread, 
         threadFirstItemId, 
-        authorUser, 
-        author } = props;
+        author = {} } = props;
 
     let background = 'neutral100';
     let borderColor = 'neutral200';
@@ -57,8 +56,7 @@ const DiscussionThreadItem = (props) => {
         StyledComponent = DiscussionThreadItemRoot;
     }
 
-    const avatar = author?.avatar || authorUser?.avatar;
-    const name = author?.name || `${authorUser?.firstName} ${authorUser?.lastName}`;
+    const { name, avatar } = author;
     const isBlocked = blocked || blockedThread;
     
     return (<StyledComponent as="li">

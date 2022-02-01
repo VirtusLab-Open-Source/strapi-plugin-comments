@@ -3,7 +3,6 @@ const typesFactories = [
 	require('./comment'),
 	require('./comment-nested'),
 	require('./comment-author'),
-	require('./comment-author-user'),
 	require('./create-comment'),
 	require('./create-comment-author'),
 	require('./update-comment'),

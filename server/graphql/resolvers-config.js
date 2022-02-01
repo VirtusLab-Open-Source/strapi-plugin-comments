@@ -1,10 +1,15 @@
 'use strict'
 
-module.exports = ({ }) => ({
-	'Query.findAllFlat': { auth: false },
-	'Query.findAllInHierarchy': { auth: false },
-	'Mutation.createComment': { auth: false },
-	'Mutation.updateComment': { auth: false },
-	'Mutation.removeComment': { auth: false },
-	'Mutation.createAbuseReport': { auth: false },
-});
+const { getPluginService } = require("../utils/functions");
+
+module.exports = () => {
+	const auth = getPluginService('common').getConfig('gql.auth', false);
+	return {
+		'Query.findAllFlat': { auth },
+		'Query.findAllInHierarchy': { auth },
+		'Mutation.createComment': { auth },
+		'Mutation.updateComment': { auth },
+		'Mutation.removeComment': { auth },
+		'Mutation.createAbuseReport': { auth },
+	};
+};

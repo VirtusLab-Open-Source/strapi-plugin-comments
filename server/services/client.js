@@ -9,7 +9,6 @@ const {
     getModelUid,
     getRelatedGroups,
     checkBadWords,
-    isValidUserContext,
     resolveUserContextError,
 } = require('./utils/functions');
 const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
@@ -49,7 +48,7 @@ module.exports = ({ strapi }) => ({
             id: threadOf,
             related: relation,
         }) : true;
-        const validContext = isValidUserContext(user);
+        const validContext = this.getCommonService().isValidUserContext(user);
 
         if (!linkToThread) {
             throw new PluginError(400, 'Thread does not exist');
@@ -60,7 +59,7 @@ module.exports = ({ strapi }) => ({
         }
 
         if (checkBadWords(content) && singleRelationFulfilled) {
-            const { author, ...rest } = data;
+            const { author = {}, ...rest } = data;
             let authorData = {};
             if (validContext && user) {
                 authorData = {
@@ -80,7 +79,7 @@ module.exports = ({ strapi }) => ({
             }
             
             if (!isEmpty(authorData) && !(authorData.authorId || authorData.authorUser)) {
-                throw new PluginError(400, 'Object: "author" is invalid. Check your payload');
+                throw new PluginError(400, `Not able to recognise author of a comment. Make sure you've provided "author" property in a payload or authenticated your request properly.`);
             }
 
             if (isApprovalFlowEnabled && 
@@ -114,14 +113,15 @@ module.exports = ({ strapi }) => ({
         const singleRelationFulfilled = relation && REGEX.relatedUid.test(relation)
 
         if(!singleRelationFulfilled) {
-            throw new PluginError(400, `Field "related" got incorrect format, use format like "api::<collection name>.<content type name>:<entity id>"`);
+            throw new PluginError(400, `Request property "relation" got incorrect format, use format like "api::<collection name>.<content type name>:<entity id>"`);
         }
 
         const existingEntity = await this.getCommonService().findOne({
             id,
             related: relation,
         });
-        const validContext = isValidUserContext(user);
+
+        const validContext = this.getCommonService().isValidUserContext(user);
 
         if (!validContext) {
             throw resolveUserContextError(user);
@@ -137,12 +137,12 @@ module.exports = ({ strapi }) => ({
                 return this.getCommonService().sanitizeCommentEntity(entity);
             }
         }
-        throw new PluginError(409, 'Action on that entity is not allowed');
+        throw new PluginError(403, `You're not allowed to take an action on that entity. Make sure you've provided "author" property in a payload or authenticated your request properly.`);
     },
 
     // Report abuse in comment
-	async reportAbuse(id, relation, payload, user) {
-        if (!isValidUserContext(user)) {
+	async reportAbuse(id, relation, payload, user = undefined) {
+        if (!this.getCommonService().isValidUserContext(user)) {
             throw resolveUserContextError(user);
         }
 		const reportAgainstEntity = await this.getCommonService().findOne({
@@ -172,18 +172,34 @@ module.exports = ({ strapi }) => ({
                 throw new PluginError(500, 'Report cannot be created');
             }
         }
-        throw new PluginError(409, 'Action on that entity is not allowed');
+        throw new PluginError(403, `You're not allowed to take an action on that entity. Make sure that comment exist or you've authenticated your request properly.`);
     },
 
-    async markAsRemoved(id, relation, authorId){
-        const entity = await this.getCommonService().findOne({
-            id,
-            related: relation,
-            $or: [{ authorUser: authorId }, { authorId }],
-        });
+    async markAsRemoved(id, relation, authorId, user = undefined){
+        if (!this.getCommonService().isValidUserContext(user)) {
+            throw resolveUserContextError(user);
+        }
 
-        if (!entity) {
-            throw new PluginError(404, 'Entity not exist');
+        const author = user?.id || authorId;
+
+        if (!author) {
+            throw new PluginError(403, `You're not allowed to take an action on that entity. Make sure that you've provided proper "authorId" or authenticated your request properly.`);
+        }
+
+        let entity;
+        try {
+            const byAuthor = user?.id ? {
+                authorUser: author
+            } : {
+                authorId: author
+            }
+            entity = await this.getCommonService().findOne({
+                id,
+                related: relation,
+                ...byAuthor,
+            });
+        } catch(e) {
+            throw new PluginError(404, `Entity does not exist or you're not allowed to take an action on it`);
         }
 
         const removedEntity = await strapi.db.query(getModelUid('comment'))
@@ -193,7 +209,7 @@ module.exports = ({ strapi }) => ({
                   related: relation
                 },
                 data: { removed: true },
-                populate: { threadOf: true },
+                populate: { threadOf: true, authorUser: true },
           })
         await this.markAsRemovedNested(id, true);
 

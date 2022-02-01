@@ -117,19 +117,24 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
             }
         };
 
-        const entity = await strapi.db.query(getModelUid('comment')).findOne({ 
-            where: {
-                id,
-            },
+        const defaultPopulate = {
             populate: {
                 authorUser: true,
                 threadOf: {
                     populate: { 
+                        authorUser: true,
                         ...reportsPopulation
                     },
                 },
                 ...reportsPopulation,
             },
+        }
+
+        const entity = await strapi.db.query(getModelUid('comment')).findOne({ 
+            where: {
+                id,
+            },
+            ...defaultPopulate,
         });
 
         if (!entity){
@@ -159,9 +164,7 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
                     threadOf: levelThreadId,
                     related: entity.related,
                 },
-                populate: {
-                    ...reportsPopulation,
-                },
+                ...defaultPopulate,
                 startingFromId: levelThreadId,
                 isAdmin: true
             }, false);

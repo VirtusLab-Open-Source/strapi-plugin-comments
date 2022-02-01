@@ -1,6 +1,6 @@
 'use strict';
 
-const { isArray, isNumber, isObject, first, parseInt } = require('lodash');
+const { isArray, isNumber, isObject, isNil, first, parseInt } = require('lodash');
 // const { sanitizeEntity } = require('strapi-utils');
 const PluginError = require('./../utils/error');
 const {
@@ -158,15 +158,16 @@ module.exports = ({ strapi }) => ({
         }
     },
 
-    sanitizeCommentEntity: (entity) => ({
-        ...buildAuthorModel({
-            ...entity,
-            threadOf: isObject(entity.threadOf) ? buildAuthorModel(entity.threadOf) : entity.threadOf,
-        }),
-	}),
+    sanitizeCommentEntity(entity) {
+        return {
+            ...buildAuthorModel({
+                ...entity,
+                threadOf: isObject(entity.threadOf) ? buildAuthorModel(entity.threadOf) : entity.threadOf,
+            }),
+        };
+    },
 
-    // sanitizeCommentEntity: (entity) => ({
-    //     ...entity,
-    //     authorUser: sanitizeEntity(entity.authorUser, { model: strapi.plugins['users-permissions'].models.user }),
-	// }),
+    isValidUserContext(user) {
+        return user ? !isNil(user?.id) : true;
+    },
 });

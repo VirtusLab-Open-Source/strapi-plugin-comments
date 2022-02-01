@@ -10,11 +10,16 @@ module.exports = ({ nexus }) => {
 		args: {
 			input: nonNull('UpdateComment'),
 		},
-		async resolve(obj, args) {
+		async resolve(obj, args, ctx) {
 			const { input } = args;
+			const { state: { user } = {} } = ctx;
 			const { id, relation, ...body } = input;
-			return await getPluginService('client')
-				.update(id, relation, body);
+			try {
+				return await getPluginService('client')
+					.update(id, relation, body, user);
+			} catch(e) {
+				throw new Error(e);
+			}
 		},
 	};
 }

@@ -82,14 +82,19 @@ module.exports = {
   },
 
   async removeComment(ctx) {
-    const { params: { relationId, commentId }, query: { authorId } } = ctx;
-    if (authorId) {
+    const { 
+      params: { relationId, commentId }, 
+      query: { authorId },
+      state: { user },
+    } = ctx;
+    if (authorId || user?.id) {
       try {
         return await this.getService()
           .markAsRemoved(
             commentId,
             relationId,
             authorId,
+            user
           );
       } catch (e) {
         if (!e.isBoom) {

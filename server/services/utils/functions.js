@@ -1,7 +1,7 @@
 const BadWordsFilter = require('bad-words');
 const PluginError = require('./../../utils/error');
 const { REGEX } = require('./../../utils/constants')
-const { first, get, isObject, isNil } = require('lodash');
+const { first, get, isObject, isEmpty } = require('lodash');
 
 const buildNestedStructure = (
   entities,
@@ -33,7 +33,7 @@ const buildNestedStructure = (
 
 module.exports = {
     isEqualEntity: (existing, data, user) => {
-        const { authorUser, author: existingAuthor } = existing;
+        const { author: existingAuthor } = existing;
         const { author } = data;
 
         // Disallow approval status change by Client
@@ -42,10 +42,10 @@ module.exports = {
         }
 
         // Make sure that author is exact the same
-        if (authorUser) {
-            const existingUserId = authorUser?.id || authorUser;
-            const receivedUserId = user?.id || author;
-            return existingUserId === receivedUserId;
+        if (user) {
+            const existingUserId = existingAuthor?.id || existingAuthor;
+            const receivedUserId = user?.id || author?.id;
+            return receivedUserId && (existingUserId === receivedUserId);
         }
         return existingAuthor.id === author?.id;
     },
@@ -85,14 +85,9 @@ module.exports = {
 
     buildNestedStructure,
 
-    isValidUserContext: (user = {}) => {
-		const builtInContextEnabled = get(strapi.config, 'plugins.comments.enableUsers', false);
-        return builtInContextEnabled ? !isNil(user.id) : true;
-    },
-
     buildAuthorModel: (item) => {
         const { authorUser, authorId, authorName, authorEmail, authorAvatar, ...rest } = item;
-        let author;
+        let author = {};
         if (authorUser) {
             author = {
                 id: authorUser.id,
@@ -100,7 +95,7 @@ module.exports = {
                 email: authorUser.email,
                 avatar: authorUser.avatar,
             };
-        } else {
+        } else if(authorId) {
             author = {
                 id: authorId,
                 name: authorName,
@@ -110,7 +105,7 @@ module.exports = {
         }
         return {
             ...rest,
-            author,
+            author: isEmpty(author) ? undefined : author,
         };
     },
 

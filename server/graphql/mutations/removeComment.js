@@ -10,11 +10,16 @@ module.exports = ({ nexus }) => {
 		args: {
 			input: nonNull('RemoveComment'),
 		},
-		async resolve(obj, args) {
+		async resolve(obj, args, ctx) {
 			const { input } = args;
+			const { state: { user } = {} } = ctx;
 			const { id, relation, author } = input;
-			return await getPluginService('client')
-				.markAsRemoved(id, relation, author?.id);
+			try {
+				return await getPluginService('client')
+					.markAsRemoved(id, relation, author?.id, user);
+			} catch(e) {
+				throw new Error(e);
+			}
 		},
 	};
 }

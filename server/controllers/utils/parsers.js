@@ -9,7 +9,9 @@ module.exports = {
               related: relation,
             },
             populate: {
-              threadOf: true,
+              threadOf: {
+                populate: { authorUser: true },
+              },
             },
           };
     },

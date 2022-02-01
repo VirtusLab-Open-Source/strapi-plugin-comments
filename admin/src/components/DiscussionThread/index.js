@@ -37,7 +37,7 @@ const DiscussionThread = ({ level = [], selected = {}, allowedActions, isReloadi
             { rootThread && (<DiscussionThreadItem {...rootThread} allowedActions={allowedActions} isThreadAuthor root pinned />) }
             { level.map(item => {
                 const isSelected = selected.id === item.id;
-                const isThreadAuthor = !isNil(selected?.threadOf?.authorId) && (selected?.threadOf?.authorId === item.authorId);
+                const isThreadAuthor = !isNil(selected?.threadOf?.author?.id) && (selected?.threadOf?.author?.id === item?.author?.id);
                 return (<DiscussionThreadItem 
                     key={`comment-${item.id}`}
                     {...item} 

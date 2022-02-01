@@ -10,11 +10,16 @@ module.exports = ({ nexus }) => {
 		args: {
 			input: nonNull('CreateReport'),
 		},
-		async resolve(obj, args) {
+		async resolve(obj, args, ctx) {
 			const { input } = args;
+			const { state: { user } = {} } = ctx;
 			const { commentId, relation, ...body } = input;
-			return await getPluginService('client')
-				.reportAbuse(commentId, relation, body);
+			try {
+				return await getPluginService('client')
+					.reportAbuse(commentId, relation, body, user);
+			} catch(e) {
+				throw new Error(e);
+			}
 		},
 	};
 }
