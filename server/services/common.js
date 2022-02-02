@@ -2,7 +2,6 @@
 
 const BadWordsFilter = require('bad-words');
 const { isArray, isNumber, isObject, isNil, first, parseInt } = require('lodash');
-// const { sanitizeEntity } = require('strapi-utils');
 const PluginError = require('./../utils/error');
 const {
     getModelUid,
@@ -23,7 +22,8 @@ module.exports = ({ strapi }) => ({
         if (prop && isArray(prop)) {
             queryProp = prop.join('.');
         }
-        return strapi.config.get(`plugin.comments${ queryProp ? '.' + queryProp : ''}`) || defaultValue;
+        const result = strapi.config.get(`plugin.comments${ queryProp ? '.' + queryProp : ''}`);
+        return isNil(result) ? defaultValue : result;
     },
 
     // Find comments in the flat structure
