@@ -8,7 +8,6 @@
  import { useIntl } from 'react-intl';
  import PropTypes from 'prop-types';
  import { isEmpty } from 'lodash';
- import { Button } from '@strapi/design-system/Button'; 
  import { BaseCheckbox } from '@strapi/design-system/BaseCheckbox'; 
  import { Flex } from '@strapi/design-system/Flex'; 
  import { Table, Thead, Tbody, TFooter, Tr, Th, Td } from '@strapi/design-system/Table'; 
@@ -19,6 +18,7 @@ import { useOverlayBlocker } from '@strapi/helper-plugin';
 import { getMessage } from '../../utils';
 import { REPORT_REASON, REPORT_STATUS } from '../../utils/constants';
 import StatusBadge from '../StatusBadge';
+import { ActionButton } from '../ActionButton/styles';
 
 const ReportsReviewTable = ({ 
     commentId,
@@ -129,7 +129,13 @@ const ReportsReviewTable = ({
                 </Td>
                 { canReviewReports && (<Td>
                     { !entry.resolved && (<Flex direction="column" alignItems="flex-end">
-                          <Button onClick={() => handleClickResolve(entry.id)} startIcon={<Check />} variant="success">{ getMessage('page.details.panel.discussion.warnings.reports.dialog.actions.resolve', 'resolve') }</Button>
+                          <ActionButton 
+                            isSingle
+                            onClick={() => handleClickResolve(entry.id)} 
+                            startIcon={<Check />} 
+                            variant="success">
+                            { getMessage('page.details.panel.discussion.warnings.reports.dialog.actions.resolve', 'resolve') }
+                          </ActionButton>
                       </Flex>) }
                 </Td>)}
               </Tr>)}
