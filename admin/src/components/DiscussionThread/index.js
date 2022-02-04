@@ -8,7 +8,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { isNil } from 'lodash';
 import { Box } from '@strapi/design-system/Box';
-import { Divider } from '@strapi/design-system/Divider';
 import { Flex } from '@strapi/design-system/Flex';
 import { Link } from '@strapi/design-system/Link';
 import { Typography } from '@strapi/design-system/Typography';
@@ -22,17 +21,14 @@ const DiscussionThread = ({ level = [], selected = {}, allowedActions, isReloadi
     const rootThread = selected?.threadOf;
     return (<LoadingIndicatorContainer as={Box} padding={4}>
         { isReloading && <LoadingIndicatorOverlay />}
-        <Flex as={Box} direction="row" justifyContent="space-between">
-            <Typography variant="sigma" textColor="neutral600" id="entity-details">
+        <Flex as={Box} direction="row" justifyContent="space-between" marginBottom={2}>
+            <Typography variant="delta" textColor="neutral800" id="discussion-thread">
                 { getMessage('page.details.panel.discussion', 'Discussion') }
             </Typography>
             { rootThread && (<Link to={getUrl(`discover/${rootThread.id}`)} startIcon={<ArrowUp />}>
                         { getMessage('page.details.panel.discussion.nav.back') }
                     </Link>) }
         </Flex>
-        <Box paddingTop={2} paddingBottom={6}>
-            <Divider />
-        </Box>
         <Flex as="ul" direction="column" alignItems="flex-start">
             { rootThread && (<DiscussionThreadItem {...rootThread} allowedActions={allowedActions} isThreadAuthor root pinned />) }
             { level.map(item => {

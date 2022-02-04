@@ -7,24 +7,42 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation, useQueryClient } from 'react-query';
+import { useHistory } from 'react-router-dom';
 import { isNil, isEmpty } from 'lodash';
-import { Button } from '@strapi/design-system/Button';
 import { Flex } from '@strapi/design-system/Flex';
 import { IconButton } from '@strapi/design-system/IconButton';
 import { useNotification, useOverlayBlocker } from '@strapi/helper-plugin';
-import { getMessage, handleAPIError, resolveCommentStatus, resolveCommentStatusColor } from '../../utils';
-import { DiscussionThreadItemActionsBadge, DiscussionThreadItemActionsWrapper } from './styles';
+import { Eye } from '@strapi/icons';
+import { getMessage, getUrl, handleAPIError, resolveCommentStatus, resolveCommentStatusColor } from '../../utils';
+import { DiscussionThreadItemActionsWrapper } from './styles';
 import ConfirmationDialog from '../ConfirmationDialog';
 import { blockItem, blockItemThread, unblockItem, unblockItemThread } from '../../pages/utils/api';
 import pluginId from '../../pluginId';
 import { LockIcon, UnlockIcon } from '../icons';
 import DiscussionThreadItemApprovalFlowActions from '../DiscussionThreadItemApprovalFlowActions';
+import StatusBadge from '../StatusBadge';
+import { IconButtonGroupStyled } from '../IconButton/styles';
+import { ActionButton } from '../ActionButton/styles';
+import DiscussionThreadItemReviewAction from '../DiscussionThreadItemReviewAction';
 
-const DiscussionThreadItemActions = ({ id, blocked, removed, blockedThread, gotThread, pinned, reports = [], approvalStatus, root, allowedActions: { canModerate, canAccessReports, canReviewReports } }) => {
+const DiscussionThreadItemActions = ({ allowedActions: { canModerate, canAccessReports, canReviewReports }, ...item }) => {
+    const { id, 
+        blocked, 
+        removed, 
+        blockedThread, 
+        gotThread, 
+        threadItemsCount,
+        threadFirstItemId,
+        pinned, 
+        preview,
+        reports = [], 
+        approvalStatus } = item;
 
     const [blockConfirmationVisible, setBlockConfirmationVisible] = useState(false);
     const [blockThreadConfirmationVisible, setBlockThreadConfirmationVisible] = useState(false);
+    const [blockButtonsDisabled, setBlockButtonsDisabled] = useState(blockedThread);
 
+    const { push } = useHistory();
     const toggleNotification = useNotification();
     const queryClient = useQueryClient();
     const { lockApp, unlockApp } = useOverlayBlocker();
@@ -75,17 +93,20 @@ const DiscussionThreadItemActions = ({ id, blocked, removed, blockedThread, gotT
     const openReports = reports?.filter(_ => !_.resolved);
     const hasReports = !isEmpty(openReports);
     const reviewFlowEnabled = (canAccessReports || canReviewReports) && hasReports;
+    const hasActiveThread = gotThread && !(removed || preview || pinned || blockedThread);
+    const isStatusBadgeVisible = isBlocked || reviewFlowEnabled;
 
-    const resolveStatusBadge = () => {
-        const status = resolveCommentStatus({ removed, blocked, blockedThread, approvalStatus, reviewFlowEnabled: !isBlocked && reviewFlowEnabled });
-        return {
-            badgeVisible: isBlocked || gotApprovalFlow || removed,
-            badgeColor: resolveCommentStatusColor(status),
-            badgeLabel: status,
-        };
-    };
-
-    const {badgeVisible, badgeColor, badgeLabel } = resolveStatusBadge();
+    const renderStatus = (props) => {
+        const status = resolveCommentStatus({ ...props, reviewFlowEnabled });
+        const color = resolveCommentStatusColor(status);
+   
+        return (<StatusBadge backgroundColor={`${color}100`} textColor={`${color}700`} color={color}>{ getMessage({
+            id: `page.common.item.status.${status}`,
+            props: {
+                count: openReports.length
+            }
+        }, status) }</StatusBadge>);
+      };
 
     const handleBlockClick = () => setBlockConfirmationVisible(true);
     const handleBlockConfirm = async () => {
@@ -121,36 +142,57 @@ const DiscussionThreadItemActions = ({ id, blocked, removed, blockedThread, gotT
         }
     };
 
+    const handleDrilldownClick = () => {
+        if (hasActiveThread) {
+            push(getUrl(`discover/${threadFirstItemId}`));
+        }
+    };
+
+    const handleBlockActionClick = async (mutation, onCallback) => {
+        lockApp();
+        await mutation.mutateAsync(id);
+        onCallback();
+    };
+
+    const handleBlockButtonsStateChange = disabled => setBlockButtonsDisabled(disabled);
+
+    const anyGroupButtonsVisible = needsApproval || reviewFlowEnabled || !blockedThread;
+    const isLoading = unblockItemMutation.isLoading || blockItemMutation.isLoading || blockItemThreadMutation.isLoading || unblockItemThreadMutation.isLoading;
+
     if (removed || isRejected || !canModerate) {
         return (<DiscussionThreadItemActionsWrapper as={Flex} direction="row">
-            <DiscussionThreadItemActionsBadge 
-                color={badgeColor} 
-                backgroundColor={`${badgeColor}100`} 
-                textColor={`${badgeColor}600`}>
-                    { getMessage({
-                        id: `page.common.item.status.${badgeLabel}`,
-                        props: { count: openReports.length },
-                    }, badgeLabel)}
-            </DiscussionThreadItemActionsBadge>
+            { renderStatus(item) }
         </DiscussionThreadItemActionsWrapper>);
     }
 
     return (<>
         <DiscussionThreadItemActionsWrapper as={Flex} direction="row">
-            { badgeVisible && (<DiscussionThreadItemActionsBadge 
-                color={badgeColor} 
-                backgroundColor={`${badgeColor}100`} 
-                textColor={`${badgeColor}600`}>
-                    { getMessage({
-                        id: `page.common.item.status.${badgeLabel}`,
-                        props: { count: openReports.length },
-                    }, badgeLabel)}
-            </DiscussionThreadItemActionsBadge>)}
-            { !blockedThread && !(blocked || needsApproval) && (<IconButton onClick={handleBlockClick} loading={blockItemMutation.isLoading} icon={<LockIcon />} label={getMessage('page.details.actions.comment.block', 'Block')} style={(!blockedThread && root) ? { marginTop: '1px', marginRight: '.5rem' } : {}} />)}
-            { !blockedThread && blocked && (<IconButton onClick={handleUnblockClick} loading={unblockItemMutation.isLoading} icon={<UnlockIcon />} label={getMessage('page.details.actions.comment.unblock', 'Unblock')}  style={(blocked && !blockedThread) ? { marginTop: '1px', marginRight: '.5rem' } : {}} />)}
-            { (!blockedThread && (gotThread || pinned)) && (<Button onClick={handleBlockThreadClick} startIcon={<LockIcon />} loading={blockItemThreadMutation.isLoading} variant="danger">{ getMessage('page.details.actions.thread.block', 'Block thread') }</Button>) }
-            { (blockedThread && (gotThread || pinned)) && (<Button onClick={handleUnblockThreadClick} startIcon={<UnlockIcon />} loading={unblockItemThreadMutation.isLoading} variant="success">{ getMessage('page.details.actions.thread.unblock', 'Unblock thread') }</Button>) }
-            { needsApproval && (<DiscussionThreadItemApprovalFlowActions id={id} allowedActions={{ canModerate }} queryToInvalidate="get-details-data" />) }
+            { isStatusBadgeVisible && (renderStatus(item))}
+            { (!blockedThread && (gotThread || pinned)) && (<ActionButton onClick={handleBlockThreadClick} startIcon={<LockIcon />} loading={blockItemThreadMutation.isLoading} variant="danger">{ getMessage('page.details.actions.thread.block', 'Block thread') }</ActionButton>) }
+            { (blockedThread && (gotThread || pinned)) && (<ActionButton onClick={handleUnblockThreadClick} startIcon={<UnlockIcon />} loading={unblockItemThreadMutation.isLoading} variant="success">{ getMessage('page.details.actions.thread.unblock', 'Unblock thread') }</ActionButton>) }
+            { anyGroupButtonsVisible && (<IconButtonGroupStyled isSingle withMargin>
+                { !blockedThread && !(blocked || needsApproval) && (<IconButton onClick={handleBlockClick} loading={blockItemMutation.isLoading} icon={<LockIcon />} label={getMessage('page.details.actions.comment.block', 'Block')} />)}
+                { !blockedThread && blocked && (<IconButton onClick={handleUnblockClick} loading={unblockItemMutation.isLoading} icon={<UnlockIcon />} label={getMessage('page.details.actions.comment.unblock', 'Unblock')} />)}
+                { needsApproval && (<DiscussionThreadItemApprovalFlowActions id={id} allowedActions={{ canModerate }} queryToInvalidate="get-details-data" />) }
+                <DiscussionThreadItemReviewAction
+                    item={item}
+                    queryToInvalidate="get-details-data"
+                    areBlockButtonsDisabled={blockButtonsDisabled}
+                    isLoading={isLoading}
+                    allowedActions={{ canModerate, canAccessReports, canReviewReports }}
+                    blockItemMutation={blockItemMutation}
+                    blockItemThreadMutation={blockItemThreadMutation}
+                    onBlockButtonsStateChange={handleBlockButtonsStateChange}
+                    onBlockActionClick={handleBlockActionClick}
+                />
+            </IconButtonGroupStyled>)}
+            { hasActiveThread && (<IconButtonGroupStyled isSingle withMargin>
+                <IconButton 
+                    onClick={handleDrilldownClick} 
+                    icon={<Eye />} 
+                    label={getMessage('page.details.panel.discussion.nav.drilldown', 'Drilldown thread')}  
+                    style={(blocked && !blockedThread) ? { marginTop: '1px', marginRight: '.5rem' } : {}} />
+            </IconButtonGroupStyled>) }
         </DiscussionThreadItemActionsWrapper>
         { !blocked && (<ConfirmationDialog 
             isVisible={blockConfirmationVisible}
@@ -162,7 +204,7 @@ const DiscussionThreadItemActions = ({ id, blocked, removed, blockedThread, gotT
             onCancel={handleBlockCancel}>
                 { getMessage('page.details.actions.comment.block.confirmation.description') }
         </ConfirmationDialog>) }
-        { (!blockedThread && root) && (<ConfirmationDialog 
+        { !blockedThread && (<ConfirmationDialog 
             isVisible={blockThreadConfirmationVisible}
             isActionAsync={blockItemThreadMutation.isLoading}
             header={getMessage('page.details.actions.thread.block.confirmation.header')}

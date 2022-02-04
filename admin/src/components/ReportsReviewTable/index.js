@@ -8,7 +8,6 @@
  import { useIntl } from 'react-intl';
  import PropTypes from 'prop-types';
  import { isEmpty } from 'lodash';
- import { Badge } from '@strapi/design-system/Badge'; 
  import { Button } from '@strapi/design-system/Button'; 
  import { BaseCheckbox } from '@strapi/design-system/BaseCheckbox'; 
  import { Flex } from '@strapi/design-system/Flex'; 
@@ -19,6 +18,7 @@
 import { useOverlayBlocker } from '@strapi/helper-plugin';
 import { getMessage } from '../../utils';
 import { REPORT_REASON, REPORT_STATUS } from '../../utils/constants';
+import StatusBadge from '../StatusBadge';
 
 const ReportsReviewTable = ({ 
     commentId,
@@ -43,7 +43,7 @@ const ReportsReviewTable = ({
             case REPORT_STATUS.OPEN:
                 color = 'danger';
         };
-        return (<Badge backgroundColor={`${color}100`} textColor={`${color}600`}>{ getMessage(`page.details.panel.discussion.warnings.reports.dialog.status.${status}`, status) }</Badge>);
+        return (<StatusBadge backgroundColor={`${color}100`} textColor={`${color}600`} color={color}>{ getMessage(`page.details.panel.discussion.warnings.reports.dialog.status.${status}`, status) }</StatusBadge>);
     };
 
     const renderReason = reason => {
@@ -55,7 +55,7 @@ const ReportsReviewTable = ({
             case REPORT_REASON.BAD_LANGUAGE:
                 color = 'warning';
         };
-        return (<Badge backgroundColor={`${color}100`} textColor={`${color}600`}>{ getMessage(`page.details.panel.discussion.warnings.reports.dialog.reason.${reason}`, reason) }</Badge>);
+        return (<StatusBadge backgroundColor={`${color}100`} textColor={`${color}600`}  color={color}>{ getMessage(`page.details.panel.discussion.warnings.reports.dialog.reason.${reason}`, reason) }</StatusBadge>);
     };
 
     const handleClickResolve = async (reportId) => {
@@ -125,7 +125,7 @@ const ReportsReviewTable = ({
                   <Typography textColor="neutral800">{ formatDate(entry.createdAt, { dateStyle: 'short', timeStyle: 'short' }) }</Typography>
                 </Td>
                 <Td>
-                  <Typography textColor="neutral800">{ renderStatus(entry.resolved) }</Typography>
+                  { renderStatus(entry.resolved) }
                 </Td>
                 { canReviewReports && (<Td>
                     { !entry.resolved && (<Flex direction="column" alignItems="flex-end">

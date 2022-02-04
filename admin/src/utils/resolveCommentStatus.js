@@ -4,10 +4,6 @@ import { COMMENT_STATUS } from './constants';
 const resolveCommentStatus = ({ removed, blocked, blockedThread, approvalStatus, reviewFlowEnabled }) => {
     const gotApprovalFlow = !isNil(approvalStatus);
 
-    if (reviewFlowEnabled) {
-        return COMMENT_STATUS.TO_REVIEW;
-    }
-
     if (removed) {
         return COMMENT_STATUS.REMOVED;
     } 
@@ -15,6 +11,10 @@ const resolveCommentStatus = ({ removed, blocked, blockedThread, approvalStatus,
     if (blocked || blockedThread) {
         return COMMENT_STATUS.BLOCKED;
     } 
+
+    if (reviewFlowEnabled) {
+        return COMMENT_STATUS.TO_REVIEW;
+    }
     
     if (gotApprovalFlow) {
         const status = approvalStatus.toUpperCase();

@@ -661,15 +661,15 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@strapi/plugin-graphql@^4.0.6":
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.0.6.tgz#7d3911466bb59cb12d23cf8c3880d082b61a5e70"
-  integrity sha512-Y8SXybtz1yLOr4nOeUp2lLD7hAsaTW4K4/3e7MIlv0bAIjGdodcMVJhqlhsF4B/PTkA+rM4c2OttnOOG2miFCw==
+"@strapi/plugin-graphql@^4.0.7":
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.0.7.tgz#f1f92bd5be7577bb679e2f9c6784658315101c8f"
+  integrity sha512-xqmlkbuwQu2VjsmISjcFghdN67qH+OWuVZ/DZL0ZFimNRjkCnqhFCTPGsEF71c03YcaHeaPG1PEfOro+oOkzEw==
   dependencies:
     "@apollo/federation" "^0.28.0"
     "@graphql-tools/schema" "8.1.2"
     "@graphql-tools/utils" "^8.0.2"
-    "@strapi/utils" "4.0.6"
+    "@strapi/utils" "4.0.7"
     apollo-server-core "3.1.2"
     apollo-server-koa "3.1.2"
     glob "^7.1.7"
@@ -686,10 +686,10 @@
     pluralize "^8.0.0"
     subscriptions-transport-ws "0.9.19"
 
-"@strapi/utils@4.0.6", "@strapi/utils@^4.0.6":
-  version "4.0.6"
-  resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.0.6.tgz#768ee569dcb4f397fb7769f9ba11395f80970eb4"
-  integrity sha512-8DlZ7tAm9LC5nFi5mAajhLh8OCodE2nKXkIMgom6Nr4GC423anVoOEmYpv+cUkdfO8hohrnnIG+RzJMgDBfGCg==
+"@strapi/utils@4.0.7", "@strapi/utils@^4.0.7":
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.0.7.tgz#718823fcf23c028a65ce8c317a36cc6d7321eb0c"
+  integrity sha512-coGjVudsnlXvb20mobyeoguCfXKnLjXnKhYiMoS6wqy4ozazu12+5MsCh7Hs9UAkvK4Fzhf7+urvyoj/UpSkaQ==
   dependencies:
     "@sindresorhus/slugify" "1.1.0"
     date-fns "2.24.0"

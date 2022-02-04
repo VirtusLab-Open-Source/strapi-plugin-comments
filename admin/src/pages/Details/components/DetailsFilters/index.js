@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { Box } from '@strapi/design-system/Box'; 
 import { Flex } from '@strapi/design-system/Flex'; 
 import { Stack } from '@strapi/design-system/Stack';
-import { Switch } from '@strapi/design-system/Switch';
-import { Typography } from '@strapi/design-system/Typography'; 
+import { Checkbox } from '@strapi/design-system/Checkbox';
 import { getMessage } from '../../../../utils';
 
 const DetailsFilters = ({ data, onChange }) => {
@@ -17,14 +16,13 @@ const DetailsFilters = ({ data, onChange }) => {
     });
 
     return (<Box as={Flex}>
-        <Stack size={2} horizontal>
-            <Typography variant="epsilon">{getMessage('page.details.filters.label', '')}</Typography>
-            <Switch 
-                label={getMessage('page.details.filters.removed.label', 'Comments visibility')} 
-                onLabel={getMessage('page.details.filters.removed.show', 'Show')} 
-                offLabel={getMessage('page.details.filters.removed.hide', 'Hide')}
-                selected={removed} onChange={() => handleOnChange('removed', !removed)} 
-                visibleLabels />
+        <Stack size={2} vertical>
+            <Checkbox 
+                checked={removed} 
+                onChange={() => handleOnChange('removed', !removed)} 
+                visibleLabels>
+                    { getMessage('page.details.filters.removed.label', 'Show removed comments') }
+                </Checkbox>
         </Stack>
     </Box>);
 };

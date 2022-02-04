@@ -24,7 +24,7 @@ const ReportsReviewModal = ({
             <Typography fontWeight="bold" textColor="neutral800" as="h2" id="title">{ getMessage('page.details.panel.discussion.warnings.reports.dialog.header', 'Open reports') }</Typography>
         </ModalHeader>
         <ModalBody>
-            <DiscussionThreadItem {...item} root preview isSelected={false} />
+            <DiscussionThreadItem as="div" {...item} root preview isSelected={true} />
             { children }
         </ModalBody>
         <ModalFooter variant="tertiary" startActions={startActions} endActions={endActions} />

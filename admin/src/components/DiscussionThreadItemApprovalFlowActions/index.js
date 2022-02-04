@@ -11,7 +11,6 @@ import { IconButton } from '@strapi/design-system/IconButton';
 import { Check, Cross } from '@strapi/icons';
 import { useNotification, useOverlayBlocker } from '@strapi/helper-plugin';
 import { getMessage, handleAPIError } from '../../utils';
-import { DiscussionThreadItemActionsGroupWrapper } from './styles';
 import { approveItem, rejectItem } from '../../pages/utils/api';
 import pluginId from '../../pluginId';
 
@@ -60,10 +59,10 @@ const DiscussionThreadItemApprovalFlowActions = ({ id, allowedActions: { canMode
     };
 
     if (canModerate) {
-        return (<DiscussionThreadItemActionsGroupWrapper>
+        return (<>
             <IconButton icon={<Check />} label={getMessage('page.details.actions.comment.approve', 'Approve')} onClick={handleApproveClick} />
             <IconButton icon={<Cross />} label={getMessage('page.details.actions.comment.reject', 'Reject')} onClick={handleRejectClick} />
-        </DiscussionThreadItemActionsGroupWrapper>);
+        </>);
         }
     return null;
 };

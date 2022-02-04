@@ -1,90 +1,47 @@
 /**
  *
- * Entity Details
+ * Discussion thread - Item
  *
  */
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Avatar, Initials } from '@strapi/design-system/Avatar';
 import { Box } from '@strapi/design-system/Box';
-import { Divider } from '@strapi/design-system/Divider';
 import { Flex } from '@strapi/design-system/Flex';
-import { Link } from '@strapi/design-system/Link';
 import { Typography } from '@strapi/design-system/Typography';
-import { ArrowRight } from '@strapi/icons';
-import DiscussionThreadItemMeta from '../DiscussionThreadItemMeta';
-import { AvatarWrapper, DiscussionThreadItemBox, DiscussionThreadItemBoxContent, DiscussionThreadItemContent, DiscussionThreadItemLeft, DiscussionThreadItemLinkBox, DiscussionThreadItemRight, DiscussionThreadItemRoot } from './styles';
+import DiscussionThreadItemFooter from '../DiscussionThreadItemFooter';
 import DiscussionThreadItemActions from '../DiscussionThreadItemActions';
-import { getMessage, getUrl, renderInitials } from '../../utils';
-import DiscussionThreadItemWarnings from '../DiscussionThreadItemWarnings';
+import { DiscussionThreadItemContainer, DiscussionThreadFullsize, DiscussionThreadItemContent } from './styles';
 
 const DiscussionThreadItem = (props) => {
     const { 
+        as = "li",
         isSelected, 
-        isThreadAuthor, 
         content, 
         root, 
         preview, 
-        pinned, 
-        blocked, 
-        removed, 
-        blockedThread, 
-        gotThread, 
-        threadFirstItemId, 
-        author = {} } = props;
-
-    let background = 'neutral100';
-    let borderColor = 'neutral200';
-    let dividerColor = 'neutral200';
-    let StyledComponent = DiscussionThreadItemRight;
-
-    if(isThreadAuthor || root){
-        StyledComponent = DiscussionThreadItemLeft;
-        borderColor = 'neutral100';
-        dividerColor = 'neutral100';
-        background = null;
-    } 
+        pinned } = props;
     
-    if (isSelected) {
-        background = 'secondary100'
-        borderColor = 'secondary500';
-        dividerColor = 'secondary200';
-    }
-
-    if (root) {
-        StyledComponent = DiscussionThreadItemRoot;
-    }
-
-    const { name, avatar } = author;
-    const isBlocked = blocked || blockedThread;
-    
-    return (<StyledComponent as="li">
-        <DiscussionThreadItemContent as={Flex} direction="row">
-            <AvatarWrapper>
-                { avatar ? <Avatar src={avatar} alt={name} /> : <Initials>{ renderInitials(name) }</Initials> }
-            </AvatarWrapper>
-            <DiscussionThreadItemBox hasRadius shadow="filterShadow" borderColor={borderColor} background={background} padding={2}>
-                <Flex as={Box} paddingBottom={2} direction="column">
-                    <DiscussionThreadItemBoxContent as={Flex} direction="row">
-                        <Box as={Flex} grow={1} alignItems="center">
-                            <Typography variant="omega">{ content }</Typography>
-                        </Box>
-                        { !preview && (<DiscussionThreadItemActions { ...props } root={root || pinned} />) }
-                    </DiscussionThreadItemBoxContent>
-                    { !(preview || isBlocked || removed) && (<DiscussionThreadItemWarnings { ...props } gotThread={gotThread || root} />) }
-                </Flex>
-                <Divider background={dividerColor} />
-                <DiscussionThreadItemMeta { ...props } />
-            </DiscussionThreadItemBox>
-        </DiscussionThreadItemContent>
-
-        { (gotThread && !(removed || preview || pinned)) && (<DiscussionThreadItemLinkBox direction="column" alignItems="flex-end">
-            <Link to={getUrl(`discover/${threadFirstItemId}`)} endIcon={<ArrowRight />}>
-                { getMessage('page.details.panel.discussion.nav.drilldown') }
-            </Link>
-        </DiscussionThreadItemLinkBox>) }
-    </StyledComponent>);
+    return (<DiscussionThreadFullsize as={as} marginBottom={preview ? 4 : 0}>
+        <DiscussionThreadItemContainer 
+            as={Flex} 
+            direction="column" 
+            alignItems="flex-start" 
+            hasRadius 
+            background={isSelected ? 'neutral100' : null} 
+            paddingLeft={2} paddingRight={2} paddingTop={4} paddingBottom={4}>
+            <DiscussionThreadItemContent 
+                as={Flex} 
+                paddingBottom={2} 
+                direction="row">
+                <Box as={Flex} grow={1} alignItems="center" marginTop="6px">
+                    <Typography variant="omega" textColor="neutral800">{ content }</Typography>
+                </Box>
+                { !preview && (<DiscussionThreadItemActions { ...props } root={root || pinned} preview={preview} />) }
+            </DiscussionThreadItemContent>
+            <DiscussionThreadItemFooter { ...props } />
+        </DiscussionThreadItemContainer>
+    </DiscussionThreadFullsize>);
 };
 
 DiscussionThreadItem.propTypes = {

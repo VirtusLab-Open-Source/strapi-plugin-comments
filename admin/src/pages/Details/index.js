@@ -12,10 +12,8 @@ import { useQuery } from 'react-query';
 import { useRouteMatch } from 'react-router-dom';
 import { Layout, HeaderLayout, TwoColsLayout, ContentLayout } from '@strapi/design-system/Layout';
 import { Box } from '@strapi/design-system/Box';
-import { Flex } from '@strapi/design-system/Flex';
 import { Link } from '@strapi/design-system/Link';
 import { Loader } from '@strapi/design-system/Loader';
-import { Stack } from '@strapi/design-system/Stack';
 import { useNotifyAT } from '@strapi/design-system/LiveRegions';
 import { ArrowLeft } from '@strapi/icons';
 
@@ -34,9 +32,7 @@ import { getUrl } from '../../utils';
 import Nav from '../../components/Nav';
 import DetailsEntity from './components/DetailsEntity';
 import DiscussionThread from '../../components/DiscussionThread';
-import DiscussionStatus from '../../components/DiscussionStatus';
 import makeAppView from '../App/reducer/selectors';
-import DetailsFilters from './components/DetailsFilters';
 
 const Details = ({ config }) => {
   useFocusWhenNavigate();
@@ -102,21 +98,19 @@ const Details = ({ config }) => {
                   </Link>}
                   title={ getMessage('page.details.header') } 
                   subtitle={ getMessage('page.details.header.description') } 
-                  primaryAction={<DetailsFilters data={filters} onChange={handleChangeFilters} />}
-                  secondaryAction={<Box as={Flex}>&nbsp;</Box>}
                   as="h2" />
                 <ContentLayout>
                   <TwoColsLayout 
                     startCol={<DiscussionThread level={level} selected={selected} isReloading={isLoading} allowedActions={{ canModerate, canAccessReports, canReviewReports }} />} 
-                    endCol={ <Stack size={2}>
-                      <DiscussionStatus item={selected} />
-                      { !contentTypeData?.schema ? (<Box padding={4}>
-                          <Loader small>{ getMessage('page.details.panel.loading', 'Loading...') }</Loader>
-                        </Box>) : 
-                        (<DetailsEntity data={entity} schema={contentTypeData?.schema} config={config} />)
-                      }
-                    </Stack>
-                    } 
+                    endCol={!contentTypeData?.schema ? (<Box padding={4}>
+                      <Loader small>{ getMessage('page.details.panel.loading', 'Loading...') }</Loader>
+                    </Box>) : 
+                    (<DetailsEntity 
+                      data={entity} 
+                      schema={contentTypeData?.schema} 
+                      config={config}
+                      filters={filters}
+                      onFiltersChange={handleChangeFilters} />)} 
                   />
                 </ContentLayout>
               </>) }
