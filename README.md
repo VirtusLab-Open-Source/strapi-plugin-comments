@@ -16,6 +16,12 @@
   <a href="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments">
     <img src="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments/coverage.svg?branch=master" alt="codecov.io" />
   </a>
+  <a href="https://sharing.clickup.com/tl/xhcmx-83/strapiv-4-comments-roadmap">
+    <img src="https://img.shields.io/website?down_message=roadmap&label=product&up_message=roadmap&url=https%3A%2F%2Fsharing.clickup.com%2Ftl%2Fxhcmx-83%2Fstrapiv-4-comments-roadmap" />
+  </a>
+  <a href="https://sharing.clickup.com/b/xhcmx-63/strapiv-4-comments-board">
+    <img src="https://img.shields.io/website?down_message=board&label=product&up_color=blue&up_message=board&url=https%3A%2F%2Fsharing.clickup.com%2Fb%2Fxhcmx-63%2Fstrapiv-4-comments-board" />
+  </a>
 </div>
 
 ---
@@ -704,6 +710,15 @@ mutation createAbuseReport {
 Live example of plugin usage can be found in the [VirtusLab Strapi Examples](https://github.com/VirtusLab/strapi-examples/tree/master/strapi-v4-plugin-comments) repository.
 
 ## 🤝 Contributing
+
+<div>
+  <a href="https://sharing.clickup.com/tl/xhcmx-83/strapiv-4-comments-roadmap">
+    <img src="https://img.shields.io/website?down_message=roadmap&label=product&up_message=roadmap&url=https%3A%2F%2Fsharing.clickup.com%2Ftl%2Fxhcmx-83%2Fstrapiv-4-comments-roadmap" />
+  </a>
+  <a href="https://sharing.clickup.com/b/xhcmx-63/strapiv-4-comments-board">
+    <img src="https://img.shields.io/website?down_message=board&label=product&up_color=blue&up_message=board&url=https%3A%2F%2Fsharing.clickup.com%2Fb%2Fxhcmx-63%2Fstrapiv-4-comments-board" />
+  </a>
+</div>
 
 Feel free to fork and make a Pull Request to this plugin project. All the input is warmly welcome!
 
