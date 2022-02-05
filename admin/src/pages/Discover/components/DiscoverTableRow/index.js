@@ -98,7 +98,7 @@ const DiscoverTableRow = ({ config, item, allowedActions: { canModerate, canAcce
         }, status) }</StatusBadge>);
       };
     
-      const renderEntryUrl = entry => `/content-manager/collectionType/${entry.uid}/${entry.id}`;
+      const renderEntryUrl = entry => entry ? `/content-manager/collectionType/${entry.uid}/${entry.id}` : null;
       const renderDetailsUrl = entry => getUrl(`discover/${entry.id}`);
 
       const gotApprovalFlow = !isNil(item.approvalStatus);
@@ -130,7 +130,7 @@ const DiscoverTableRow = ({ config, item, allowedActions: { canModerate, canAcce
                 }, '#' + item.threadOf.id) }</Link>) : '-' }
             </Td>
             <Td style={{ maxWidth: '15vw' }}>
-                <TableLink to={ renderEntryUrl(item.related) }>{ renderEntryTitle(item.related, config) }</TableLink>
+                { item.related ? (<TableLink to={ renderEntryUrl(item.related) }>{ renderEntryTitle(item.related, config) }</TableLink>) : '-' }
             </Td>
             <Td>
                 <Typography textColor="neutral800">{ formatDate(item.updatedAt || item.createdAt, { dateStyle: 'long', timeStyle: 'short' }) }</Typography>

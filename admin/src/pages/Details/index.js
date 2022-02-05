@@ -102,15 +102,12 @@ const Details = ({ config }) => {
                 <ContentLayout>
                   <TwoColsLayout 
                     startCol={<DiscussionThread level={level} selected={selected} isReloading={isLoading} allowedActions={{ canModerate, canAccessReports, canReviewReports }} />} 
-                    endCol={!contentTypeData?.schema ? (<Box padding={4}>
-                      <Loader small>{ getMessage('page.details.panel.loading', 'Loading...') }</Loader>
-                    </Box>) : 
-                    (<DetailsEntity 
+                    endCol={<DetailsEntity 
                       data={entity} 
                       schema={contentTypeData?.schema} 
                       config={config}
                       filters={filters}
-                      onFiltersChange={handleChangeFilters} />)} 
+                      onFiltersChange={handleChangeFilters} />}
                   />
                 </ContentLayout>
               </>) }

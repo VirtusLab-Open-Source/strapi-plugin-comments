@@ -37,8 +37,10 @@ const DetailsEntity = ({
         .map(_ => capitalize(_))
         .join(' ');
 
+    const entityIsRenderable = data && !isEmpty(data) && !isEmpty(itemKeys);
+
     return (<Box padding={4}>
-        { !isEmpty(keys) && (<Box marginBottom={4}>
+        { entityIsRenderable && (<Box marginBottom={4}>
             <Typography variant="sigma" textColor="neutral600" id="entity-details">
                 { getMessage('page.details.panel.entity', 'Details') }
             </Typography>
