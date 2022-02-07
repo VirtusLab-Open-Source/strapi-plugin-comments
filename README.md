@@ -37,10 +37,10 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 
 - **Comments Public REST + GraphQL API:** Elegant, entirely customizable and a fully extensible admin panel.
 - **Strapi &amp; generic users:** Support for built-in &amp; also generic non-Strapi users that might be the comments authors.
-- **Any Content Type relation:** Comments can by linked to any of your Content Types by default. Simply, you're controlling it.
+- **Any Content Type relation:** Comments can be linked to any of your Content Types by default. Simply, you're controlling it.
 - **Moderation Panel:** Search & Filter through the bucket with your auditory comments. Manage them by blocking single ones or full threads. All in combined list &amp; hierarchical tree view of threads.
-- **Automated Bad Words filtering:** By detault end users are not allowed to post abusing comments where bad words have been used.
-- **Abuse Reporting & Reviewing:** Don't allow inferior language, react to reports from your community, send email notifiactions about abuse reports
+- **Automated Bad Words filtering:** By default end users are not allowed to post abusing comments where bad words have been used.
+- **Abuse Reporting & Reviewing:** Don't allow inferior language, react to reports from your community, send email notifications about issued reports
 
 ## ⚙️ Versions
 
