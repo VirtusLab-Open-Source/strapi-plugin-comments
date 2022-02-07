@@ -1,0 +1,7 @@
+public/
+coverage/
+.circleci/
+.github/
+.nvmrc
+.eslintrc
+codecov.yml
