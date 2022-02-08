@@ -1,7 +1,7 @@
 'use strict';
 
 const BadWordsFilter = require('bad-words');
-const { isArray, isNumber, isObject, isEmpty, isNil, isString, first, parseInt, set } = require('lodash');
+const { isArray, isNumber, isObject, isNil, isString, first, parseInt, set } = require('lodash');
 const { REGEX } = require('../utils/constants');
 const PluginError = require('./../utils/error');
 const {
@@ -130,7 +130,7 @@ module.exports = ({ strapi }) => ({
     },
 
     // Find all related entiries
-    async findRelatedEntitiesFor(entities = [], relatedFields = {}, relatedPopulate = {}) {
+    async findRelatedEntitiesFor(entities = []) {
         const data = entities.reduce((acc, cur) => {
                 const [relatedUid, relatedStringId] = getRelatedGroups(cur.related);
                 const parsedRelatedId = parseInt(relatedStringId);
