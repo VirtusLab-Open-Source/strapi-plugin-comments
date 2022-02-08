@@ -1,7 +1,7 @@
 'use strict';
 
 const BadWordsFilter = require('bad-words');
-const { isArray, isNumber, isObject, isNil, isString, first, parseInt, set } = require('lodash');
+const { isArray, isNumber, isObject, isEmpty, isNil, isString, first, parseInt, set } = require('lodash');
 const { REGEX } = require('../utils/constants');
 const PluginError = require('./../utils/error');
 const {
@@ -28,16 +28,21 @@ module.exports = ({ strapi }) => ({
     },
 
     // Find comments in the flat structure
-    async findAllFlat({ query = {}, populate = {}, sort, pagination }, relatedEntity = null) {
+    async findAllFlat({ 
+        query = {}, 
+        populate = {}, 
+        sort, 
+        pagination }, relatedEntity = null) {
+
         const defaultPopulate = {
             authorUser: true,
         };
 
-        let orderingAndPagination = {};
+        let queryExtension = {};
 
         if (sort && (isString(sort) || isArray(sort))) {
-            orderingAndPagination = {
-                ...orderingAndPagination,
+            queryExtension = {
+                ...queryExtension,
                 orderBy: (isString(sort) ? [sort] : sort)
                 .map(_ => REGEX.sorting.test(_) ? _ : `${_}:asc`)
                 .reduce((prev, curr) => {
@@ -49,14 +54,12 @@ module.exports = ({ strapi }) => ({
 
         if (pagination && isObject(pagination)) {
             const { page = 1, pageSize = 10 } = pagination;
-            orderingAndPagination = {
-                ...orderingAndPagination,
+            queryExtension = {
+                ...queryExtension,
                 offset: (page - 1) * pageSize,
                 limit: pageSize,
             };
         }
-
-        console.log(orderingAndPagination);
         
         const entries = await strapi.db.query(getModelUid('comment'))
         .findMany({
@@ -67,7 +70,7 @@ module.exports = ({ strapi }) => ({
                 ...defaultPopulate,
                 ...populate,
             },
-            ...orderingAndPagination,
+            ...queryExtension,
         });
 
         const entriesWithThreads = await Promise.all(entries.map(async _ => {
@@ -127,7 +130,7 @@ module.exports = ({ strapi }) => ({
     },
 
     // Find all related entiries
-    async findRelatedEntitiesFor(entities = []) {
+    async findRelatedEntitiesFor(entities = [], relatedFields = {}, relatedPopulate = {}) {
         const data = entities.reduce((acc, cur) => {
                 const [relatedUid, relatedStringId] = getRelatedGroups(cur.related);
                 const parsedRelatedId = parseInt(relatedStringId);
@@ -143,7 +146,7 @@ module.exports = ({ strapi }) => ({
             Object.entries(data)
             .map(async ([relatedUid, relatedStringIds]) => 
                 strapi.db.query(relatedUid).findMany({ 
-                    where: { id: Array.from(new Set(relatedStringIds)) } 
+                    where: { id: Array.from(new Set(relatedStringIds)) },
                 }).then(relatedEntities => relatedEntities.map(_ => 
                     ({
                         ..._,

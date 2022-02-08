@@ -203,7 +203,7 @@ Feature / Capability focused permissions:
 
 `GET <host>/api/comments/api::<collection name>.<content type name>:<entity id>`
 
-Return a hierarchical tree structure of comments for specified instance of Content Type like for example `Page` with `ID: 1`
+Return a hierarchical tree structure of comments for specified instance of Content Type like for example `Page` with `ID: 1`.
 
 **Example URL**: `https://localhost:1337/comments/api::page.page:1`
 
@@ -226,6 +226,8 @@ Return a hierarchical tree structure of comments for specified instance of Conte
     // ...
 ]
 ```
+#### Strapi REST API properties support:
+- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
 
 ### Get Comments (flat structure)
 
@@ -254,6 +256,11 @@ Return a flat structure of comments for specified instance of Content Type like 
 **Possible response codes**
 - `200` - Successful. Response with list of comments (can be empty)
 - `400` - Bad Request. Requested list for not valid / not existing Content Type
+
+#### Strapi REST API properties support:
+- [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/filtering-locale-publication.html#filtering)
+- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
+- [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#pagination)
 
 ### Post a Comment
 
@@ -460,6 +467,9 @@ query {
   }
 ```
 
+#### Strapi GraphQL API properties support:
+- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#sorting)
+
 ### Get Comments (flat structure)
 
 *REST API equivalent: [Public REST API -> Get Comments (flat structure)](#get-comments-flat-structure)*
@@ -515,6 +525,11 @@ query {
   }
 }
 ```
+
+#### Strapi GraphQL API properties support:
+- [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#filters)
+- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#sorting)
+- [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#pagination)
 
 ### Post a Comment
 
