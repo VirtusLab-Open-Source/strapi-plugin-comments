@@ -1,7 +1,8 @@
 'use strict';
 
 const BadWordsFilter = require('bad-words');
-const { isArray, isNumber, isObject, isNil, first, parseInt } = require('lodash');
+const { isArray, isNumber, isObject, isNil, isString, first, parseInt, set } = require('lodash');
+const { REGEX } = require('../utils/constants');
 const PluginError = require('./../utils/error');
 const {
     getModelUid,
@@ -27,12 +28,36 @@ module.exports = ({ strapi }) => ({
     },
 
     // Find comments in the flat structure
-    async findAllFlat({ query = {}, populate = {} }, relatedEntity = null) {
-
+    async findAllFlat({ query = {}, populate = {}, sort, pagination }, relatedEntity = null) {
         const defaultPopulate = {
             authorUser: true,
         };
 
+        let orderingAndPagination = {};
+
+        if (sort && (isString(sort) || isArray(sort))) {
+            orderingAndPagination = {
+                ...orderingAndPagination,
+                orderBy: (isString(sort) ? [sort] : sort)
+                .map(_ => REGEX.sorting.test(_) ? _ : `${_}:asc`)
+                .reduce((prev, curr) => {
+                    const [type = 'asc', ...parts] = curr.split(':').reverse();
+                    return { ...set(prev, parts.reverse().join('.'), type) };
+                }, {})
+            };
+        }
+
+        if (pagination && isObject(pagination)) {
+            const { page = 1, pageSize = 10 } = pagination;
+            orderingAndPagination = {
+                ...orderingAndPagination,
+                offset: (page - 1) * pageSize,
+                limit: pageSize,
+            };
+        }
+
+        console.log(orderingAndPagination);
+        
         const entries = await strapi.db.query(getModelUid('comment'))
         .findMany({
             where: {
@@ -42,6 +67,7 @@ module.exports = ({ strapi }) => ({
                 ...defaultPopulate,
                 ...populate,
             },
+            ...orderingAndPagination,
         });
 
         const entriesWithThreads = await Promise.all(entries.map(async _ => {
@@ -76,10 +102,11 @@ module.exports = ({ strapi }) => ({
     async findAllInHierarchy ({
         query,
         populate = {},
+        sort,
         startingFromId = null,
         dropBlockedThreads = false,
     }, relatedEntity) {
-        const entities = await this.findAllFlat({ query, populate }, relatedEntity);
+        const entities = await this.findAllFlat({ query, populate, sort }, relatedEntity);
         return buildNestedStructure(entities, startingFromId, 'threadOf', dropBlockedThreads, false);
     },
 

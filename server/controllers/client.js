@@ -11,23 +11,23 @@ module.exports = {
   },
 
   async findAllFlat(ctx) {
-    const { params = {}, query } = ctx;
+    const { params = {}, query, sort, pagination } = ctx;
     const { relation } = parseParams(params);
     try {
       return this.getService('common')
-        .findAllFlat(flatInput(relation, query));
+        .findAllFlat(flatInput(relation, query, sort, pagination));
     } catch (e) {
       throwError(ctx, e);
     }
   },
 
   async findAllInHierarchy(ctx) {
-    const { params = {}, query } = ctx;
+    const { params = {}, query, sort } = ctx;
     const { relation } = parseParams(params);
     try {
       return await this.getService('common')
         .findAllInHierarchy({
-          ...flatInput(relation, query),
+          ...flatInput(relation, query, sort),
           dropBlockedThreads: true,
         });
     } catch (e) {

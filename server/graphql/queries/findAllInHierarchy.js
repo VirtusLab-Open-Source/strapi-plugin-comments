@@ -13,16 +13,16 @@ module.exports = ({ strapi, nexus }) => {
 		type: nonNull(list('CommentNested')),
 		args: {
 			relation: nonNull(stringArg()),
-			// filters: filtersArg,
 			sort: args.SortArg,
 		},
 		async resolve(obj, args) {
-			const { relation, filters } = args;
+			const { relation, filters, sort } = args;
 			return await getPluginService('common')
 				.findAllInHierarchy({
 					...flatInput(
 						relation, 
-						getPluginService('gql').graphQLFiltersToStrapiQuery(filters, contentType)
+						getPluginService('gql').graphQLFiltersToStrapiQuery(filters, contentType),
+						sort
 					),
 					dropBlockedThreads: true,
 				});

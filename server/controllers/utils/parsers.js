@@ -1,7 +1,7 @@
 'use strict'
 
 module.exports = {
-    flatInput(relation, query) {
+    flatInput(relation, query, sort, pagination) {
         return {
             query: {
               ...query,
@@ -13,6 +13,8 @@ module.exports = {
                 populate: { authorUser: true },
               },
             },
+            pagination,
+            sort,
           };
     },
   

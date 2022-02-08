@@ -18,11 +18,13 @@ module.exports = ({ strapi, nexus }) => {
 			sort: args.SortArg,
 		},
 		async resolve(obj, args) {
-			const { relation, filters } = args;
+			const { relation, filters, sort, pagination } = args;
 			return await getPluginService('common')
 				.findAllFlat(flatInput(
 					relation, 
-					getPluginService('gql').graphQLFiltersToStrapiQuery(filters, contentType)
+					getPluginService('gql').graphQLFiltersToStrapiQuery(filters, contentType),
+					sort,
+					pagination
 				), undefined);
 		},
 	};
