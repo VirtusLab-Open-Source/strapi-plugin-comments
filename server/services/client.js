@@ -40,7 +40,7 @@ module.exports = ({ strapi }) => ({
             throw new PluginError(400, `Relation for field "related" does not exist. Check your payload please.`);
         }
 
-        const isApprovalFlowEnabled = this.getCommonService().getConfig('approvalFlow', []).includes(uid) ||
+        const isApprovalFlowEnabled = await this.getCommonService().getConfig('approvalFlow', []).includes(uid) ||
             relatedEntity.requireCommentsApproval;
 
         const linkToThread = !isNil(threadOf) ? await this.getCommonService().findOne({
@@ -57,7 +57,7 @@ module.exports = ({ strapi }) => ({
             throw resolveUserContextError(user);
         }
 
-        if (this.getCommonService().checkBadWords(content) && singleRelationFulfilled) {
+        if (await this.getCommonService().checkBadWords(content) && singleRelationFulfilled) {
             const { author = {}, ...rest } = data;
             let authorData = {};
             if (validContext && user) {
@@ -127,7 +127,7 @@ module.exports = ({ strapi }) => ({
         }
 
         if (isEqualEntity(existingEntity, data, user) && content) {
-            if (this.getCommonService().checkBadWords(content)) {
+            if (await this.getCommonService().checkBadWords(content)) {
                 const entity = await strapi.db.query(getModelUid('comment')).update({
                     where: { id },
                     data: { content },
@@ -216,7 +216,7 @@ module.exports = ({ strapi }) => ({
     },
 
 	async sendAbuseReportEmail(reason, content) {
-		const rolesToBeNotified = this.getCommonService().getConfig('moderatorRoles') || ['strapi-super-admin'];
+		const rolesToBeNotified = await this.getCommonService().getConfig('moderatorRoles') || ['strapi-super-admin'];
 
         const adminUserModel = strapi.db.query('admin::user');
 		const emails = await adminUserModel.findMany({

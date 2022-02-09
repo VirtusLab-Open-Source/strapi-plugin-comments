@@ -6,7 +6,7 @@ import PluginIcon from './components/PluginIcon';
 import pluginPermissions from './permissions';
 import reducers from './reducers';
 
-const name = pluginPkg.strapi.name;
+const { name, displayName } = pluginPkg.strapi;
 
 export default {
   register(app) {
@@ -16,7 +16,7 @@ export default {
       icon: PluginIcon,
       intlLabel: {
         id: `${pluginId}.plugin.name`,
-        defaultMessage: name,
+        defaultMessage: displayName,
       },
       Component: async () => {
         const component = await import(/* webpackChunkName: "[request]" */ './pages/App');
@@ -39,6 +39,22 @@ export default {
     //     name: 'comments-link',
     //     Component: () => 'TODO: Comments count',
     // });
+    app.addSettingsLink('global', {
+      intlLabel: {
+        id: `${pluginId}.plugin.name`,
+        defaultMessage: displayName,
+      },
+      id: 'comments',
+      to: `/settings/${pluginId}`,
+      Component: async () => {
+        const component = await import(
+          /* webpackChunkName: "documentation-settings" */ './pages/Settings'
+        );
+
+        return component;
+      },
+      permissions: pluginPermissions.settings,
+    });
   },
   
   async registerTrads({ locales }) {

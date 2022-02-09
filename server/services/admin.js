@@ -22,17 +22,56 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
 
     // Config
     async config() {
-        const entryLabel = this.getCommonService().getConfig('entryLabel');
-        const approvalFlow = this.getCommonService().getConfig('approvalFlow');
-        return {
-            entryLabel,
-            approvalFlow,
+        const pluginStore = await this.getCommonService().getConfigStore();
+        const config = await pluginStore.get({ key: 'config' });
+
+        console.log('stored config', config);
+
+        const additionalConfiguration = {
             regex: Object.keys(REGEX).reduce((prev, curr) => ({
                 ...prev,
                 [curr]: REGEX[curr].toString(),
             }), {}),
         };
+
+        if (config) {
+            return {
+                ...config,
+                ...additionalConfiguration,
+            };
+        }
+
+        const entryLabel = this.getCommonService().getLocalConfig('entryLabel');
+        const approvalFlow = this.getCommonService().getLocalConfig('approvalFlow');
+        return {
+            entryLabel,
+            approvalFlow,
+            ...additionalConfiguration,
+        };
     },
+
+    async updateConfig(body) {
+        const pluginStore = await this.getCommonService().getConfigStore();
+    
+        await pluginStore.set({ key: 'config', value: body });
+    
+        return this.config();
+      },
+    
+      async restoreConfig() {
+        const pluginStore = await this.getCommonService().getConfigStore();
+        const { config: defaultConfig } = strapi.plugin('comments');
+    
+        await pluginStore.delete({key: 'config'})
+        await pluginStore.set({
+            key: 'config',
+            value: {
+                ...defaultConfig,
+            }
+        });
+    
+        return this.config();
+      },
 
     // Find all comments
     async findAll({ related, entity, ...query }) {

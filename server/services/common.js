@@ -10,6 +10,7 @@ const {
     buildNestedStructure,
     filterOurResolvedReports,
     buildAuthorModel,
+    buildConfigQueryProp,
 } = require('./utils/functions');
 
 /**
@@ -18,11 +19,26 @@ const {
 
 module.exports = ({ strapi }) => ({
 
-    getConfig(prop, defaultValue) {
-        let queryProp = prop;
-        if (prop && isArray(prop)) {
-            queryProp = prop.join('.');
+    async getConfig(prop, defaultValue) {
+        const queryProp = buildConfigQueryProp(prop);
+        const pluginStore = await this.getConfigStore();
+        const config = await pluginStore.get({ key: 'config' });
+
+        let result;
+        if (config && !useLocal) {
+            result = queryProp ? get(config, queryProp) : config;;
+        } else {
+            result = this.getLocalConfig(queryProp, defaultValue);
         }
+        return isNil(result) ? defaultValue : result;
+    },
+
+    async getConfigStore() {
+        return strapi.store({ type: 'plugin', name: 'comments' });
+    },
+
+    getLocalConfig(prop, defaultValue) {
+        const queryProp = buildConfigQueryProp(prop);
         const result = strapi.config.get(`plugin.comments${ queryProp ? '.' + queryProp : ''}`);
         return isNil(result) ? defaultValue : result;
     },
@@ -202,8 +218,8 @@ module.exports = ({ strapi }) => ({
         return user ? !isNil(user?.id) : true;
     },
 
-    checkBadWords(content) {
-        const config = this.getConfig('badWords', true);
+    async checkBadWords(content) {
+        const config = await this.getConfig('badWords', true);
         if (config) {
             const filter = new BadWordsFilter(isObject(config) ? config : undefined);
             if (content && filter.isProfane(content)) {

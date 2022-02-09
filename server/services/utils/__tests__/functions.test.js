@@ -1,5 +1,5 @@
 const PluginError = require('../../../utils/error');
-const { resolveUserContextError, getModelUid } = require('../functions');
+const { resolveUserContextError, getModelUid, buildConfigQueryProp } = require('../functions');
 
 beforeEach(() => {
   Object.defineProperty(global, 'strapi', {
@@ -39,4 +39,15 @@ describe('Test service functions utils', () => {
       }
     });
   });
+
+  describe('Building config query props', () => {
+    test('Should return prop as is', () => {
+      expect(buildConfigQueryProp('my.sample.prop')).toBe('my.sample.prop');
+    });
+
+    test('Should build query prop with \'.\'', () => {
+      expect(buildConfigQueryProp(['my', 'sample', 'prop'])).toBe('my.sample.prop');
+    });
+  });
+  
 });

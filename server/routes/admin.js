@@ -10,6 +10,22 @@ module.exports = [
     },
   },
   {
+    method: 'PUT',
+    path: '/moderate/config',
+    handler: 'admin.updateConfig',
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: 'DELETE',
+    path: '/moderate/config',
+    handler: 'admin.restoreConfig',
+    config: {
+      policies: [],
+    },
+  },
+  {
     method: 'GET',
     path: '/moderate/config/content-types/:contentTypeName',
     handler: 'admin.contentTypeName',

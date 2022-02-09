@@ -10,6 +10,15 @@ module.exports = {
     return getPluginService(name);
   },
 
+  async updateConfig(ctx) {
+    const { request: { body } } = ctx;
+    return this.getService().updateConfig(body);
+  },
+
+  async restoreConfig() {
+    return this.getService().restoreConfig();
+  },
+
   async findAll(ctx) {
     return this.getService()
       .findAll(ctx.query);

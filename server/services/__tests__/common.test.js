@@ -22,12 +22,14 @@ describe('Test Comments service functions utils', () => {
       test: 'sample',
     }));
 
-    test('Should return config value', () => {
-      expect(getPluginService('common').getConfig('test')).toEqual('sample');
+    test('Should return config value', async () => {
+      const result = await getPluginService('common').getConfig('test');
+      expect(result).toEqual('sample');
     });
 
-    test('Should return default config prop value if not set', () => {
-      expect(getPluginService('common').getConfig('another', 'defaultValue')).toEqual('defaultValue');
+    test('Should return default config prop value if not set', async () => {
+      const result = await getPluginService('common').getConfig('another', 'defaultValue');
+      expect(result).toEqual('defaultValue');
     });
   });
 
@@ -131,10 +133,10 @@ describe('Test Comments service functions utils', () => {
 
     const text = 'Lorem ipsum dolor sit fuck amet';
 
-    test('Should find bad words usage and throw error PluginError', () => {
+    test('Should find bad words usage and throw error PluginError', async () => {
       expect.assertions(7);
       try {
-        getPluginService('common').checkBadWords(text);
+        await getPluginService('common').checkBadWords(text);
       } catch (e) {
         expect(getPluginService('common').getConfig('badWords')).toEqual(undefined);
         expect(e).toBeInstanceOf(PluginError);
@@ -157,9 +159,9 @@ describe('Test Comments service functions utils', () => {
 
     const text = 'Lorem ipsum dolor sit fuck amet';
 
-    test('Should skip bad words filtering because of configuration change', () => {
-      expect(getPluginService('common').getConfig('badWords')).toEqual(false);
-      expect(getPluginService('common').checkBadWords(text)).toEqual(text);
+    test('Should skip bad words filtering because of configuration change', async () => {
+      expect(await getPluginService('common').getConfig('badWords')).toEqual(false);
+      expect(await getPluginService('common').checkBadWords(text)).toEqual(text);
     });
   });
 });

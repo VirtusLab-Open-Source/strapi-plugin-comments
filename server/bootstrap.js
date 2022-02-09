@@ -35,6 +35,18 @@ module.exports = async ({ strapi }) => {
       uid: permissions.reports.action,
       pluginName: "comments",
     },
+    {
+      section: "plugins",
+      displayName: "Settings: Read",
+      uid: permissions.settings.read,
+      pluginName: "comments",
+    },
+    {
+      section: "plugins",
+      displayName: "Settings: Change",
+      uid: permissions.settings.change,
+      pluginName: "comments",
+    },
   ];
 
   await strapi.admin.services.permission.actionProvider.registerMany(actions);
