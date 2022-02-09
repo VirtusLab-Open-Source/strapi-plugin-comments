@@ -32,8 +32,8 @@
     "@strapi/strapi": "4.x"
   },
   "author": {
-    "name": "VirtusLab // Mateusz Ziarko",
-    "email": "mziarko@virtuslab.com",
+    "name": "VirtusLab",
+    "email": "strapi@virtuslab.com",
     "url": "https://virtuslab.com"
   },
   "maintainers": [
