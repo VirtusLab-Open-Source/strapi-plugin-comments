@@ -10,10 +10,9 @@ module.exports = async ({ strapi, config}) => {
 	const extensionService = strapi.plugin('graphql').service('extension');
 	extensionService.shadowCRUD(getModelUid('comment')).disable();
 	extensionService.shadowCRUD(getModelUid('comment-report')).disable();
-	console.log(extensionService);
+	
 	extensionService.use(({ strapi, nexus }) => {
 		const types = getTypes({ strapi, nexus, config });
-		console.log('types', types);
 		const queries = getQueries({ strapi, nexus, config });
 		const mutations = getMutations({ strapi, nexus, config });
 		const resolversConfig = getResolversConfig({ strapi, config });

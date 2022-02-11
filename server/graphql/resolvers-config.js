@@ -2,7 +2,6 @@
 
 module.exports = ({ config }) => {
 	const { gql: { auth = false } = {}} = config;
-	console.log('auth', auth);
 	return {
 		'Query.findAllFlat': { auth },
 		'Query.findAllInHierarchy': { auth },
