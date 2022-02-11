@@ -360,7 +360,7 @@ Updates a specified Comment content based on it `commentId` and related to speci
 
 *GraphQL equivalent: [Public GraphQL API -> Delete Comment](#delete-comment-1)*
 
-`DELETE <host>/api/comments/api::<collection name>.<content type name>:<entity id>/<commentId>?authorId=<authorId>`
+`DELETE <host>/api/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>?authorId=<authorId>`
 
 Deletes a specified Comment based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1`.
 
