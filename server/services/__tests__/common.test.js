@@ -1,3 +1,4 @@
+const { CONFIG_PARAMS } = require('../../utils/constants');
 const PluginError = require('../../utils/error');
 const { getPluginService } = require('../../utils/functions');
 
@@ -16,20 +17,48 @@ afterEach(() => {
 })
 
 describe('Test Comments service functions utils', () => {
+  describe('Get plugin store', () => {
+    beforeEach(() => setup());
+
+    test('Should return store', async () => {
+      const pluginStore = await getPluginService('common').getPluginStore();
+      expect(pluginStore).toHaveProperty('get');
+      expect(pluginStore).toHaveProperty('set');
+      expect(pluginStore).toHaveProperty('delete');
+    });
+  });
 
   describe('Get plugin config', () => {
-    beforeEach(() => setup({
-      test: 'sample',
-    }));
-
-    test('Should return config value', async () => {
-      const result = await getPluginService('common').getConfig('test');
-      expect(result).toEqual('sample');
+    describe('Local config', () => {
+      beforeEach(() => setup({
+        test: 'sample',
+      }));
+  
+      test('Should return config value', async () => {
+        const result = await getPluginService('common').getConfig('test');
+        expect(result).toEqual('sample');
+      });
+  
+      test('Should return default config prop value if not set', async () => {
+        const result = await getPluginService('common').getConfig('another', 'defaultValue');
+        expect(result).toEqual('defaultValue');
+      });
     });
 
-    test('Should return default config prop value if not set', async () => {
-      const result = await getPluginService('common').getConfig('another', 'defaultValue');
-      expect(result).toEqual('defaultValue');
+    describe('Store config', () => {
+      beforeEach(() => setup({
+        test: 'sample',
+      }, true));
+  
+      test('Should return config value', async () => {
+        const result = await getPluginService('common').getConfig('test');
+        expect(result).toEqual('sample');
+      });
+  
+      test('Should return default config prop value if not set', async () => {
+        const result = await getPluginService('common').getConfig('another', 'defaultValue');
+        expect(result).toEqual('defaultValue');
+      });
     });
   });
 
@@ -138,7 +167,7 @@ describe('Test Comments service functions utils', () => {
       try {
         await getPluginService('common').checkBadWords(text);
       } catch (e) {
-        expect(getPluginService('common').getConfig('badWords')).toEqual(undefined);
+        expect(await getPluginService('common').getConfig('badWords')).toEqual(undefined);
         expect(e).toBeInstanceOf(PluginError);
         expect(e).toHaveProperty('status', 400);
         expect(e).toHaveProperty('name', 'Strapi:Plugin:Comments');
@@ -162,6 +191,56 @@ describe('Test Comments service functions utils', () => {
     test('Should skip bad words filtering because of configuration change', async () => {
       expect(await getPluginService('common').getConfig('badWords')).toEqual(false);
       expect(await getPluginService('common').checkBadWords(text)).toEqual(text);
+    });
+  });
+
+  describe('Parse relation string (store config)', () => {
+    const [uid, id] = ['api::my-collection.my-content-type', '1'];
+    const validCollection = `${uid}:${id}`;
+
+    const [wrongUid, wrongId] = ['api::wrong.type', '2'];
+    const testCollection = `${wrongUid}:${wrongId}`;
+
+    describe('Store config', () => {
+      beforeEach(() => setup({ enabledCollections: [uid] }, true));
+
+      test('Should pass', async () => {
+        expect(await getPluginService('common').parseRelationString(validCollection));
+        expect(await getPluginService('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).toContain(uid);
+      });
+  
+      test('Should fail with 403', async () => {
+  
+        try {
+          await getPluginService('common').parseRelationString(testCollection);
+        } catch(e) {
+          expect(await getPluginService('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).toContain(uid);
+          expect(await getPluginService('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).not.toContain(wrongUid);
+          expect(e).toBeInstanceOf(PluginError);
+          expect(e).toHaveProperty('status', 403);
+        }
+      });
+    });
+
+    describe('Local config', () => {
+      beforeEach(() => setup({ enabledCollections: [uid] }));
+
+      test('Should pass', async () => {
+        expect(await getPluginService('common').parseRelationString(validCollection));
+        expect(await getPluginService('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).toContain(uid);
+      });
+  
+      test('Should fail with 403', async () => {
+  
+        try {
+          await getPluginService('common').parseRelationString(testCollection);
+        } catch(e) {
+          expect(await getPluginService('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).toContain(uid);
+          expect(await getPluginService('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).not.toContain(wrongUid);
+          expect(e).toBeInstanceOf(PluginError);
+          expect(e).toHaveProperty('status', 403);
+        }
+      });
     });
   });
 });

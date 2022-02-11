@@ -10,13 +10,37 @@ module.exports = {
     return getPluginService(name);
   },
 
-  async updateConfig(ctx) {
-    const { request: { body } } = ctx;
-    return this.getService().updateConfig(body);
+  async config(ctx) {
+    try {
+      return await this.getService().config();
+    } catch (e) {
+      throwError(ctx, e);
+    }
   },
 
-  async restoreConfig() {
-    return this.getService().restoreConfig();
+  async settingsConfig(ctx) {
+    try {
+      return this.getService().config(true);
+    } catch (e) {
+      throwError(ctx, e);
+    }
+  },
+
+  async settingsUpdateConfig(ctx) {
+    try {
+      const { request: { body } } = ctx;
+      return this.getService().updateConfig(body);
+    } catch (e) {
+      throwError(ctx, e);
+    }
+  },
+
+  async settingsRestoreConfig(ctx) {
+    try {
+      return this.getService().restoreConfig();
+    } catch (e) {
+      throwError(ctx, e);
+    }
   },
 
   async findAll(ctx) {
@@ -105,14 +129,6 @@ module.exports = {
     try {
       return await this.getService()
         .rejectComment(id);
-    } catch (e) {
-      throwError(ctx, e);
-    }
-  },
-
-  async config(ctx) {
-    try {
-      return await this.getService().config();
     } catch (e) {
       throwError(ctx, e);
     }

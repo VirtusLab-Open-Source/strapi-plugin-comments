@@ -2,6 +2,7 @@
 
 module.exports = {
   default: {
+    enabledCollections: [],
     moderatorRoles: [],
     approvalFlow: [],
     entryLabel: {

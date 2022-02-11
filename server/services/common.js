@@ -2,7 +2,7 @@
 
 const BadWordsFilter = require('bad-words');
 const { isArray, isNumber, isObject, isNil, isString, first, parseInt, set } = require('lodash');
-const { REGEX } = require('../utils/constants');
+const { REGEX, CONFIG_PARAMS } = require('../utils/constants');
 const PluginError = require('./../utils/error');
 const {
     getModelUid,
@@ -21,7 +21,7 @@ module.exports = ({ strapi }) => ({
 
     async getConfig(prop, defaultValue) {
         const queryProp = buildConfigQueryProp(prop);
-        const pluginStore = await this.getConfigStore();
+        const pluginStore = await this.getPluginStore();
         const config = await pluginStore.get({ key: 'config' });
 
         let result;
@@ -33,7 +33,7 @@ module.exports = ({ strapi }) => ({
         return isNil(result) ? defaultValue : result;
     },
 
-    async getConfigStore() {
+    async getPluginStore() {
         return strapi.store({ type: 'plugin', name: 'comments' });
     },
 
@@ -218,8 +218,20 @@ module.exports = ({ strapi }) => ({
         return user ? !isNil(user?.id) : true;
     },
 
+    async parseRelationString(relation) {
+        const [ uid, relatedStringId ] = getRelatedGroups(relation);
+        const parsedRelatedId = parseInt(relatedStringId);
+        const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
+
+        const enabledCollections = await this.getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS, []);
+        if (!enabledCollections.includes(uid)) {
+            throw new PluginError(403, `Action not allowed for collection '${uid}'. Use one of: ${ enabledCollections.join(', ') }`);
+        }
+        return [ uid, relatedId];
+    },
+
     async checkBadWords(content) {
-        const config = await this.getConfig('badWords', true);
+        const config = await this.getConfig(CONFIG_PARAMS.BAD_WORDS, true);
         if (config) {
             const filter = new BadWordsFilter(isObject(config) ? config : undefined);
             if (content && filter.isProfane(content)) {

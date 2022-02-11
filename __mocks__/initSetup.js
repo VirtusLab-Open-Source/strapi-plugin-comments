@@ -1,12 +1,41 @@
 const { get, set } = require('lodash');
 
-module.exports = (config = {}) => {
+module.exports = (config = {}, toStore = false) => {
   const mock = {
+    db: toStore ? {
+      plugin: {
+        comments: {
+          config: { ...config },
+        },
+      },
+    }: {},
     getRef: function() {
       return this;
     },
     plugin: function(name) {
       return this.plugins[name];
+    },
+    store: async function(storeProps) {
+      const { type, name } = storeProps; // { type: 'plugin', name: 'comments' }
+
+      const mockedStore = {
+        get: async function(props) { // { key: 'config' }
+          const { key } = props;
+          return new Promise(resolve => resolve(get(mock.db, `${type}.${name}.${key}`, undefined)));
+        },
+        set: async function(props) { // { key: 'config', value: {...} }
+          const { key, value } = props;
+          set(mock.db, `${type}.${name}.${key}`, value);
+          return this.get(key);
+        },
+        delete: async function(props) { // { key: 'config' }
+          const { key } = props;
+          set(mock.db, `${type}.${name}.${key}`, undefined);
+          return new Promise(resolve => resolve(true));
+        },
+      };
+
+      return new Promise(resolve => resolve(mockedStore));
     },
     plugins: {
       comments: {
@@ -44,7 +73,7 @@ module.exports = (config = {}) => {
           entryLabel: {
             'api::blog-post.blog-post': ['alternative_subject'],
           },
-          ...config
+          ...(toStore ? {} : config)
         }
       }
     }

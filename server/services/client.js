@@ -10,7 +10,7 @@ const {
     getRelatedGroups,
     resolveUserContextError,
 } = require('./utils/functions');
-const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
+const { APPROVAL_STATUS, REGEX, CONFIG_PARAMS } = require('./../utils/constants')
 
 /**
  * Comments Plugin - Client services
@@ -31,16 +31,14 @@ module.exports = ({ strapi }) => ({
             throw new PluginError(400, `Field "related" got incorrect format, use format like "api::<collection name>.<content type name>:<entity id>"`);
         }
 
-        const [ uid, relatedStringId ] = getRelatedGroups(relation);
-        const parsedRelatedId = parseInt(relatedStringId);
-        const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
+        const [ uid, relatedId ] = await this.getCommonService().parseRelationString(relation);
 
         const relatedEntity = await strapi.db.query(uid).findOne(relatedId);
         if (!relatedEntity) {
             throw new PluginError(400, `Relation for field "related" does not exist. Check your payload please.`);
         }
 
-        const isApprovalFlowEnabled = await this.getCommonService().getConfig('approvalFlow', []).includes(uid) ||
+        const isApprovalFlowEnabled = await this.getCommonService().getConfig(CONFIG_PARAMS.APPROVAL_FLOW, []).includes(uid) ||
             relatedEntity.requireCommentsApproval;
 
         const linkToThread = !isNil(threadOf) ? await this.getCommonService().findOne({
@@ -115,6 +113,8 @@ module.exports = ({ strapi }) => ({
             throw new PluginError(400, `Request property "relation" got incorrect format, use format like "api::<collection name>.<content type name>:<entity id>"`);
         }
 
+        await this.getCommonService().parseRelationString(relation);
+
         const existingEntity = await this.getCommonService().findOne({
             id,
             related: relation,
@@ -144,6 +144,9 @@ module.exports = ({ strapi }) => ({
         if (!this.getCommonService().isValidUserContext(user)) {
             throw resolveUserContextError(user);
         }
+
+        await this.getCommonService().parseRelationString(relation);
+
 		const reportAgainstEntity = await this.getCommonService().findOne({
             id, 
             related: relation,
@@ -185,6 +188,8 @@ module.exports = ({ strapi }) => ({
             throw new PluginError(403, `You're not allowed to take an action on that entity. Make sure that you've provided proper "authorId" or authenticated your request properly.`);
         }
 
+        await this.getCommonService().parseRelationString(relation);
+
         let entity;
         try {
             const byAuthor = user?.id ? {
@@ -216,7 +221,7 @@ module.exports = ({ strapi }) => ({
     },
 
 	async sendAbuseReportEmail(reason, content) {
-		const rolesToBeNotified = await this.getCommonService().getConfig('moderatorRoles') || ['strapi-super-admin'];
+		const rolesToBeNotified = await this.getCommonService().getConfig(CONFIG_PARAMS.MODERATOR_ROLES) || ['strapi-super-admin'];
 
         const adminUserModel = strapi.db.query('admin::user');
 		const emails = await adminUserModel.findMany({

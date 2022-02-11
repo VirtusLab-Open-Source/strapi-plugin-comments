@@ -21,12 +21,9 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
     },
 
     // Config
-    async config() {
-        const pluginStore = await this.getCommonService().getConfigStore();
+    async config(viaSettingsPage = false) {
+        const pluginStore = await this.getCommonService().getPluginStore();
         const config = await pluginStore.get({ key: 'config' });
-
-        console.log('stored config', config);
-
         const additionalConfiguration = {
             regex: Object.keys(REGEX).reduce((prev, curr) => ({
                 ...prev,
@@ -43,15 +40,27 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
 
         const entryLabel = this.getCommonService().getLocalConfig('entryLabel');
         const approvalFlow = this.getCommonService().getLocalConfig('approvalFlow');
-        return {
+        const result = {
             entryLabel,
             approvalFlow,
             ...additionalConfiguration,
         };
+
+        if (viaSettingsPage) {
+            const enabledCollections = this.getCommonService().getLocalConfig('enabledCollections');
+            const moderatorRoles = this.getCommonService().getLocalConfig('moderatorRoles');
+            return {
+                ...result,
+                enabledCollections,
+                moderatorRoles,
+            };
+        }
+
+        return result;
     },
 
     async updateConfig(body) {
-        const pluginStore = await this.getCommonService().getConfigStore();
+        const pluginStore = await this.getCommonService().getPluginStore();
     
         await pluginStore.set({ key: 'config', value: body });
     
@@ -59,8 +68,8 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
       },
     
       async restoreConfig() {
-        const pluginStore = await this.getCommonService().getConfigStore();
-        const { config: defaultConfig } = strapi.plugin('comments');
+        const pluginStore = await this.getCommonService().getPluginStore();
+        const defaultConfig = this.getCommonService().getLocalConfig();
     
         await pluginStore.delete({key: 'config'})
         await pluginStore.set({

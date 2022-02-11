@@ -10,22 +10,6 @@ module.exports = [
     },
   },
   {
-    method: 'PUT',
-    path: '/moderate/config',
-    handler: 'admin.updateConfig',
-    config: {
-      policies: [],
-    },
-  },
-  {
-    method: 'DELETE',
-    path: '/moderate/config',
-    handler: 'admin.restoreConfig',
-    config: {
-      policies: [],
-    },
-  },
-  {
     method: 'GET',
     path: '/moderate/config/content-types/:contentTypeName',
     handler: 'admin.contentTypeName',
@@ -101,6 +85,30 @@ module.exports = [
     method: 'PATCH',
     path: '/moderate/thread/:id/unblock',
     handler: 'admin.unblockCommentThread',
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: 'GET',
+    path: '/settings/config',
+    handler: 'admin.settingsConfig',
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/settings/config',
+    handler: 'admin.settingsUpdateConfig',
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: 'DELETE',
+    path: '/settings/config',
+    handler: 'admin.settingsRestoreConfig',
     config: {
       policies: [],
     },

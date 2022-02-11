@@ -1,29 +1,30 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { useNotification } from '@strapi/helper-plugin';
-import { fetchConfig } from '../pages/App/utils/api';
-import { restoreConfig, updateConfig } from '../pages/Settings/utils/api';
+import { fetchConfig, restoreConfig, updateConfig } from '../pages/Settings/utils/api';
+import pluginId from '../pluginId';
 import { getMessage } from '../utils';
 
-const useConfig = () => {
+const useConfig = (toggleNotification) => {
   const queryClient = useQueryClient();
-  const toggleNotification = useNotification();
+
   const fetch = useQuery('get-config', () =>
     fetchConfig(toggleNotification)
   );
 
-  const handleError = (type) => {
+  const handleError = (type, callback = () => {}) => {
     toggleNotification({
       type: 'warning',
-      message: getMessage(`page.settings.notification.${type}.error`),
+      message: `${pluginId}.page.settings.notification.${type}.error`,
     });
+    callback();
   };
 
-  const handleSuccess = (type) => {
+  const handleSuccess = (type, callback = () => {}) => {
     queryClient.invalidateQueries('get-config');
     toggleNotification({
       type: 'success',
-      message: getTrad(`page.settings.notification.${type}.success`),
+      message: `${pluginId}.page.settings.notification.${type}.success`,
     });
+    callback();
   };
 
   const submitMutation = useMutation(updateConfig, {

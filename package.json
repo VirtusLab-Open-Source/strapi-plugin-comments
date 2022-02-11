@@ -9,6 +9,7 @@
     "kind": "plugin"
   },
   "scripts": {
+    "prepare": "husky install",
     "publish": "npm publish --tag latest",
     "test:unit": "jest --verbose --coverage"
   },
@@ -26,7 +27,9 @@
     "jest": "^26.0.1",
     "jest-cli": "^26.0.1",
     "jest-styled-components": "^7.0.2",
-    "koa": "2.13.3"
+    "koa": "2.13.3",
+    "husky": "7.0.4",
+    "prettier": "2.5.1"
   },
   "peerDependencies": {
     "@strapi/strapi": "4.x"

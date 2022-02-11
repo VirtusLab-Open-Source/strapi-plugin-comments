@@ -25,6 +25,35 @@ export default {
       },
       permissions: pluginPermissions.access,
     });
+
+    app.createSettingSection(
+      {
+        id: pluginId,
+        intlLabel: {
+          id: `${pluginId}.plugin.section`,
+          defaultMessage: `${displayName} plugin`,
+        },
+      },
+      [
+        {
+          intlLabel: {
+            id: `${pluginId}.plugin.section.item`,
+            defaultMessage: 'Configuration',
+          },
+          id: 'comments',
+          to: `/settings/${pluginId}`,
+          Component: async () => {
+            const component = await import(
+              /* webpackChunkName: "documentation-settings" */ './pages/Settings'
+            );
+    
+            return component;
+          },
+          permissions: pluginPermissions.settings,
+        },
+      ]
+    );
+
     app.addReducers(reducers);
     app.registerPlugin({
       id: pluginId,
@@ -39,22 +68,6 @@ export default {
     //     name: 'comments-link',
     //     Component: () => 'TODO: Comments count',
     // });
-    app.addSettingsLink('global', {
-      intlLabel: {
-        id: `${pluginId}.plugin.name`,
-        defaultMessage: displayName,
-      },
-      id: 'comments',
-      to: `/settings/${pluginId}`,
-      Component: async () => {
-        const component = await import(
-          /* webpackChunkName: "documentation-settings" */ './pages/Settings'
-        );
-
-        return component;
-      },
-      permissions: pluginPermissions.settings,
-    });
   },
   
   async registerTrads({ locales }) {
