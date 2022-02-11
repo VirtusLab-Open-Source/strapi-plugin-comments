@@ -84,6 +84,7 @@ const Settings = () => {
 			}), {}),
 			'*': entryLabel['*'],
 		},
+		reportReasons: configData?.reportReasons,
 		gql: gqlAuthEnabled ? { auth: true } : undefined,
 	});
 

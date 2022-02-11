@@ -40,9 +40,11 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
 
         const entryLabel = this.getCommonService().getLocalConfig('entryLabel');
         const approvalFlow = this.getCommonService().getLocalConfig('approvalFlow');
+        const reportReasons = this.getCommonService().getLocalConfig('reportReasons');
         const result = {
             entryLabel,
             approvalFlow,
+            reportReasons,
             ...additionalConfiguration,
         };
 
