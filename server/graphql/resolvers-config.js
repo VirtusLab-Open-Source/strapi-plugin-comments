@@ -1,9 +1,8 @@
 'use strict'
 
-const { getPluginService } = require("../utils/functions");
-
-module.exports = () => {
-	const auth = getPluginService('common').getConfig('gql.auth', false);
+module.exports = ({ config }) => {
+	const { gql: { auth = false } = {}} = config;
+	console.log('auth', auth);
 	return {
 		'Query.findAllFlat': { auth },
 		'Query.findAllInHierarchy': { auth },

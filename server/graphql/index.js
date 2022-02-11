@@ -6,17 +6,17 @@ const getMutations = require('./mutations');
 const getResolversConfig = require('./resolvers-config');
 const { getModelUid } = require('../services/utils/functions');
 
-module.exports = () => {
+module.exports = async ({ strapi, config}) => {
 	const extensionService = strapi.plugin('graphql').service('extension');
-
 	extensionService.shadowCRUD(getModelUid('comment')).disable();
 	extensionService.shadowCRUD(getModelUid('comment-report')).disable();
-
-	extensionService.use(({ nexus }) => {
-		const types = getTypes({ strapi, nexus });
-		const queries = getQueries({ strapi, nexus });
-		const mutations = getMutations({ strapi, nexus });
-		const resolversConfig = getResolversConfig({ strapi });
+	console.log(extensionService);
+	extensionService.use(({ strapi, nexus }) => {
+		const types = getTypes({ strapi, nexus, config });
+		console.log('types', types);
+		const queries = getQueries({ strapi, nexus, config });
+		const mutations = getMutations({ strapi, nexus, config });
+		const resolversConfig = getResolversConfig({ strapi, config });
 
 		return {
 			types: [types, queries, mutations],

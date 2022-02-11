@@ -1,8 +1,16 @@
 'use strict';
 
 const permissions = require('./../permissions');
+const { getPluginService } = require('./utils/functions');
 
 module.exports = async ({ strapi }) => {
+
+  // Provide GQL support
+  if (strapi.plugin('graphql')) {
+    const config = await getPluginService('common').getConfig();
+    await require('./graphql')({ strapi, config });
+  }
+
   // Check if the plugin users-permissions is installed because the navigation needs it
   if (Object.keys(strapi.plugins).indexOf("users-permissions") === -1) {
     throw new Error(

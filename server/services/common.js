@@ -1,7 +1,7 @@
 'use strict';
 
 const BadWordsFilter = require('bad-words');
-const { isArray, isNumber, isObject, isNil, isString, first, parseInt, set } = require('lodash');
+const { isArray, isNumber, isObject, isNil, isString, first, parseInt, set, get } = require('lodash');
 const { REGEX, CONFIG_PARAMS } = require('../utils/constants');
 const PluginError = require('./../utils/error');
 const {
@@ -19,7 +19,7 @@ const {
 
 module.exports = ({ strapi }) => ({
 
-    async getConfig(prop, defaultValue) {
+    async getConfig(prop, defaultValue, useLocal = false) {
         const queryProp = buildConfigQueryProp(prop);
         const pluginStore = await this.getPluginStore();
         const config = await pluginStore.get({ key: 'config' });
@@ -140,7 +140,7 @@ module.exports = ({ strapi }) => ({
                 },
             });
         if (!entity){
-            throw new PluginError(404, 'Not found');
+            throw new PluginError(404, 'Comment does not exist. Check your payload please.');
         }
         return filterOurResolvedReports(this.sanitizeCommentEntity(entity));
     },
