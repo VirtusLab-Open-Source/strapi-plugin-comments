@@ -31,10 +31,13 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
             }), {}),
         };
 
+        const isGQLPluginEnabled = !isNil(strapi.plugin('graphql'));
+
         if (config) {
             return {
                 ...config,
                 ...additionalConfiguration,
+                isGQLPluginEnabled: viaSettingsPage ? isGQLPluginEnabled : undefined,
             };
         }
 
@@ -55,6 +58,7 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
                 ...result,
                 enabledCollections,
                 moderatorRoles,
+                isGQLPluginEnabled,
             };
         }
 

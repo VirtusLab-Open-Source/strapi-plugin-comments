@@ -92,6 +92,16 @@ In our minimum support we're following [official Node.js releases timelines](htt
 **We recommend always using the latest version of Strapi to start your new projects**.
 
 ## 🔧 Configuration
+
+### In `v2.0.3` and newest
+
+Version `2.0.3` introduce the intuitive **Settings** page which you can easly access via `Strapi Settings -> Section: Comments Plugin -> Configuration`. On dedicated page you will be able to setup all crucial properties which drives the plugin and customize each individual collection for which **Comments plugin** should be enabled.
+
+> *Note*
+> Default configuration for your plugin is fetched from `config/plugins.js` or directly from the plugin itself. If you would like to customize the default state to which you might revert, please follow the next section.
+
+### In `v2.0.2` and older + default configuration state for `v2.0.3` and newest
+
 To setup amend default plugin configuration we recommend to put following snippet as part of `config/plugins.js` or `config/<env>/plugins.js` file. If the file does not exist yet, you have to create it manually. If you've got already configurations for other plugins stores by this way, use just the `comments` part within exising `plugins` item.
 
 

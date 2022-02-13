@@ -108,7 +108,7 @@ const Settings = () => {
 	const entryLabel = configData?.entryLabel || {};
 	const approvalFlow = configData?.approvalFlow || [];
 	const badWords = configData?.badWords || undefined;
-	const isGQLPluginEnabled = false;
+	const isGQLPluginEnabled = configData?.isGQLPluginEnabled;
 	const gqlAuthEnabled = configData?.gql?.auth || undefined;
 	const moderatorRoles = configData?.moderatorRoles
 		?.filter(code => allRoles.find(_ => _.code === code)) || [];
