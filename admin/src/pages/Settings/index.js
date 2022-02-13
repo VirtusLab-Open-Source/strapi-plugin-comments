@@ -165,6 +165,7 @@ const Settings = () => {
 					entryLabel,
 					gqlAuthEnabled,
 				}}
+				enableReinitialize={true}
 				onSubmit={handleUpdateConfiguration}
 			>
 				{({ handleSubmit, setFieldValue, values }) => (
