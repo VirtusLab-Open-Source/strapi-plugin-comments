@@ -28,7 +28,7 @@ import {
 import getMessage from '../../utils/getMessage';
 import { fetchDetailsData, fetchContentTypeData } from '../utils/api';
 import pluginPermissions from '../../permissions';
-import { getUrl } from '../../utils';
+import { getUrl, parseRegExp } from '../../utils';
 import Nav from '../../components/Nav';
 import DetailsEntity from './components/DetailsEntity';
 import DiscussionThread from '../../components/DiscussionThread';
@@ -60,7 +60,10 @@ const Details = ({ config }) => {
 
   const [filters, setFilters] = useState({});
 
-  const regexUID = new RegExp(config.regex.uid);
+  const regexUID = new RegExp(
+    parseRegExp(config.regex.uid).value,
+    parseRegExp(config.regex.uid).flags
+  );
 
   const { isLoading: isLoadingForData, data, isFetching } = useQuery(
     ['get-details-data', id, filters, canAccess],

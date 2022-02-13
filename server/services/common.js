@@ -1,8 +1,8 @@
 'use strict';
 
 const BadWordsFilter = require('bad-words');
-const { isArray, isNumber, isObject, isNil, isString, first, parseInt, set } = require('lodash');
-const { REGEX } = require('../utils/constants');
+const { isArray, isNumber, isObject, isNil, isString, first, parseInt, set, get } = require('lodash');
+const { REGEX, CONFIG_PARAMS } = require('../utils/constants');
 const PluginError = require('./../utils/error');
 const {
     getModelUid,
@@ -10,6 +10,7 @@ const {
     buildNestedStructure,
     filterOurResolvedReports,
     buildAuthorModel,
+    buildConfigQueryProp,
 } = require('./utils/functions');
 
 /**
@@ -18,11 +19,26 @@ const {
 
 module.exports = ({ strapi }) => ({
 
-    getConfig(prop, defaultValue) {
-        let queryProp = prop;
-        if (prop && isArray(prop)) {
-            queryProp = prop.join('.');
+    async getConfig(prop, defaultValue, useLocal = false) {
+        const queryProp = buildConfigQueryProp(prop);
+        const pluginStore = await this.getPluginStore();
+        const config = await pluginStore.get({ key: 'config' });
+
+        let result;
+        if (config && !useLocal) {
+            result = queryProp ? get(config, queryProp) : config;;
+        } else {
+            result = this.getLocalConfig(queryProp, defaultValue);
         }
+        return isNil(result) ? defaultValue : result;
+    },
+
+    async getPluginStore() {
+        return strapi.store({ type: 'plugin', name: 'comments' });
+    },
+
+    getLocalConfig(prop, defaultValue) {
+        const queryProp = buildConfigQueryProp(prop);
         const result = strapi.config.get(`plugin.comments${ queryProp ? '.' + queryProp : ''}`);
         return isNil(result) ? defaultValue : result;
     },
@@ -124,7 +140,7 @@ module.exports = ({ strapi }) => ({
                 },
             });
         if (!entity){
-            throw new PluginError(404, 'Not found');
+            throw new PluginError(404, 'Comment does not exist. Check your payload please.');
         }
         return filterOurResolvedReports(this.sanitizeCommentEntity(entity));
     },
@@ -202,8 +218,20 @@ module.exports = ({ strapi }) => ({
         return user ? !isNil(user?.id) : true;
     },
 
-    checkBadWords(content) {
-        const config = this.getConfig('badWords', true);
+    async parseRelationString(relation) {
+        const [ uid, relatedStringId ] = getRelatedGroups(relation);
+        const parsedRelatedId = parseInt(relatedStringId);
+        const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
+
+        const enabledCollections = await this.getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS, []);
+        if (!enabledCollections.includes(uid)) {
+            throw new PluginError(403, `Action not allowed for collection '${uid}'. Use one of: ${ enabledCollections.join(', ') }`);
+        }
+        return [ uid, relatedId];
+    },
+
+    async checkBadWords(content) {
+        const config = await this.getConfig(CONFIG_PARAMS.BAD_WORDS, true);
         if (config) {
             const filter = new BadWordsFilter(isObject(config) ? config : undefined);
             if (content && filter.isProfane(content)) {

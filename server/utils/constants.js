@@ -1,3 +1,11 @@
+const CONFIG_PARAMS = {
+  ENABLED_COLLECTIONS: 'enabledCollections',
+  APPROVAL_FLOW: 'approvalFlow',
+  ENTRY_LABEL: 'entryLabel',
+  MODERATOR_ROLES: 'moderatorRoles',
+  BAD_WORDS: 'badWords',
+};
+
 const APPROVAL_STATUS = {
   PENDING: "PENDING",
   APPROVED: "APPROVED",
@@ -12,6 +20,7 @@ const REGEX = {
 };
 
 module.exports = {
+  CONFIG_PARAMS,
   APPROVAL_STATUS,
   REGEX,
 };

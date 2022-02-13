@@ -1,8 +1,20 @@
 'use strict';
 
+const { isEmpty } = require('lodash');
 const permissions = require('./../permissions');
+const { getPluginService } = require('./utils/functions');
 
 module.exports = async ({ strapi }) => {
+
+  // Provide GQL support
+  if (strapi.plugin('graphql')) {
+    const config = await getPluginService('common').getConfig();
+    const { enabledCollections } = config;
+    if (!isEmpty(enabledCollections)) {
+      await require('./graphql')({ strapi, config });
+    }
+  }
+
   // Check if the plugin users-permissions is installed because the navigation needs it
   if (Object.keys(strapi.plugins).indexOf("users-permissions") === -1) {
     throw new Error(
@@ -33,6 +45,18 @@ module.exports = async ({ strapi }) => {
       section: "plugins",
       displayName: "Reports: Moderate",
       uid: permissions.reports.action,
+      pluginName: "comments",
+    },
+    {
+      section: "plugins",
+      displayName: "Settings: Read",
+      uid: permissions.settings.read,
+      pluginName: "comments",
+    },
+    {
+      section: "plugins",
+      displayName: "Settings: Change",
+      uid: permissions.settings.change,
       pluginName: "comments",
     },
   ];

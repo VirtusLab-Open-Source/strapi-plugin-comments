@@ -1,6 +1,6 @@
 const PluginError = require('./../../utils/error');
 const { REGEX } = require('./../../utils/constants')
-const { first, isObject, isEmpty } = require('lodash');
+const { first, isObject, isArray, isEmpty } = require('lodash');
 
 const buildNestedStructure = (
   entities,
@@ -91,6 +91,14 @@ module.exports = {
             ...rest,
             author: isEmpty(author) ? undefined : author,
         };
+    },
+
+    buildConfigQueryProp(prop) {
+        let queryProp = prop;
+        if (prop && isArray(prop)) {
+            queryProp = prop.join('.');
+        }
+        return queryProp;
     },
 
     resolveUserContextError: user => {

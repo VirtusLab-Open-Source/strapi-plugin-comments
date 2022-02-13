@@ -8,3 +8,4 @@ export { default as renderEntryTitle } from './renderEntryTitle';
 export { default as renderInitials } from './renderInitials';
 export { default as resolveCommentStatus } from './resolveCommentStatus';
 export { default as resolveCommentStatusColor } from './resolveCommentStatusColor';
+export { default as parseRegExp } from './parseRegExp';

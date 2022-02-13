@@ -21,18 +21,68 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
     },
 
     // Config
-    async config() {
-        const entryLabel = this.getCommonService().getConfig('entryLabel');
-        const approvalFlow = this.getCommonService().getConfig('approvalFlow');
-        return {
-            entryLabel,
-            approvalFlow,
+    async config(viaSettingsPage = false) {
+        const pluginStore = await this.getCommonService().getPluginStore();
+        const config = await pluginStore.get({ key: 'config' });
+        const additionalConfiguration = {
             regex: Object.keys(REGEX).reduce((prev, curr) => ({
                 ...prev,
                 [curr]: REGEX[curr].toString(),
             }), {}),
         };
+
+        if (config) {
+            return {
+                ...config,
+                ...additionalConfiguration,
+            };
+        }
+
+        const entryLabel = this.getCommonService().getLocalConfig('entryLabel');
+        const approvalFlow = this.getCommonService().getLocalConfig('approvalFlow');
+        const reportReasons = this.getCommonService().getLocalConfig('reportReasons');
+        const result = {
+            entryLabel,
+            approvalFlow,
+            reportReasons,
+            ...additionalConfiguration,
+        };
+
+        if (viaSettingsPage) {
+            const enabledCollections = this.getCommonService().getLocalConfig('enabledCollections');
+            const moderatorRoles = this.getCommonService().getLocalConfig('moderatorRoles');
+            return {
+                ...result,
+                enabledCollections,
+                moderatorRoles,
+            };
+        }
+
+        return result;
     },
+
+    async updateConfig(body) {
+        const pluginStore = await this.getCommonService().getPluginStore();
+    
+        await pluginStore.set({ key: 'config', value: body });
+    
+        return this.config();
+      },
+    
+      async restoreConfig() {
+        const pluginStore = await this.getCommonService().getPluginStore();
+        const defaultConfig = this.getCommonService().getLocalConfig();
+    
+        await pluginStore.delete({key: 'config'})
+        await pluginStore.set({
+            key: 'config',
+            value: {
+                ...defaultConfig,
+            }
+        });
+    
+        return this.config();
+      },
 
     // Find all comments
     async findAll({ related, entity, ...query }) {

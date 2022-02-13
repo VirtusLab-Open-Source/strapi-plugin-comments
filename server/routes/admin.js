@@ -89,4 +89,28 @@ module.exports = [
       policies: [],
     },
   },
+  {
+    method: 'GET',
+    path: '/settings/config',
+    handler: 'admin.settingsConfig',
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/settings/config',
+    handler: 'admin.settingsUpdateConfig',
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: 'DELETE',
+    path: '/settings/config',
+    handler: 'admin.settingsRestoreConfig',
+    config: {
+      policies: [],
+    },
+  },
 ];
