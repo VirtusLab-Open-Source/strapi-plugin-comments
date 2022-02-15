@@ -75,15 +75,8 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
     
       async restoreConfig() {
         const pluginStore = await this.getCommonService().getPluginStore();
-        const defaultConfig = this.getCommonService().getLocalConfig();
-    
+
         await pluginStore.delete({key: 'config'})
-        await pluginStore.set({
-            key: 'config',
-            value: {
-                ...defaultConfig,
-            }
-        });
     
         return this.config();
       },
