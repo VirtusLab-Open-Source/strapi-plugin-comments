@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
@@ -10,7 +10,7 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "publish": "npm publish --tag latest",
+    "publish:latest": "npm publish --tag latest",
     "test:unit": "jest --verbose --coverage"
   },
   "repository": {
