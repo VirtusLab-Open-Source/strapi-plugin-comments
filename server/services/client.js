@@ -38,7 +38,8 @@ module.exports = ({ strapi }) => ({
             throw new PluginError(400, `Relation for field "related" does not exist. Check your payload please.`);
         }
 
-        const isApprovalFlowEnabled = await this.getCommonService().getConfig(CONFIG_PARAMS.APPROVAL_FLOW, []).includes(uid) ||
+        const approvalFlow = await this.getCommonService().getConfig(CONFIG_PARAMS.APPROVAL_FLOW, []);
+        const isApprovalFlowEnabled = approvalFlow.includes(uid) ||
             relatedEntity.requireCommentsApproval;
 
         const linkToThread = !isNil(threadOf) ? await this.getCommonService().findOne({

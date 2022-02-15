@@ -1,8 +1,9 @@
+import pluginId from "../pluginId";
 
-const handleAPIError = (err = null, toggleNotification = null) => {
+const handleAPIError = (err = null, toggleNotification = null, message = 'app.components.notification.error') => {
     toggleNotification({
         type: 'warning',
-        message: 'app.components.notification.error',
+        message: `${pluginId}.${message}`,
     });
 
     if (err) {

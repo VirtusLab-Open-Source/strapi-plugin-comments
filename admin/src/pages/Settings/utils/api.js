@@ -7,7 +7,7 @@ export const fetchConfig = async (toggleNotification) => {
 
     return data;
   } catch (err) {
-    handleAPIError(err, toggleNotification);
+    handleAPIError(err, toggleNotification, 'page.settings.notification.fetch.error');
   }
 };
 
@@ -43,6 +43,16 @@ export const fetchAllContentTypes = async (toggleNotification) => {
 export const fetchRoles = async (toggleNotification) => {
   try {
     const { data } = await axiosInstance.get(`/admin/roles`);
+    return data;
+  } catch (err) {
+    handleAPIError(err, toggleNotification);
+  }
+};
+
+export const restartStrapi = async (toggleNotification) => {
+  try {
+    const { data } = await axiosInstance.get(getApiURL(`settings/restart`));
+
     return data;
   } catch (err) {
     handleAPIError(err, toggleNotification);

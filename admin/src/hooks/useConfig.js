@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { fetchConfig, restoreConfig, updateConfig } from '../pages/Settings/utils/api';
+import { fetchConfig, restartStrapi, restoreConfig, updateConfig } from '../pages/Settings/utils/api';
 import pluginId from '../pluginId';
-import { getMessage } from '../utils';
 
 const useConfig = (toggleNotification) => {
   const queryClient = useQueryClient();
@@ -18,8 +17,10 @@ const useConfig = (toggleNotification) => {
     callback();
   };
 
-  const handleSuccess = (type, callback = () => {}) => {
-    queryClient.invalidateQueries('get-config');
+  const handleSuccess = (type, callback = () => {}, invalidateQueries = true) => {
+    if (invalidateQueries) {
+      queryClient.invalidateQueries('get-config');
+    };
     toggleNotification({
       type: 'success',
       message: `${pluginId}.page.settings.notification.${type}.success`,
@@ -37,7 +38,12 @@ const useConfig = (toggleNotification) => {
     onError: () => handleError('restore'),
   });
 
-  return { fetch, submitMutation, restoreMutation };
+  const restartMutation = useMutation(restartStrapi, {
+    onSuccess: () => handleSuccess('restart', () => {}, false),
+    onError: () => handleError('restart'),
+  });
+
+  return { fetch, restartMutation, submitMutation, restoreMutation };
 };
 
 export default useConfig;

@@ -88,6 +88,10 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
         return this.config();
       },
 
+    async restart() {
+        setImmediate(() => strapi.reload());
+    },
+
     // Find all comments
     async findAll({ related, entity, ...query }) {
         const { _q, orderBy, pageSize = 10, page = 1, filters, ...rest } = parseParams(query);

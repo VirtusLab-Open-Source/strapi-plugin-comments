@@ -113,4 +113,12 @@ module.exports = [
       policies: [],
     },
   },
+  {
+    method: 'GET',
+    path: '/settings/restart',
+    handler: 'admin.settingsRestart',
+    config: {
+      policies: [],
+    },
+  },
 ];

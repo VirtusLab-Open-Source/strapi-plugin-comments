@@ -43,6 +43,15 @@ module.exports = {
     }
   },
 
+  async settingsRestart(ctx) {
+    try {
+      await this.getService().restart();
+      return ctx.send({ status: 200 });
+    } catch (e) {
+      throwError(ctx, e);
+    }
+  },
+
   async findAll(ctx) {
     return this.getService()
       .findAll(ctx.query);

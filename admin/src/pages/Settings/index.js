@@ -1,7 +1,7 @@
 import React, { useRef, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import { Formik } from 'formik';
-import { capitalize, first, orderBy, isEmpty } from 'lodash';
+import { capitalize, first, orderBy, isEmpty, isEqual } from 'lodash';
 import {
 	CheckPermissions,
 	LoadingIndicatorPage,
@@ -27,13 +27,14 @@ import {
   CardBody,
   CardContent,
 } from '@strapi/design-system/Card';
-import { Check, Refresh } from '@strapi/icons';
+import { Check, Refresh, Play } from '@strapi/icons';
 
 import pluginPermissions from '../../permissions';
 import useConfig from '../../hooks/useConfig';
 import { fetchAllContentTypes, fetchRoles } from './utils/api';
 import { getMessage, parseRegExp } from '../../utils';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
+import { RestartAlert } from './components/RestartAlert/styles';
 
 
 const Settings = () => {
@@ -56,8 +57,9 @@ const Settings = () => {
 	} = useRBAC(viewPermissions);
 
 	const [restoreConfigmationVisible, setRestoreConfigmationVisible] = useState(false);
+	const [restartRequired, setRestartRequired] = useState(false);
 
-	const { fetch, submitMutation, restoreMutation } = useConfig(toggleNotification);
+	const { fetch, restartMutation, submitMutation, restoreMutation } = useConfig(toggleNotification);
 	const { data: configData, isLoading: isConfigLoading, err: configErr } = fetch;
 
 	const { data: allCollectionsData, isLoading: areCollectionsLoading, err: collectionsErr } = useQuery(
@@ -131,7 +133,13 @@ const Settings = () => {
 	const handleUpdateConfiguration = async (form) => {
 		if (canChange) {
 			lockApp();
-			await submitMutation.mutateAsync(preparePayload(form));
+			const payload = preparePayload(form);
+			await submitMutation.mutateAsync(payload);
+			const enabledCollectionsChanged = !isEqual(payload.enabledCollections, configData?.enabledCollections);
+			const gqlAuthChanged = !isEqual(payload.gql?.auth, configData?.gql?.auth);
+			if (enabledCollectionsChanged || gqlAuthChanged) {
+				setRestartRequired(true);
+			}
 			unlockApp();
 		}
 	};
@@ -142,10 +150,21 @@ const Settings = () => {
 			lockApp();
 			await restoreMutation.mutateAsync();
 			unlockApp();
+			setRestartRequired(true);
 			setRestoreConfigmationVisible(false);
 		}
 	};
 	const handleRestoreCancel = () => setRestoreConfigmationVisible(false);
+
+	const handleRestart = async () => {
+		if (canChange) {
+			lockApp();
+			await restartMutation.mutateAsync();
+			setRestartRequired(false);
+			unlockApp();
+		}
+	};
+	const handleRestartDiscard = () => setRestartRequired(false);
 
 	const boxDefaultProps = {
 		background: "neutral0",
@@ -175,7 +194,7 @@ const Settings = () => {
 							subtitle={getMessage('page.settings.header.description')}
 							primaryAction={
 								<CheckPermissions permissions={pluginPermissions.settingsChange}>
-									<Button type="submit" startIcon={<Check />} >
+									<Button type="submit" startIcon={<Check />} disabled={restartRequired} >
 										{getMessage('page.settings.actions.submit')}
 									</Button>
 								</CheckPermissions>
@@ -183,6 +202,15 @@ const Settings = () => {
 						/>
 						<ContentLayout>
 							<Stack size={6}>
+								{ restartRequired && (
+									<RestartAlert 
+										closeLabel={getMessage('page.settings.actions.restart.alert.cancel')} 
+										title={getMessage('page.settings.actions.restart.alert.title')}
+										action={<Box><Button onClick={handleRestart} startIcon={<Play />}>{getMessage('page.settings.actions.restart')}</Button></Box>}
+										onClose={handleRestartDiscard}>
+										{ getMessage('page.settings.actions.restart.alert.description')}
+									</RestartAlert>)}
+
 								<Box {...boxDefaultProps}>
 									<Stack size={4}>
 										<Typography variant="delta" as="h2">
@@ -198,6 +226,7 @@ const Settings = () => {
 													onClear={() => setFieldValue('enabledCollections', [], false)}
 													value={values.enabledCollections}
 													onChange={(value) => setFieldValue('enabledCollections', value, false)}
+													disabled={restartRequired}
 													multi
 													withTags
 												>
@@ -214,6 +243,7 @@ const Settings = () => {
 													onClear={() => setFieldValue('moderatorRoles', [], false)}
 													value={values.moderatorRoles}
 													onChange={(value) => setFieldValue('moderatorRoles', value, false)}
+													disabled={restartRequired}
 													multi
 													withTags
 												>
@@ -230,6 +260,7 @@ const Settings = () => {
 													onChange={({ target: { checked } }) => setFieldValue('badWords', checked, false)}
 													onLabel={getMessage('compontents.toogle.enabled')}
 													offLabel={getMessage('compontents.toogle.disabled')}
+													disabled={restartRequired}
 												/>
 											</GridItem>
 											{ isGQLPluginEnabled && (<GridItem col={6} xs={12}>
@@ -241,6 +272,7 @@ const Settings = () => {
 													onChange={({ target: { checked } }) => setFieldValue('gqlAuthEnabled', checked, false)}
 													onLabel={getMessage('compontents.toogle.enabled')}
 													offLabel={getMessage('compontents.toogle.disabled')}
+													disabled={restartRequired}
 												/>
 											</GridItem>) }
 										</Grid>
@@ -272,6 +304,7 @@ const Settings = () => {
 																		onChange={({ target: { checked } }) => setFieldValue('approvalFlow', changeApprovalFlowFor(uid, values.approvalFlow, checked), [])}
 																		onLabel={getMessage('compontents.toogle.enabled')}
 																		offLabel={getMessage('compontents.toogle.disabled')}
+																		disabled={restartRequired}
 																	/>
 																	{ !isEmpty(stringAttributes) && (<Select
 																		name={`collectionSettings-${uid}-entryLabel`}
@@ -283,6 +316,7 @@ const Settings = () => {
 																		onChange={(value) => setFieldValue('entryLabel', changeEntryLabelFor(uid, values.entryLabel, value))}
 																		multi
 																		withTags
+																		disabled={restartRequired}
 																	>
 																		{ stringAttributes.map(key => 
 																			(<Option key={`collectionSettings-${uid}-entryLabel-${key}`} value={key}>{ capitalize(key.split('_').join(' ')) }</Option>))}

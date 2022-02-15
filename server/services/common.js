@@ -26,7 +26,7 @@ module.exports = ({ strapi }) => ({
 
         let result;
         if (config && !useLocal) {
-            result = queryProp ? get(config, queryProp) : config;;
+            result = queryProp ? get(config, queryProp, defaultValue) : config;
         } else {
             result = this.getLocalConfig(queryProp, defaultValue);
         }
