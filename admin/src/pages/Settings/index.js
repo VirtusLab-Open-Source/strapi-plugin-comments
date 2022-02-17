@@ -12,22 +12,20 @@ import {
 	useFocusWhenNavigate,
 	useOverlayBlocker,
 } from '@strapi/helper-plugin';
+import { Accordion, AccordionToggle, AccordionContent, AccordionGroup } from '@strapi/design-system/Accordion';
 import { Main } from '@strapi/design-system/Main';
 import { ContentLayout, HeaderLayout } from '@strapi/design-system/Layout';
 import { Button } from '@strapi/design-system/Button';
 import { Box } from '@strapi/design-system/Box';
 import { Stack } from '@strapi/design-system/Stack';
+import { Switch } from '@strapi/design-system/Switch';
 import { Typography } from '@strapi/design-system/Typography';
 import { Grid, GridItem } from '@strapi/design-system/Grid';
 import { ToggleInput } from '@strapi/design-system/ToggleInput';
 import { Select, Option } from '@strapi/design-system/Select';
 import { useNotifyAT } from '@strapi/design-system/LiveRegions';
-import {
-  Card,
-  CardBody,
-  CardContent,
-} from '@strapi/design-system/Card';
-import { Check, Refresh, Play } from '@strapi/icons';
+import { Tooltip } from '@strapi/design-system/Tooltip';
+import { Check, Refresh, Play, Information } from '@strapi/icons';
 
 import pluginPermissions from '../../permissions';
 import useConfig from '../../hooks/useConfig';
@@ -35,6 +33,7 @@ import { fetchAllContentTypes, fetchRoles } from './utils/api';
 import { getMessage, parseRegExp } from '../../utils';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import { RestartAlert } from './components/RestartAlert/styles';
+import FormSwitch from '../../components/FormSwitch';
 
 
 const Settings = () => {
@@ -58,6 +57,7 @@ const Settings = () => {
 
 	const [restoreConfigmationVisible, setRestoreConfigmationVisible] = useState(false);
 	const [restartRequired, setRestartRequired] = useState(false);
+	const [contentTypeExpanded, setContentTypeExpanded] = useState(undefined);
 
 	const { fetch, restartMutation, submitMutation, restoreMutation } = useConfig(toggleNotification);
 	const { data: configData, isLoading: isConfigLoading, err: configErr } = fetch;
@@ -166,6 +166,8 @@ const Settings = () => {
 	};
 	const handleRestartDiscard = () => setRestartRequired(false);
 
+	const handleSetContentTypeExpanded = key => setContentTypeExpanded(key === contentTypeExpanded ? undefined : key);
+
 	const boxDefaultProps = {
 		background: "neutral0",
 		hasRadius: true,
@@ -201,7 +203,7 @@ const Settings = () => {
 							}
 						/>
 						<ContentLayout>
-							<Stack size={6}>
+							<Stack size={4}>
 								{ restartRequired && (
 									<RestartAlert 
 										closeLabel={getMessage('page.settings.actions.restart.alert.cancel')} 
@@ -234,6 +236,72 @@ const Settings = () => {
 														(<Option key={uid} value={uid}>{displayName}</Option>))}
 												</Select>
 											</GridItem>
+											{ !isEmpty(values.enabledCollections) && (
+											<GridItem col={12}>
+												<AccordionGroup 
+													label={getMessage('page.settings.form.contentTypesSettings.label')} 
+													labelAction={<Tooltip description={getMessage('page.settings.form.contentTypesSettings.tooltip')}>
+														<Information aria-hidden={true} />
+													</Tooltip>}>
+													{ orderBy(values.enabledCollections).map(uid => {
+														const { schema: { displayName, attributes = {} } } = allCollections.find(_ => _.uid === uid);
+														const stringAttributes = Object.keys(attributes).filter(_ => attributes[_].type === 'string');
+														const key = `collectionSettings-${uid}`;
+														return (<Accordion 
+															expanded={contentTypeExpanded === key} 
+															toggle={() => handleSetContentTypeExpanded(key)} 
+															key={key} 
+															id={key} 
+															size="S">
+															<AccordionToggle title={displayName} togglePosition="left" />
+															<AccordionContent>
+																<Box padding={6}>
+																	<Stack size={4}>
+																		<FormSwitch 
+																			name={`collectionSettings-${uid}-approvalFlow`}
+																			label={getMessage('page.settings.form.approvalFlow.label')}
+																			hint={getMessage({
+																				id: 'page.settings.form.approvalFlow.hint',
+																				props: { name: displayName },
+																			})}
+																			selected={values.approvalFlow.includes(uid)}
+																			onChange={() => setFieldValue('approvalFlow', changeApprovalFlowFor(uid, values.approvalFlow, !values.approvalFlow.includes(uid)), [])} 
+																			onLabel={getMessage('compontents.toogle.enabled')}
+																			offLabel={getMessage('compontents.toogle.disabled')}
+																			disabled={restartRequired}
+																			visibleLabels />
+																		{ !isEmpty(stringAttributes) && (<Select
+																			name={`collectionSettings-${uid}-entryLabel`}
+																			label={getMessage('page.settings.form.entryLabel.label')}
+																			placeholder={getMessage('page.settings.form.entryLabel.placeholder')}
+																			hint={getMessage('page.settings.form.entryLabel.hint')}
+																			onClear={() => setFieldValue('entryLabel', changeEntryLabelFor(uid, values.entryLabel))}
+																			value={values.entryLabel[uid] || []}
+																			onChange={(value) => setFieldValue('entryLabel', changeEntryLabelFor(uid, values.entryLabel, value))}
+																			multi
+																			withTags
+																			disabled={restartRequired}
+																		>
+																			{ stringAttributes.map(key => 
+																				(<Option key={`collectionSettings-${uid}-entryLabel-${key}`} value={key}>{ capitalize(key.split('_').join(' ')) }</Option>))}
+																		</Select>) }
+																	</Stack>
+																</Box>
+															</AccordionContent>
+														</Accordion>);
+												})}
+												</AccordionGroup>
+											</GridItem>)}
+										</Grid>
+									</Stack>
+								</Box>
+
+								<Box {...boxDefaultProps}>
+									<Stack size={4}>
+										<Typography variant="delta" as="h2">
+											{getMessage('page.settings.section.additional')}
+										</Typography>
+										<Grid gap={4}>
 											<GridItem col={6} xs={12}>
 												<Select
 													name="moderatorRoles"
@@ -278,64 +346,12 @@ const Settings = () => {
 										</Grid>
 									</Stack>
 								</Box>
-								{ !isEmpty(values.enabledCollections) && (<Box {...boxDefaultProps}>
-									<Stack size={4}>
-										<Typography variant="delta" as="h2">
-											{getMessage('page.settings.section.collections')}
-										</Typography>
-										<Grid gap={4}>
-											{ orderBy(values.enabledCollections).map(uid => {
-												const { schema: { displayName, attributes = {} } } = allCollections.find(_ => _.uid === uid);
-												const stringAttributes = Object.keys(attributes).filter(_ => attributes[_].type === 'string');
-												return (<GridItem key={`collectionSettings-${uid}`} col={6} s={12} xs={12}>
-													<Card background="primary100" borderColor="primary200">
-														<CardBody>
-															<CardContent style={{ width: '100%' }}>
-																<Stack size={4}>
-																	<Typography variant="epsilon" fontWeight="semibold" as="h3">{ displayName }</Typography>
-																	<ToggleInput
-																		name={`collectionSettings-${uid}-approvalFlow`}
-																		label={getMessage('page.settings.form.approvalFlow.label')}
-																		hind={getMessage({
-																			id: 'page.settings.form.approvalFlow.hint',
-																			params: { name: displayName },
-																		})}
-																		checked={values.approvalFlow.includes(uid)}
-																		onChange={({ target: { checked } }) => setFieldValue('approvalFlow', changeApprovalFlowFor(uid, values.approvalFlow, checked), [])}
-																		onLabel={getMessage('compontents.toogle.enabled')}
-																		offLabel={getMessage('compontents.toogle.disabled')}
-																		disabled={restartRequired}
-																	/>
-																	{ !isEmpty(stringAttributes) && (<Select
-																		name={`collectionSettings-${uid}-entryLabel`}
-																		label={getMessage('page.settings.form.entryLabel.label')}
-																		placeholder={getMessage('page.settings.form.entryLabel.placeholder')}
-																		hint={getMessage('page.settings.form.entryLabel.hint')}
-																		onClear={() => setFieldValue('entryLabel', changeEntryLabelFor(uid, values.entryLabel))}
-																		value={values.entryLabel[uid] || []}
-																		onChange={(value) => setFieldValue('entryLabel', changeEntryLabelFor(uid, values.entryLabel, value))}
-																		multi
-																		withTags
-																		disabled={restartRequired}
-																	>
-																		{ stringAttributes.map(key => 
-																			(<Option key={`collectionSettings-${uid}-entryLabel-${key}`} value={key}>{ capitalize(key.split('_').join(' ')) }</Option>))}
-																	</Select>) }
-																</Stack>
-															</CardContent>
-														</CardBody>
-													</Card>
-												</GridItem>);
-											})}
-										</Grid>
-									</Stack>
-								</Box>)}
 
 								<CheckPermissions permissions={pluginPermissions.settingsChange}>
 									<Box {...boxDefaultProps}>
 										<Stack size={4}>
 											<Stack size={2}>
-												<Typography variant="delta" textColor="danger700" as="h2">
+												<Typography variant="delta" as="h2">
 													{getMessage('page.settings.section.restore')}
 												</Typography>
 												<Typography variant="pi"as="h4">
