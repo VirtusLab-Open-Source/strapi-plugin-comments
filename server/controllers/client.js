@@ -13,9 +13,15 @@ module.exports = {
   async findAllFlat(ctx) {
     const { params = {}, query, sort, pagination } = ctx;
     const { relation } = parseParams(params);
+
+    const { sort: querySort, pagination: queryPagination, ...filterQuery } = query || {};
+
+
+console.log(filterQuery);
+
     try {
       return this.getService('common')
-        .findAllFlat(flatInput(relation, query, sort, pagination));
+        .findAllFlat(flatInput(relation, filterQuery, sort || querySort, pagination || queryPagination));
     } catch (e) {
       throwError(ctx, e);
     }
@@ -24,10 +30,13 @@ module.exports = {
   async findAllInHierarchy(ctx) {
     const { params = {}, query, sort } = ctx;
     const { relation } = parseParams(params);
+
+    const { sort: querySort, ...filterQuery } = query || {};
+
     try {
       return await this.getService('common')
         .findAllInHierarchy({
-          ...flatInput(relation, query, sort),
+          ...flatInput(relation, filterQuery, sort || querySort),
           dropBlockedThreads: true,
         });
     } catch (e) {
