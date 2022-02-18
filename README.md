@@ -109,6 +109,8 @@ To setup amend default plugin configuration we recommend to put following snippe
     module.exports = ({ env }) => ({
         //...
         comments: {
+          enabled: true,
+          config: {
             badWords: false,
             moderatorRoles: ["Authenticated"],
             approvalFlow: ['api::page.page'],
@@ -122,6 +124,7 @@ To setup amend default plugin configuration we recommend to put following snippe
             gql: { 
               // ...
             },
+          },
         },
         //...
     });
@@ -144,8 +147,8 @@ All you need to do is to install and enable `@strapi/plugin-graphql` for you ins
 ```json
   {
     // ...
-    gql: {
-      auth: true, // Default: false
+    "gql": {
+      "auth": true, // Default: false
     },
     // ...
   }
@@ -226,10 +229,10 @@ Return a hierarchical tree structure of comments for specified instance of Conte
 [
     {
         // -- Comment Model fields ---,
-        children: [
+        "children": [
             {
                 // -- Comment Model fields ---,
-                children: [
+                "children": [
                     // ...
                 ]
             },
@@ -255,7 +258,8 @@ Return a flat structure of comments for specified instance of Content Type like 
 **Example response body**
 
 ```json
-[
+{
+  "data": [
     {
         // -- Comment Model fields ---
     },
@@ -263,7 +267,13 @@ Return a flat structure of comments for specified instance of Content Type like 
         // -- Comment Model fields ---
     },
     // ...
-]
+  ],
+  "meta": {
+    "pagination": {
+      // payload based on Strapi REST Pagination specification
+    }
+  }
+}
 ```
 
 **Possible response codes**

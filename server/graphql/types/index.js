@@ -11,6 +11,9 @@ const typesFactories = [
 	require('./report'),
 	require('./report-reason'),
 	require('./create-report'),
+	require('./response-pagination'),
+	require('./response-meta'),
+	require('./response-find-all'),
 ];
 
 module.exports = context => typesFactories.map(factory => factory(context));

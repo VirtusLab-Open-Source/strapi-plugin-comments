@@ -10,7 +10,7 @@ module.exports = ({ strapi, nexus }) => {
 	const { args } = getService('internals');
 
 	return {
-		type: nonNull(list('CommentSingle')),
+		type: 'ResponseFindAll',
 		args: {
 			relation: nonNull(stringArg()),
 			filters: getPluginService('gql').buildContentTypeFilters(contentType),

@@ -68,12 +68,35 @@ module.exports = ({ strapi }) => ({
             };
         }
 
+        let meta = {};
         if (pagination && isObject(pagination)) {
-            const { page = 1, pageSize = 10 } = pagination;
+            const parsedPagination = Object.keys(pagination).reduce((prev, curr) => ({
+                ...prev,
+                [curr]: parseInt(pagination[curr]),
+            }), {});
+            const { page, pageSize = 10, limit, start = 0 } = parsedPagination
+            const paginationByPage = !isNil(page);
+
             queryExtension = {
                 ...queryExtension,
-                offset: (page - 1) * pageSize,
-                limit: pageSize,
+                offset: paginationByPage ? (page - 1) * pageSize : start,
+                limit: paginationByPage ? pageSize : limit,
+            };
+
+            const metaPagination = paginationByPage ? {
+                pagination: {
+                    page,
+                    pageSize,
+                },
+            } : {
+                pagination: {
+                    start,
+                    limit,
+                },
+            };
+
+            meta = {
+                ...metaPagination,
             };
         }
         
@@ -88,6 +111,26 @@ module.exports = ({ strapi }) => ({
             },
             ...queryExtension,
         });
+
+        if (pagination?.withCount && (pagination.withCount === 'true' || pagination.withCount === true)) {
+            const total = await strapi.db.query(getModelUid('comment'))
+                .count({
+                    where: {
+                        ...query,
+                    }
+                });
+            const pageCount = Math.floor(total / meta.pagination.pageSize);
+            meta = {
+                ...meta,
+                pagination: {
+                    ...meta.pagination,
+                    pageCount: !isNil(meta.pagination.page) ? 
+                        total % meta.pagination.pageSize === 0 ? pageCount : pageCount + 1 : 
+                        undefined,
+                    total,
+                },
+            };
+        }
 
         const entriesWithThreads = await Promise.all(entries.map(async _ => {
             const [nestedEntries, count] = await strapi.db.query(getModelUid('comment'))
@@ -112,9 +155,15 @@ module.exports = ({ strapi }) => ({
             });
 
         if (relatedEntities.filter(_ => _).length > 0) {
-            return result.map(_ => this.mergeRelatedEntityTo(_, relatedEntities));
+            return {
+                data: result.map(_ => this.mergeRelatedEntityTo(_, relatedEntities)),
+                meta,
+            };     
         }
-        return result;    
+        return {
+            data: result,
+            meta,
+        };    
     },
 
     // Find comments and create relations tree structure
@@ -125,7 +174,7 @@ module.exports = ({ strapi }) => ({
         startingFromId = null,
         dropBlockedThreads = false,
     }, relatedEntity) {
-        const entities = await this.findAllFlat({ query, populate, sort }, relatedEntity);
+        const entities = await this.findAllFlat({ query, populate, sort }, relatedEntity)?.data;
         return buildNestedStructure(entities, startingFromId, 'threadOf', dropBlockedThreads, false);
     },
 
