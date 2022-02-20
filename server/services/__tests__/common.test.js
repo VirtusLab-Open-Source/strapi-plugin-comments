@@ -308,7 +308,7 @@ describe('Test Comments service functions utils', () => {
 
       beforeEach(() => setup({ enabledCollections: [collection] }, true, {
         'plugins::comments': db,
-        'api::collection': [relatedEntity],
+        'api::collection': [relatedEntity, { id: 2, title: 'Test 2', uid: collection }],
       }));
 
       describe('findAllFlat', () => {
@@ -327,6 +327,10 @@ describe('Test Comments service functions utils', () => {
           expect(result).toHaveProperty('meta');
           expect(result.data.length).toBe(4);
           expect(result).toHaveProperty(['data', 0, 'content'], db[0].content);
+          expect(result).toHaveProperty(['data', 0, 'author']);
+          expect(result).toHaveProperty(['data', 0, 'author', 'id'], db[0].authorId);
+          expect(result).toHaveProperty(['data', 0, 'author', 'name'], db[0].authorName);
+          expect(result).toHaveProperty(['data', 0, 'author', 'email'], db[0].authorEmail);
           expect(result).toHaveProperty(['data', 3, 'content'], db[3].content);
           expect(result).toHaveProperty(['meta', 'pagination', 'page'], 1);
           expect(result).toHaveProperty(['meta', 'pagination', 'pageSize'], 5);
@@ -368,6 +372,26 @@ describe('Test Comments service functions utils', () => {
           expect(result).toHaveProperty([0, 'content'], db[1].content);
           expect(result).toHaveProperty([0, 'children']);
           expect(result[0].children.length).toBe(0);
+        });
+      });
+
+      describe('findOne', () => {
+        test('Should return proper structure', async () => {
+          const result = await getPluginService('common').findOne({ related });
+          expect(result).toHaveProperty('id', db[0].id);
+          expect(result).toHaveProperty('content', db[0].content);
+          expect(result).toHaveProperty(['author', 'id'], db[0].authorId);
+          expect(result).toHaveProperty(['author', 'name'], db[0].authorName);
+          expect(result).toHaveProperty(['author', 'email'], db[0].authorEmail);
+        });
+      });
+
+      describe('findRelatedEntitiesFor', () => {
+        test('Should return proper structure', async () => {
+          const result = await getPluginService('common').findRelatedEntitiesFor(db);
+          expect(result).toHaveProperty([0, 'id'], relatedEntity.id);
+          expect(result).toHaveProperty([0, 'title'], relatedEntity.title);
+          expect(result).toHaveProperty([0, 'uid'], relatedEntity.uid);
         });
       });
     });
