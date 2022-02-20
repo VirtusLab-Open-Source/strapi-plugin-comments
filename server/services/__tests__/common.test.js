@@ -5,9 +5,9 @@ const { getPluginService } = require('../../utils/functions');
 jest.mock
 
 
-const setup = function(config) {
+const setup = function(config, toStore, database) {
   Object.defineProperty(global, 'strapi', {
-    value: require('../../../__mocks__/initSetup')(config),
+    value: require('../../../__mocks__/initSetup')(config, toStore, database),
     writable: true,
   });
 }
@@ -240,6 +240,135 @@ describe('Test Comments service functions utils', () => {
           expect(e).toBeInstanceOf(PluginError);
           expect(e).toHaveProperty('status', 403);
         }
+      });
+    });
+
+    describe('Merge related entity', () => {
+      beforeEach(() => setup({ enabledCollections: [uid] }));
+      const collection = 'api::collection.test';
+      const related = `${collection}:1`;
+      const comment = {
+        id: 1,
+        content: 'ABC',
+        threadOf: null,
+        related,
+        authorId: 1,
+        authorName: 'Joe Doe',
+        authorEmail: 'joe@example.com'
+      };
+      const relatedEntity = { id: 1, title: 'Test', uid: collection};
+
+      
+      test('Should merge related entity', async () => {
+        const result = await getPluginService('common').mergeRelatedEntityTo(comment, [relatedEntity]);
+        expect(result).toHaveProperty('id', 1);
+        expect(result).not.toHaveProperty('related', related);
+        expect(result).toHaveProperty(['related', 'title'], relatedEntity.title);
+      });
+    });
+
+    describe('Client API', () => {
+      const collection = 'api::collection.test';
+      const related = `${collection}:1`;
+      const db = [{
+        id: 1,
+        content: 'ABC',
+        threadOf: null,
+        related,
+        authorId: 1,
+        authorName: 'Joe Doe',
+        authorEmail: 'joe@example.com'
+      }, {
+        id: 2,
+        content: 'DEF',
+        threadOf: 1,
+        related,
+        authorId: 1,
+        authorName: 'Joe Doe',
+        authorEmail: 'joe@example.com',
+        blockedThread: true,
+      }, {
+        id: 3,
+        content: 'GHJ',
+        threadOf: null,
+        related,
+        authorId: 1,
+        authorName: 'Joe Doe',
+        authorEmail: 'joe@example.com'
+      }, {
+        id: 4,
+        content: 'IKL',
+        threadOf: 2,
+        related,
+        authorId: 1,
+        authorName: 'Joe Doe',
+        authorEmail: 'joe@example.com',
+      }];
+      const relatedEntity = { id: 1, title: 'Test', uid: collection};
+
+      beforeEach(() => setup({ enabledCollections: [collection] }, true, {
+        'plugins::comments': db,
+        'api::collection': [relatedEntity],
+      }));
+
+      describe('findAllFlat', () => {
+        test('Should return proper structure', async () => {
+          const result = await getPluginService('common').findAllFlat({ query: { related }}, relatedEntity);
+          expect(result).toHaveProperty('data');
+          expect(result).not.toHaveProperty('meta');
+          expect(result.data.length).toBe(4);
+          expect(result).toHaveProperty(['data', 0, 'content'], db[0].content);
+          expect(result).toHaveProperty(['data', 3, 'content'], db[3].content);
+        });
+  
+        test('Should return structure with pagination', async () => {
+          const result = await getPluginService('common').findAllFlat({ query: { related }, pagination: { page: 1, pageSize: 5 }}, relatedEntity);
+          expect(result).toHaveProperty('data');
+          expect(result).toHaveProperty('meta');
+          expect(result.data.length).toBe(4);
+          expect(result).toHaveProperty(['data', 0, 'content'], db[0].content);
+          expect(result).toHaveProperty(['data', 3, 'content'], db[3].content);
+          expect(result).toHaveProperty(['meta', 'pagination', 'page'], 1);
+          expect(result).toHaveProperty(['meta', 'pagination', 'pageSize'], 5);
+        });
+      });
+
+      describe('findAllInHierarchy', () => {
+        test('Should return nested structure starting for root', async () => {
+          const result = await getPluginService('common').findAllInHierarchy({ query: { related }}, relatedEntity);
+          expect(result).not.toHaveProperty('data');
+          expect(result).not.toHaveProperty('meta');
+          expect(result.length).toBe(2);
+          expect(result).toHaveProperty([0, 'content'], db[0].content);
+          expect(result).toHaveProperty([0, 'children']);
+          expect(result[0].children.length).toBe(1);
+          expect(result).toHaveProperty([0, 'children', 0, 'content'], 'DEF');
+          expect(result).toHaveProperty([0, 'children', 0, 'children']);
+          expect(result[0].children[0].children.length).toBe(1);
+          expect(result).toHaveProperty([0, 'children', 0, 'children', 0, 'content'], 'IKL');
+          expect(result).toHaveProperty([1, 'content'], db[2].content);
+        });
+
+        test('Should return nested structure starting for comment id: 1', async () => {
+          const result = await getPluginService('common').findAllInHierarchy({ query: { related }, startingFromId: 1}, relatedEntity);
+          expect(result).not.toHaveProperty('data');
+          expect(result).not.toHaveProperty('meta');
+          expect(result.length).toBe(1);
+          expect(result).toHaveProperty([0, 'content'], db[1].content);
+          expect(result).toHaveProperty([0, 'children']);
+          expect(result[0].children.length).toBe(1);
+          expect(result).toHaveProperty([0, 'children', 0, 'content'], 'IKL');
+        });
+
+        test('Should return nested structure starting for comment id: 1 without blocked comments', async () => {
+          const result = await getPluginService('common').findAllInHierarchy({ query: { related }, startingFromId: 1, dropBlockedThreads: true}, relatedEntity);
+          expect(result).not.toHaveProperty('data');
+          expect(result).not.toHaveProperty('meta');
+          expect(result.length).toBe(1);
+          expect(result).toHaveProperty([0, 'content'], db[1].content);
+          expect(result).toHaveProperty([0, 'children']);
+          expect(result[0].children.length).toBe(0);
+        });
       });
     });
   });

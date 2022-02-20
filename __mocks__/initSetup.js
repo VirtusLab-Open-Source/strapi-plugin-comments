@@ -1,14 +1,32 @@
-const { get, set } = require('lodash');
+const { get, set, isEmpty } = require('lodash');
 
-module.exports = (config = {}, toStore = false) => {
-  const mock = {
-    db: toStore ? {
-      plugin: {
-        comments: {
-          config: { ...config },
-        },
+module.exports = (config = {}, toStore = false, database = {}) => {
+  const dbConfig = toStore ? {
+    plugin: {
+      comments: {
+        config: { ...config },
       },
-    }: {},
+    },
+  }: {};
+
+  let mock = {
+    db: {
+      query: (uid) => {
+        const [handler, rest] = uid.split('::');
+        const [collection] = rest.split('.');
+        const values = get(mock.db, `${handler}.${collection}.records`, []);
+        return {
+          findOne: async () => new Promise(resolve => resolve(values[0])),
+          findMany: async () => new Promise(resolve => resolve(values)),
+          findWithCount: async () => new Promise(resolve => resolve([values, values.length])),
+          count: async () => new Promise(resolve => resolve(values.length)),
+          create: async (value) => new Promise(resolve => resolve(value)), 
+          update: async (value) => new Promise(resolve => resolve(value)), 
+          delete: async (value) => new Promise(resolve => resolve(value)),
+        };
+      },
+      ...dbConfig,
+    },
     getRef: function() {
       return this;
     },
@@ -78,5 +96,13 @@ module.exports = (config = {}, toStore = false) => {
       }
     }
   };
+
+  if (!isEmpty(database)) {
+    Object.keys(database).forEach((uid) => {
+      const [handler, collection] = uid.split('::');
+      set(mock.db, `${handler}.${collection}.records`, database[uid]);
+    });
+  }
+
   return mock;
 };

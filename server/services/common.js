@@ -1,7 +1,7 @@
 'use strict';
 
 const BadWordsFilter = require('bad-words');
-const { isArray, isNumber, isObject, isNil, isString, first, parseInt, set, get } = require('lodash');
+const { isArray, isNumber, isObject, isNil, isString, isEmpty, first, parseInt, set, get } = require('lodash');
 const { REGEX, CONFIG_PARAMS } = require('../utils/constants');
 const PluginError = require('./../utils/error');
 const {
@@ -143,6 +143,8 @@ module.exports = ({ strapi }) => ({
         }));
 
         const relatedEntities = relatedEntity !== null ? [relatedEntity] : await this.findRelatedEntitiesFor([...entries]);
+        const hasRelatedEntitiesToMap = relatedEntities.filter(_ => _).length > 0;
+
         const result = entries
             .map(_ => {
                 const threadedItem = entriesWithThreads.find(item => item.id === _.id);
@@ -154,16 +156,12 @@ module.exports = ({ strapi }) => ({
                 });
             });
 
-        if (relatedEntities.filter(_ => _).length > 0) {
-            return {
-                data: result.map(_ => this.mergeRelatedEntityTo(_, relatedEntities)),
-                meta,
-            };     
-        }
         return {
-            data: result,
-            meta,
-        };    
+            data: hasRelatedEntitiesToMap ?
+                result.map(_ => this.mergeRelatedEntityTo(_, relatedEntities)) :
+                result,
+            ...(isEmpty(meta) ? {} : { meta }),
+        };   
     },
 
     // Find comments and create relations tree structure
@@ -174,8 +172,8 @@ module.exports = ({ strapi }) => ({
         startingFromId = null,
         dropBlockedThreads = false,
     }, relatedEntity) {
-        const entities = await this.findAllFlat({ query, populate, sort }, relatedEntity)?.data;
-        return buildNestedStructure(entities, startingFromId, 'threadOf', dropBlockedThreads, false);
+        const entities = await this.findAllFlat({ query, populate, sort }, relatedEntity);
+        return buildNestedStructure(entities?.data, startingFromId, 'threadOf', dropBlockedThreads, false);
     },
 
     // Find single comment
