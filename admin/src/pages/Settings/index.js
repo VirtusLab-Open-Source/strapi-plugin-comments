@@ -1,7 +1,7 @@
 import React, { useRef, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import { Formik } from 'formik';
-import { capitalize, first, orderBy, isEmpty, isEqual } from 'lodash';
+import { capitalize, first, orderBy, isEmpty, isEqual, isNil } from 'lodash';
 import {
 	CheckPermissions,
 	LoadingIndicatorPage,
@@ -109,7 +109,7 @@ const Settings = () => {
 		.filter(_ => _) || [];
 	const entryLabel = configData?.entryLabel || {};
 	const approvalFlow = configData?.approvalFlow || [];
-	const badWords = configData?.badWords || undefined;
+	const badWords = isNil(configData?.badWords) ? true : configData?.badWords;
 	const isGQLPluginEnabled = configData?.isGQLPluginEnabled;
 	const gqlAuthEnabled = configData?.gql?.auth || undefined;
 	const moderatorRoles = configData?.moderatorRoles
