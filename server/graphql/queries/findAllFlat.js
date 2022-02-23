@@ -1,11 +1,12 @@
 'use strict'
 
+const { isEmpty } = require('lodash');
 const contentType = require('../../../content-types/comment');
 const { flatInput } = require('../../controllers/utils/parsers');
 const { getPluginService } = require('../../utils/functions');
 
 module.exports = ({ strapi, nexus }) => {
-	const { nonNull, list, stringArg } = nexus;
+	const { nonNull, stringArg } = nexus;
 	const { service: getService } = strapi.plugin('graphql');
 	const { args } = getService('internals');
 
@@ -24,7 +25,10 @@ module.exports = ({ strapi, nexus }) => {
 					relation, 
 					getPluginService('gql').graphQLFiltersToStrapiQuery(filters, contentType),
 					sort,
-					pagination
+					pagination ? {
+						...pagination,
+						withCount: !isEmpty(pagination),
+					} : undefined
 				), undefined);
 		},
 	};

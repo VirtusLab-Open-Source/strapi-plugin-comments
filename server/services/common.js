@@ -74,8 +74,8 @@ module.exports = ({ strapi }) => ({
                 ...prev,
                 [curr]: parseInt(pagination[curr]),
             }), {});
-            const { page, pageSize = 10, limit, start = 0 } = parsedPagination
-            const paginationByPage = !isNil(page);
+            const { page = 1, pageSize = 10, start = 0, limit = 10 } = parsedPagination;
+            const paginationByPage = !isNil(parsedPagination?.page) || !isNil(parsedPagination?.pageSize);
 
             queryExtension = {
                 ...queryExtension,

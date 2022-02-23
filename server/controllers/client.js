@@ -16,9 +16,6 @@ module.exports = {
 
     const { sort: querySort, pagination: queryPagination, ...filterQuery } = query || {};
 
-
-console.log(filterQuery);
-
     try {
       return this.getService('common')
         .findAllFlat(flatInput(relation, filterQuery, sort || querySort, pagination || queryPagination));
