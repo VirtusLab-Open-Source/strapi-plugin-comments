@@ -221,7 +221,7 @@ Feature / Capability focused permissions:
 
 Return a hierarchical tree structure of comments for specified instance of Content Type like for example `Page` with `ID: 1`.
 
-**Example URL**: `https://localhost:1337/comments/api::page.page:1`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:1`
 
 **Example response body**
 
@@ -253,7 +253,7 @@ Return a hierarchical tree structure of comments for specified instance of Conte
 
 Return a flat structure of comments for specified instance of Content Type like for example `Page` with `ID: 1`
 
-**Example URL**: `https://localhost:1337/comments/api::page.page:1/flat`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:1/flat`
 
 **Example response body**
 
@@ -293,7 +293,7 @@ Return a flat structure of comments for specified instance of Content Type like 
 
 Posts a Comment related to specified instance of Content Type like for example `Page` with `ID: 1`
 
-**Example URL**: `https://localhost:1337/comments/api::page.page:1`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:1`
 
 **Example request body**
 
@@ -342,7 +342,7 @@ Posts a Comment related to specified instance of Content Type like for example `
 
 Updates a specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1`
 
-**Example URL**: `https://localhost:1337/comments/api::page.page:1/comment/2`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:1/comment/2`
 
 **Example request body**
 
@@ -387,7 +387,7 @@ Updates a specified Comment content based on it `commentId` and related to speci
 
 Deletes a specified Comment based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1`.
 
-**Example URL**: `https://localhost:1337/comments/api::page.page:1/comment/1?authorId=1`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:1/comment/1?authorId=1`
 
 **Example response body**
 
@@ -410,7 +410,7 @@ Deletes a specified Comment based on it `commentId` and related to specified ins
 
 Reports abuse in specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1` and requests moderator attention.
 
-**Example URL**: `https://localhost:1337/comments/api::page.page:1/comment/2/report-abuse`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:1/comment/2/report-abuse`
 
 **Example request body**
 
