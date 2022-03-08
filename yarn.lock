@@ -661,15 +661,15 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@strapi/plugin-graphql@^4.0.7":
-  version "4.0.7"
-  resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.0.7.tgz#f1f92bd5be7577bb679e2f9c6784658315101c8f"
-  integrity sha512-xqmlkbuwQu2VjsmISjcFghdN67qH+OWuVZ/DZL0ZFimNRjkCnqhFCTPGsEF71c03YcaHeaPG1PEfOro+oOkzEw==
+"@strapi/plugin-graphql@^4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.1.2.tgz#5063e7dc237f408bf9114f2cf10eb054d56410f0"
+  integrity sha512-p1ox1GwFslfHDU3Vgc1gv/QH59phuqzGXHTt7k7rqA4g9gCJ7iJlkdvssAD8T2tJTIhHRtoZXQ9iE1Y0/zgnSQ==
   dependencies:
     "@apollo/federation" "^0.28.0"
     "@graphql-tools/schema" "8.1.2"
     "@graphql-tools/utils" "^8.0.2"
-    "@strapi/utils" "4.0.7"
+    "@strapi/utils" "4.1.2"
     apollo-server-core "3.1.2"
     apollo-server-koa "3.1.2"
     glob "^7.1.7"
@@ -682,14 +682,14 @@
     graphql-upload "^13.0.0"
     koa-compose "^4.1.0"
     lodash "4.17.21"
-    nexus "1.1.0"
+    nexus "1.2.0"
     pluralize "^8.0.0"
     subscriptions-transport-ws "0.9.19"
 
-"@strapi/utils@4.0.7", "@strapi/utils@^4.0.7":
-  version "4.0.7"
-  resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.0.7.tgz#718823fcf23c028a65ce8c317a36cc6d7321eb0c"
-  integrity sha512-coGjVudsnlXvb20mobyeoguCfXKnLjXnKhYiMoS6wqy4ozazu12+5MsCh7Hs9UAkvK4Fzhf7+urvyoj/UpSkaQ==
+"@strapi/utils@4.1.2", "@strapi/utils@^4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.1.2.tgz#1772b66490dcc0aff1e51345f79cdfe1284af9af"
+  integrity sha512-MMT6zIg9G0SMUCHAB27OrDrrU7bIXcg0FXSlyOAyzXMV5aZKXp9vbS5pPmxSc5nxOvooPxjWRLJB8sLyM6f7sw==
   dependencies:
     "@sindresorhus/slugify" "1.1.0"
     date-fns "2.24.0"
@@ -3355,10 +3355,10 @@ negotiator@0.6.2:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.2.tgz#feacf7ccf525a77ae9634436a64883ffeca346fb"
   integrity sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw==
 
-nexus@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/nexus/-/nexus-1.1.0.tgz#3d8fa05c29e7a61aa55f64ef5e0ba43dd76b3ed6"
-  integrity sha512-jUhbg22gKVY2YwZm726BrbfHaQ7Xzc0hNXklygDhuqaVxCuHCgFMhWa2svNWd1npe8kfeiu5nbwnz+UnhNXzCQ==
+nexus@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/nexus/-/nexus-1.2.0.tgz#12c4611702184fac170c98c1a2c778a76a9e9827"
+  integrity sha512-7+0240LrQNnKKLTgbxM6KLLdfMgm4wp1TPAULim0lGmHfX7QsJK39i2KmFdMr3WdsAKoybMmwyrJtaYOq0q62g==
   dependencies:
     iterall "^1.3.0"
     tslib "^2.0.3"
@@ -3624,6 +3624,11 @@ prelude-ls@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
   integrity sha1-IZMqVJ9eUv/ZqCf1cOBL5iqX2lQ=
+
+prettier@2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.5.1.tgz#fff75fa9d519c54cf0fce328c1017d94546bc56a"
+  integrity sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==
 
 pretty-format@^26.6.2:
   version "26.6.2"
