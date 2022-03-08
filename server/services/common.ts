@@ -1,30 +1,30 @@
-'use strict';
-
-const BadWordsFilter = require('bad-words');
-const { isArray, isNumber, isObject, isNil, isString, isEmpty, first, parseInt, set, get } = require('lodash');
-const { REGEX, CONFIG_PARAMS } = require('../utils/constants');
-const PluginError = require('./../utils/error');
-const {
+import BadWordsFilter from 'bad-words';
+import { isArray, isNumber, isObject, isNil, isString, isEmpty, first, parseInt, set, get } from 'lodash';
+import { CommentsPluginConfig, Context, FindAllFlatProps, FindAllInHierarhyProps, PaginatedResponse, Pagination, ResponseMeta, ServiceCommon, StrapiStore, ToBeFixed } from '../../types';
+import { Comment, RelatedEntity } from '../../types/contentTypes';
+import { REGEX, CONFIG_PARAMS } from '../utils/constants';
+import PluginError from './../utils/error';
+import {
     getModelUid,
     getRelatedGroups,
     buildNestedStructure,
     filterOurResolvedReports,
     buildAuthorModel,
     buildConfigQueryProp,
-} = require('./utils/functions');
+} from './utils/functions';
 
 /**
  * Comments Plugin - common services
  */
 
-module.exports = ({ strapi }) => ({
+export = ({ strapi }: Context): ServiceCommon => ({
 
-    async getConfig(prop, defaultValue, useLocal = false) {
-        const queryProp = buildConfigQueryProp(prop);
-        const pluginStore = await this.getPluginStore();
-        const config = await pluginStore.get({ key: 'config' });
+    async getConfig<T>(prop?: string, defaultValue?: any, useLocal: boolean = false): Promise<T> {
+        const queryProp: string = buildConfigQueryProp(prop);
+        const pluginStore: StrapiStore = await this.getPluginStore();
+        const config: CommentsPluginConfig = await pluginStore.get({ key: 'config' });
 
-        let result;
+        let result: T;
         if (config && !useLocal) {
             result = queryProp ? get(config, queryProp, defaultValue) : config;
         } else {
@@ -33,13 +33,13 @@ module.exports = ({ strapi }) => ({
         return isNil(result) ? defaultValue : result;
     },
 
-    async getPluginStore() {
+    async getPluginStore(): Promise<StrapiStore> {
         return strapi.store({ type: 'plugin', name: 'comments' });
     },
 
-    getLocalConfig(prop, defaultValue) {
-        const queryProp = buildConfigQueryProp(prop);
-        const result = strapi.config.get(`plugin.comments${ queryProp ? '.' + queryProp : ''}`);
+    getLocalConfig<T>(prop?: string, defaultValue?: any): T {
+        const queryProp: string = buildConfigQueryProp(prop);
+        const result: T = strapi.config.get(`plugin.comments${ queryProp ? '.' + queryProp : ''}`);
         return isNil(result) ? defaultValue : result;
     },
 
@@ -48,7 +48,7 @@ module.exports = ({ strapi }) => ({
         query = {}, 
         populate = {}, 
         sort, 
-        pagination }, relatedEntity = null) {
+        pagination }: FindAllFlatProps, relatedEntity: RelatedEntity = null): Promise<PaginatedResponse> {
 
         const defaultPopulate = {
             authorUser: true,
@@ -68,12 +68,13 @@ module.exports = ({ strapi }) => ({
             };
         }
 
-        let meta = {};
+        let meta: ResponseMeta = {} as ResponseMeta;
         if (pagination && isObject(pagination)) {
-            const parsedPagination = Object.keys(pagination).reduce((prev, curr) => ({
-                ...prev,
-                [curr]: parseInt(pagination[curr]),
-            }), {});
+            const parsedPagination: Pagination = Object.keys(pagination)
+                .reduce((prev, curr) => ({
+                    ...prev,
+                    [curr]: parseInt(pagination[curr]),
+                }), {});
             const { page = 1, pageSize = 10, start = 0, limit = 10 } = parsedPagination;
             const paginationByPage = !isNil(parsedPagination?.page) || !isNil(parsedPagination?.pageSize);
 
@@ -100,7 +101,7 @@ module.exports = ({ strapi }) => ({
             };
         }
         
-        const entries = await strapi.db.query(getModelUid('comment'))
+        const entries = await strapi.db.query<Comment>(getModelUid('comment'))
         .findMany({
             where: {
                 ...query,
@@ -113,7 +114,7 @@ module.exports = ({ strapi }) => ({
         });
 
         if (pagination?.withCount && (pagination.withCount === 'true' || pagination.withCount === true)) {
-            const total = await strapi.db.query(getModelUid('comment'))
+            const total = await strapi.db.query<Comment>(getModelUid('comment'))
                 .count({
                     where: {
                         ...query,
@@ -132,22 +133,22 @@ module.exports = ({ strapi }) => ({
             };
         }
 
-        const entriesWithThreads = await Promise.all(entries.map(async _ => {
-            const [nestedEntries, count] = await strapi.db.query(getModelUid('comment'))
+        const entriesWithThreads = await Promise.all(entries.map(async (_: Comment) => {
+            const [nestedEntries, count] = await strapi.db.query<Comment>(getModelUid('comment'))
                 .findWithCount({ 
                     where: {
                         threadOf: _.id
                     }
                  })
-            return { id: _.id, itemsInTread: count, firstThreadItemId: first(nestedEntries)?.id }
+            return { id: _.id, itemsInTread: count, firstThreadItemId: first<ToBeFixed>(nestedEntries)?.id }
         }));
 
         const relatedEntities = relatedEntity !== null ? [relatedEntity] : await this.findRelatedEntitiesFor([...entries]);
-        const hasRelatedEntitiesToMap = relatedEntities.filter(_ => _).length > 0;
+        const hasRelatedEntitiesToMap = relatedEntities.filter((_: Comment) => _).length > 0;
 
         const result = entries
-            .map(_ => {
-                const threadedItem = entriesWithThreads.find(item => item.id === _.id);
+            .map((_: Comment) => {
+                const threadedItem = entriesWithThreads.find((item: Comment) => item.id === _.id);
                 return this.sanitizeCommentEntity({
                     ..._,
                     threadOf: query.threadOf || _.threadOf || null,
@@ -158,7 +159,7 @@ module.exports = ({ strapi }) => ({
 
         return {
             data: hasRelatedEntitiesToMap ?
-                result.map(_ => this.mergeRelatedEntityTo(_, relatedEntities)) :
+                result.map((_: Comment) => this.mergeRelatedEntityTo(_, relatedEntities)) :
                 result,
             ...(isEmpty(meta) ? {} : { meta }),
         };   
@@ -171,14 +172,14 @@ module.exports = ({ strapi }) => ({
         sort,
         startingFromId = null,
         dropBlockedThreads = false,
-    }, relatedEntity) {
+    }: FindAllInHierarhyProps, relatedEntity?: RelatedEntity): Promise<Array<Comment>> {
         const entities = await this.findAllFlat({ query, populate, sort }, relatedEntity);
         return buildNestedStructure(entities?.data, startingFromId, 'threadOf', dropBlockedThreads, false);
     },
 
     // Find single comment
-    async findOne(criteria) {
-        const entity = await strapi.db.query(getModelUid('comment'))
+    async findOne(criteria): Promise<Comment> {
+        const entity = await strapi.db.query<Comment>(getModelUid('comment'))
             .findOne({
                 where: criteria,
                 populate: {
@@ -193,7 +194,8 @@ module.exports = ({ strapi }) => ({
     },
 
     // Find all related entiries
-    async findRelatedEntitiesFor(entities = []) {
+    
+    async findRelatedEntitiesFor(entities: Array<Comment> = []): Promise<Array<RelatedEntity>> {
         const data = entities.reduce((acc, cur) => {
                 const [relatedUid, relatedStringId] = getRelatedGroups(cur.related);
                 const parsedRelatedId = parseInt(relatedStringId);
@@ -205,12 +207,13 @@ module.exports = ({ strapi }) => ({
             },
             {}
         );
-        return Promise.all(
+        
+        return Promise.all<RelatedEntity>(
             Object.entries(data)
-            .map(async ([relatedUid, relatedStringIds]) => 
-                strapi.db.query(relatedUid).findMany({ 
-                    where: { id: Array.from(new Set(relatedStringIds)) },
-                }).then(relatedEntities => relatedEntities.map(_ => 
+            .map(async ([relatedUid, relatedStringIds]): Promise<Array<RelatedEntity>> =>
+                strapi.db.query<RelatedEntity>(relatedUid).findMany({ 
+                    where: { id: Array.from(new Set(relatedStringIds as ToBeFixed)) },
+                }).then((relatedEntities: Array<RelatedEntity>) => relatedEntities.map((_: RelatedEntity) => 
                     ({
                         ..._,
                         uid: relatedUid,
@@ -222,7 +225,7 @@ module.exports = ({ strapi }) => ({
     },
 
     // Merge related entity with comment
-    mergeRelatedEntityTo(entity, relatedEntities = []) {
+    mergeRelatedEntityTo(entity: Comment, relatedEntities: Array<RelatedEntity> = []): Comment {
         return {
             ...entity,
             related: relatedEntities.find(relatedEntity => entity.related === `${relatedEntity.uid}:${relatedEntity.id}`)
@@ -231,18 +234,18 @@ module.exports = ({ strapi }) => ({
 
     async modifiedNestedNestedComments(id, fieldName, value) {
         try {
-            const entitiesToChange = await strapi.bd.query(getModelUid('comment'))
+            const entitiesToChange = await strapi.db.query<Comment>(getModelUid('comment'))
                 .findMany({
                     where: { threadOf: id }
                 });
-            const changedEntities = await strapi.bd.query(getModelUid('comment'))
+            const changedEntities = await strapi.db.query<Comment>(getModelUid('comment'))
                 .updateMany({
-                    where: { id: entitiesToChange.map(_ => _.id) },
+                    where: { id: entitiesToChange.map((_: Comment) => _.id) },
                     data: { [fieldName]: value }
                 });
             if ((entitiesToChange.length === changedEntities.length) && (changedEntities.length > 0)) {
                 const nestedTransactions = await Promise.all(
-                  changedEntities.map(item => this.modifiedNestedNestedComments(item.id, fieldName, value))
+                  changedEntities.map((item: Comment) => this.modifiedNestedNestedComments(item.id, fieldName, value))
                 );
                 return nestedTransactions.length === changedEntities.length;
             }
@@ -252,7 +255,7 @@ module.exports = ({ strapi }) => ({
         }
     },
 
-    sanitizeCommentEntity(entity) {
+    sanitizeCommentEntity(entity: Comment): Comment {
         return {
             ...buildAuthorModel({
                 ...entity,
@@ -265,7 +268,7 @@ module.exports = ({ strapi }) => ({
         return user ? !isNil(user?.id) : true;
     },
 
-    async parseRelationString(relation) {
+    async parseRelationString(relation): Promise<[uid: string, relatedId: string]> {
         const [ uid, relatedStringId ] = getRelatedGroups(relation);
         const parsedRelatedId = parseInt(relatedStringId);
         const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
@@ -277,10 +280,10 @@ module.exports = ({ strapi }) => ({
         return [ uid, relatedId];
     },
 
-    async checkBadWords(content) {
+    async checkBadWords(content: string): Promise<boolean | string | Error> {
         const config = await this.getConfig(CONFIG_PARAMS.BAD_WORDS, true);
         if (config) {
-            const filter = new BadWordsFilter(isObject(config) ? config : undefined);
+            const filter = new BadWordsFilter(isObject(config) ? config as ToBeFixed : undefined);
             if (content && filter.isProfane(content)) {
                 throw new PluginError(400, 'Bad language used! Please polite your comment...', {
                     content: {

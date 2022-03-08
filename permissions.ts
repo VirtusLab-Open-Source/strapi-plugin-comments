@@ -1,7 +1,9 @@
 'use strict';
 
-module.exports = {
-    render: function(uid) {
+import { ToBeFixed } from "./types/common";
+
+export default {
+    render: function(uid: ToBeFixed) {
         return `plugin::comments.${uid}`;
     },
     comments: {

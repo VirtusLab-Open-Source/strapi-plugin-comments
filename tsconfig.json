@@ -1,0 +1,35 @@
+{
+    "compilerOptions": {
+      "rootDir": "./",
+      "outDir": "build",
+      "target": "es5",
+      "jsx": "react",
+      "moduleResolution": "node",
+      "allowSyntheticDefaultImports": true,
+      "esModuleInterop": true,
+      "strict": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "removeComments": false,
+      "sourceMap": true,
+      "declaration": true,
+      "declarationMap": true,
+      "downlevelIteration": true,
+      "incremental": true,
+      "allowJs": true,
+      "skipLibCheck": true,
+      "resolveJsonModule": true
+    },
+    "include": [
+      "./server/**/*",
+      "./admin/**/*",
+      "./strapi-server.*",
+      "./strapi-admin.*",
+      "./setup-package.ts",
+      "./permissions.*"
+    ],
+    "exclude": [
+      "**/node_modules/**/*",
+      "**/build/**/*"
+    ]
+  } 

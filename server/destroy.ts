@@ -1,0 +1,4 @@
+
+export = () => {
+  // destroy phase
+};

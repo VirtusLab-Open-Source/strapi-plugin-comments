@@ -1,14 +1,14 @@
-'use strict';
 
-const { isEmpty } = require('lodash');
-const permissions = require('./../permissions');
-const { getPluginService } = require('./utils/functions');
+import { isEmpty } from 'lodash';
+import { CommentsPluginConfig, Context, ServiceCommon } from '../types';
+import permissions from './../permissions';
+import { getPluginService } from './utils/functions';
 
-module.exports = async ({ strapi }) => {
+export = async ({ strapi }: Context) => {
 
   // Provide GQL support
   if (strapi.plugin('graphql')) {
-    const config = await getPluginService('common').getConfig();
+    const config: CommentsPluginConfig = await getPluginService<ServiceCommon>('common').getConfig();
     const { enabledCollections } = config;
     if (!isEmpty(enabledCollections)) {
       await require('./graphql')({ strapi, config });

@@ -1,6 +1,6 @@
-'use strict';
+import { StrapiConfig } from "../../types";
 
-module.exports = {
+const config: StrapiConfig = {
   default: {
     enabledCollections: [],
     moderatorRoles: [],
@@ -15,3 +15,5 @@ module.exports = {
     },
   }
 };
+
+export default config;

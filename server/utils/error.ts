@@ -1,5 +1,14 @@
-module.exports = class PluginError extends Error {
-    constructor(status, message, payload = undefined) { 
+
+interface PluginErrorInterface extends Error {
+    status: number
+    payload: any
+};
+
+export class PluginError extends Error implements PluginErrorInterface {
+    status: number
+    payload: any
+
+    constructor(status: number, message: string, payload = undefined) { 
         super();
         this.name = 'Strapi:Plugin:Comments'; 
         this.status = status || 500;

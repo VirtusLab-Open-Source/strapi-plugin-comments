@@ -72,6 +72,29 @@ The **Comments** plugin should appear in the **Plugins** section of Strapi sideb
 
 Enjoy 🎉
 
+### Working in development mode
+
+1. Clone repository
+
+    ```
+    git clone git@github.com:VirtusLab-Open-Source/strapi-plugin-comments.git
+    ```
+
+2. Create a soft link in your strapi project to plugin build folder
+
+    ```sh
+    ln -s <your path>/strapi-plugin-comments/build <your path>/strapi-project/src/plugins/comments 
+    ```
+
+3. Run develop or build command 
+
+    ```ts
+    // Watch for file changes
+    yarn develop
+    // or run build without nodemon
+    yarn build:dev
+    ```
+
 ## 🖐 Requirements
 
 Complete installation requirements are exact same as for Strapi itself and can be found in the documentation under [Installation Requirements](https://docs.strapi.io/developer-docs/latest/getting-started/introduction.html).
