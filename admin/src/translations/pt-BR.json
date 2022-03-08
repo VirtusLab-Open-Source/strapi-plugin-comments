@@ -10,6 +10,7 @@
     "nav.item.reports": "Reports",
     "nav.item.settings": "Configurações",
     "page.common.item.status.OPEN": "Abrir",
+    "page.common.item.status.PENDING": "Pendente",
     "page.common.item.status.BLOCKED": "Bloqueado",
     "page.common.item.status.APPROVED": "Aprovedo",
     "page.common.item.status.TO_REVIEW": "Para revisar ({count, number})",
