@@ -1,27 +1,31 @@
-const PluginError = require('./../../utils/error');
-const { REGEX } = require('./../../utils/constants')
-const { first, isObject, isArray, isEmpty } = require('lodash');
+import PluginError from './../../utils/error';
+import { REGEX } from './../../utils/constants';
+import { first, get, isObject, isArray, isEmpty } from 'lodash';
+import { Comment, CommentAuthor, Id, IStrapi, StrapiUser, ToBeFixed } from '../../../types';
 
-const buildNestedStructure = (
-  entities,
-  id = null,
-  field = 'threadOf',
-  dropBlockedThreads = false,
-  blockNestedThreads = false,
-) =>
+declare var strapi: IStrapi;
+
+export const buildNestedStructure = (
+  entities: Array<Comment>,
+  id: Id | null = null,
+  field: string = 'threadOf',
+  dropBlockedThreads: boolean = false,
+  blockNestedThreads: boolean = false,
+): Array<Comment> =>
   entities
-    .filter(entity => {
+    .filter((entity: Comment) => {
         // mongo by default not return `null` for empty data
-        if (entity[field] === null && id === null) {
+        const entityField: any = get(entity, field);
+        if (entityField === null && id === null) {
             return true;
         }
-        let data = entity[field];
+        let data = entityField;
         if (data && typeof id === 'string') {
             data = data.toString();
         }
-        return (data && data === id) || (isObject(entity[field]) && (entity[field].id === id));
+        return (data && data === id) || (isObject(entityField) && ((entityField as any).id === id));
     })
-    .map(entity => ({
+    .map((entity: Comment) => ({
         ...entity,
         [field]: undefined,
         related: undefined,
@@ -30,9 +34,9 @@ const buildNestedStructure = (
         dropBlockedThreads, entity.blockedThread),
     }));
 
-module.exports = {
-    isEqualEntity: (existing, data, user) => {
-        const { author: existingAuthor } = existing;
+
+export const isEqualEntity = (existing: Comment, data: ToBeFixed, user: StrapiUser): boolean => {
+        const { author: existingAuthor = {} as CommentAuthor} = existing;
         const { author } = data;
 
         // Disallow approval status change by Client
@@ -47,31 +51,30 @@ module.exports = {
             return receivedUserId && (existingUserId === receivedUserId);
         }
         return existingAuthor.id === author?.id;
-    },
+    };
 
-    getRelatedGroups: related => related.split(REGEX.relatedUid).filter(s => s && s.length > 0),
 
-    getModelUid: name => {
+export const getRelatedGroups = (related: string): Array<string> => related.split(REGEX.relatedUid).filter(s => s && s.length > 0);
+
+export const getModelUid = (name: string): string => {
         return strapi
             .plugin('comments')
             .contentTypes[name]?.uid;
-    },
+    };
 
-    filterOurResolvedReports: item => (item ? {
+export const filterOurResolvedReports = (item: Comment): Comment => (item ? {
         ...item,
         reports: (item.reports || []).filter(report => !report.resolved),
-    } : item),
+    } : item);
 
-    convertContentTypeNameToSlug: str => {
+export const convertContentTypeNameToSlug = (str: string): string => {
         const plainConversion = str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
         return first(plainConversion) === '-' ? plainConversion.slice(1, plainConversion.length) : plainConversion;
-    },
+    };
 
-    buildNestedStructure,
-
-    buildAuthorModel: (item) => {
+export const buildAuthorModel = (item: Comment): Comment => {
         const { authorUser, authorId, authorName, authorEmail, authorAvatar, ...rest } = item;
-        let author = {};
+        let author: CommentAuthor = {} as CommentAuthor;
         if (authorUser) {
             author = {
                 id: authorUser.id,
@@ -91,22 +94,21 @@ module.exports = {
             ...rest,
             author: isEmpty(author) ? undefined : author,
         };
-    },
+    };
 
-    buildConfigQueryProp(prop) {
+export const buildConfigQueryProp = (prop: undefined | string | Array<string> = ''): string => {
         let queryProp = prop;
         if (prop && isArray(prop)) {
             queryProp = prop.join('.');
         }
-        return queryProp;
-    },
+        return queryProp as string;
+    };
 
-    resolveUserContextError: user => {
+export const resolveUserContextError = (user: StrapiUser): PluginError => {
         if (user) {
             throw new PluginError(401, 'Not authenticated');
         } else {
             throw new PluginError(403, 'Not authorized');
         }
-    },
-};
+    };
 

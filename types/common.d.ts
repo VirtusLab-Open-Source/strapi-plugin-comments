@@ -8,7 +8,7 @@ type StrapiMap<Type> = {
     [key: string]: Type
 };
 
-export interface Strapi {
+export interface IStrapi {
     config: StrapiConfigContainer
     EE(): Function
     services(): StrapiMap<StrapiService>
@@ -73,6 +73,7 @@ export type StrapiPlugin = {
     service(name: string): StrapiService
     controller(name: string): StrapiController
     config: StrapiConfigContainer
+    contentTypes: StrapiMap<any>
 };
 
 export type StrapiConfigContainer = StrapiMap<any> & {
@@ -116,7 +117,7 @@ export type StrapiLog = {
 };
 
 export type Context = {
-    strapi: Strapi
+    strapi: IStrapi
 }
 
 export type StrapiAdminUser = any;

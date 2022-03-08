@@ -1,23 +1,27 @@
-import { StrapiUser } from "./common";
+import { StrapiUser, ToBeFixed } from "./common";
 
 export type Id = number | string;
 
 export type Comment = {
     id: Id
     content?: string
-    author?: CommentAuthor
+    author?: CommentAuthor | undefined
     children?: Array<Comment>
+    reports?: Array<CommentReport>
     threadOf?: Comment | number | null
+    gotThread?: boolean
     related?: any
     blocked?: boolean
     blockedThread?: boolean
     itemsInTread?: number
+    approvalStatus?: ToBeFixed | null
     firstThreadItemId?: Id
+    threadFirstItemId?: Id
 } & CommentAuthorPartial;
 
 export type CommentAuthor = {
     id: Id
-    name: string
+    name?: string
     email?: string
     avatar?: string
 };
@@ -34,6 +38,7 @@ export type CommentReport = {
     id: Id
     reason: any
     content: string
+    resolved: boolean
 };
 
 export type RelatedEntity = {

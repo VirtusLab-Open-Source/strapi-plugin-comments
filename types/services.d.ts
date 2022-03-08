@@ -41,26 +41,26 @@ export type FindAllInHierarhyProps = Omit<FindAllFlatProps, 'pagination'> & {
     dropBlockedThreads?: boolean,
 };
 
-export interface ServiceCommon {
+export interface IServiceCommon {
     getConfig<T>(path?: string, defaultValue?: any): Promise<T>
     getPluginStore(): Promise<StrapiStore>
     getLocalConfig<T>(path?: string, defaultValue?: any): T
-    findAllFlat(props: FindAllFlatProps, relatedEntity?: RelatedEntity): Promise<PaginatedResponse>
-    findAllInHierarchy(props: FindAllInHierarhyProps, relatedEntity?: RelatedEntity): Promise<Array<Comment>>
+    findAllFlat(props: FindAllFlatProps, relatedEntity?: RelatedEntity | null): Promise<PaginatedResponse>
+    findAllInHierarchy(props: FindAllInHierarhyProps, relatedEntity?: RelatedEntity | null): Promise<Array<Comment>>
     findOne(criteria: KeyValueSet<any>): Promise<Comment>
     findRelatedEntitiesFor(entities: Array<Comment>): Promise<RelatedEntity[]>
     mergeRelatedEntityTo(entity: ToBeFixed, relatedEntities: Array<RelatedEntity>): Comment
     modifiedNestedNestedComments(id: Id, fieldName: string, value: any): Promise<boolean> 
     sanitizeCommentEntity(entity: Comment): Comment
     isValidUserContext(user?: any): boolean
-    parseRelationString(relation: string): Promise<[uid: string, relatedId: string]>
+    parseRelationString(relation: string): Promise<[uid: string, relatedId: string | number]>
     checkBadWords(content: string): Promise<boolean | string | PluginError>
 }
 
 export type ServiceAdmin = {}
 
-export interface ServiceClient {
-    getCommonService(): ServiceCommon
+export interface IServiceClient {
+    getCommonService(): IServiceCommon
     create(relation: string, data: ToBeFixed, user: StrapiUser): Promise<Comment>
     update(id: Id, relation: string, data: ToBeFixed, user: StrapiUser): Promise<Comment>
     reportAbuse(id: Id, relation: string, payload:  ToBeFixed, user: StrapiUser): Promise<CommentReport>

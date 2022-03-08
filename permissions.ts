@@ -1,5 +1,3 @@
-'use strict';
-
 import { ToBeFixed } from "./types/common";
 
 export default {

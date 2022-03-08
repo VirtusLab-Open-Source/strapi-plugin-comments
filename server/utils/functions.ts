@@ -1,6 +1,6 @@
-import { QueryParams, QueryParamsParsed, Strapi } from "../../types";
+import { QueryParams, QueryParamsParsed, IStrapi } from "../../types";
 
-declare var strapi: Strapi;
+declare var strapi: IStrapi;
 
 export const getPluginService = <T>(name: string): T => 
         strapi

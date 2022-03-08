@@ -1,6 +1,6 @@
 import BadWordsFilter from 'bad-words';
 import { isArray, isNumber, isObject, isNil, isString, isEmpty, first, parseInt, set, get } from 'lodash';
-import { Id, CommentsPluginConfig, Context, FindAllFlatProps, FindAllInHierarhyProps, PaginatedResponse, Pagination, ResponseMeta, ServiceCommon, StrapiStore, ToBeFixed } from '../../types';
+import { Id, CommentsPluginConfig, Context, FindAllFlatProps, FindAllInHierarhyProps, PaginatedResponse, Pagination, ResponseMeta, IServiceCommon, StrapiStore, ToBeFixed } from '../../types';
 import { Comment, RelatedEntity } from '../../types/contentTypes';
 import { REGEX, CONFIG_PARAMS } from '../utils/constants';
 import PluginError from './../utils/error';
@@ -17,9 +17,11 @@ import {
  * Comments Plugin - common services
  */
 
-export = ({ strapi }: Context): ServiceCommon => ({
+const PAGE_SIZE = 10;
 
-    async getConfig<T>(this: ServiceCommon, prop?: string, defaultValue?: any, useLocal: boolean = false): Promise<T> {
+export = ({ strapi }: Context): IServiceCommon => ({
+
+    async getConfig<T>(this: IServiceCommon, prop?: string, defaultValue?: any, useLocal: boolean = false): Promise<T> {
         const queryProp: string = buildConfigQueryProp(prop);
         const pluginStore: StrapiStore = await this.getPluginStore();
         const config: CommentsPluginConfig = await pluginStore.get({ key: 'config' });
@@ -44,11 +46,11 @@ export = ({ strapi }: Context): ServiceCommon => ({
     },
 
     // Find comments in the flat structure
-    async findAllFlat(this: ServiceCommon, { 
+    async findAllFlat(this: IServiceCommon, { 
         query = {}, 
         populate = {}, 
         sort, 
-        pagination }: FindAllFlatProps, relatedEntity: RelatedEntity = null): Promise<PaginatedResponse> {
+        pagination }: FindAllFlatProps, relatedEntity: RelatedEntity | null = null): Promise<PaginatedResponse> {
 
         const defaultPopulate = {
             authorUser: true,
@@ -71,11 +73,11 @@ export = ({ strapi }: Context): ServiceCommon => ({
         let meta: ResponseMeta = {} as ResponseMeta;
         if (pagination && isObject(pagination)) {
             const parsedPagination: Pagination = Object.keys(pagination)
-                .reduce((prev, curr) => ({
+                .reduce((prev: Pagination, curr: string) => ({
                     ...prev,
-                    [curr]: parseInt(pagination[curr]),
+                    [curr]: parseInt(get(pagination, curr)),
                 }), {});
-            const { page = 1, pageSize = 10, start = 0, limit = 10 } = parsedPagination;
+            const { page = 1, pageSize = PAGE_SIZE, start = 0, limit = PAGE_SIZE } = parsedPagination;
             const paginationByPage = !isNil(parsedPagination?.page) || !isNil(parsedPagination?.pageSize);
 
             queryExtension = {
@@ -120,13 +122,14 @@ export = ({ strapi }: Context): ServiceCommon => ({
                         ...query,
                     }
                 });
-            const pageCount = Math.floor(total / meta.pagination.pageSize);
+            const pageSize = meta.pagination.pageSize || PAGE_SIZE;
+            const pageCount = Math.floor(total / pageSize);
             meta = {
                 ...meta,
                 pagination: {
                     ...meta.pagination,
                     pageCount: !isNil(meta.pagination.page) ? 
-                        total % meta.pagination.pageSize === 0 ? pageCount : pageCount + 1 : 
+                        total % pageSize === 0 ? pageCount : pageCount + 1 : 
                         undefined,
                     total,
                 },
@@ -149,9 +152,10 @@ export = ({ strapi }: Context): ServiceCommon => ({
         const result = entries
             .map((_: Comment) => {
                 const threadedItem = entriesWithThreads.find((item: Comment) => item.id === _.id);
+                const parsedThreadOf = isString(query.threadOf) ? parseInt(query.threadOf) : query.threadOf;
                 return this.sanitizeCommentEntity({
                     ..._,
-                    threadOf: query.threadOf || _.threadOf || null,
+                    threadOf: parsedThreadOf || _.threadOf || null,
                     gotThread: (threadedItem?.itemsInTread || 0) > 0,
                     threadFirstItemId: threadedItem?.firstThreadItemId,
                 });
@@ -166,7 +170,7 @@ export = ({ strapi }: Context): ServiceCommon => ({
     },
 
     // Find comments and create relations tree structure
-    async findAllInHierarchy (this: ServiceCommon, {
+    async findAllInHierarchy (this: IServiceCommon, {
         query,
         populate = {},
         sort,
@@ -196,8 +200,8 @@ export = ({ strapi }: Context): ServiceCommon => ({
     // Find all related entiries
     
     async findRelatedEntitiesFor(entities: Array<Comment> = []): Promise<Array<RelatedEntity>> {
-        const data = entities.reduce((acc, cur) => {
-                const [relatedUid, relatedStringId] = getRelatedGroups(cur.related);
+        const data = entities.reduce((acc: { [key: string]: Array<string | number> }, curr: Comment) => {
+                const [relatedUid, relatedStringId] = getRelatedGroups(curr.related);
                 const parsedRelatedId = parseInt(relatedStringId);
                 const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
                 return {
@@ -208,8 +212,7 @@ export = ({ strapi }: Context): ServiceCommon => ({
             {}
         );
 
-        // @ts-ignore
-        return Promise.all<RelatedEntity>(
+        return Promise.all<Array<RelatedEntity>>(
             Object.entries(data)
             .map(async ([relatedUid, relatedStringIds]): Promise<Array<RelatedEntity>> =>
                 strapi.db.query<RelatedEntity>(relatedUid).findMany({ 
@@ -233,7 +236,7 @@ export = ({ strapi }: Context): ServiceCommon => ({
         };
     },
 
-    async modifiedNestedNestedComments(this: ServiceCommon, id: Id, fieldName: string, value: any): Promise<boolean> {
+    async modifiedNestedNestedComments(this: IServiceCommon, id: Id, fieldName: string, value: any): Promise<boolean> {
         try {
             const entitiesToChange = await strapi.db.query<Comment>(getModelUid('comment'))
                 .findMany({
@@ -269,7 +272,7 @@ export = ({ strapi }: Context): ServiceCommon => ({
         return user ? !isNil(user?.id) : true;
     },
 
-    async parseRelationString(this: ServiceCommon, relation): Promise<[uid: string, relatedId: string]> {
+    async parseRelationString(this: IServiceCommon, relation): Promise<[uid: string, relatedId: string | number]> {
         const [ uid, relatedStringId ] = getRelatedGroups(relation);
         const parsedRelatedId = parseInt(relatedStringId);
         const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
@@ -281,7 +284,7 @@ export = ({ strapi }: Context): ServiceCommon => ({
         return [ uid, relatedId];
     },
 
-    async checkBadWords(this: ServiceCommon, content: string): Promise<boolean | string | PluginError> {
+    async checkBadWords(this: IServiceCommon, content: string): Promise<boolean | string | PluginError> {
         const config: boolean = await this.getConfig<boolean>(CONFIG_PARAMS.BAD_WORDS, true);
         if (config) {
             const filter = new BadWordsFilter(isObject(config) ? config as ToBeFixed : undefined);

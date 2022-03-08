@@ -1,6 +1,6 @@
 
 import { isEmpty } from 'lodash';
-import { CommentsPluginConfig, Context, ServiceCommon } from '../types';
+import { CommentsPluginConfig, Context, IServiceCommon } from '../types';
 import permissions from './../permissions';
 import { getPluginService } from './utils/functions';
 
@@ -8,7 +8,7 @@ export = async ({ strapi }: Context) => {
 
   // Provide GQL support
   if (strapi.plugin('graphql')) {
-    const config: CommentsPluginConfig = await getPluginService<ServiceCommon>('common').getConfig();
+    const config: CommentsPluginConfig = await getPluginService<IServiceCommon>('common').getConfig();
     const { enabledCollections } = config;
     if (!isEmpty(enabledCollections)) {
       await require('./graphql')({ strapi, config });

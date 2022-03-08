@@ -1,14 +1,18 @@
 
-interface PluginErrorInterface extends Error {
+type ErrorPayload = {
+    [key: string]: any
+} | undefined
+
+interface IPluginError extends Error {
     status: number
-    payload: any
+    payload: ErrorPayload
 };
 
-export default class PluginError extends Error implements PluginErrorInterface {
+export default class PluginError extends Error implements IPluginError {
     status: number
-    payload: any
+    payload: ErrorPayload
 
-    constructor(status: number, message: string, payload = undefined) { 
+    constructor(status: number, message: string, payload: ErrorPayload = undefined) { 
         super();
         this.name = 'Strapi:Plugin:Comments'; 
         this.status = status || 500;
@@ -18,7 +22,7 @@ export default class PluginError extends Error implements PluginErrorInterface {
         Object.setPrototypeOf(this, PluginError.prototype);
      }
 
-     toString(e = this) {
+     toString(e: PluginError = this): string {
         return `${e.name} - ${e.message}`;
      }
 

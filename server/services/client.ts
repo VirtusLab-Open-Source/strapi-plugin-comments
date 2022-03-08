@@ -9,20 +9,20 @@ import {
     resolveUserContextError,
 } from './utils/functions';
 import { APPROVAL_STATUS, REGEX, CONFIG_PARAMS } from './../utils/constants';
-import { Comment, CommentAuthorPartial, CommentReport, Context, Id, RelatedEntity, ServiceClient, ServiceCommon, StrapiAdminUser, StrapiUser, ToBeFixed } from '../../types';
+import { Comment, CommentAuthorPartial, CommentReport, Context, Id, RelatedEntity, IServiceClient, IServiceCommon, StrapiAdminUser, StrapiUser, ToBeFixed } from '../../types';
 
 /**
  * Comments Plugin - Client services
  */
 
-export = ({ strapi }: Context): ServiceClient => ({
+export = ({ strapi }: Context): IServiceClient => ({
 
-    getCommonService(): ServiceCommon {
+    getCommonService(): IServiceCommon {
         return getPluginService('common');
     },
 
     // Create a comment
-    async create(this: ServiceClient, relation: string, data: ToBeFixed, user: StrapiUser = undefined): Promise<Comment> {
+    async create(this: IServiceClient, relation: string, data: ToBeFixed, user: StrapiUser = undefined): Promise<Comment> {
         const { content, threadOf } = data;
         const singleRelationFulfilled = relation && REGEX.relatedUid.test(relation);
         
@@ -104,7 +104,7 @@ export = ({ strapi }: Context): ServiceClient => ({
     },
 
     // Update a comment
-    async update(this: ServiceClient, id: Id, relation: string, data: ToBeFixed, user: StrapiUser = undefined): Promise<Comment> {
+    async update(this: IServiceClient, id: Id, relation: string, data: ToBeFixed, user: StrapiUser = undefined): Promise<Comment> {
         const { content } = data;
 
         const singleRelationFulfilled = relation && REGEX.relatedUid.test(relation)
@@ -140,7 +140,7 @@ export = ({ strapi }: Context): ServiceClient => ({
     },
 
     // Report abuse in comment
-	async reportAbuse(this: ServiceClient, id: Id, relation: string, payload:  ToBeFixed, user: StrapiUser = undefined): Promise<CommentReport> {
+	async reportAbuse(this: IServiceClient, id: Id, relation: string, payload:  ToBeFixed, user: StrapiUser = undefined): Promise<CommentReport> {
         if (!this.getCommonService().isValidUserContext(user)) {
             throw resolveUserContextError(user);
         }
@@ -177,7 +177,7 @@ export = ({ strapi }: Context): ServiceClient => ({
         throw new PluginError(403, `You're not allowed to take an action on that entity. Make sure that comment exist or you've authenticated your request properly.`);
     },
 
-    async markAsRemoved(this: ServiceClient, id: Id, relation: string, authorId: Id, user: StrapiUser = undefined): Promise<Comment> {
+    async markAsRemoved(this: IServiceClient, id: Id, relation: string, authorId: Id, user: StrapiUser = undefined): Promise<Comment> {
         if (!this.getCommonService().isValidUserContext(user)) {
             throw resolveUserContextError(user);
         }
@@ -190,38 +190,41 @@ export = ({ strapi }: Context): ServiceClient => ({
 
         await this.getCommonService().parseRelationString(relation);
 
-        let entity: Comment;
         try {
             const byAuthor = user?.id ? {
                 authorUser: author
             } : {
                 authorId: author
             }
-            entity = await this.getCommonService().findOne({
+            const entity = await this.getCommonService().findOne({
                 id,
                 related: relation,
                 ...byAuthor,
             });
+            if (entity) {
+                const removedEntity = await strapi.db.query<Comment>(getModelUid('comment'))
+                .update({
+                    where: { 
+                        id, 
+                        related: relation
+                      },
+                      data: { removed: true },
+                      populate: { threadOf: true, authorUser: true },
+                })
+      
+              await this.markAsRemovedNested(id, true);
+      
+              return this.getCommonService().sanitizeCommentEntity(removedEntity);
+            }
+            else {
+                throw new PluginError(404, `Entity does not exist or you're not allowed to take an action on it`);
+            }
         } catch(e) {
             throw new PluginError(404, `Entity does not exist or you're not allowed to take an action on it`);
         }
-
-        const removedEntity = await strapi.db.query<Comment>(getModelUid('comment'))
-          .update({
-              where: { 
-                  id, 
-                  related: relation
-                },
-                data: { removed: true },
-                populate: { threadOf: true, authorUser: true },
-          })
-
-        await this.markAsRemovedNested(id, true);
-
-        return this.getCommonService().sanitizeCommentEntity(removedEntity);
     },
 
-	async sendAbuseReportEmail(this: ServiceClient, reason: string, content: string): Promise<void> {
+	async sendAbuseReportEmail(this: IServiceClient, reason: string, content: string): Promise<void> {
 		const rolesToBeNotified: Array<string> = await this.getCommonService().getConfig<Array<string>>(CONFIG_PARAMS.MODERATOR_ROLES) || ['strapi-super-admin'];
 
         const adminUserModel = strapi.db.query<StrapiAdminUser>('admin::user');
@@ -257,7 +260,7 @@ export = ({ strapi }: Context): ServiceClient => ({
 		}
 	},
 
-    async markAsRemovedNested(this: ServiceClient, id: Id, status: boolean): Promise<boolean> {
+    async markAsRemovedNested(this: IServiceClient, id: Id, status: boolean): Promise<boolean> {
         return this.getCommonService().modifiedNestedNestedComments(id, 'removed', status);
     },
 });

@@ -1,4 +1,4 @@
-import { ServiceCommon } from '../../../types';
+import { IServiceCommon } from '../../../types';
 import { Comment } from '../../../types/contentTypes';
 import { CONFIG_PARAMS } from '../../utils/constants';
 import PluginError from '../../utils/error';
@@ -23,7 +23,7 @@ describe('Test Comments service functions utils', () => {
     beforeEach(() => setup());
 
     test('Should return store', async () => {
-      const pluginStore = await getPluginService<ServiceCommon>('common').getPluginStore();
+      const pluginStore = await getPluginService<IServiceCommon>('common').getPluginStore();
       expect(pluginStore).toHaveProperty('get');
       expect(pluginStore).toHaveProperty('set');
       expect(pluginStore).toHaveProperty('delete');
@@ -37,12 +37,12 @@ describe('Test Comments service functions utils', () => {
       }));
   
       test('Should return config value', async () => {
-        const result = await getPluginService<ServiceCommon>('common').getConfig('test');
+        const result = await getPluginService<IServiceCommon>('common').getConfig('test');
         expect(result).toEqual('sample');
       });
   
       test('Should return default config prop value if not set', async () => {
-        const result = await getPluginService<ServiceCommon>('common').getConfig('another', 'defaultValue');
+        const result = await getPluginService<IServiceCommon>('common').getConfig('another', 'defaultValue');
         expect(result).toEqual('defaultValue');
       });
     });
@@ -53,12 +53,12 @@ describe('Test Comments service functions utils', () => {
       }, true));
   
       test('Should return config value', async () => {
-        const result = await getPluginService<ServiceCommon>('common').getConfig('test');
+        const result = await getPluginService<IServiceCommon>('common').getConfig('test');
         expect(result).toEqual('sample');
       });
   
       test('Should return default config prop value if not set', async () => {
-        const result = await getPluginService<ServiceCommon>('common').getConfig('another', 'defaultValue');
+        const result = await getPluginService<IServiceCommon>('common').getConfig('another', 'defaultValue');
         expect(result).toEqual('defaultValue');
       });
     });
@@ -68,15 +68,15 @@ describe('Test Comments service functions utils', () => {
     beforeEach(() => setup());
 
     test('Should context be valid', () => {
-      expect(getPluginService<ServiceCommon>('common').isValidUserContext({ id: 1 })).toEqual(true);
+      expect(getPluginService<IServiceCommon>('common').isValidUserContext({ id: 1 })).toEqual(true);
     });
 
     test('Should context be invalid', () => {
-      expect(getPluginService<ServiceCommon>('common').isValidUserContext({ })).toEqual(false);
+      expect(getPluginService<IServiceCommon>('common').isValidUserContext({ })).toEqual(false);
     });
 
     test('Should use fallback', () => {
-      expect(getPluginService<ServiceCommon>('common').isValidUserContext()).toEqual(true);
+      expect(getPluginService<IServiceCommon>('common').isValidUserContext()).toEqual(true);
     });
   });
 
@@ -111,7 +111,7 @@ describe('Test Comments service functions utils', () => {
 
     test('Should return exact the same value', () => {
       const input = { ...sample };
-      const output = getPluginService<ServiceCommon>('common').sanitizeCommentEntity(input);
+      const output = getPluginService<IServiceCommon>('common').sanitizeCommentEntity(input);
       expect(output).toHaveProperty('id', input.id);
       expect(output).toHaveProperty('content', input.content);
       expect(output).toHaveProperty('blocked', input.blocked);
@@ -123,7 +123,7 @@ describe('Test Comments service functions utils', () => {
         ...sample,
         ...authorGenericSample,
       };
-      const output = getPluginService<ServiceCommon>('common').sanitizeCommentEntity(input);
+      const output = getPluginService<IServiceCommon>('common').sanitizeCommentEntity(input);
 
       expect(output).toHaveProperty('author');
       expect(output).toHaveProperty('author.id', input.authorId);
@@ -143,7 +143,7 @@ describe('Test Comments service functions utils', () => {
         ...sample,
         authorUser: authorSample,
       };
-      const output = getPluginService<ServiceCommon>('common').sanitizeCommentEntity(input);
+      const output = getPluginService<IServiceCommon>('common').sanitizeCommentEntity(input);
 
       expect(output).toHaveProperty('author');
       expect(output).toHaveProperty('author.id', input.authorUser.id);
@@ -167,9 +167,9 @@ describe('Test Comments service functions utils', () => {
     test('Should find bad words usage and throw error PluginError', async () => {
       expect.assertions(7);
       try {
-        await getPluginService<ServiceCommon>('common').checkBadWords(text);
+        await getPluginService<IServiceCommon>('common').checkBadWords(text);
       } catch (e) {
-        expect(await getPluginService<ServiceCommon>('common').getConfig('badWords')).toEqual(undefined);
+        expect(await getPluginService<IServiceCommon>('common').getConfig('badWords')).toEqual(undefined);
         expect(e).toBeInstanceOf(PluginError);
         expect(e).toHaveProperty('status', 400);
         expect(e).toHaveProperty('name', 'Strapi:Plugin:Comments');
@@ -193,8 +193,8 @@ describe('Test Comments service functions utils', () => {
     const text = 'Lorem ipsum dolor sit fuck amet';
 
     test('Should skip bad words filtering because of configuration change', async () => {
-      expect(await getPluginService<ServiceCommon>('common').getConfig('badWords')).toEqual(false);
-      expect(await getPluginService<ServiceCommon>('common').checkBadWords(text)).toEqual(text);
+      expect(await getPluginService<IServiceCommon>('common').getConfig('badWords')).toEqual(false);
+      expect(await getPluginService<IServiceCommon>('common').checkBadWords(text)).toEqual(text);
     });
   });
 
@@ -209,17 +209,17 @@ describe('Test Comments service functions utils', () => {
       beforeEach(() => setup({ enabledCollections: [uid] }, true));
 
       test('Should pass', async () => {
-        expect(await getPluginService<ServiceCommon>('common').parseRelationString(validCollection));
-        expect(await getPluginService<ServiceCommon>('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).toContain(uid);
+        expect(await getPluginService<IServiceCommon>('common').parseRelationString(validCollection));
+        expect(await getPluginService<IServiceCommon>('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).toContain(uid);
       });
   
       test('Should fail with 403', async () => {
   
         try {
-          await getPluginService<ServiceCommon>('common').parseRelationString(testCollection);
+          await getPluginService<IServiceCommon>('common').parseRelationString(testCollection);
         } catch(e) {
-          expect(await getPluginService<ServiceCommon>('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).toContain(uid);
-          expect(await getPluginService<ServiceCommon>('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).not.toContain(wrongUid);
+          expect(await getPluginService<IServiceCommon>('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).toContain(uid);
+          expect(await getPluginService<IServiceCommon>('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).not.toContain(wrongUid);
           expect(e).toBeInstanceOf(PluginError);
           expect(e).toHaveProperty('status', 403);
         }
@@ -230,17 +230,17 @@ describe('Test Comments service functions utils', () => {
       beforeEach(() => setup({ enabledCollections: [uid] }));
 
       test('Should pass', async () => {
-        expect(await getPluginService<ServiceCommon>('common').parseRelationString(validCollection));
-        expect(await getPluginService<ServiceCommon>('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).toContain(uid);
+        expect(await getPluginService<IServiceCommon>('common').parseRelationString(validCollection));
+        expect(await getPluginService<IServiceCommon>('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).toContain(uid);
       });
   
       test('Should fail with 403', async () => {
   
         try {
-          await getPluginService<ServiceCommon>('common').parseRelationString(testCollection);
+          await getPluginService<IServiceCommon>('common').parseRelationString(testCollection);
         } catch(e) {
-          expect(await getPluginService<ServiceCommon>('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).toContain(uid);
-          expect(await getPluginService<ServiceCommon>('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).not.toContain(wrongUid);
+          expect(await getPluginService<IServiceCommon>('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).toContain(uid);
+          expect(await getPluginService<IServiceCommon>('common').getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS)).not.toContain(wrongUid);
           expect(e).toBeInstanceOf(PluginError);
           expect(e).toHaveProperty('status', 403);
         }
@@ -264,7 +264,7 @@ describe('Test Comments service functions utils', () => {
 
       
       test('Should merge related entity', async () => {
-        const result = await getPluginService<ServiceCommon>('common').mergeRelatedEntityTo(comment, [relatedEntity]);
+        const result = await getPluginService<IServiceCommon>('common').mergeRelatedEntityTo(comment, [relatedEntity]);
         expect(result).toHaveProperty('id', 1);
         expect(result).not.toHaveProperty('related', related);
         expect(result).toHaveProperty(['related', 'title'], relatedEntity.title);
@@ -317,7 +317,7 @@ describe('Test Comments service functions utils', () => {
 
       describe('findAllFlat', () => {
         test('Should return proper structure', async () => {
-          const result = await getPluginService<ServiceCommon>('common').findAllFlat({ query: { related }}, relatedEntity);
+          const result = await getPluginService<IServiceCommon>('common').findAllFlat({ query: { related }}, relatedEntity);
           expect(result).toHaveProperty('data');
           expect(result).not.toHaveProperty('meta');
           expect(result.data.length).toBe(4);
@@ -326,7 +326,7 @@ describe('Test Comments service functions utils', () => {
         });
   
         test('Should return structure with pagination', async () => {
-          const result = await getPluginService<ServiceCommon>('common').findAllFlat({ query: { related }, pagination: { page: 1, pageSize: 5 }}, relatedEntity);
+          const result = await getPluginService<IServiceCommon>('common').findAllFlat({ query: { related }, pagination: { page: 1, pageSize: 5 }}, relatedEntity);
           expect(result).toHaveProperty('data');
           expect(result).toHaveProperty('meta');
           expect(result.data.length).toBe(4);
@@ -343,7 +343,7 @@ describe('Test Comments service functions utils', () => {
 
       describe('findAllInHierarchy', () => {
         test('Should return nested structure starting for root', async () => {
-          const result = await getPluginService<ServiceCommon>('common').findAllInHierarchy({ query: { related }}, relatedEntity);
+          const result = await getPluginService<IServiceCommon>('common').findAllInHierarchy({ query: { related }}, relatedEntity);
           expect(result).not.toHaveProperty('data');
           expect(result).not.toHaveProperty('meta');
           expect(result.length).toBe(2);
@@ -360,7 +360,7 @@ describe('Test Comments service functions utils', () => {
         });
 
         test('Should return nested structure starting for comment id: 1', async () => {
-          const result = await getPluginService<ServiceCommon>('common').findAllInHierarchy({ query: { related }, startingFromId: 1}, relatedEntity);
+          const result = await getPluginService<IServiceCommon>('common').findAllInHierarchy({ query: { related }, startingFromId: 1}, relatedEntity);
           expect(result).not.toHaveProperty('data');
           expect(result).not.toHaveProperty('meta');
           expect(result.length).toBe(1);
@@ -371,7 +371,7 @@ describe('Test Comments service functions utils', () => {
         });
 
         test('Should return nested structure starting for comment id: 1 without blocked comments', async () => {
-          const result = await getPluginService<ServiceCommon>('common').findAllInHierarchy({ query: { related }, startingFromId: 1, dropBlockedThreads: true}, relatedEntity);
+          const result = await getPluginService<IServiceCommon>('common').findAllInHierarchy({ query: { related }, startingFromId: 1, dropBlockedThreads: true}, relatedEntity);
           expect(result).not.toHaveProperty('data');
           expect(result).not.toHaveProperty('meta');
           expect(result.length).toBe(1);
@@ -383,7 +383,7 @@ describe('Test Comments service functions utils', () => {
 
       describe('findOne', () => {
         test('Should return proper structure', async () => {
-          const result = await getPluginService<ServiceCommon>('common').findOne({ related });
+          const result = await getPluginService<IServiceCommon>('common').findOne({ related });
           expect(result).toHaveProperty('id', db[0].id);
           expect(result).toHaveProperty('content', db[0].content);
           expect(result).toHaveProperty(['author', 'id'], db[0].authorId);
@@ -394,7 +394,7 @@ describe('Test Comments service functions utils', () => {
 
       describe('findRelatedEntitiesFor', () => {
         test('Should return proper structure', async () => {
-          const result = await getPluginService<ServiceCommon>('common').findRelatedEntitiesFor(db);
+          const result = await getPluginService<IServiceCommon>('common').findRelatedEntitiesFor(db);
           expect(result).toHaveProperty([0, 'id'], relatedEntity.id);
           expect(result).toHaveProperty([0, 'title'], relatedEntity.title);
           expect(result).toHaveProperty([0, 'uid'], relatedEntity.uid);
