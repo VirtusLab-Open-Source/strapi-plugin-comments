@@ -207,7 +207,8 @@ export = ({ strapi }: Context): ServiceCommon => ({
             },
             {}
         );
-        
+
+        // @ts-ignore
         return Promise.all<RelatedEntity>(
             Object.entries(data)
             .map(async ([relatedUid, relatedStringIds]): Promise<Array<RelatedEntity>> =>
@@ -264,7 +265,7 @@ export = ({ strapi }: Context): ServiceCommon => ({
         };
     },
 
-    isValidUserContext(user) {
+    isValidUserContext(user?: any): boolean {
         return user ? !isNil(user?.id) : true;
     },
 
@@ -280,7 +281,7 @@ export = ({ strapi }: Context): ServiceCommon => ({
         return [ uid, relatedId];
     },
 
-    async checkBadWords(content: string): Promise<boolean | string | Error> {
+    async checkBadWords(content: string): Promise<boolean | string | PluginError> {
         const config = await this.getConfig(CONFIG_PARAMS.BAD_WORDS, true);
         if (config) {
             const filter = new BadWordsFilter(isObject(config) ? config as ToBeFixed : undefined);

@@ -57,6 +57,7 @@ export interface Strapi {
     runLifecyclesFunctions: Function
 
     db: StrapiDB
+    admin: StrapiAdmin
 }
 
 export type StrapiService = any;
@@ -103,9 +104,9 @@ export type StrapiDBQuery<T> = {
     count(args: StrapiDBQueryArgs): number
 };
 
-export type StrapiDBQueryArgs = {
+export type StrapiDBQueryArgs = any
 
-}
+export type StrapiAdmin = any
 
 export type Context = {
     strapi: Strapi

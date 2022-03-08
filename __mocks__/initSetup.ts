@@ -1,6 +1,6 @@
-const { get, set, isEmpty } = require('lodash');
+import { get, set, isEmpty } from 'lodash';
 
-module.exports = (config = {}, toStore = false, database = {}) => {
+export = (config = {}, toStore = false, database = {}) => {
   const dbConfig = toStore ? {
     plugin: {
       comments: {

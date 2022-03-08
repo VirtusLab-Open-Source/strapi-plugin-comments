@@ -1,4 +1,4 @@
-const { getPluginService } = require('../functions');
+import { getPluginService } from '../functions';
 
 beforeEach(() => {
   Object.defineProperty(global, 'strapi', {

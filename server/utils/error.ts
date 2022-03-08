@@ -4,7 +4,7 @@ interface PluginErrorInterface extends Error {
     payload: any
 };
 
-export class PluginError extends Error implements PluginErrorInterface {
+export default class PluginError extends Error implements PluginErrorInterface {
     status: number
     payload: any
 
@@ -14,6 +14,8 @@ export class PluginError extends Error implements PluginErrorInterface {
         this.status = status || 500;
         this.message = message || 'Internal error'; 
         this.payload = payload;
+
+        Object.setPrototypeOf(this, PluginError.prototype);
      }
 
      toString(e = this) {

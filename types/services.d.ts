@@ -1,5 +1,5 @@
+import PluginError from "../server/utils/error";
 import { KeyValueSet, StrapiStore, ToBeFixed } from "./common"
-import { CommentsPluginConfig } from "./config"
 import { Comment, RelatedEntity } from "./contentTypes";
 
 export type Pagination = {
@@ -27,24 +27,24 @@ export type FindAllFlatProps = {
         threadOf?: number | string
         [key: string]: any
     } & {}
-    populate: {
+    populate?: {
         [key: string]: any
     }
-    sort: {
+    sort?: {
         [key: string]: any
     }
-    pagination: Pagination
+    pagination?: Pagination
 };
 
 export type FindAllInHierarhyProps = Omit<FindAllFlatProps, 'pagination'> & {
-    startingFromId?: number,
+    startingFromId?: number | null,
     dropBlockedThreads?: boolean,
 };
 
 export interface ServiceCommon {
-    getConfig<T>(): Promise<T>
+    getConfig<T>(path?: string, defaultValue?: any): Promise<T>
     getPluginStore(): Promise<StrapiStore>
-    getLocalConfig<T>(): T
+    getLocalConfig<T>(path?: string, defaultValue?: any): T
     findAllFlat(props: FindAllFlatProps, relatedEntity?: RelatedEntity): Promise<PaginatedResponse>
     findAllInHierarchy(props: FindAllInHierarhyProps, relatedEntity?: RelatedEntity): Promise<Array<Comment>>
     findOne(criteria: KeyValueSet<any>): Promise<Comment>
@@ -52,9 +52,9 @@ export interface ServiceCommon {
     mergeRelatedEntityTo(entity: ToBeFixed, relatedEntities: Array<RelatedEntity>): Comment
     modifiedNestedNestedComments(id: number, fieldName: string, value: any): Promise<boolean> 
     sanitizeCommentEntity(entity: Comment): Comment
-    isValidUserContext(user: any): boolean
+    isValidUserContext(user?: any): boolean
     parseRelationString(relation: string): Promise<[uid: string, relatedId: string]>
-    checkBadWords(content: string): Promise<boolean | string | Error>
+    checkBadWords(content: string): Promise<boolean | string | PluginError>
 }
 
 export type ServiceAdmin = {}
