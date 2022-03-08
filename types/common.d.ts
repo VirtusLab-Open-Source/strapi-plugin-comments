@@ -58,6 +58,7 @@ export interface Strapi {
 
     db: StrapiDB
     admin: StrapiAdmin
+    log: StrapiLog
 }
 
 export type StrapiService = any;
@@ -108,8 +109,18 @@ export type StrapiDBQueryArgs = any
 
 export type StrapiAdmin = any
 
+export type StrapiLog = {
+    log: Function
+    error: Function
+    warn: Function 
+};
+
 export type Context = {
     strapi: Strapi
 }
+
+export type StrapiAdminUser = any;
+
+export type StrapiUser = any;
 
 export type ToBeFixed = any;

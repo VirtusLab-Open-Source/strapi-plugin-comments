@@ -1,6 +1,6 @@
 import BadWordsFilter from 'bad-words';
 import { isArray, isNumber, isObject, isNil, isString, isEmpty, first, parseInt, set, get } from 'lodash';
-import { CommentsPluginConfig, Context, FindAllFlatProps, FindAllInHierarhyProps, PaginatedResponse, Pagination, ResponseMeta, ServiceCommon, StrapiStore, ToBeFixed } from '../../types';
+import { Id, CommentsPluginConfig, Context, FindAllFlatProps, FindAllInHierarhyProps, PaginatedResponse, Pagination, ResponseMeta, ServiceCommon, StrapiStore, ToBeFixed } from '../../types';
 import { Comment, RelatedEntity } from '../../types/contentTypes';
 import { REGEX, CONFIG_PARAMS } from '../utils/constants';
 import PluginError from './../utils/error';
@@ -19,7 +19,7 @@ import {
 
 export = ({ strapi }: Context): ServiceCommon => ({
 
-    async getConfig<T>(prop?: string, defaultValue?: any, useLocal: boolean = false): Promise<T> {
+    async getConfig<T>(this: ServiceCommon, prop?: string, defaultValue?: any, useLocal: boolean = false): Promise<T> {
         const queryProp: string = buildConfigQueryProp(prop);
         const pluginStore: StrapiStore = await this.getPluginStore();
         const config: CommentsPluginConfig = await pluginStore.get({ key: 'config' });
@@ -44,7 +44,7 @@ export = ({ strapi }: Context): ServiceCommon => ({
     },
 
     // Find comments in the flat structure
-    async findAllFlat({ 
+    async findAllFlat(this: ServiceCommon, { 
         query = {}, 
         populate = {}, 
         sort, 
@@ -166,7 +166,7 @@ export = ({ strapi }: Context): ServiceCommon => ({
     },
 
     // Find comments and create relations tree structure
-    async findAllInHierarchy ({
+    async findAllInHierarchy (this: ServiceCommon, {
         query,
         populate = {},
         sort,
@@ -233,7 +233,7 @@ export = ({ strapi }: Context): ServiceCommon => ({
         };
     },
 
-    async modifiedNestedNestedComments(id, fieldName, value) {
+    async modifiedNestedNestedComments(this: ServiceCommon, id: Id, fieldName: string, value: any): Promise<boolean> {
         try {
             const entitiesToChange = await strapi.db.query<Comment>(getModelUid('comment'))
                 .findMany({
@@ -269,20 +269,20 @@ export = ({ strapi }: Context): ServiceCommon => ({
         return user ? !isNil(user?.id) : true;
     },
 
-    async parseRelationString(relation): Promise<[uid: string, relatedId: string]> {
+    async parseRelationString(this: ServiceCommon, relation): Promise<[uid: string, relatedId: string]> {
         const [ uid, relatedStringId ] = getRelatedGroups(relation);
         const parsedRelatedId = parseInt(relatedStringId);
         const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
 
-        const enabledCollections = await this.getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS, []);
+        const enabledCollections: Array<string> = await this.getConfig<Array<string>>(CONFIG_PARAMS.ENABLED_COLLECTIONS, []);
         if (!enabledCollections.includes(uid)) {
             throw new PluginError(403, `Action not allowed for collection '${uid}'. Use one of: ${ enabledCollections.join(', ') }`);
         }
         return [ uid, relatedId];
     },
 
-    async checkBadWords(content: string): Promise<boolean | string | PluginError> {
-        const config = await this.getConfig(CONFIG_PARAMS.BAD_WORDS, true);
+    async checkBadWords(this: ServiceCommon, content: string): Promise<boolean | string | PluginError> {
+        const config: boolean = await this.getConfig<boolean>(CONFIG_PARAMS.BAD_WORDS, true);
         if (config) {
             const filter = new BadWordsFilter(isObject(config) ? config as ToBeFixed : undefined);
             if (content && filter.isProfane(content)) {

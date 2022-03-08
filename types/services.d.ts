@@ -1,6 +1,6 @@
 import PluginError from "../server/utils/error";
-import { KeyValueSet, StrapiStore, ToBeFixed } from "./common"
-import { Comment, RelatedEntity } from "./contentTypes";
+import { KeyValueSet, StrapiStore, StrapiUser, ToBeFixed } from "./common"
+import { Comment, CommentReport, Id, RelatedEntity } from "./contentTypes";
 
 export type Pagination = {
     page?: number
@@ -50,7 +50,7 @@ export interface ServiceCommon {
     findOne(criteria: KeyValueSet<any>): Promise<Comment>
     findRelatedEntitiesFor(entities: Array<Comment>): Promise<RelatedEntity[]>
     mergeRelatedEntityTo(entity: ToBeFixed, relatedEntities: Array<RelatedEntity>): Comment
-    modifiedNestedNestedComments(id: number, fieldName: string, value: any): Promise<boolean> 
+    modifiedNestedNestedComments(id: Id, fieldName: string, value: any): Promise<boolean> 
     sanitizeCommentEntity(entity: Comment): Comment
     isValidUserContext(user?: any): boolean
     parseRelationString(relation: string): Promise<[uid: string, relatedId: string]>
@@ -59,4 +59,12 @@ export interface ServiceCommon {
 
 export type ServiceAdmin = {}
 
-export type ServiceClient = {}
+export interface ServiceClient {
+    getCommonService(): ServiceCommon
+    create(relation: string, data: ToBeFixed, user: StrapiUser): Promise<Comment>
+    update(id: Id, relation: string, data: ToBeFixed, user: StrapiUser): Promise<Comment>
+    reportAbuse(id: Id, relation: string, payload:  ToBeFixed, user: StrapiUser): Promise<CommentReport>
+    markAsRemoved(id: Id, relation: string, authorId: Id, user: StrapiUser): Promise<Comment>
+    sendAbuseReportEmail(reason: string, content: string): Promise<void>
+    markAsRemovedNested(id: Id, status: boolean): Promise<boolean>
+}
