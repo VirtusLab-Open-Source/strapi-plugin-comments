@@ -12,7 +12,7 @@
     "page.common.item.status.OPEN": "Abrir",
     "page.common.item.status.PENDING": "Pendente",
     "page.common.item.status.BLOCKED": "Bloqueado",
-    "page.common.item.status.APPROVED": "Aprovedo",
+    "page.common.item.status.APPROVED": "Aprovado",
     "page.common.item.status.TO_REVIEW": "Para revisar ({count, number})",
     "page.common.item.status.REJECTED": "Rejeitado",
     "page.common.item.status.REMOVED": "Removido pelo autor",
