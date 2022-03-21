@@ -1,9 +1,7 @@
 import { ToBeFixed } from "./types/common";
 
 export default {
-    render: function(uid: ToBeFixed) {
-        return `plugin::comments.${uid}`;
-    },
+    render: (uid: ToBeFixed) => `plugin::comments.${uid}`,
     comments: {
         read: 'read',
         moderate: 'moderate',

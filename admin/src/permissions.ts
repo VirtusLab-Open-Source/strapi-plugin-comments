@@ -1,6 +1,6 @@
-const permissions = require('./../../permissions');
+import permissions from './../../permissions';
 
-const pluginPermissions = {
+export default {
     access: [
       { action: permissions.render(permissions.comments.read), subject: null },
       { action: permissions.render(permissions.reports.read), subject: null },
@@ -15,5 +15,3 @@ const pluginPermissions = {
     settings: [{ action: permissions.render(permissions.settings.read), subject: null }],
     settingsChange: [{ action: permissions.render(permissions.settings.change), subject: null }],
   };
-  
-  export default pluginPermissions;
