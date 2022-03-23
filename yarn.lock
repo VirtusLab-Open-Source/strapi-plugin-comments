@@ -3987,10 +3987,10 @@ stack-utils@^2.0.3:
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.5.0.tgz#161c7dac177659fd9811f43771fa99381478628c"
   integrity sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=
 
-strapi-typed@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/strapi-typed/-/strapi-typed-1.0.1.tgz#47717bab5c36657739368fd1204dc6f05e0c768a"
-  integrity sha512-3x/WnzwHvHzyId+Odyme99F2rrVIv/fESO/ApU5rWJcQd5aTO5XFetiTHLIBCfdSV9IBH7MSrL8giSRRIl0vjg==
+strapi-typed@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/strapi-typed/-/strapi-typed-1.0.2.tgz#be73079bfaf829a38df52ae8686a5018a15f9269"
+  integrity sha512-vWOjvDbnjXvrgqTKw/IelhWYE4hKC1tHI97J95HwQAmmrPfcebOTlkjRD1SUGayt2tSvBdsKajIh1lCzqK46RQ==
   dependencies:
     "@strapi/plugin-graphql" "^4.1.2"
     "@strapi/utils" "^4.1.2"
