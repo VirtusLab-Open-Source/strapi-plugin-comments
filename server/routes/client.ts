@@ -1,6 +1,6 @@
-'use strict';
+import { StrapiRoute } from 'strapi-typed';
 
-module.exports = [
+const routes: StrapiRoute[] = [
   {
     method: 'GET',
     path: '/:relation',
@@ -50,3 +50,5 @@ module.exports = [
     },
   },
 ];
+
+export default routes;

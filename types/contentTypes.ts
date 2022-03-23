@@ -1,4 +1,5 @@
-import { StrapiUser, ToBeFixed } from "./common";
+import { StrapiUser } from "strapi-typed";
+import { ToBeFixed } from "./common";
 
 export type Id = number | string;
 

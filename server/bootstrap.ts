@@ -1,10 +1,11 @@
 
 import { isEmpty } from 'lodash';
-import { CommentsPluginConfig, Context, IServiceCommon } from '../types';
+import { StrapiContext } from 'strapi-typed';
+import { CommentsPluginConfig, IServiceCommon } from '../types';
 import permissions from './../permissions';
 import { getPluginService } from './utils/functions';
 
-export = async ({ strapi }: Context) => {
+export = async ({ strapi }: StrapiContext) => {
 
   // Provide GQL support
   if (strapi.plugin('graphql')) {

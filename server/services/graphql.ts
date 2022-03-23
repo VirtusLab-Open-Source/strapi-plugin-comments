@@ -1,11 +1,12 @@
-'use strict';
+import { Primitive, StrapiContext } from 'strapi-typed';
+import { IServiceGraphQL, ToBeFixed } from "../../types";
 
-const { has, propEq, isNil, isDate, isObject } = require('lodash/fp');
-const { inputObjectType } = require('nexus');
+import { has, propEq, isNil, isDate, isObject } from 'lodash/fp';
+import { inputObjectType }from 'nexus';
 
 const virtualScalarAttributes = ['id'];
 
-module.exports = ({ strapi }) => {
+export = ({ strapi }: StrapiContext): IServiceGraphQL => {
   const { service: getService } = strapi.plugin('graphql');
 
   const rootLevelOperators = () => {
@@ -14,7 +15,7 @@ module.exports = ({ strapi }) => {
     return [operators.and, operators.or, operators.not];
   };
 
-  const buildContentTypeFilters = contentType => {
+  const buildContentTypeFilters = (contentType: ToBeFixed) => {
     const utils = strapi.plugin('graphql').service('utils');
     const extension = strapi.plugin('graphql').service('extension');
 
@@ -66,7 +67,7 @@ module.exports = ({ strapi }) => {
     });
   };
 
-  const addScalarAttribute = (builder, attributeName, attribute) => {
+  const addScalarAttribute = (builder: ToBeFixed, attributeName: string, attribute: ToBeFixed): void => {
     const { naming, mappers } = strapi.plugin('graphql').service('utils');
 
     const gqlType = mappers.strapiScalarToGraphQLScalar(attribute.type);
@@ -74,13 +75,13 @@ module.exports = ({ strapi }) => {
     builder.field(attributeName, { type: naming.getScalarFilterInputTypeName(gqlType) });
   };
 
-  const addRelationalAttribute = (builder, attributeName, attribute) => {
+  const addRelationalAttribute = (builder: ToBeFixed, attributeName: string, attribute: ToBeFixed): void => {
     const utils = strapi.plugin('graphql').service('utils');
     const extension = strapi.plugin('graphql').service('extension');
     const { getFiltersInputTypeName } = utils.naming;
     const { isMorphRelation } = utils.attributes;
 
-    const model = strapi.getModel(attribute.target);
+    const model = strapi.getModel<ToBeFixed>(attribute.target);
 
     // If there is no model corresponding to the attribute configuration
     // or if the attribute is a polymorphic relation, then ignore it
@@ -92,7 +93,7 @@ module.exports = ({ strapi }) => {
     builder.field(attributeName, { type: getFiltersInputTypeName(model) });
   };
 
-  const recursivelyReplaceScalarOperators = data => {
+  const recursivelyReplaceScalarOperators = (data: ToBeFixed): ToBeFixed => {
     const { operators } = getService('builders').filters;
 
     if (Array.isArray(data)) {
@@ -105,12 +106,12 @@ module.exports = ({ strapi }) => {
       return data;
     }
 
-    const result = {};
+    const result: ToBeFixed = {};
 
     for (const [key, value] of Object.entries(data)) {
       const isOperator = !!operators[key];
 
-      const newKey = isOperator ? operators[key].strapiOperator : key;
+      const newKey: string = isOperator ? operators[key].strapiOperator : key;
 
       result[newKey] = recursivelyReplaceScalarOperators(value);
     }
@@ -118,7 +119,7 @@ module.exports = ({ strapi }) => {
     return result;
   };
 
-  const graphQLFiltersToStrapiQuery = (filters, contentType = {}) => {
+  const graphQLFiltersToStrapiQuery = (filters: ToBeFixed, contentType: ToBeFixed = {}): Array<ToBeFixed> | ToBeFixed => {
     const { isStrapiScalar, isMedia, isRelation } = getService('utils').attributes;
     const { operators } = getService('builders').filters;
 
@@ -136,17 +137,17 @@ module.exports = ({ strapi }) => {
       );
     }
 
-    const resultMap = {};
+    const resultMap: ToBeFixed = {};
     const { attributes } = contentType;
 
-    const isAttribute = attributeName => {
+    const isAttribute = (attributeName: string): boolean => {
       return virtualScalarAttributes.includes(attributeName) || has(attributeName, attributes);
     };
 
     for (const [key, value] of Object.entries(filters)) {
       // If the key is an attribute, update the value
       if (isAttribute(key)) {
-        const attribute = attributes[key];
+        const attribute: Primitive | ToBeFixed = attributes[key];
 
         // If it's a scalar attribute
         if (virtualScalarAttributes.includes(key) || isStrapiScalar(attribute)) {
@@ -183,8 +184,9 @@ module.exports = ({ strapi }) => {
     return resultMap;
   };
 
-  return {
+  const serviceMethods: IServiceGraphQL = {
     buildContentTypeFilters,
     graphQLFiltersToStrapiQuery,
   };
+  return serviceMethods;
 };

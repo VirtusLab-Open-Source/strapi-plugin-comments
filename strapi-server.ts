@@ -1,6 +1,6 @@
-'use strict';
 
-import { CommentsPluginConfig, PropType } from "./types";
+import { PropType } from "strapi-typed";
+import { CommentsPluginConfig } from "./types";
 
 import { isArray, isEmpty, isString } from 'lodash';
 

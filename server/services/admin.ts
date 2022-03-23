@@ -1,29 +1,30 @@
-'use strict';
+import { StrapiContext, Id, StrapiDBQueryArgs, PropType } from "strapi-typed";
+import { AdminFindAllProps, AdminFindAllQueryParamsParsed, AdminFindOneAndThreadProps, AdminPaginatedResponse, AdminSinglePageResponse, AnyConfig, Comment, CommentReport, IServiceAdmin, IServiceCommon, PluginConfigKeys, RelatedEntity, SettingsCommentsPluginConfig } from "../../types";
 
-const { getPluginService, parseParams } = require('./../utils/functions');
-const { isEmpty, isNil, isNumber, parseInt } = require('lodash');
-const PluginError = require('./../utils/error');
-const {
+import { getPluginService, parseParams } from './../utils/functions';
+import { isEmpty, isNil, isNumber, parseInt } from 'lodash';
+import PluginError from './../utils/error';
+import {
     getModelUid,
     getRelatedGroups,
     filterOurResolvedReports,
-} = require('./utils/functions');
-const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
+} from './utils/functions';
+import { APPROVAL_STATUS, REGEX } from './../utils/constants';
 
 /**
  * Comments Plugin - Moderation services
  */
 
- module.exports = ({ strapi }) => ({
+export = ({ strapi }: StrapiContext): IServiceAdmin => ({
 
-    getCommonService() {
+    getCommonService(): IServiceCommon {
         return getPluginService('common');
     },
 
     // Config
-    async config(viaSettingsPage = false) {
+    async config<T extends AnyConfig>(this: IServiceAdmin, viaSettingsPage = false): Promise<T | AnyConfig> {
         const pluginStore = await this.getCommonService().getPluginStore();
-        const config = await pluginStore.get({ key: 'config' });
+        const config: SettingsCommentsPluginConfig = await pluginStore.get({ key: 'config' });
         const additionalConfiguration = {
             regex: Object.keys(REGEX).reduce((prev, curr) => ({
                 ...prev,
@@ -31,7 +32,10 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
             }), {}),
         };
 
-        const isGQLPluginEnabled = !isNil(strapi.plugin('graphql'));
+        const getConfigProp = <M extends PluginConfigKeys>(key: string) => 
+            this.getCommonService().getLocalConfig<PropType<SettingsCommentsPluginConfig, M>>(key);
+
+        const isGQLPluginEnabled: PropType<SettingsCommentsPluginConfig, 'isGQLPluginEnabled'> = !isNil(strapi.plugin('graphql'));
 
         if (config) {
             return {
@@ -41,9 +45,9 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
             };
         }
 
-        const entryLabel = this.getCommonService().getLocalConfig('entryLabel');
-        const approvalFlow = this.getCommonService().getLocalConfig('approvalFlow');
-        const reportReasons = this.getCommonService().getLocalConfig('reportReasons');
+        const entryLabel = getConfigProp<'entryLabel'>('entryLabel');
+        const approvalFlow = getConfigProp<'approvalFlow'>('approvalFlow');
+        const reportReasons = getConfigProp<'reportReasons'>('reportReasons');
         const result = {
             entryLabel,
             approvalFlow,
@@ -52,8 +56,8 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
         };
 
         if (viaSettingsPage) {
-            const enabledCollections = this.getCommonService().getLocalConfig('enabledCollections');
-            const moderatorRoles = this.getCommonService().getLocalConfig('moderatorRoles');
+            const enabledCollections = getConfigProp<'enabledCollections'>('enabledCollections');
+            const moderatorRoles = getConfigProp<'moderatorRoles'>('moderatorRoles');
             return {
                 ...result,
                 enabledCollections,
@@ -65,20 +69,20 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
         return result;
     },
 
-    async updateConfig(body) {
+    async updateConfig(this: IServiceAdmin, body: SettingsCommentsPluginConfig): Promise<SettingsCommentsPluginConfig> {
         const pluginStore = await this.getCommonService().getPluginStore();
     
         await pluginStore.set({ key: 'config', value: body });
     
-        return this.config();
+        return this.config<SettingsCommentsPluginConfig>();
       },
     
-      async restoreConfig() {
+      async restoreConfig(this: IServiceAdmin): Promise<SettingsCommentsPluginConfig> {
         const pluginStore = await this.getCommonService().getPluginStore();
 
         await pluginStore.delete({key: 'config'})
     
-        return this.config();
+        return this.config<SettingsCommentsPluginConfig>();
       },
 
     async restart() {
@@ -86,8 +90,8 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
     },
 
     // Find all comments
-    async findAll({ related, entity, ...query }) {
-        const { _q, orderBy, pageSize = 10, page = 1, filters, ...rest } = parseParams(query);
+    async findAll(this: IServiceAdmin, { related, entity, ...query }: AdminFindAllProps): Promise<AdminPaginatedResponse<Comment>> {
+        const { _q, orderBy, pageSize = 10, page = 1, filters }: AdminFindAllQueryParamsParsed = parseParams<AdminFindAllQueryParamsParsed>(query);
 
         const defaultWhere = {
             $or: [
@@ -96,7 +100,7 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
             ],
         };
 
-        let params = {
+        let params: StrapiDBQueryArgs = {
             where: !isEmpty(filters) ? {
                 ...defaultWhere,
                 ...filters,
@@ -117,7 +121,7 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
             };
         }
     
-        const entities = await strapi.db.query(getModelUid('comment'))
+        const entities = await strapi.db.query<Comment>(getModelUid('comment'))
             .findMany({
                 ...params, 
                 populate: {
@@ -130,7 +134,7 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
                     },
                 },
             });
-        const total = await strapi.db.query(getModelUid('comment'))
+        const total = await strapi.db.query<number>(getModelUid('comment'))
             .count({
                 where: params.where,
             });
@@ -152,7 +156,7 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
     },
 
     // Find single comment
-    async findOneAndThread(id, { removed, ...query }) {
+    async findOneAndThread(this: IServiceAdmin, id: Id, { removed, ...query }: AdminFindOneAndThreadProps): Promise<AdminSinglePageResponse> {
         const defaultWhere = !removed ? {
             $or: [
                 { removed: false },
@@ -181,7 +185,7 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
             },
         }
 
-        const entity = await strapi.db.query(getModelUid('comment')).findOne({ 
+        const entity = await strapi.db.query<Comment>(getModelUid('comment')).findOne({ 
             where: {
                 id,
             },
@@ -195,9 +199,9 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
         const [relatedUid, relatedStringId] = getRelatedGroups(entity.related);
         const parsedRelatedId = parseInt(relatedStringId);
         const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
-        const relatedEntity = await strapi.db.query(relatedUid).findOne({ 
+        const relatedEntity = await strapi.db.query<RelatedEntity>(relatedUid).findOne({ 
             where: { id: relatedId }
-        }).then(_ => ({
+        }).then((_: RelatedEntity) => ({
             ..._,
             uid: relatedUid,
         }));
@@ -206,7 +210,7 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
             throw new PluginError(404, 'Relation not found');
         }
 
-        const levelThreadId = entity?.threadOf?.id || null;
+        const levelThreadId = (entity?.threadOf as Comment)?.id || null;
         const entitiesOnSameLevel = await this.getCommonService()
             .findAllInHierarchy({
                 query: {
@@ -232,9 +236,9 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
     },
 
     // Block / Unblock a comment
-    async blockComment(id, forceStatus) {
+    async blockComment(this: IServiceAdmin, id: Id, forceStatus?: boolean): Promise<Comment> {
         const existingEntity = await this.getCommonService().findOne({ id });
-        const changedEntity = await strapi.db.query(getModelUid('comment')).update({ 
+        const changedEntity = await strapi.db.query<Comment>(getModelUid('comment')).update({ 
             where: { id },
             data: { blocked: !isNil(forceStatus) ? forceStatus : !existingEntity.blocked }
         });
@@ -242,10 +246,10 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
     },
 
     // Block / Unblock a comment thread
-    async blockCommentThread(id, forceStatus) {
+    async blockCommentThread(this: IServiceAdmin, id: Id, forceStatus?: boolean): Promise<Comment> {
         const existingEntity = await this.getCommonService().findOne({ id });
         const status = !isNil(forceStatus) ? forceStatus : !existingEntity.blockedThread;
-        const changedEntity = await strapi.db.query(getModelUid('comment')).update({ 
+        const changedEntity = await strapi.db.query<Comment>(getModelUid('comment')).update({ 
             where: { id },
             data: { 
                 blocked: status,
@@ -258,8 +262,8 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
     },
 
     // Approve comment
-    async approveComment(id) {
-        const changedEntity = await strapi.db.query(getModelUid('comment'))
+    async approveComment(this: IServiceAdmin, id: Id): Promise<Comment> {
+        const changedEntity = await strapi.db.query<Comment>(getModelUid('comment'))
           .update({
               where: { id },
               data: { approvalStatus: APPROVAL_STATUS.APPROVED }
@@ -268,8 +272,8 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
         return this.getCommonService().sanitizeCommentEntity(changedEntity);
     },
     
-    async rejectComment(id) {
-        const changedEntity = await strapi.db.query(getModelUid('comment'))
+    async rejectComment(this: IServiceAdmin, id: Id): Promise<Comment> {
+        const changedEntity = await strapi.db.query<Comment>(getModelUid('comment'))
             .update({ 
                 where: { id }, 
                 data: { approvalStatus: APPROVAL_STATUS.REJECTED }
@@ -278,14 +282,14 @@ const { APPROVAL_STATUS, REGEX } = require('./../utils/constants')
         return this.getCommonService().sanitizeCommentEntity(changedEntity);
     },
 
-    async blockNestedThreads(id, blockStatus) {
+    async blockNestedThreads(this: IServiceAdmin, id: Id, blockStatus?: boolean): Promise<boolean> {
         return await this.getCommonService()
             .modifiedNestedNestedComments(id, 'blockedThread', blockStatus)
     },
 
     // Resolve reported abuse for comment
-    async resolveAbuseReport(id, commentId) {
-        return strapi.db.query(getModelUid('comment-report')).update({
+    async resolveAbuseReport(this: IServiceAdmin, id: Id, commentId: Id): Promise<CommentReport> {
+        return strapi.db.query<CommentReport>(getModelUid('comment-report')).update({
             where: {
                 id,
                 related: commentId,

@@ -1,6 +1,7 @@
 import BadWordsFilter from 'bad-words';
 import { isArray, isNumber, isObject, isNil, isString, isEmpty, first, parseInt, set, get } from 'lodash';
-import { Id, CommentsPluginConfig, Context, FindAllFlatProps, FindAllInHierarhyProps, PaginatedResponse, Pagination, ResponseMeta, IServiceCommon, StrapiStore, ToBeFixed } from '../../types';
+import { Id, StrapiContext, StrapiStore, StrapiPagination, StrapiResponseMeta, StrapiPaginatedResponse } from 'strapi-typed';
+import { CommentsPluginConfig, FindAllFlatProps, FindAllInHierarhyProps, IServiceCommon, ToBeFixed } from '../../types';
 import { Comment, RelatedEntity } from '../../types/contentTypes';
 import { REGEX, CONFIG_PARAMS } from '../utils/constants';
 import PluginError from './../utils/error';
@@ -19,7 +20,7 @@ import {
 
 const PAGE_SIZE = 10;
 
-export = ({ strapi }: Context): IServiceCommon => ({
+export = ({ strapi }: StrapiContext): IServiceCommon => ({
 
     async getConfig<T>(this: IServiceCommon, prop?: string, defaultValue?: any, useLocal: boolean = false): Promise<T> {
         const queryProp: string = buildConfigQueryProp(prop);
@@ -50,7 +51,7 @@ export = ({ strapi }: Context): IServiceCommon => ({
         query = {}, 
         populate = {}, 
         sort, 
-        pagination }: FindAllFlatProps, relatedEntity: RelatedEntity | null = null): Promise<PaginatedResponse> {
+        pagination }: FindAllFlatProps, relatedEntity: RelatedEntity | null = null): Promise<StrapiPaginatedResponse<Comment>> {
 
         const defaultPopulate = {
             authorUser: true,
@@ -70,15 +71,15 @@ export = ({ strapi }: Context): IServiceCommon => ({
             };
         }
 
-        let meta: ResponseMeta = {} as ResponseMeta;
+        let meta: StrapiResponseMeta = {} as StrapiResponseMeta;
         if (pagination && isObject(pagination)) {
-            const parsedPagination: Pagination = Object.keys(pagination)
-                .reduce((prev: Pagination, curr: string) => ({
+            const parsedpagination: StrapiPagination = Object.keys(pagination)
+                .reduce((prev: StrapiPagination, curr: string) => ({
                     ...prev,
                     [curr]: parseInt(get(pagination, curr)),
                 }), {});
-            const { page = 1, pageSize = PAGE_SIZE, start = 0, limit = PAGE_SIZE } = parsedPagination;
-            const paginationByPage = !isNil(parsedPagination?.page) || !isNil(parsedPagination?.pageSize);
+            const { page = 1, pageSize = PAGE_SIZE, start = 0, limit = PAGE_SIZE } = parsedpagination;
+            const paginationByPage = !isNil(parsedpagination?.page) || !isNil(parsedpagination?.pageSize);
 
             queryExtension = {
                 ...queryExtension,
@@ -86,7 +87,7 @@ export = ({ strapi }: Context): IServiceCommon => ({
                 limit: paginationByPage ? pageSize : limit,
             };
 
-            const metaPagination = paginationByPage ? {
+            const metapagination = paginationByPage ? {
                 pagination: {
                     page,
                     pageSize,
@@ -99,7 +100,7 @@ export = ({ strapi }: Context): IServiceCommon => ({
             };
 
             meta = {
-                ...metaPagination,
+                ...metapagination,
             };
         }
         
@@ -176,7 +177,7 @@ export = ({ strapi }: Context): IServiceCommon => ({
         sort,
         startingFromId = null,
         dropBlockedThreads = false,
-    }: FindAllInHierarhyProps, relatedEntity?: RelatedEntity): Promise<Array<Comment>> {
+    }: FindAllInHierarhyProps, relatedEntity?: RelatedEntity | null | boolean): Promise<Array<Comment>> {
         const entities = await this.findAllFlat({ query, populate, sort }, relatedEntity);
         return buildNestedStructure(entities?.data, startingFromId, 'threadOf', dropBlockedThreads, false);
     },

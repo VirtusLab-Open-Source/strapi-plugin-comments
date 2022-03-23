@@ -1,7 +1,9 @@
+import {  Id, IStrapi, StrapiUser, } from 'strapi-typed';
+import { Comment, CommentAuthor, ToBeFixed } from '../../../types';
+
 import PluginError from './../../utils/error';
 import { REGEX } from './../../utils/constants';
 import { first, get, isObject, isArray, isEmpty } from 'lodash';
-import { Comment, CommentAuthor, Id, IStrapi, StrapiUser, ToBeFixed } from '../../../types';
 
 declare var strapi: IStrapi;
 

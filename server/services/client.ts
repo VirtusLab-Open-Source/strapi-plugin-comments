@@ -1,4 +1,6 @@
-'use strict';
+
+import { StrapiContext, Id, StrapiAdminUser, StrapiUser } from 'strapi-typed';
+import { Comment, CommentAuthorPartial, CommentReport, RelatedEntity, IServiceClient, IServiceCommon, ToBeFixed } from '../../types';
 
 import { getPluginService } from './../utils/functions';
 import { isNil, isEmpty } from 'lodash';
@@ -9,13 +11,12 @@ import {
     resolveUserContextError,
 } from './utils/functions';
 import { APPROVAL_STATUS, REGEX, CONFIG_PARAMS } from './../utils/constants';
-import { Comment, CommentAuthorPartial, CommentReport, Context, Id, RelatedEntity, IServiceClient, IServiceCommon, StrapiAdminUser, StrapiUser, ToBeFixed } from '../../types';
 
 /**
  * Comments Plugin - Client services
  */
 
-export = ({ strapi }: Context): IServiceClient => ({
+export = ({ strapi }: StrapiContext): IServiceClient => ({
 
     getCommonService(): IServiceCommon {
         return getPluginService('common');
