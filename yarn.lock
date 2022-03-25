@@ -4093,9 +4093,10 @@ stack-utils@^2.0.3:
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.5.0.tgz#161c7dac177659fd9811f43771fa99381478628c"
   integrity sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=
 
-"strapi-typed@https://github.com/VirtusLab-Open-Source/strapi-typed":
-  version "1.0.2"
-  resolved "https://github.com/VirtusLab-Open-Source/strapi-typed#bab49f4450cdd1808ea88d43895b236d3ec1f481"
+strapi-typed@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/strapi-typed/-/strapi-typed-1.0.3.tgz#dfa8f142d385ef88aae07b208fea5c24a7a26664"
+  integrity sha512-5Ca6wGLbkl+6/38e/+gDjcgIzz1lILv6BtdzYQSdb9Hp96XOQZAClcs9kIgvsLqSFMSFSYRo/Gm8Ap6QnWqSPg==
   dependencies:
     "@strapi/plugin-graphql" "^4.1.2"
     "@strapi/utils" "^4.1.2"

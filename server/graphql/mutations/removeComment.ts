@@ -1,10 +1,10 @@
 "use strict";
 
+import { StrapiRequestContext } from "strapi-typed";
 import {
   IServiceClient,
   NexusRequestProps,
   StrapiGraphQLContext,
-  StrapiRequestContext,
   ToBeFixed,
 } from "../../../types";
 
@@ -18,8 +18,8 @@ export = ({ nexus }: StrapiGraphQLContext) => {
     args: {
       input: nonNull("RemoveComment"),
     },
-    // @ts-ignore
     async resolve(
+      // @ts-ignore
       obj: Object,
       args: NexusRequestProps,
       ctx: StrapiRequestContext & ToBeFixed

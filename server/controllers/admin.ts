@@ -1,3 +1,4 @@
+import { StrapiRequestContext } from "strapi-typed";
 import {
   AdminFindAllProps,
   AdminFindOneAndThreadProps,
@@ -8,7 +9,6 @@ import {
   IControllerAdmin,
   IServiceAdmin,
   SettingsCommentsPluginConfig,
-  StrapiRequestContext,
   ThrowablePromisedResponse,
   ToBeFixed,
   ViewCommentsPluginConfig,
@@ -79,13 +79,13 @@ const controllers: IControllerAdmin = {
   },
 
   async findAll(
-    ctx: StrapiRequestContext<unknown, AdminFindAllProps>
+    ctx: StrapiRequestContext<{}, AdminFindAllProps>
   ): Promise<AdminPaginatedResponse<Comment>> {
     return this.getService<IServiceAdmin>().findAll(ctx.query);
   },
 
   async findOne(
-    ctx: StrapiRequestContext<unknown, AdminFindOneAndThreadProps>
+    ctx: StrapiRequestContext<{}, AdminFindOneAndThreadProps>
   ): ThrowablePromisedResponse<AdminSinglePageResponse> {
     const { params = {}, query } = ctx;
     const { id }: ToBeFixed = parseParams(params);

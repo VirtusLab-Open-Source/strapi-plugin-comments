@@ -104,7 +104,7 @@ export interface IServiceAdmin {
   getCommonService(): IServiceCommon;
   config<T extends AnyConfig>(viaSettingsPage?: boolean): Promise<T>;
   updateConfig(
-    body: SettingsCommentsPluginConfig
+    body: SettingsCommentsPluginConfig | undefined
   ): Promise<SettingsCommentsPluginConfig>;
   restoreConfig(): Promise<SettingsCommentsPluginConfig>;
   restart(): void;

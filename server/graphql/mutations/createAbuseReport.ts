@@ -1,8 +1,8 @@
+import { StrapiRequestContext } from "strapi-typed";
 import {
   IServiceClient,
   NexusRequestProps,
   StrapiGraphQLContext,
-  StrapiRequestContext,
   ToBeFixed,
 } from "../../../types";
 import { getPluginService } from "../../utils/functions";
@@ -15,8 +15,8 @@ export = ({ nexus }: StrapiGraphQLContext) => {
     args: {
       input: nonNull("CreateReport"),
     },
-    // @ts-ignore
     async resolve(
+      // @ts-ignore
       obj: Object,
       args: NexusRequestProps,
       ctx: StrapiRequestContext & ToBeFixed

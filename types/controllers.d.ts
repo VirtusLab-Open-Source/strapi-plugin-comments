@@ -3,6 +3,7 @@ import {
   KeyValueSet,
   StrapiPagination,
   StrapiPaginatedResponse,
+  StrapiRequestContext,
   StrapiResponseMeta,
   StrapiStore,
   StrapiQueryParams,
@@ -11,7 +12,7 @@ import {
   StrapiQueryParamsParsedOrderBy,
   StrapiUser,
 } from "strapi-typed";
-import { StrapiRequestContext, ToBeFixed } from "./common";
+import { ToBeFixed } from "./common";
 import {
   CommentsPluginConfig,
   SettingsCommentsPluginConfig,
