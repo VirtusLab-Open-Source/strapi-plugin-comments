@@ -6,12 +6,11 @@
 
 // @ts-nocheck
 
-import { useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
-import { pluginId } from '../../pluginId';
+import { useEffect, useRef } from "react";
+import PropTypes from "prop-types";
+import { pluginId } from "../../pluginId";
 
 const Initializer = ({ setPlugin }) => {
-  
   const ref = useRef();
   ref.current = setPlugin;
 

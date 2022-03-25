@@ -1,19 +1,22 @@
 // @ts-nocheck
 
-import React, { useRef, useState } from 'react';
-import PropTypes from 'prop-types';
-import { Button } from '@strapi/design-system/Button';
-import { Box } from '@strapi/design-system/Box';
-import { Filter } from '@strapi/icons';
-import { FilterListURLQuery, FilterPopoverURLQuery } from '@strapi/helper-plugin';
-import { getMessage } from '../../utils';
+import React, { useRef, useState } from "react";
+import PropTypes from "prop-types";
+import { Button } from "@strapi/design-system/Button";
+import { Box } from "@strapi/design-system/Box";
+import { Filter } from "@strapi/icons";
+import {
+  FilterListURLQuery,
+  FilterPopoverURLQuery,
+} from "@strapi/helper-plugin";
+import { getMessage } from "../../utils";
 
 const TableFilters = ({ displayedFilters }) => {
   const [isVisible, setIsVisible] = useState(false);
   const buttonRef = useRef();
 
   const handleToggle = () => {
-    setIsVisible(prev => !prev);
+    setIsVisible((prev) => !prev);
   };
 
   return (
@@ -26,7 +29,7 @@ const TableFilters = ({ displayedFilters }) => {
           onClick={handleToggle}
           size="S"
         >
-          {getMessage('page.discover.table.filters')}
+          {getMessage("page.discover.table.filters")}
         </Button>
         {isVisible && (
           <FilterPopoverURLQuery

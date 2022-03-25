@@ -1,25 +1,25 @@
-
-import { isEmpty } from 'lodash';
-import { StrapiContext } from 'strapi-typed';
-import { CommentsPluginConfig, IServiceCommon } from '../types';
-import permissions from './../permissions';
-import { getPluginService } from './utils/functions';
+import { isEmpty } from "lodash";
+import { StrapiContext } from "strapi-typed";
+import { CommentsPluginConfig, IServiceCommon } from "../types";
+import permissions from "./../permissions";
+import { getPluginService } from "./utils/functions";
 
 export = async ({ strapi }: StrapiContext) => {
-
   // Provide GQL support
-  if (strapi.plugin('graphql')) {
-    const config: CommentsPluginConfig = await getPluginService<IServiceCommon>('common').getConfig();
+  if (strapi.plugin("graphql")) {
+    const config: CommentsPluginConfig = await getPluginService<IServiceCommon>(
+      "common"
+    ).getConfig();
     const { enabledCollections } = config;
     if (!isEmpty(enabledCollections)) {
-      await require('./graphql')({ strapi, config });
+      await require("./graphql")({ strapi, config });
     }
   }
 
   // Check if the plugin users-permissions is installed because the navigation needs it
   if (Object.keys(strapi.plugins).indexOf("users-permissions") === -1) {
     throw new Error(
-      "In order to make the comments plugin work the users-permissions plugin is required",
+      "In order to make the comments plugin work the users-permissions plugin is required"
     );
   }
   // Add permissions

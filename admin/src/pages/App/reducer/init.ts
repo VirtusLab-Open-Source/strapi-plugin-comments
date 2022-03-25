@@ -1,9 +1,9 @@
 // @ts-nocheck
 
 const initReducer = (initialState) => {
-    return {
-      ...initialState,
-    };
+  return {
+    ...initialState,
   };
-  
-  export default initReducer;
+};
+
+export default initReducer;

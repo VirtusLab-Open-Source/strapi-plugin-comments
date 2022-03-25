@@ -1,25 +1,26 @@
-import { Primitive, StrapiContext } from 'strapi-typed';
+import { Primitive, StrapiContext } from "strapi-typed";
 import { IServiceGraphQL, ToBeFixed } from "../../types";
 
-import { has, propEq, isNil, isDate, isObject } from 'lodash/fp';
-import { inputObjectType }from 'nexus';
+import { has, propEq, isNil, isDate, isObject } from "lodash/fp";
+import { inputObjectType } from "nexus";
 
-const virtualScalarAttributes = ['id'];
+const virtualScalarAttributes = ["id"];
 
 export = ({ strapi }: StrapiContext): IServiceGraphQL => {
-  const { service: getService } = strapi.plugin('graphql');
+  const { service: getService } = strapi.plugin("graphql");
 
   const rootLevelOperators = () => {
-    const { operators } = strapi.plugin('graphql').service('builders').filters;
+    const { operators } = strapi.plugin("graphql").service("builders").filters;
 
     return [operators.and, operators.or, operators.not];
   };
 
   const buildContentTypeFilters = (contentType: ToBeFixed) => {
-    const utils = strapi.plugin('graphql').service('utils');
-    const extension = strapi.plugin('graphql').service('extension');
+    const utils = strapi.plugin("graphql").service("utils");
+    const extension = strapi.plugin("graphql").service("extension");
 
-    const { getFiltersInputTypeName, getScalarFilterInputTypeName } = utils.naming;
+    const { getFiltersInputTypeName, getScalarFilterInputTypeName } =
+      utils.naming;
     const { isStrapiScalar, isRelation } = utils.attributes;
 
     const { attributes } = contentType;
@@ -30,20 +31,21 @@ export = ({ strapi }: StrapiContext): IServiceGraphQL => {
       name: filtersTypeName,
 
       definition(t) {
-        const validAttributes = Object.entries(attributes).filter(([attributeName]) =>
-          extension
-            .shadowCRUD(contentType.uid)
-            .field(attributeName)
-            .hasFiltersEnabeld()
+        const validAttributes = Object.entries(attributes).filter(
+          ([attributeName]) =>
+            extension
+              .shadowCRUD(contentType.uid)
+              .field(attributeName)
+              .hasFiltersEnabeld()
         );
 
         const isIDFilterEnabled = extension
           .shadowCRUD(contentType.uid)
-          .field('id')
+          .field("id")
           .hasFiltersEnabeld();
         // Add an ID filter to the collection types
-        if (contentType.kind === 'collectionType' && isIDFilterEnabled) {
-          t.field('id', { type: getScalarFilterInputTypeName('ID') });
+        if (contentType.kind === "collectionType" && isIDFilterEnabled) {
+          t.field("id", { type: getScalarFilterInputTypeName("ID") });
         }
 
         // Add every defined attribute
@@ -67,17 +69,27 @@ export = ({ strapi }: StrapiContext): IServiceGraphQL => {
     });
   };
 
-  const addScalarAttribute = (builder: ToBeFixed, attributeName: string, attribute: ToBeFixed): void => {
-    const { naming, mappers } = strapi.plugin('graphql').service('utils');
+  const addScalarAttribute = (
+    builder: ToBeFixed,
+    attributeName: string,
+    attribute: ToBeFixed
+  ): void => {
+    const { naming, mappers } = strapi.plugin("graphql").service("utils");
 
     const gqlType = mappers.strapiScalarToGraphQLScalar(attribute.type);
 
-    builder.field(attributeName, { type: naming.getScalarFilterInputTypeName(gqlType) });
+    builder.field(attributeName, {
+      type: naming.getScalarFilterInputTypeName(gqlType),
+    });
   };
 
-  const addRelationalAttribute = (builder: ToBeFixed, attributeName: string, attribute: ToBeFixed): void => {
-    const utils = strapi.plugin('graphql').service('utils');
-    const extension = strapi.plugin('graphql').service('extension');
+  const addRelationalAttribute = (
+    builder: ToBeFixed,
+    attributeName: string,
+    attribute: ToBeFixed
+  ): void => {
+    const utils = strapi.plugin("graphql").service("utils");
+    const extension = strapi.plugin("graphql").service("extension");
     const { getFiltersInputTypeName } = utils.naming;
     const { isMorphRelation } = utils.attributes;
 
@@ -94,7 +106,7 @@ export = ({ strapi }: StrapiContext): IServiceGraphQL => {
   };
 
   const recursivelyReplaceScalarOperators = (data: ToBeFixed): ToBeFixed => {
-    const { operators } = getService('builders').filters;
+    const { operators } = getService("builders").filters;
 
     if (Array.isArray(data)) {
       return data.map(recursivelyReplaceScalarOperators);
@@ -119,9 +131,13 @@ export = ({ strapi }: StrapiContext): IServiceGraphQL => {
     return result;
   };
 
-  const graphQLFiltersToStrapiQuery = (filters: ToBeFixed, contentType: ToBeFixed = {}): Array<ToBeFixed> | ToBeFixed => {
-    const { isStrapiScalar, isMedia, isRelation } = getService('utils').attributes;
-    const { operators } = getService('builders').filters;
+  const graphQLFiltersToStrapiQuery = (
+    filters: ToBeFixed,
+    contentType: ToBeFixed = {}
+  ): Array<ToBeFixed> | ToBeFixed => {
+    const { isStrapiScalar, isMedia, isRelation } =
+      getService("utils").attributes;
+    const { operators } = getService("builders").filters;
 
     const ROOT_LEVEL_OPERATORS = [operators.and, operators.or, operators.not];
 
@@ -132,7 +148,7 @@ export = ({ strapi }: StrapiContext): IServiceGraphQL => {
 
     // If filters is a collection, then apply the transformation to every item of the list
     if (Array.isArray(filters)) {
-      return filters.map(filtersItem =>
+      return filters.map((filtersItem) =>
         graphQLFiltersToStrapiQuery(filtersItem, contentType)
       );
     }
@@ -141,7 +157,10 @@ export = ({ strapi }: StrapiContext): IServiceGraphQL => {
     const { attributes } = contentType;
 
     const isAttribute = (attributeName: string): boolean => {
-      return virtualScalarAttributes.includes(attributeName) || has(attributeName, attributes);
+      return (
+        virtualScalarAttributes.includes(attributeName) ||
+        has(attributeName, attributes)
+      );
     };
 
     for (const [key, value] of Object.entries(filters)) {
@@ -150,7 +169,10 @@ export = ({ strapi }: StrapiContext): IServiceGraphQL => {
         const attribute: Primitive | ToBeFixed = attributes[key];
 
         // If it's a scalar attribute
-        if (virtualScalarAttributes.includes(key) || isStrapiScalar(attribute)) {
+        if (
+          virtualScalarAttributes.includes(key) ||
+          isStrapiScalar(attribute)
+        ) {
           // Replace (recursively) every GraphQL scalar operator with the associated Strapi operator
           resultMap[key] = recursivelyReplaceScalarOperators(value);
         }
@@ -168,7 +190,9 @@ export = ({ strapi }: StrapiContext): IServiceGraphQL => {
 
       // Handle the case where the key is not an attribute (operator, ...)
       else {
-        const rootLevelOperator = ROOT_LEVEL_OPERATORS.find(propEq('fieldName', key));
+        const rootLevelOperator = ROOT_LEVEL_OPERATORS.find(
+          propEq("fieldName", key)
+        );
 
         // If it's a root level operator (AND, NOT, OR, ...)
         if (rootLevelOperator) {
@@ -176,7 +200,10 @@ export = ({ strapi }: StrapiContext): IServiceGraphQL => {
 
           // Transform the current value recursively and add it to the resultMap
           // object using the strapiOperator equivalent of the GraphQL key
-          resultMap[strapiOperator] = graphQLFiltersToStrapiQuery(value, contentType);
+          resultMap[strapiOperator] = graphQLFiltersToStrapiQuery(
+            value,
+            contentType
+          );
         }
       }
     }

@@ -1,9 +1,9 @@
-import type { Config}  from '@jest/types';
-import { defaults as tsjPreset } from 'ts-jest/presets'
+import type { Config } from "@jest/types";
+import { defaults as tsjPreset } from "ts-jest/presets";
 
 const config: Config.InitialOptions = {
-  name: 'Unit test',
-  testMatch: ['**/__tests__/?(*.)+(spec|test).ts'],
+  name: "Unit test",
+  testMatch: ["**/__tests__/?(*.)+(spec|test).ts"],
   transform: {
     ...tsjPreset.transform,
   },
@@ -11,12 +11,12 @@ const config: Config.InitialOptions = {
   coverageDirectory: "./coverage/",
   collectCoverage: true,
   globals: {
-    'ts-jest': {
+    "ts-jest": {
       diagnostics: {
-        warnOnly: true
-      }
-    }
-  }
+        warnOnly: true,
+      },
+    },
+  },
 };
 
 export default config;

@@ -1,4 +1,4 @@
-import { pluginId } from '../pluginId';
+import { pluginId } from "../pluginId";
 
 const getApiURL = (endPoint: string) => `/${pluginId}/${endPoint}`;
 

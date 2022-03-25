@@ -30,7 +30,6 @@
   <img style="width: 100%; height: auto;" src="public/assets/preview.png" alt="UI preview" />
 </div>
 
-
 A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provides end to end comments feature with their moderation panel, bad words filtering, abuse reporting and much more.
 
 ## ✨ Features
@@ -55,7 +54,7 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 yarn add strapi-plugin-comments@latest
 ```
 
-After successful installation you've to build a fresh package that includes  plugin UI. To archive that simply use:
+After successful installation you've to build a fresh package that includes plugin UI. To archive that simply use:
 
 ```bash
 yarn build
@@ -76,30 +75,31 @@ Enjoy 🎉
 
 1. Clone repository
 
-    ```
-    git clone git@github.com:VirtusLab-Open-Source/strapi-plugin-comments.git
-    ```
+   ```
+   git clone git@github.com:VirtusLab-Open-Source/strapi-plugin-comments.git
+   ```
 
 2. Create a soft link in your strapi project to plugin build folder
 
-    ```sh
-    ln -s <your path>/strapi-plugin-comments/build <your path>/strapi-project/src/plugins/comments 
-    ```
+   ```sh
+   ln -s <your path>/strapi-plugin-comments/build <your path>/strapi-project/src/plugins/comments
+   ```
 
-3. Run develop or build command 
+3. Run develop or build command
 
-    ```ts
-    // Watch for file changes
-    yarn develop
-    // or run build without nodemon
-    yarn build:dev
-    ```
+   ```ts
+   // Watch for file changes
+   yarn develop
+   // or run build without nodemon
+   yarn build:dev
+   ```
 
 ## 🖐 Requirements
 
 Complete installation requirements are exact same as for Strapi itself and can be found in the documentation under [Installation Requirements](https://docs.strapi.io/developer-docs/latest/getting-started/introduction.html).
 
 **Minimum environment requirements**
+
 - Node.js `>=14.x.x`
 - NPM `>=7.x.x`
 
@@ -120,88 +120,95 @@ In our minimum support we're following [official Node.js releases timelines](htt
 
 Version `2.0.3` introduce the intuitive **Settings** page which you can easly access via `Strapi Settings -> Section: Comments Plugin -> Configuration`. On dedicated page you will be able to setup all crucial properties which drives the plugin and customize each individual collection for which **Comments plugin** should be enabled.
 
-> *Note*
+> _Note_
 > Default configuration for your plugin is fetched from `config/plugins.js` or directly from the plugin itself. If you would like to customize the default state to which you might revert, please follow the next section.
 
 ### In `v2.0.2` and older + default configuration state for `v2.0.3` and newest
 
 To setup amend default plugin configuration we recommend to put following snippet as part of `config/plugins.js` or `config/<env>/plugins.js` file. If the file does not exist yet, you have to create it manually. If you've got already configurations for other plugins stores by this way, use just the `comments` part within exising `plugins` item.
 
-
 ```js
-    module.exports = ({ env }) => ({
-        //...
-        comments: {
-          enabled: true,
-          config: {
-            badWords: false,
-            moderatorRoles: ["Authenticated"],
-            approvalFlow: ['api::page.page'],
-            entryLabel: {
-                '*': ['Title', 'title', 'Name', 'name', 'Subject', 'subject'],
-                'api::page.page': ['MyField'],
-            },
-            reportReasons: {
-                'MY_CUSTOM_REASON': 'MY_CUSTOM_REASON',
-            },
-            gql: { 
-              // ...
-            },
-          },
-        },
-        //...
-    });
+module.exports = ({ env }) => ({
+  //...
+  comments: {
+    enabled: true,
+    config: {
+      badWords: false,
+      moderatorRoles: ["Authenticated"],
+      approvalFlow: ["api::page.page"],
+      entryLabel: {
+        "*": ["Title", "title", "Name", "name", "Subject", "subject"],
+        "api::page.page": ["MyField"],
+      },
+      reportReasons: {
+        MY_CUSTOM_REASON: "MY_CUSTOM_REASON",
+      },
+      gql: {
+        // ...
+      },
+    },
+  },
+  //...
+});
 ```
 
 ### Properties
-- `badWords` - Enabled support for [bad words filtering](https://www.npmjs.com/package/bad-words). Can be turned off or overwritten using [options reference](https://www.npmjs.com/package/bad-words#constructor). Default value: `true`. 
+
+- `badWords` - Enabled support for [bad words filtering](https://www.npmjs.com/package/bad-words). Can be turned off or overwritten using [options reference](https://www.npmjs.com/package/bad-words#constructor). Default value: `true`.
 - `moderatorRoles` - Optional list of names of roles. Users with those roles will be notified by email when a new abuse report is created. This feature requires a built-in [Strapi email plugin](https://docs.strapi.io/developer-docs/latest/plugins/email.html) configured.
-- `approvalFlow` - list of Content Types which are supporting approval flow. Values must be in format like `'api::<collection name>.<content type name>'`. For not included, posted comments are going to be immediately visible. 
+- `approvalFlow` - list of Content Types which are supporting approval flow. Values must be in format like `'api::<collection name>.<content type name>'`. For not included, posted comments are going to be immediately visible.
 - `entryLabel` - ordered list of property names per Content Type to generate related entity label. Keys must be in format like `'api::<collection name>.<content type name>'`. Default formatting set as `*`.
 - `reportReasons` - set of enums you would like to use for issuing abuse reports. Provided by default `'BAD_LANGUAGE'`, `'DISCRIMINATION'` and `'OTHER'`.
 - `gql` - specific configuration for GraphQL. See [Additional GQL Configuration](#additional-gql-configuration)
 
 ## Additional GQL Configuration
+
 All you need to do is to install and enable `@strapi/plugin-graphql` for you instance based on the **[official Strapi v4 docs](https://docs.strapi.io/developer-docs/latest/plugins/graphql.html#configurations)** and decide if you would like to call it by anyone (open for world) or only by authenticated users (Strapi users).
 
 > **Important!**
 > If you're using `config/plugins.js` to configure your plugins , please put `comments` property before `graphql`. Otherwise types are not going to be properly added to GraphQL Schema. That's because of dynamic types which base on plugin configuration which are added on `boostrap` stage, not `register`. This is not valid if you're using `graphql` plugin without any custom configuration, so most of cases in real.
 
 ```json
-  {
-    // ...
-    "gql": {
-      "auth": true, // Default: false
-    },
-    // ...
+{
+  // ...
+  "gql": {
+    "auth": true // Default: false
   }
+  // ...
+}
 ```
 
 ### Properties
+
 - `auth` - does GraphQL Queries should be authenticated or not? Default: `false`
 
 ### Queries
 
 See [available GQL specification section](#public-graphql-specification).
 
->  If `auth` is set to `true` you must provide relevant authentication headers to all requests like for example:
->  
+> If `auth` is set to `true` you must provide relevant authentication headers to all requests like for example:
+>
 > ```json
 > {
->  "Authorization": "Bearer <your token here>"
+>   "Authorization": "Bearer <your token here>"
 > }
 > ```
 
 ## 👤 RBAC
+
 Plugin provides granular permissions based on Strapi RBAC functionality.
 
 ### Mandatory permissions
+
 For any role different than **Super Admin**, to access the **Comments panel** you must set following permissions:
+
 - _Plugins_ -> _Content-type-builder_ -> _Read_ - gives you ability to fetch Content Type schema
 - _Plugins_ -> _Comments_ -> _Comments: Read_ - gives you the basic read access to **Comments Panel**
 
 ### Optional permissions
+
 Feature / Capability focused permissions:
+
 - _Plugins_ -> _Comments_ -> _Comments: Moderate_ - allows you to block, unblock, approve &amp; reject comments
 - _Plugins_ -> _Comments_ -> _Reports: Read_ - allows you to see the list of issued abuse reports against comments
 - _Plugins_ -> _Comments_ -> _Reports: Moderate_ - allows you to review (resolve) issued abuse reports against comments
@@ -210,35 +217,36 @@ Feature / Capability focused permissions:
 
 ```json
 {
-    "id": 1,
-    "content": "My comment content",
-    "blocked": null,
-    "blockedThread": true,
-    "blockReason": null,
-    "authorUser": null,
-    "removed": null,
-    "approvalStatus": "APPROVED", // Only in case of enabled approval flow. Default: null
-    "author": {
-        "id": "207ccfdc-94ba-45eb-979c-790f6f49c392", // For Strapi users id reflects to the format used by your Strapi
-        "name": "Joe Doe", // For Strapi users it is equal to 'username' field
-        "email": "jdoe@sample.com",
-        "avatar": null,
-    },
-    "createdAt": "2020-07-14T20:13:01.649Z",
-    "updatedAt": "2020-07-14T20:13:01.670Z",
-    "related": {}, // Related content type entity
-    "reports": [] // Reports issued against this comment
+  "id": 1,
+  "content": "My comment content",
+  "blocked": null,
+  "blockedThread": true,
+  "blockReason": null,
+  "authorUser": null,
+  "removed": null,
+  "approvalStatus": "APPROVED", // Only in case of enabled approval flow. Default: null
+  "author": {
+    "id": "207ccfdc-94ba-45eb-979c-790f6f49c392", // For Strapi users id reflects to the format used by your Strapi
+    "name": "Joe Doe", // For Strapi users it is equal to 'username' field
+    "email": "jdoe@sample.com",
+    "avatar": null
+  },
+  "createdAt": "2020-07-14T20:13:01.649Z",
+  "updatedAt": "2020-07-14T20:13:01.670Z",
+  "related": {}, // Related content type entity
+  "reports": [] // Reports issued against this comment
 }
 ```
 
 ## 🕸️ Public REST API specification
 
 **Strapi Users vs. Generic authors**
+
 > Keep in mind that if you're using auth / authz your requests to setup proper user contexts it has got higher priority in order to take author data comparing to `author` property provided as part of your payload.
 
 ### Get Comments
 
-*GraphQL equivalent: [Public GraphQL API -> Get Comments](#get-comments-1)*
+_GraphQL equivalent: [Public GraphQL API -> Get Comments](#get-comments-1)_
 
 `GET <host>/api/comments/api::<collection name>.<content type name>:<entity id>`
 
@@ -250,27 +258,29 @@ Return a hierarchical tree structure of comments for specified instance of Conte
 
 ```json
 [
-    {
+  {
+    // -- Comment Model fields ---,
+    "children": [
+      {
         // -- Comment Model fields ---,
         "children": [
-            {
-                // -- Comment Model fields ---,
-                "children": [
-                    // ...
-                ]
-            },
-            // ...
+          // ...
         ]
-    },
-    // ...
+      }
+      // ...
+    ]
+  }
+  // ...
 ]
 ```
+
 #### Strapi REST API properties support:
+
 - [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
 
 ### Get Comments (flat structure)
 
-*GraphQL equivalent: [Public GraphQL API -> Get Comments (flat structure)](#get-comments-flat-structure-1)*
+_GraphQL equivalent: [Public GraphQL API -> Get Comments (flat structure)](#get-comments-flat-structure-1)_
 
 `GET <host>/api/comments/api::<collection name>.<content type name>:<entity id>/flat`
 
@@ -284,11 +294,11 @@ Return a flat structure of comments for specified instance of Content Type like 
 {
   "data": [
     {
-        // -- Comment Model fields ---
+      // -- Comment Model fields ---
     },
     {
-        // -- Comment Model fields ---
-    },
+      // -- Comment Model fields ---
+    }
     // ...
   ],
   "meta": {
@@ -300,17 +310,19 @@ Return a flat structure of comments for specified instance of Content Type like 
 ```
 
 **Possible response codes**
+
 - `200` - Successful. Response with list of comments (can be empty)
 - `400` - Bad Request. Requested list for not valid / not existing Content Type
 
 #### Strapi REST API properties support:
+
 - [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/filtering-locale-publication.html#filtering)
 - [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
 - [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#pagination)
 
 ### Post a Comment
 
-*GraphQL equivalent: [Public GraphQL API -> Post a Comments](#post-a-comment-1)*
+_GraphQL equivalent: [Public GraphQL API -> Post a Comments](#post-a-comment-1)_
 
 `POST <host>/api/comments/api::<collection name>.<content type name>:<entity id>`
 
@@ -320,28 +332,29 @@ Posts a Comment related to specified instance of Content Type like for example `
 
 **Example request body**
 
-*Generic (non Strapi User)*
+_Generic (non Strapi User)_
+
 ```json
 {
   "author": {
-      "id": "<any ID like value>",
-      "name": "Joe Doe",
-      "email": "jdoe@sample.com",
-      "avatar": "<any image url>"
+    "id": "<any ID like value>",
+    "name": "Joe Doe",
+    "email": "jdoe@sample.com",
+    "avatar": "<any image url>"
   },
-	"content": "My sample response",
-	"threadOf": 2, // id of comment we would like to start / continue the thread (Optional)
+  "content": "My sample response",
+  "threadOf": 2 // id of comment we would like to start / continue the thread (Optional)
 }
 ```
 
-*Strapi user*
+_Strapi user_
 
 > Author is taken directly from the request context
 
 ```json
 {
-	"content": "My sample response",
-	"threadOf": 2, // id of comment we would like to start / continue the thread (Optional)
+  "content": "My sample response",
+  "threadOf": 2 // id of comment we would like to start / continue the thread (Optional)
 }
 ```
 
@@ -349,17 +362,18 @@ Posts a Comment related to specified instance of Content Type like for example `
 
 ```json
 {
-    // -- Comment Model fields ---
+  // -- Comment Model fields ---
 }
 ```
 
 **Possible response codes**
+
 - `200` - Successful. Response with created Comment Model
 - `400` - Bad Request. Missing field values or bad words check fails. Error message will provide relevant reason.
 
 ### Update Comment
 
-*GraphQL equivalent: [Public GraphQL API -> Update Comments](#update-comment-1)*
+_GraphQL equivalent: [Public GraphQL API -> Update Comments](#update-comment-1)_
 
 `PUT <host>/api/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>`
 
@@ -369,23 +383,24 @@ Updates a specified Comment content based on it `commentId` and related to speci
 
 **Example request body**
 
-*Generic (non Strapi User)*
+_Generic (non Strapi User)_
+
 ```json
 {
   "author": {
-      "id": "<any ID like value>"
+    "id": "<any ID like value>"
   },
-	"content": "My sample response"
+  "content": "My sample response"
 }
 ```
 
-*Strapi user*
+_Strapi user_
 
 > Author is taken directly from the request context
 
 ```json
 {
-	"content": "My sample response"
+  "content": "My sample response"
 }
 ```
 
@@ -393,18 +408,19 @@ Updates a specified Comment content based on it `commentId` and related to speci
 
 ```json
 {
-    // -- Comment Model fields ---
+  // -- Comment Model fields ---
 }
 ```
 
 **Possible response codes**
+
 - `200` - Successful. Response with updated Comment Model
 - `400` - Bad Request. Missing field values or bad words check fails. Error message will provide relevant reason.
 - `409` - Conflict. Occurs when trying to update a non existing or not own comment. Possible cause might be that `authorId` or `authorUser` mismatch with existing comment.
 
 ### Delete Comment
 
-*GraphQL equivalent: [Public GraphQL API -> Delete Comment](#delete-comment-1)*
+_GraphQL equivalent: [Public GraphQL API -> Delete Comment](#delete-comment-1)_
 
 `DELETE <host>/api/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>?authorId=<authorId>`
 
@@ -416,18 +432,18 @@ Deletes a specified Comment based on it `commentId` and related to specified ins
 
 ```json
 {
-    // -- Empty Response ---
+  // -- Empty Response ---
 }
 ```
 
 **Possible response codes**
+
 - `200` - Successful with blank Response.
 - `409` - Conflict. Occurs when trying to delete a non existing comment.
 
-
 ### Issue Abuse Report against specified Comment
 
-*GraphQL equivalent: [Public GraphQL API -> Issue Abuse Report against specified Comment](#issue-abuse-report-against-specified-comment-1)*
+_GraphQL equivalent: [Public GraphQL API -> Issue Abuse Report against specified Comment](#issue-abuse-report-against-specified-comment-1)_
 
 `POST <host>/api/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>/report-abuse`
 
@@ -439,36 +455,39 @@ Reports abuse in specified Comment content based on it `commentId` and related t
 
 ```json
 {
-	"reason": "<reason enum>",
-	"content": "This comment is not relevant"
+  "reason": "<reason enum>",
+  "content": "This comment is not relevant"
 }
 ```
 
-*Available reason enums:* `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See [configuration section](#configuration).)
+_Available reason enums:_ `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See [configuration section](#configuration).)
 
 **Example response body**
 
 ```json
 {
-    // -- Comment Abuse Report fields ---
+  // -- Comment Abuse Report fields ---
 }
 ```
 
 **Possible response codes**
+
 - `200` - Successful. Response with reported abuse.
 - `409` - Conflict. Occurs when trying to report an abuse to a non existing comment.
 
 ## 🕸️ Public GraphQL specification
 
 **Strapi Users vs. Generic authors**
+
 > Keep in mind that if you're using auth / authz your requests to setup proper user contexts it has got higher priority in order to take author data comparing to `author` property provided as part of your payload.
 
 **Testing**
+
 > To test all queries and understand the schemas use GraphQL Playground exposed by `@strapi/plugin-graphql` on `http://localhost:1337/graphql`
 
 ### Get Comments
 
-*REST API equivalent: [Public REST API -> Get Comments](#get-comments)*
+_REST API equivalent: [Public REST API -> Get Comments](#get-comments)_
 
 **Example request**
 
@@ -478,17 +497,17 @@ query {
     relation: "api::page.page:1"
     filters: { content: { contains: "Test" } }
   ) {
-        id
-        content
-        blocked
-        threadOf {
-            id
-        }
-        author {
-            id
-            name
-        }
+    id
+    content
+    blocked
+    threadOf {
+      id
     }
+    author {
+      id
+      name
+    }
+  }
 }
 ```
 
@@ -499,7 +518,7 @@ query {
   "data": {
     "findAllFlat": [
       {
-        "id": 3,  
+        "id": 3,
         "content": "Test",
         "blocked": false,
         "threadOf": null,
@@ -514,11 +533,12 @@ query {
 ```
 
 #### Strapi GraphQL API properties support:
+
 - [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#sorting)
 
 ### Get Comments (flat structure)
 
-*REST API equivalent: [Public REST API -> Get Comments (flat structure)](#get-comments-flat-structure)*
+_REST API equivalent: [Public REST API -> Get Comments (flat structure)](#get-comments-flat-structure)_
 
 **Example request**
 
@@ -557,7 +577,7 @@ query {
           {
             "id": 6,
             "content": "Text to search for"
-          },
+          }
           // ...
         ],
         "threadOf": null,
@@ -565,7 +585,7 @@ query {
           "id": "123456",
           "name": "Joe Doe"
         }
-      },
+      }
       // ...
     ]
   }
@@ -573,13 +593,14 @@ query {
 ```
 
 #### Strapi GraphQL API properties support:
+
 - [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#filters)
 - [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#sorting)
 - [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#pagination)
 
 ### Post a Comment
 
-*REST API equivalent: [Public REST API -> Post a Comment](#post-a-comment)*
+_REST API equivalent: [Public REST API -> Post a Comment](#post-a-comment)_
 
 **Example request**
 
@@ -628,7 +649,7 @@ mutation createComment {
 
 ### Update Comment
 
-*REST API equivalent: [Public REST API -> Update Comment](#update-comment)*
+_REST API equivalent: [Public REST API -> Update Comment](#update-comment)_
 
 **Example request**
 
@@ -681,16 +702,16 @@ mutation updateComment {
 
 ### Delete Comment
 
-*REST API equivalent: [Public REST API -> Delete Comment](#delete-comment)*
+_REST API equivalent: [Public REST API -> Delete Comment](#delete-comment)_
 
 **Example request**
 
 ```graphql
 mutation removeComment {
   removeComment(
-    input: { 
-      id: 33, 
-      relation: "api::page.page:1", 
+    input: {
+      id: 33
+      relation: "api::page.page:1"
       author: { id: "12345678" } # Optional if using auth / authz requests
     }
   ) {
@@ -715,7 +736,7 @@ mutation removeComment {
 
 ### Issue Abuse Report against specified Comment
 
-*REST API equivalent: [Public REST API -> Issue Abuse Report against specified Comment](#issue-abuse-report-against-specified-comment)*
+_REST API equivalent: [Public REST API -> Issue Abuse Report against specified Comment](#issue-abuse-report-against-specified-comment)_
 
 **Example request body**
 
@@ -743,7 +764,7 @@ mutation createAbuseReport {
 }
 ```
 
-*Available reason enums:* `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See [configuration section](#configuration).)
+_Available reason enums:_ `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See [configuration section](#configuration).)
 
 **Example response**
 

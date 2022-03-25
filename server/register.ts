@@ -1,4 +1,3 @@
-
 export = () => {
-      // register phase
+  // register phase
 };

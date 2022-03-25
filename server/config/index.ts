@@ -6,14 +6,14 @@ const config: StrapiConfig = {
     moderatorRoles: [],
     approvalFlow: [],
     entryLabel: {
-      '*': ['Title', 'title', 'Name', 'name', 'Subject', 'subject']
+      "*": ["Title", "title", "Name", "name", "Subject", "subject"],
     },
     reportReasons: {
-      'BAD_LANGUAGE': 'BAD_LANGUAGE',
-      'DISCRIMINATION': 'DISCRIMINATION',
-      'OTHER': 'OTHER',
+      BAD_LANGUAGE: "BAD_LANGUAGE",
+      DISCRIMINATION: "DISCRIMINATION",
+      OTHER: "OTHER",
     },
-  }
+  },
 };
 
 export default config;

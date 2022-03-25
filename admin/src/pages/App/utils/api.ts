@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { getApiURL, axiosInstance, handleAPIError } from '../../../utils';
+import { getApiURL, axiosInstance, handleAPIError } from "../../../utils";
 
 // eslint-disable-next-line import/prefer-default-export
 export const fetchConfig = async (toggleNotification) => {

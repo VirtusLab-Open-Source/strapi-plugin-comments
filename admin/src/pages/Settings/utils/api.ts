@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { getApiURL, axiosInstance, handleAPIError } from '../../../utils';
+import { getApiURL, axiosInstance, handleAPIError } from "../../../utils";
 
 // eslint-disable-next-line import/prefer-default-export
 export const fetchConfig = async (toggleNotification) => {
@@ -9,13 +9,20 @@ export const fetchConfig = async (toggleNotification) => {
 
     return data;
   } catch (err) {
-    handleAPIError(err, toggleNotification, 'page.settings.notification.fetch.error');
+    handleAPIError(
+      err,
+      toggleNotification,
+      "page.settings.notification.fetch.error"
+    );
   }
 };
 
 export const updateConfig = async (body, toggleNotification) => {
   try {
-    const { data } = await axiosInstance.put(getApiURL(`settings/config`), body);
+    const { data } = await axiosInstance.put(
+      getApiURL(`settings/config`),
+      body
+    );
 
     return data;
   } catch (err) {
@@ -35,7 +42,9 @@ export const restoreConfig = async (toggleNotification) => {
 
 export const fetchAllContentTypes = async (toggleNotification) => {
   try {
-    const { data } = await axiosInstance.get(`/content-type-builder/content-types`);
+    const { data } = await axiosInstance.get(
+      `/content-type-builder/content-types`
+    );
     return data?.data;
   } catch (err) {
     handleAPIError(err, toggleNotification);

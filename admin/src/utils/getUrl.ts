@@ -1,5 +1,5 @@
-import { pluginId } from '../pluginId';
+import { pluginId } from "../pluginId";
 
-const getUrl = (path = '') => `/plugins/${pluginId}/${path}`;
+const getUrl = (path = "") => `/plugins/${pluginId}/${path}`;
 
 export default getUrl;

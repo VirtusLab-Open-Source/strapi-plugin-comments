@@ -1,5 +1,5 @@
-'use strict';
+"use strict";
 
-import admin from './admin/src';
+import admin from "./admin/src";
 
-export default admin; 
+export default admin;

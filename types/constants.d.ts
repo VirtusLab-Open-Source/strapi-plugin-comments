@@ -1,4 +1,3 @@
 export type RegExpCollection = {
-    [key: string]: RegExp;
-  }
-  
+  [key: string]: RegExp;
+};

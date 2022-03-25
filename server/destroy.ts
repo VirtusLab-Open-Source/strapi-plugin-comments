@@ -1,4 +1,3 @@
-
 export = () => {
   // destroy phase
 };

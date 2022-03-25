@@ -1,15 +1,23 @@
-import { stringify } from 'qs';
-import { isEmpty } from 'lodash';
+import { stringify } from "qs";
+import { isEmpty } from "lodash";
 
-import { getApiURL, axiosInstance, handleAPIError } from '../../utils';
-import { Id } from 'strapi-typed';
-import { ToBeFixed } from '../../../../types';
+import { getApiURL, axiosInstance, handleAPIError } from "../../utils";
+import { Id } from "strapi-typed";
+import { ToBeFixed } from "../../../../types";
 
 // eslint-disable-next-line import/prefer-default-export
-export const fetchDetailsData = async (id: Id, queryParams: ToBeFixed, toggleNotification: Function) => {
+export const fetchDetailsData = async (
+  id: Id,
+  queryParams: ToBeFixed,
+  toggleNotification: Function
+) => {
   try {
-    const stringifiedProps = !isEmpty(queryParams) ? `?${stringify(queryParams, { encode: false })}` : '';
-    const { data } = await axiosInstance.get(getApiURL(`moderate/single/${id}${stringifiedProps}`));
+    const stringifiedProps = !isEmpty(queryParams)
+      ? `?${stringify(queryParams, { encode: false })}`
+      : "";
+    const { data } = await axiosInstance.get(
+      getApiURL(`moderate/single/${id}${stringifiedProps}`)
+    );
 
     return data;
   } catch (err: ToBeFixed) {
@@ -17,9 +25,14 @@ export const fetchDetailsData = async (id: Id, queryParams: ToBeFixed, toggleNot
   }
 };
 
-export const fetchContentTypeData = async (uid: string, toggleNotification: Function) => {
+export const fetchContentTypeData = async (
+  uid: string,
+  toggleNotification: Function
+) => {
   try {
-    const { data } = await axiosInstance.get(`/content-type-builder/content-types/${uid}`);
+    const { data } = await axiosInstance.get(
+      `/content-type-builder/content-types/${uid}`
+    );
     return data?.data;
   } catch (err: ToBeFixed) {
     handleAPIError(err, toggleNotification);
@@ -51,5 +64,7 @@ export const unblockItemThread = (id: Id) => {
 };
 
 export const resolveReport = ({ id, reportId }: ToBeFixed) => {
-  return axiosInstance.patch(getApiURL(`moderate/single/${id}/report/${reportId}/resolve`));
+  return axiosInstance.patch(
+    getApiURL(`moderate/single/${id}/report/${reportId}/resolve`)
+  );
 };

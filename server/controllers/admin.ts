@@ -1,16 +1,30 @@
-import { AdminFindAllProps, AdminFindOneAndThreadProps, AdminPaginatedResponse, AdminSinglePageResponse, Comment, CommentReport, IControllerAdmin, IServiceAdmin, SettingsCommentsPluginConfig, StrapiRequestContext, ThrowablePromisedResponse, ToBeFixed, ViewCommentsPluginConfig } from '../../types'
+import {
+  AdminFindAllProps,
+  AdminFindOneAndThreadProps,
+  AdminPaginatedResponse,
+  AdminSinglePageResponse,
+  Comment,
+  CommentReport,
+  IControllerAdmin,
+  IServiceAdmin,
+  SettingsCommentsPluginConfig,
+  StrapiRequestContext,
+  ThrowablePromisedResponse,
+  ToBeFixed,
+  ViewCommentsPluginConfig,
+} from "../../types";
 
-
-import { getPluginService } from './../utils/functions';
-import { parseParams, throwError } from './utils/functions';
+import { getPluginService } from "./../utils/functions";
+import { parseParams, throwError } from "./utils/functions";
 
 const controllers: IControllerAdmin = {
-
-  getService<T>(name = 'admin') {
+  getService<T>(name = "admin") {
     return getPluginService<T>(name);
   },
 
-  async config(ctx: StrapiRequestContext): ThrowablePromisedResponse<ViewCommentsPluginConfig> {
+  async config(
+    ctx: StrapiRequestContext
+  ): ThrowablePromisedResponse<ViewCommentsPluginConfig> {
     try {
       return await this.getService<IServiceAdmin>().config<ViewCommentsPluginConfig>();
     } catch (e) {
@@ -18,24 +32,34 @@ const controllers: IControllerAdmin = {
     }
   },
 
-  async settingsConfig(ctx: StrapiRequestContext): ThrowablePromisedResponse<SettingsCommentsPluginConfig> {
+  async settingsConfig(
+    ctx: StrapiRequestContext
+  ): ThrowablePromisedResponse<SettingsCommentsPluginConfig> {
     try {
-      return this.getService<IServiceAdmin>().config<SettingsCommentsPluginConfig>(true);
+      return this.getService<IServiceAdmin>().config<SettingsCommentsPluginConfig>(
+        true
+      );
     } catch (e) {
       throw throwError(ctx, e);
     }
   },
 
-  async settingsUpdateConfig(ctx: StrapiRequestContext<SettingsCommentsPluginConfig>): ThrowablePromisedResponse<SettingsCommentsPluginConfig> {
+  async settingsUpdateConfig(
+    ctx: StrapiRequestContext<SettingsCommentsPluginConfig>
+  ): ThrowablePromisedResponse<SettingsCommentsPluginConfig> {
     try {
-      const { request: { body } } = ctx;
+      const {
+        request: { body },
+      } = ctx;
       return this.getService<IServiceAdmin>().updateConfig(body);
     } catch (e) {
       throw throwError(ctx, e);
     }
   },
 
-  async settingsRestoreConfig(ctx: StrapiRequestContext): ThrowablePromisedResponse<SettingsCommentsPluginConfig> {
+  async settingsRestoreConfig(
+    ctx: StrapiRequestContext
+  ): ThrowablePromisedResponse<SettingsCommentsPluginConfig> {
     try {
       return this.getService<IServiceAdmin>().restoreConfig();
     } catch (e) {
@@ -43,7 +67,9 @@ const controllers: IControllerAdmin = {
     }
   },
 
-  async settingsRestart(ctx: StrapiRequestContext): ThrowablePromisedResponse<any> {
+  async settingsRestart(
+    ctx: StrapiRequestContext
+  ): ThrowablePromisedResponse<any> {
     try {
       await this.getService<IServiceAdmin>().restart();
       return ctx.send({ status: 200 });
@@ -52,92 +78,110 @@ const controllers: IControllerAdmin = {
     }
   },
 
-  async findAll(ctx: StrapiRequestContext<unknown, AdminFindAllProps>): Promise<AdminPaginatedResponse<Comment>> {
-    return this.getService<IServiceAdmin>()
-      .findAll(ctx.query);
+  async findAll(
+    ctx: StrapiRequestContext<unknown, AdminFindAllProps>
+  ): Promise<AdminPaginatedResponse<Comment>> {
+    return this.getService<IServiceAdmin>().findAll(ctx.query);
   },
 
-  async findOne(ctx: StrapiRequestContext<unknown, AdminFindOneAndThreadProps>): ThrowablePromisedResponse<AdminSinglePageResponse> {
+  async findOne(
+    ctx: StrapiRequestContext<unknown, AdminFindOneAndThreadProps>
+  ): ThrowablePromisedResponse<AdminSinglePageResponse> {
     const { params = {}, query } = ctx;
     const { id }: ToBeFixed = parseParams(params);
     try {
-      return await this.getService<IServiceAdmin>()
-        .findOneAndThread(id, query);
+      return await this.getService<IServiceAdmin>().findOneAndThread(id, query);
     } catch (e) {
       throw throwError(ctx, e);
     }
   },
 
-  async blockComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment> {
+  async blockComment(
+    ctx: StrapiRequestContext
+  ): ThrowablePromisedResponse<Comment> {
     const { params = {} } = ctx;
     const { id } = parseParams(params);
     try {
-      return await this.getService<IServiceAdmin>()
-        .blockComment(id, true);
+      return await this.getService<IServiceAdmin>().blockComment(id, true);
     } catch (e) {
       throw throwError(ctx, e);
     }
   },
 
-  async unblockComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment> {
+  async unblockComment(
+    ctx: StrapiRequestContext
+  ): ThrowablePromisedResponse<Comment> {
     const { params = {} } = ctx;
     const { id } = parseParams(params);
     try {
-      return await this.getService<IServiceAdmin>()
-        .blockComment(id, false);
+      return await this.getService<IServiceAdmin>().blockComment(id, false);
     } catch (e) {
       throw throwError(ctx, e);
     }
   },
 
-  async blockCommentThread(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment> {
+  async blockCommentThread(
+    ctx: StrapiRequestContext
+  ): ThrowablePromisedResponse<Comment> {
     const { params = {} } = ctx;
     const { id } = parseParams(params);
     try {
-      return await this.getService<IServiceAdmin>()
-        .blockCommentThread(id, true);
+      return await this.getService<IServiceAdmin>().blockCommentThread(
+        id,
+        true
+      );
     } catch (e) {
       throw throwError(ctx, e);
     }
   },
 
-  async unblockCommentThread(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment> {
+  async unblockCommentThread(
+    ctx: StrapiRequestContext
+  ): ThrowablePromisedResponse<Comment> {
     const { params = {} } = ctx;
     const { id } = parseParams(params);
     try {
-      return await this.getService<IServiceAdmin>()
-        .blockCommentThread(id, false);
+      return await this.getService<IServiceAdmin>().blockCommentThread(
+        id,
+        false
+      );
     } catch (e) {
       throw throwError(ctx, e);
     }
   },
 
-  async resolveAbuseReport(ctx: StrapiRequestContext): ThrowablePromisedResponse<CommentReport> {
+  async resolveAbuseReport(
+    ctx: StrapiRequestContext
+  ): ThrowablePromisedResponse<CommentReport> {
     const { params = {} } = ctx;
     const { id: commentId, reportId } = parseParams(params);
     try {
-      return await this.getService<IServiceAdmin>()
-        .resolveAbuseReport(reportId, commentId);
+      return await this.getService<IServiceAdmin>().resolveAbuseReport(
+        reportId,
+        commentId
+      );
     } catch (e) {
       throw throwError(ctx, e);
     }
   },
 
-  async approveComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment> {
+  async approveComment(
+    ctx: StrapiRequestContext
+  ): ThrowablePromisedResponse<Comment> {
     const { id } = parseParams(ctx.params || {});
     try {
-      return await this.getService<IServiceAdmin>()
-        .approveComment(id);
+      return await this.getService<IServiceAdmin>().approveComment(id);
     } catch (e) {
       throw throwError(ctx, e);
     }
   },
 
-  async rejectComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment> {
+  async rejectComment(
+    ctx: StrapiRequestContext
+  ): ThrowablePromisedResponse<Comment> {
     const { id } = parseParams(ctx.params || {});
     try {
-      return await this.getService<IServiceAdmin>()
-        .rejectComment(id);
+      return await this.getService<IServiceAdmin>().rejectComment(id);
     } catch (e) {
       throw throwError(ctx, e);
     }

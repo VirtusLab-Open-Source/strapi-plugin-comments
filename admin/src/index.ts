@@ -1,18 +1,17 @@
 // @ts-ignore
-import { prefixPluginTranslations } from '@strapi/helper-plugin';
-import * as pluginPkg from '../../package.json';
-import { pluginId } from './pluginId';
-import Initializer from './components/Initializer';
-import PluginIcon from './components/PluginIcon';
-import pluginPermissions from './permissions';
-import reducers from './reducers';
-import { ToBeFixed } from '../../types';
+import { prefixPluginTranslations } from "@strapi/helper-plugin";
+import * as pluginPkg from "../../package.json";
+import { pluginId } from "./pluginId";
+import Initializer from "./components/Initializer";
+import PluginIcon from "./components/PluginIcon";
+import pluginPermissions from "./permissions";
+import reducers from "./reducers";
+import { ToBeFixed } from "../../types";
 
 const { name, displayName } = pluginPkg.strapi;
 
 export default {
   register(app: ToBeFixed) {
-    
     app.addMenuLink({
       to: `/plugins/${pluginId}/discover`,
       badgeContent: 1,
@@ -22,7 +21,9 @@ export default {
         defaultMessage: displayName,
       },
       Component: async () => {
-        const component = await import(/* webpackChunkName: "[request]" */ './pages/App');
+        const component = await import(
+          /* webpackChunkName: "[request]" */ "./pages/App"
+        );
 
         return component;
       },
@@ -41,15 +42,15 @@ export default {
         {
           intlLabel: {
             id: `${pluginId}.plugin.section.item`,
-            defaultMessage: 'Configuration',
+            defaultMessage: "Configuration",
           },
-          id: 'comments',
+          id: "comments",
           to: `/settings/${pluginId}`,
           Component: async () => {
             const component = await import(
-              /* webpackChunkName: "documentation-settings" */ './pages/Settings'
+              /* webpackChunkName: "documentation-settings" */ "./pages/Settings"
             );
-    
+
             return component;
           },
           permissions: pluginPermissions.settings,
@@ -72,7 +73,7 @@ export default {
   //   //     Component: () => 'TODO: Comments count',
   //   // });
   // },
-  
+
   async registerTrads({ locales }: ToBeFixed) {
     const importedTrads = await Promise.all(
       locales.map((locale: ToBeFixed) => {

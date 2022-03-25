@@ -1,11 +1,11 @@
-import CommentCT from './comment';
-import ReportCT from './report';
+import CommentCT from "./comment";
+import ReportCT from "./report";
 
 export default {
-  'comment': {
+  comment: {
     schema: CommentCT,
   },
-  'comment-report': {
+  "comment-report": {
     schema: ReportCT,
-  }, 
+  },
 };

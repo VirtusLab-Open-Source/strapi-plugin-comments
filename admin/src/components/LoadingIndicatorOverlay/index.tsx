@@ -6,12 +6,14 @@
 
 // @ts-nocheck
 
- import React from 'react';
- import { LoadingIndicatorPage } from '@strapi/helper-plugin';
-import { LoadingIndicatorOverlayWrapper } from './styles';
+import React from "react";
+import { LoadingIndicatorPage } from "@strapi/helper-plugin";
+import { LoadingIndicatorOverlayWrapper } from "./styles";
 
-const LoadingIndicatorOverlay = () => (<LoadingIndicatorOverlayWrapper>
+const LoadingIndicatorOverlay = () => (
+  <LoadingIndicatorOverlayWrapper>
     <LoadingIndicatorPage />
-</LoadingIndicatorOverlayWrapper>);
+  </LoadingIndicatorOverlayWrapper>
+);
 
-  export default LoadingIndicatorOverlay;
+export default LoadingIndicatorOverlay;

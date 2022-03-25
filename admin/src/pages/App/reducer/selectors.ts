@@ -1,15 +1,13 @@
-
-   
 // @ts-nocheck
 
-import { createSelector } from 'reselect';
-import { initialState } from './';
-import { REDUCER_NAME } from './constants';
+import { createSelector } from "reselect";
+import { initialState } from "./";
+import { REDUCER_NAME } from "./constants";
 
 /**
  * Direct selector to the listView state domain
  */
-const appView = () => state => state[REDUCER_NAME] || initialState;
+const appView = () => (state) => state[REDUCER_NAME] || initialState;
 
 /**
  * Other specific selectors
@@ -20,14 +18,11 @@ const appView = () => state => state[REDUCER_NAME] || initialState;
  */
 
 const makeAppView = () =>
-  createSelector(
-    appView(),
-    substate => {
-      return substate;
-    }
-  );
+  createSelector(appView(), (substate) => {
+    return substate;
+  });
 
-const selectConfig = state => {
+const selectConfig = (state) => {
   const { config } = state;
 
   return config;

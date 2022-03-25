@@ -1,38 +1,38 @@
 {
-    "compilerOptions": {
-      "rootDir": "./",
-      "outDir": "build",
-      "target": "esnext",
-      "module": "commonjs",
-      "jsx": "react",
-      "moduleResolution": "node",
-      "allowSyntheticDefaultImports": true,
-      "esModuleInterop": true,
-      "strict": true,
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "removeComments": true,
-      "sourceMap": true,
-      "declaration": true,
-      "declarationMap": true,
-      "downlevelIteration": true,
-      "incremental": true,
-      "allowJs": true,
-      "skipLibCheck": true,
-      "resolveJsonModule": true
-    },
-    "include": [
-      "./server/**/*",
-      "./admin/**/*",
-      "./strapi-server.*",
-      "./strapi-admin.*",
-      "./setup-package.ts",
-      "./permissions.*"
-    ],
-    "exclude": [
-      "**/node_modules/**/*",
-      "**/__tests__/**/*",
-      "**/__mocks__/**/*",
-      "**/build/**/*"
-    ]
-  } 
+  "compilerOptions": {
+    "rootDir": "./",
+    "outDir": "build",
+    "target": "esnext",
+    "module": "commonjs",
+    "jsx": "react",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "downlevelIteration": true,
+    "incremental": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true
+  },
+  "include": [
+    "./server/**/*",
+    "./admin/**/*",
+    "./strapi-server.*",
+    "./strapi-admin.*",
+    "./setup-package.ts",
+    "./permissions.*"
+  ],
+  "exclude": [
+    "**/node_modules/**/*",
+    "**/__tests__/**/*",
+    "**/__mocks__/**/*",
+    "**/build/**/*"
+  ]
+}

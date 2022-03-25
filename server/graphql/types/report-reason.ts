@@ -4,9 +4,9 @@ export = ({ nexus, config }: StrapiGraphQLContext) => {
   const { reportReasons } = config;
   return nexus.enumType({
     name: "ReportReason",
-    description: 'Reason of abuse report',
+    description: "Reason of abuse report",
     members: {
-      ...reportReasons
+      ...reportReasons,
     },
-  })
+  });
 };

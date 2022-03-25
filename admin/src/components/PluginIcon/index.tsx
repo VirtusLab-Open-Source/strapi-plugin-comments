@@ -6,8 +6,8 @@
 
 // @ts-nocheck
 
-import React from 'react';
-import CommentsIcon from "../icons/comments"
+import React from "react";
+import CommentsIcon from "../icons/comments";
 
 const PluginIcon = () => <CommentsIcon />;
 

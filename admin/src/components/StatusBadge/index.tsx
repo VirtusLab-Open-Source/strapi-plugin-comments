@@ -6,14 +6,16 @@
 
 // @ts-nocheck
 
- import React from 'react';
- import { Typography } from '@strapi/design-system/Typography';
- import { StatusBadge as StatusBadgeStyled } from './styles';
+import React from "react";
+import { Typography } from "@strapi/design-system/Typography";
+import { StatusBadge as StatusBadgeStyled } from "./styles";
 
-const StatusBadge = ({ children, textColor, ...rest }) => (<StatusBadgeStyled {...rest} >
+const StatusBadge = ({ children, textColor, ...rest }) => (
+  <StatusBadgeStyled {...rest}>
     <Typography variant="omega" fontWeight="semibold" textColor={textColor}>
-        { children }
+      {children}
     </Typography>
-</StatusBadgeStyled>);
+  </StatusBadgeStyled>
+);
 
 export default StatusBadge;
