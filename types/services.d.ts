@@ -1,38 +1,17 @@
-import { Id, KeyValueSet, StrapiStore, StrapiQueryParamsParsed, StrapiQueryParamsParsedFilters, StrapiQueryParamsParsedOrderBy, StrapiUser } from "strapi-typed"
+import { Id, KeyValueSet, StrapiPagination, StrapiPaginatedResponse, StrapiResponseMeta, StrapiStore, StrapiQueryParams, StrapiQueryParamsParsed, StrapiQueryParamsParsedFilters, StrapiQueryParamsParsedOrderBy, StrapiUser } from "strapi-typed"
 import { ToBeFixed } from "./common"
-import { CommentsPluginConfig, SettingsCommentsPluginConfig, ViewCommentsPluginConfig } from "./config";
+import { AnyConfig, CommentsPluginConfig, SettingsCommentsPluginConfig, ViewCommentsPluginConfig } from "./config";
 import { Comment, CommentReport, RelatedEntity } from "./contentTypes";
 
 import PluginError from "../server/utils/error";
 
-
-export type Pagination = {
-    page?: number
-    pageSize?: number
-    start?: number
-    limit?: number
-    withCount?: boolean | string
-};
-
-export type ResponseMeta = {
-    pagination: Pick<Pagination, 'page' | 'pageSize' |'start' | 'limit'> & { 
-        pageCount?: number
-        total?: number
-    }
-};
-
-export type PaginatedResponse<T> = {
-    data: Array<T>
-    meta?: ResponseMeta
-};
-
 export type AdminPaginatedResponse<T> = {
     result: Array<T>
-} & ResponseMeta;
+} & StrapiResponseMeta;
 
 export type FindAllFlatProps = {
     query: {
-        threadOf?: number | string
+        threadOf?: number | string | null
         [key: string]: any
     } & {}
     populate?: {
@@ -41,7 +20,7 @@ export type FindAllFlatProps = {
     sort?: {
         [key: string]: any
     }
-    pagination?: Pagination
+    pagination?: StrapiPagination
 };
 
 export type FindAllInHierarhyProps = Omit<FindAllFlatProps, 'pagination'> & {
@@ -77,7 +56,7 @@ export interface IServiceCommon {
     getConfig<T>(path?: string, defaultValue?: any): Promise<T>
     getPluginStore(): Promise<StrapiStore>
     getLocalConfig<T>(path?: string, defaultValue?: any): T
-    findAllFlat(props: FindAllFlatProps, relatedEntity?: RelatedEntity | null | boolean): Promise<PaginatedResponse<Comment>>
+    findAllFlat(props: FindAllFlatProps, relatedEntity?: RelatedEntity | null | boolean): Promise<StrapiPaginatedResponse<Comment>>
     findAllInHierarchy(props: FindAllInHierarhyProps, relatedEntity?: RelatedEntity | null | boolean): Promise<Array<Comment>>
     findOne(criteria: KeyValueSet<any>): Promise<Comment>
     findRelatedEntitiesFor(entities: Array<Comment>): Promise<RelatedEntity[]>
@@ -91,7 +70,7 @@ export interface IServiceCommon {
 
 export interface IServiceAdmin {
     getCommonService(): IServiceCommon
-    config<T extends AnyConfig>(viaSettingsPage?: boolean): Promise<T | AnyConfig>
+    config<T extends AnyConfig>(viaSettingsPage?: boolean): Promise<T>
     updateConfig(body: SettingsCommentsPluginConfig): Promise<SettingsCommentsPluginConfig>
     restoreConfig(): Promise<SettingsCommentsPluginConfig>
     restart(): void
@@ -119,3 +98,5 @@ export interface IServiceGraphQL {
     buildContentTypeFilters(contentType: ToBeFixed)
     graphQLFiltersToStrapiQuery(filters: ToBeFixed, contentType: ToBeFixed = {})
 }
+
+export type CommentsPluginServices = IServiceCommon | IServiceClient | IServiceAdmin;

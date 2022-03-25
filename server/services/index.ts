@@ -5,7 +5,7 @@ import clientServices from './client';
 import commonServices from './common';
 import graphQLService from './graphql';
 
-export = {
+export default {
   admin: adminServices,
   client: clientServices,
   common: commonServices,

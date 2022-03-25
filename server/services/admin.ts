@@ -22,7 +22,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     },
 
     // Config
-    async config<T extends AnyConfig>(this: IServiceAdmin, viaSettingsPage = false): Promise<T | AnyConfig> {
+    async config<T extends AnyConfig>(this: IServiceAdmin, viaSettingsPage = false): Promise<T> {
         const pluginStore = await this.getCommonService().getPluginStore();
         const config: SettingsCommentsPluginConfig = await pluginStore.get({ key: 'config' });
         const additionalConfiguration = {
@@ -42,7 +42,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
                 ...config,
                 ...additionalConfiguration,
                 isGQLPluginEnabled: viaSettingsPage ? isGQLPluginEnabled : undefined,
-            };
+            } as T;
         }
 
         const entryLabel = getConfigProp<'entryLabel'>('entryLabel');
@@ -63,10 +63,10 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
                 enabledCollections,
                 moderatorRoles,
                 isGQLPluginEnabled,
-            };
+            } as T;
         }
 
-        return result;
+        return result as T;
     },
 
     async updateConfig(this: IServiceAdmin, body: SettingsCommentsPluginConfig): Promise<SettingsCommentsPluginConfig> {

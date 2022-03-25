@@ -11,14 +11,6 @@ const routes: StrapiRoute[] = [
   },
   {
     method: 'GET',
-    path: '/moderate/config/content-types/:contentTypeName',
-    handler: 'admin.contentTypeName',
-    config: {
-      policies: [],
-    },
-  },
-  {
-    method: 'GET',
     path: '/moderate/all',
     handler: 'admin.findAll',
     config: {
