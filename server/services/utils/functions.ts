@@ -11,8 +11,8 @@ export const buildNestedStructure = (
   entities: Array<Comment>,
   id: Id | null = null,
   field: string = "threadOf",
-  dropBlockedThreads: boolean = false,
-  blockNestedThreads: boolean = false
+  dropBlockedThreads = false,
+  blockNestedThreads = false
 ): Array<Comment> =>
   entities
     .filter((entity: Comment) => {
