@@ -129,10 +129,7 @@ export const buildConfigQueryProp = (
   prop: undefined | string | Array<string> = ""
 ): string => {
   let queryProp = prop;
-  if (prop && isArray(prop)) {
-    queryProp = prop.join(".");
-  }
-  return queryProp as string;
+  return isArray(prop) ? prop.join(".") : prop ?? "";
 };
 
 export const resolveUserContextError = (user: StrapiUser): PluginError => {
