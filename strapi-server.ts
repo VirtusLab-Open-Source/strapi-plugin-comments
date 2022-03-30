@@ -20,9 +20,7 @@ export = () => ({
       const enabledCollections: PropType<
         CommentsPluginConfig,
         "enabledCollections"
-      > = config[CONFIG_PARAMS.ENABLED_COLLECTIONS] as PropType<
-        CommentsPluginConfig,
-        "enabledCollections"
+      > = config[CONFIG_PARAMS.ENABLED_COLLECTIONS] as CommentsPluginConfig["enabledCollections"],
       >;
       const enabledCollectionsValid: boolean =
         enabledCollections.filter((_: string) => !REGEX.uid.test(_)).length ===
