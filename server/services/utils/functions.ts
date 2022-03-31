@@ -127,7 +127,7 @@ export const buildAuthorModel = (item: Comment): Comment => {
 
 export const buildConfigQueryProp = (
   prop: undefined | string | Array<string> = ""
-): string => isArray(prop) ? prop.join(".") : prop ?? "";
+): string => (isArray(prop) ? prop.join(".") : prop ?? "");
 
 export const resolveUserContextError = (user: StrapiUser): PluginError => {
   if (user) {

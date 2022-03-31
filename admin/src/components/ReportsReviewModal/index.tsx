@@ -54,18 +54,18 @@ const ReportsReviewModal = ({
     </ModalLayout>
   );
 
-  ReportsReviewModal.propTypes = {
-    isVisible: PropTypes.bool,
-    startActions: PropTypes.array,
-    endActions: PropTypes.array,
-    item: PropTypes.object.isRequired,
-    children: PropTypes.array.isRequired,
-    allowedActions: PropTypes.shape({
-        canModerate: PropTypes.bool,
-        canAccessReports: PropTypes.bool,
-        canReviewReports: PropTypes.bool,
-    }),
-    onClose: PropTypes.func.isRequired,
+ReportsReviewModal.propTypes = {
+  isVisible: PropTypes.bool,
+  startActions: PropTypes.array,
+  endActions: PropTypes.array,
+  item: PropTypes.object.isRequired,
+  children: PropTypes.array.isRequired,
+  allowedActions: PropTypes.shape({
+    canModerate: PropTypes.bool,
+    canAccessReports: PropTypes.bool,
+    canReviewReports: PropTypes.bool,
+  }),
+  onClose: PropTypes.func.isRequired,
 };
 
 export default ReportsReviewModal;

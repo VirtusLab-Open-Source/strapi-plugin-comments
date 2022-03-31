@@ -88,12 +88,12 @@ const DiscussionThreadItemApprovalFlowActions = ({
 };
 
 DiscussionThreadItemApprovalFlowActions.propTypes = {
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    queryToInvalidate: PropTypes.string,
-    allowedActions: PropTypes.shape({
-        canModerate: PropTypes.bool,
-    }),
-    wrapped: PropTypes.bool,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  queryToInvalidate: PropTypes.string,
+  allowedActions: PropTypes.shape({
+    canModerate: PropTypes.bool,
+  }),
+  wrapped: PropTypes.bool,
 };
 
 export default DiscussionThreadItemApprovalFlowActions;

@@ -23,8 +23,8 @@ export const parseParams = <T = StrapiQueryParamsParsed>(
   }, {} as unknown as T);
 
 export const assertParamsPresent: <T>(
-    params: unknown,
-    keys: string[]
+  params: unknown,
+  keys: string[]
 ) => asserts params is T = (params, keys) => {
   const missingParams =
     params instanceof Object
@@ -35,16 +35,21 @@ export const assertParamsPresent: <T>(
     return;
   }
 
-  throw new PluginError(400, `Expected params missing: ${missingParams.join(", ")}`);
+  throw new PluginError(
+    400,
+    `Expected params missing: ${missingParams.join(", ")}`
+  );
 };
 
 export const assertNotEmpty: <T>(
-    value: T | null | undefined,
-    customError?: Error
-  ) => asserts value is T = (value, customError) => {
-    if (value) {
-      return;
-    }
-  
-    throw customError ?? new PluginError(400, 'Non-empty value expected, empty given');
-  };
+  value: T | null | undefined,
+  customError?: Error
+) => asserts value is T = (value, customError) => {
+  if (value) {
+    return;
+  }
+
+  throw (
+    customError ?? new PluginError(400, "Non-empty value expected, empty given")
+  );
+};

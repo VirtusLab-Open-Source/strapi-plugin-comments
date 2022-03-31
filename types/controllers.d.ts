@@ -45,7 +45,9 @@ export interface IControllerAdmin {
   settingsRestoreConfig(
     ctx: StrapiRequestContext<SettingsCommentsPluginConfig>
   ): ThrowablePromisedResponse<SettingsCommentsPluginConfig>;
-  settingsRestart(ctx: StrapiRequestContext): ThrowablePromisedResponse<unknown>;
+  settingsRestart(
+    ctx: StrapiRequestContext
+  ): ThrowablePromisedResponse<unknown>;
   findAll(ctx: StrapiRequestContext): Promise<AdminPaginatedResponse<Comment>>;
   findOne(
     ctx: StrapiRequestContext<never, AdminFindOneAndThreadProps>

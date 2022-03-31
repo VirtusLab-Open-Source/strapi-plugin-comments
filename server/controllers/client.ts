@@ -1,6 +1,10 @@
 import { ToBeFixed } from "../../types";
 
-import { assertNotEmpty, assertParamsPresent, getPluginService } from "./../utils/functions";
+import {
+  assertNotEmpty,
+  assertParamsPresent,
+  getPluginService,
+} from "./../utils/functions";
 import { parseParams, throwError } from "./utils/functions";
 import { flatInput } from "./utils/parsers";
 
@@ -20,7 +24,7 @@ const controllers: ToBeFixed = {
     } = query || {};
 
     try {
-      assertParamsPresent(params, ['relation']);
+      assertParamsPresent(params, ["relation"]);
 
       return this.getService("common").findAllFlat(
         flatInput(
@@ -42,7 +46,7 @@ const controllers: ToBeFixed = {
     const { sort: querySort, ...filterQuery } = query || {};
 
     try {
-      assertParamsPresent(params, ['relation']);
+      assertParamsPresent(params, ["relation"]);
 
       return await this.getService("common").findAllInHierarchy({
         ...flatInput(relation, filterQuery, sort || querySort),
@@ -59,7 +63,7 @@ const controllers: ToBeFixed = {
     const { user } = state;
     const { body = {} } = request;
     try {
-      assertParamsPresent(params, ['relation']);
+      assertParamsPresent(params, ["relation"]);
       assertNotEmpty(body);
 
       const entity = await this.getService().create(relation, body, user);
@@ -78,7 +82,7 @@ const controllers: ToBeFixed = {
     const { user } = state;
     const { commentId, relation } = parseParams(params);
     try {
-      assertParamsPresent(params, ['commentId', 'relation']);
+      assertParamsPresent(params, ["commentId", "relation"]);
       assertNotEmpty(body);
 
       return await this.getService().update(commentId, relation, body, user);
@@ -99,8 +103,8 @@ const controllers: ToBeFixed = {
     const { user } = state;
     const { relation, commentId } = parseParams(params);
     try {
-      assertParamsPresent(params, ['commentId', 'relation']);
-      
+      assertParamsPresent(params, ["commentId", "relation"]);
+
       return await this.getService().reportAbuse(
         commentId,
         relation,
@@ -123,8 +127,8 @@ const controllers: ToBeFixed = {
     const { authorId } = parseParams(query);
 
     try {
-      assertParamsPresent(params, ['commentId', 'relationId']);
-      assertParamsPresent(query, ['authorId']);
+      assertParamsPresent(params, ["commentId", "relationId"]);
+      assertParamsPresent(query, ["authorId"]);
 
       if (authorId || user?.id) {
         return await this.getService().markAsRemoved(

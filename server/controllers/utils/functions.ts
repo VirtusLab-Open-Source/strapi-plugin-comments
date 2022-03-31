@@ -1,4 +1,4 @@
-import { Id, StringMap, StrapiRequestContext} from "strapi-typed";
+import { Id, StringMap, StrapiRequestContext } from "strapi-typed";
 
 import PluginError from "../../utils/error";
 

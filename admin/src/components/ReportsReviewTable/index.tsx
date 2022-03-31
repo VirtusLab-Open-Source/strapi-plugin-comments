@@ -220,14 +220,14 @@ const ReportsReviewTable = ({
 };
 
 ReportsReviewTable.propTypes = {
-    commentId: PropTypes.oneOfType(PropTypes.string, PropTypes.number).isRequired,
-    items: PropTypes.array.isRequired,
-    mutation: PropTypes.func.isRequired,
-    allowedActions: PropTypes.shape({
-      canAccessReports: PropTypes.bool,
-      canReviewReports: PropTypes.bool,
-    }),
-    onBlockButtonsStateChange: PropTypes.func.isRequired,
+  commentId: PropTypes.oneOfType(PropTypes.string, PropTypes.number).isRequired,
+  items: PropTypes.array.isRequired,
+  mutation: PropTypes.func.isRequired,
+  allowedActions: PropTypes.shape({
+    canAccessReports: PropTypes.bool,
+    canReviewReports: PropTypes.bool,
+  }),
+  onBlockButtonsStateChange: PropTypes.func.isRequired,
 };
 
 export default ReportsReviewTable;

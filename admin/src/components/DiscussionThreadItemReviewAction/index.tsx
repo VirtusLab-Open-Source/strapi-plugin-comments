@@ -162,19 +162,19 @@ const DiscussionThreadItemReviewAction = ({
 };
 
 DiscussionThreadItemReviewAction.propTypes = {
-    item: PropTypes.object.isRequired,
-    isLoading: PropTypes.bool,
-    queryToInvalidate: PropTypes.string.isRequired,
-    areBlockButtonsDisabled: PropTypes.bool,
-    allowedActions: PropTypes.shape({
-        canModerate: PropTypes.bool,
-        canAccessReports: PropTypes.bool,
-        canReviewReports: PropTypes.bool,
-    }),
-    blockItemMutation: PropTypes.func.isRequired,
-    blockItemThreadMutation: PropTypes.func.isRequired,
-    onBlockButtonsStateChange: PropTypes.func.isRequired,
-    onBlockActionClick: PropTypes.func.isRequired,
+  item: PropTypes.object.isRequired,
+  isLoading: PropTypes.bool,
+  queryToInvalidate: PropTypes.string.isRequired,
+  areBlockButtonsDisabled: PropTypes.bool,
+  allowedActions: PropTypes.shape({
+    canModerate: PropTypes.bool,
+    canAccessReports: PropTypes.bool,
+    canReviewReports: PropTypes.bool,
+  }),
+  blockItemMutation: PropTypes.func.isRequired,
+  blockItemThreadMutation: PropTypes.func.isRequired,
+  onBlockButtonsStateChange: PropTypes.func.isRequired,
+  onBlockActionClick: PropTypes.func.isRequired,
 };
 
 export default DiscussionThreadItemReviewAction;

@@ -350,13 +350,16 @@ const DiscussionThreadItemActions = ({
 };
 
 DiscussionThreadItemActions.propTypes = {
-    isRoot: PropTypes.bool,
-    blocked: PropTypes.bool.isRequired,
-    blockedThread: PropTypes.bool.isRequired,
-    approvalStatus: PropTypes.oneOfType([PropTypes.nullable, PropTypes.oneOf(['PENDING', 'APPROVED', 'REJECTED'])]),
-    allowedActions: PropTypes.shape({
-        canModerate: PropTypes.bool,
-    }),
+  isRoot: PropTypes.bool,
+  blocked: PropTypes.bool.isRequired,
+  blockedThread: PropTypes.bool.isRequired,
+  approvalStatus: PropTypes.oneOfType([
+    PropTypes.nullable,
+    PropTypes.oneOf(["PENDING", "APPROVED", "REJECTED"]),
+  ]),
+  allowedActions: PropTypes.shape({
+    canModerate: PropTypes.bool,
+  }),
 };
 
 export default DiscussionThreadItemActions;
