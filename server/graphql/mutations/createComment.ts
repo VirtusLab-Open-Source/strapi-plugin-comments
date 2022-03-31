@@ -20,10 +20,9 @@ export = ({ nexus }: StrapiGraphQLContext) => {
       input: nonNull("CreateComment"),
     },
     async resolve(
-      // @ts-ignore
-      obj: Object,
+      _: Object,
       args: CreateCommentProps,
-      ctx: StrapiRequestContext & ToBeFixed
+      ctx: StrapiRequestContext<never> & ToBeFixed
     ) {
       const { input } = args;
       const { state: { user = undefined } = {} } = ctx;

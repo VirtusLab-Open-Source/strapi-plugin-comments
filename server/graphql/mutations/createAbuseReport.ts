@@ -16,10 +16,9 @@ export = ({ nexus }: StrapiGraphQLContext) => {
       input: nonNull("CreateReport"),
     },
     async resolve(
-      // @ts-ignore
-      obj: Object,
+      _: Object,
       args: NexusRequestProps,
-      ctx: StrapiRequestContext & ToBeFixed
+      ctx: StrapiRequestContext<never> & ToBeFixed
     ) {
       const { input } = args;
       const { state: { user = undefined } = {} } = ctx;

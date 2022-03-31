@@ -1,10 +1,10 @@
-import { Id, Map, StrapiRequestContext} from "strapi-typed";
+import { Id, StringMap, StrapiRequestContext} from "strapi-typed";
 
 import PluginError from "../../utils/error";
 
-type ParseResponse = Map<string | number | Id>;
+type ParseResponse = StringMap<string | number | Id>;
 
-export const parseParams = (params: Map<string | number>) =>
+export const parseParams = (params: StringMap<string | number>) =>
   Object.keys(params).reduce((prev, curr): ParseResponse => {
     const value = params[curr];
     const parsedValue = Number(value);
@@ -14,8 +14,8 @@ export const parseParams = (params: Map<string | number>) =>
     };
   }, {} as ParseResponse);
 
-export const throwError = (
-  ctx: StrapiRequestContext,
+export const throwError = <T extends {} = never>(
+  ctx: StrapiRequestContext<T>,
   e: PluginError | Error | unknown
 ): PluginError | Error | unknown | never => {
   if (e instanceof PluginError) {

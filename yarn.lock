@@ -775,31 +775,6 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@strapi/plugin-graphql@^4.1.2":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.1.2.tgz#5063e7dc237f408bf9114f2cf10eb054d56410f0"
-  integrity sha512-p1ox1GwFslfHDU3Vgc1gv/QH59phuqzGXHTt7k7rqA4g9gCJ7iJlkdvssAD8T2tJTIhHRtoZXQ9iE1Y0/zgnSQ==
-  dependencies:
-    "@apollo/federation" "^0.28.0"
-    "@graphql-tools/schema" "8.1.2"
-    "@graphql-tools/utils" "^8.0.2"
-    "@strapi/utils" "4.1.2"
-    apollo-server-core "3.1.2"
-    apollo-server-koa "3.1.2"
-    glob "^7.1.7"
-    graphql "^15.5.1"
-    graphql-depth-limit "^1.1.0"
-    graphql-iso-date "^3.6.1"
-    graphql-playground-middleware-koa "^1.6.21"
-    graphql-type-json "^0.3.2"
-    graphql-type-long "^0.1.1"
-    graphql-upload "^13.0.0"
-    koa-compose "^4.1.0"
-    lodash "4.17.21"
-    nexus "1.2.0"
-    pluralize "^8.0.0"
-    subscriptions-transport-ws "0.9.19"
-
 "@strapi/plugin-graphql@^4.1.6":
   version "4.1.6"
   resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.1.6.tgz#c5c5c5fe5581a953803142c6836a12a4f0e1207c"
@@ -824,17 +799,6 @@
     nexus "1.2.0"
     pluralize "^8.0.0"
     subscriptions-transport-ws "0.9.19"
-
-"@strapi/utils@4.1.2", "@strapi/utils@^4.1.2":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.1.2.tgz#1772b66490dcc0aff1e51345f79cdfe1284af9af"
-  integrity sha512-MMT6zIg9G0SMUCHAB27OrDrrU7bIXcg0FXSlyOAyzXMV5aZKXp9vbS5pPmxSc5nxOvooPxjWRLJB8sLyM6f7sw==
-  dependencies:
-    "@sindresorhus/slugify" "1.1.0"
-    date-fns "2.24.0"
-    http-errors "1.8.0"
-    lodash "4.17.21"
-    yup "0.32.9"
 
 "@strapi/utils@4.1.6", "@strapi/utils@^4.1.6":
   version "4.1.6"
@@ -4129,14 +4093,13 @@ stack-utils@^2.0.3:
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.5.0.tgz#161c7dac177659fd9811f43771fa99381478628c"
   integrity sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=
 
-strapi-typed@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/strapi-typed/-/strapi-typed-1.0.3.tgz#dfa8f142d385ef88aae07b208fea5c24a7a26664"
-  integrity sha512-5Ca6wGLbkl+6/38e/+gDjcgIzz1lILv6BtdzYQSdb9Hp96XOQZAClcs9kIgvsLqSFMSFSYRo/Gm8Ap6QnWqSPg==
+strapi-typed@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/strapi-typed/-/strapi-typed-1.0.5.tgz#2bf0574c767058ec0fc85c2d32c8d45d0910942d"
+  integrity sha512-00K1pnyCfT3Oe/Z4jjJrWDd02c43NWaTHdngVUIKHOEDiroQBOHz/MsFRrVOf5x7HF/rgGhNsCcq4n89HoNLig==
   dependencies:
-    "@strapi/plugin-graphql" "^4.1.2"
-    "@strapi/utils" "^4.1.2"
-    bad-words "^3.0.4"
+    "@strapi/plugin-graphql" "^4.1.6"
+    "@strapi/utils" "^4.1.6"
 
 stream-events@^1.0.5:
   version "1.0.5"

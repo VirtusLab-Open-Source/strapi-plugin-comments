@@ -17,11 +17,8 @@ export = () => ({
     }),
     validator: (config: CommentsPluginConfig) => {
       // Check enabledCollections values
-      const enabledCollections: PropType<
-        CommentsPluginConfig,
-        "enabledCollections"
-      > = config[CONFIG_PARAMS.ENABLED_COLLECTIONS] as CommentsPluginConfig["enabledCollections"],
-      >;
+      const enabledCollections: PropType<CommentsPluginConfig,"enabledCollections"> = 
+        config[CONFIG_PARAMS.ENABLED_COLLECTIONS] as CommentsPluginConfig["enabledCollections"];
       const enabledCollectionsValid: boolean =
         enabledCollections.filter((_: string) => !REGEX.uid.test(_)).length ===
         0;
@@ -33,11 +30,8 @@ export = () => ({
       }
 
       // Check moderatorRoles values
-      const moderatorRoles: PropType<CommentsPluginConfig, "moderatorRoles"> =
-        config[CONFIG_PARAMS.MODERATOR_ROLES] as PropType<
-          CommentsPluginConfig,
-          "moderatorRoles"
-        >;
+      const moderatorRoles: PropType<CommentsPluginConfig, "moderatorRoles"> = 
+        config[CONFIG_PARAMS.MODERATOR_ROLES] as CommentsPluginConfig['moderatorRoles'];
       const moderatorRolesValid: boolean =
         moderatorRoles.filter((_: string) => !isString(_)).length === 0;
 
@@ -47,10 +41,7 @@ export = () => ({
 
       // Check approvalFlow values
       const approvalFlow: PropType<CommentsPluginConfig, "approvalFlow"> =
-        config[CONFIG_PARAMS.APPROVAL_FLOW] as PropType<
-          CommentsPluginConfig,
-          "approvalFlow"
-        >;
+        config[CONFIG_PARAMS.APPROVAL_FLOW] as CommentsPluginConfig['approvalFlow'];
       const approvalFlowValid: boolean =
         approvalFlow.filter((_: string) => !REGEX.uid.test(_)).length === 0;
       if (!approvalFlowValid) {
@@ -60,9 +51,8 @@ export = () => ({
       }
 
       // Check entryLabel keys and values
-      const entryLabels: PropType<CommentsPluginConfig, "entryLabel"> = config[
-        CONFIG_PARAMS.ENTRY_LABEL
-      ] as PropType<CommentsPluginConfig, "entryLabel">;
+      const entryLabels: PropType<CommentsPluginConfig, "entryLabel"> = 
+        config[CONFIG_PARAMS.ENTRY_LABEL] as CommentsPluginConfig['entryLabel'];
       const entryLabelKeysValid: boolean =
         Object.keys(entryLabels)
           .filter((_: string) => _ !== "*")

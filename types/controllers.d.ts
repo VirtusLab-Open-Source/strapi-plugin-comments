@@ -48,7 +48,7 @@ export interface IControllerAdmin {
   settingsRestart(ctx: StrapiRequestContext): ThrowablePromisedResponse<unknown>;
   findAll(ctx: StrapiRequestContext): Promise<AdminPaginatedResponse<Comment>>;
   findOne(
-    ctx: StrapiRequestContext<unknown, AdminFindOneAndThreadProps>
+    ctx: StrapiRequestContext<never, AdminFindOneAndThreadProps>
   ): ThrowablePromisedResponse<AdminSinglePageResponse>;
   blockComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
   unblockComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;

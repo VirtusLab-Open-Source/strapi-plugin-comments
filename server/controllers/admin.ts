@@ -14,7 +14,7 @@ import {
   ViewCommentsPluginConfig,
 } from "../../types";
 
-import { getPluginService } from "./../utils/functions";
+import { assertNotEmpty, getPluginService } from "./../utils/functions";
 import { parseParams, throwError } from "./utils/functions";
 
 const controllers: IControllerAdmin = {
@@ -23,7 +23,7 @@ const controllers: IControllerAdmin = {
   },
 
   async config(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<ViewCommentsPluginConfig> {
     try {
       return await this.getService<IServiceAdmin>().config<ViewCommentsPluginConfig>();
@@ -33,7 +33,7 @@ const controllers: IControllerAdmin = {
   },
 
   async settingsConfig(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<SettingsCommentsPluginConfig> {
     try {
       return this.getService<IServiceAdmin>().config<SettingsCommentsPluginConfig>(
@@ -51,6 +51,9 @@ const controllers: IControllerAdmin = {
       const {
         request: { body },
       } = ctx;
+
+      assertNotEmpty<SettingsCommentsPluginConfig>(body);
+
       return this.getService<IServiceAdmin>().updateConfig(body);
     } catch (e) {
       throw throwError(ctx, e);
@@ -58,7 +61,7 @@ const controllers: IControllerAdmin = {
   },
 
   async settingsRestoreConfig(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<SettingsCommentsPluginConfig> {
     try {
       return this.getService<IServiceAdmin>().restoreConfig();
@@ -68,7 +71,7 @@ const controllers: IControllerAdmin = {
   },
 
   async settingsRestart(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<any> {
     try {
       await this.getService<IServiceAdmin>().restart();
@@ -79,13 +82,13 @@ const controllers: IControllerAdmin = {
   },
 
   async findAll(
-    ctx: StrapiRequestContext<{}, AdminFindAllProps>
+    ctx: StrapiRequestContext<never, AdminFindAllProps>
   ): Promise<AdminPaginatedResponse<Comment>> {
     return this.getService<IServiceAdmin>().findAll(ctx.query);
   },
 
   async findOne(
-    ctx: StrapiRequestContext<{}, AdminFindOneAndThreadProps>
+    ctx: StrapiRequestContext<never, AdminFindOneAndThreadProps>
   ): ThrowablePromisedResponse<AdminSinglePageResponse> {
     const { params = {}, query } = ctx;
     const { id }: ToBeFixed = parseParams(params);
@@ -97,7 +100,7 @@ const controllers: IControllerAdmin = {
   },
 
   async blockComment(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<Comment> {
     const { params = {} } = ctx;
     const { id } = parseParams(params);
@@ -109,7 +112,7 @@ const controllers: IControllerAdmin = {
   },
 
   async unblockComment(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<Comment> {
     const { params = {} } = ctx;
     const { id } = parseParams(params);
@@ -121,7 +124,7 @@ const controllers: IControllerAdmin = {
   },
 
   async blockCommentThread(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<Comment> {
     const { params = {} } = ctx;
     const { id } = parseParams(params);
@@ -136,7 +139,7 @@ const controllers: IControllerAdmin = {
   },
 
   async unblockCommentThread(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<Comment> {
     const { params = {} } = ctx;
     const { id } = parseParams(params);
@@ -151,7 +154,7 @@ const controllers: IControllerAdmin = {
   },
 
   async resolveAbuseReport(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<CommentReport> {
     const { params = {} } = ctx;
     const { id: commentId, reportId } = parseParams(params);
@@ -166,7 +169,7 @@ const controllers: IControllerAdmin = {
   },
 
   async approveComment(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<Comment> {
     const { id } = parseParams(ctx.params || {});
     try {
@@ -177,7 +180,7 @@ const controllers: IControllerAdmin = {
   },
 
   async rejectComment(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<Comment> {
     const { id } = parseParams(ctx.params || {});
     try {
