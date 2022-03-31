@@ -73,16 +73,16 @@ const ConfirmationDialog = ({
   </Dialog>
 );
 
-//   ConfirmationDialog.propTypes = {
-//     isVisible: PropTypes.bool,
-//     isActionAsync: PropTypes.bool,
-//     children: PropTypes.array.isRequired,
-//     header: PropTypes.string,
-//     labelCancel: PropTypes.string,
-//     labelConfirm: PropTypes.string,
-//     iconConfirm: PropTypes.object,
-//     onConfirm: PropTypes.func.isRequired,
-//     onCancel: PropTypes.func.isRequired,
-// };
+  ConfirmationDialog.propTypes = {
+    isVisible: PropTypes.bool,
+    isActionAsync: PropTypes.bool,
+    children: PropTypes.array.isRequired,
+    header: PropTypes.string,
+    labelCancel: PropTypes.string,
+    labelConfirm: PropTypes.string,
+    iconConfirm: PropTypes.object,
+    onConfirm: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+};
 
 export default ConfirmationDialog;

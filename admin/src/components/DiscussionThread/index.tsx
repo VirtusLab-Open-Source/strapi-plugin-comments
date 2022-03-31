@@ -83,15 +83,15 @@ const DiscussionThread = ({
   );
 };
 
-// DiscussionThread.propTypes = {
-//     level: PropTypes.array.isRequired,
-//     selected: PropTypes.object.isRequired,
-//     allowedActions: PropTypes.shape({
-//         canModerate: PropTypes.bool,
-//         canAccessReports: PropTypes.bool,
-//         canReviewReports: PropTypes.bool,
-//     }),
-//     isReloading: PropTypes.bool,
-// };
+DiscussionThread.propTypes = {
+    level: PropTypes.array.isRequired,
+    selected: PropTypes.object.isRequired,
+    allowedActions: PropTypes.shape({
+        canModerate: PropTypes.bool,
+        canAccessReports: PropTypes.bool,
+        canReviewReports: PropTypes.bool,
+    }),
+    isReloading: PropTypes.bool,
+};
 
 export default DiscussionThread;

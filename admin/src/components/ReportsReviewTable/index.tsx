@@ -219,15 +219,15 @@ const ReportsReviewTable = ({
   return null;
 };
 
-// ReportsReviewTable.propTypes = {
-//     commentId: PropTypes.oneOfType(PropTypes.string, PropTypes.number).isRequired,
-//     items: PropTypes.array.isRequired,
-//     mutation: PropTypes.func.isRequired,
-//     allowedActions: PropTypes.shape({
-//       canAccessReports: PropTypes.bool,
-//       canReviewReports: PropTypes.bool,
-//     }),
-//     onBlockButtonsStateChange: PropTypes.func.isRequired,
-// };
+ReportsReviewTable.propTypes = {
+    commentId: PropTypes.oneOfType(PropTypes.string, PropTypes.number).isRequired,
+    items: PropTypes.array.isRequired,
+    mutation: PropTypes.func.isRequired,
+    allowedActions: PropTypes.shape({
+      canAccessReports: PropTypes.bool,
+      canReviewReports: PropTypes.bool,
+    }),
+    onBlockButtonsStateChange: PropTypes.func.isRequired,
+};
 
 export default ReportsReviewTable;

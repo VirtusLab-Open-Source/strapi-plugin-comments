@@ -59,13 +59,13 @@ const DiscussionThreadItem = (props) => {
   );
 };
 
-// DiscussionThreadItem.propTypes = {
-//     content: PropTypes.string.isRequired,
-//     allowedActions: PropTypes.shape({
-//         canModerate: PropTypes.bool,
-//         canAccessReports: PropTypes.bool,
-//         canReviewReports: PropTypes.bool,
-//     }),
-// };
+DiscussionThreadItem.propTypes = {
+    content: PropTypes.string.isRequired,
+    allowedActions: PropTypes.shape({
+        canModerate: PropTypes.bool,
+        canAccessReports: PropTypes.bool,
+        canReviewReports: PropTypes.bool,
+    }),
+};
 
 export default DiscussionThreadItem;

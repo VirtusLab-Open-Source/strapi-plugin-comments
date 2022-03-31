@@ -13,7 +13,7 @@ import { Check, Cross } from "@strapi/icons";
 import { useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
 import { getMessage, handleAPIError } from "../../utils";
 import { approveItem, rejectItem } from "../../pages/utils/api";
-import pluginId from "../../pluginId";
+import { pluginId } from "../../pluginId";
 
 const DiscussionThreadItemApprovalFlowActions = ({
   id,
@@ -87,13 +87,13 @@ const DiscussionThreadItemApprovalFlowActions = ({
   return null;
 };
 
-// DiscussionThreadItemApprovalFlowActions.propTypes = {
-//     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-//     queryToInvalidate: PropTypes.string,
-//     allowedActions: PropTypes.shape({
-//         canModerate: PropTypes.bool,
-//     }),
-//     wrapped: PropTypes.bool,
-// };
+DiscussionThreadItemApprovalFlowActions.propTypes = {
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    queryToInvalidate: PropTypes.string,
+    allowedActions: PropTypes.shape({
+        canModerate: PropTypes.bool,
+    }),
+    wrapped: PropTypes.bool,
+};
 
 export default DiscussionThreadItemApprovalFlowActions;

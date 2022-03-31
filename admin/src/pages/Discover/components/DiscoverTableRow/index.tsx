@@ -23,7 +23,7 @@ import {
   resolveCommentStatusColor,
 } from "../../../../utils";
 import { blockItem, blockItemThread } from "../../../utils/api";
-import pluginId from "../../../../pluginId";
+import { pluginId } from "../../../../pluginId";
 import { ReviewIcon, LockIcon } from "../../../../components/icons";
 import { TableLink } from "./styles";
 import renderEntryTitle from "../../../../utils/renderEntryTitle";

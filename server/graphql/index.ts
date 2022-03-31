@@ -8,8 +8,10 @@ import { getModelUid } from "../services/utils/functions";
 
 export = async ({ strapi, config }: StrapiGraphQLContext) => {
   const extensionService = strapi.plugin("graphql").service("extension");
-  extensionService.shadowCRUD(getModelUid("comment")).disable();
-  extensionService.shadowCRUD(getModelUid("comment-report")).disable();
+  extensionService.shadowCRUD(getModelUid("comment")).disableQueries();
+  extensionService.shadowCRUD(getModelUid("comment")).disableMutations();
+  extensionService.shadowCRUD(getModelUid("comment-report")).disableQueries();
+  extensionService.shadowCRUD(getModelUid("comment-report")).disableMutations();
 
   extensionService.use(({ strapi, nexus }: StrapiGraphQLContext) => {
     const types = getTypes({ strapi, nexus, config });

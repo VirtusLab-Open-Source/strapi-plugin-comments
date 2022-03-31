@@ -31,8 +31,8 @@ const DiscussionStatus = ({ blocked, blockedThread }) => {
   );
 };
 
-// DiscussionStatus.propTypes = {
+DiscussionStatus.propTypes = {
 
-// };
+};
 
 export default DiscussionStatus;

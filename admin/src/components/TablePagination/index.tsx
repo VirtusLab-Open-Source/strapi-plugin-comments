@@ -17,21 +17,21 @@ const TablePagination = ({ pagination }) => {
   );
 };
 
-// TablePagination.defaultProps = {
-//   pagination: {
-//     pageCount: 0,
-//     pageSize: 10,
-//     total: 0,
-//   },
-// };
+TablePagination.defaultProps = {
+  pagination: {
+    pageCount: 0,
+    pageSize: 10,
+    total: 0,
+  },
+};
 
-// TablePagination.propTypes = {
-//   pagination: PropTypes.shape({
-//     page: PropTypes.number,
-//     pageCount: PropTypes.number,
-//     pageSize: PropTypes.number,
-//     total: PropTypes.number,
-//   }),
-// };
+TablePagination.propTypes = {
+  pagination: PropTypes.shape({
+    page: PropTypes.number,
+    pageCount: PropTypes.number,
+    pageSize: PropTypes.number,
+    total: PropTypes.number,
+  }),
+};
 
 export default TablePagination;

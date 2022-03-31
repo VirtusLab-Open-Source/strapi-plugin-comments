@@ -12,7 +12,7 @@ import { resolveReport } from "../../pages/utils/api";
 import { getMessage, handleAPIError } from "../../utils";
 import ReportsReviewTable from "../ReportsReviewTable";
 import ReportsReviewModal from "../ReportsReviewModal";
-import pluginId from "../../pluginId";
+import { pluginId } from "../../pluginId";
 
 const DiscussionThreadItemReviewAction = ({
   item,
@@ -161,20 +161,20 @@ const DiscussionThreadItemReviewAction = ({
   return null;
 };
 
-// DiscussionThreadItemReviewAction.propTypes = {
-//     item: PropTypes.object.isRequired,
-//     isLoading: PropTypes.bool,
-//     queryToInvalidate: PropTypes.string.isRequired,
-//     areBlockButtonsDisabled: PropTypes.bool,
-//     allowedActions: PropTypes.shape({
-//         canModerate: PropTypes.bool,
-//         canAccessReports: PropTypes.bool,
-//         canReviewReports: PropTypes.bool,
-//     }),
-//     blockItemMutation: PropTypes.func.isRequired,
-//     blockItemThreadMutation: PropTypes.func.isRequired,
-//     onBlockButtonsStateChange: PropTypes.func.isRequired,
-//     onBlockActionClick: PropTypes.func.isRequired,
-// };
+DiscussionThreadItemReviewAction.propTypes = {
+    item: PropTypes.object.isRequired,
+    isLoading: PropTypes.bool,
+    queryToInvalidate: PropTypes.string.isRequired,
+    areBlockButtonsDisabled: PropTypes.bool,
+    allowedActions: PropTypes.shape({
+        canModerate: PropTypes.bool,
+        canAccessReports: PropTypes.bool,
+        canReviewReports: PropTypes.bool,
+    }),
+    blockItemMutation: PropTypes.func.isRequired,
+    blockItemThreadMutation: PropTypes.func.isRequired,
+    onBlockButtonsStateChange: PropTypes.func.isRequired,
+    onBlockActionClick: PropTypes.func.isRequired,
+};
 
 export default DiscussionThreadItemReviewAction;

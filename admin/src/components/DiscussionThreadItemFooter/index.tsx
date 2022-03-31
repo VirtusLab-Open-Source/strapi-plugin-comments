@@ -52,16 +52,16 @@ const DiscussionThreadItemFooter = ({
   );
 };
 
-// DiscussionThreadItemFooter.propTypes = {
-//     author: PropTypes.shape({
-//         id: PropTypes.oneOfType(PropTypes.string, PropTypes.number).isRequired,
-//         name: PropTypes.string.isRequired,
-//         email: PropTypes.string,
-//         avatar: PropTypes.string,
-//     }).isRequired,
-//     createdAt: PropTypes.string.isRequired,
-//     updatedAt: PropTypes.string,
-//     children: PropTypes.array,
-// };
+DiscussionThreadItemFooter.propTypes = {
+    author: PropTypes.shape({
+        id: PropTypes.oneOfType(PropTypes.string, PropTypes.number).isRequired,
+        name: PropTypes.string.isRequired,
+        email: PropTypes.string,
+        avatar: PropTypes.string,
+    }).isRequired,
+    createdAt: PropTypes.string.isRequired,
+    updatedAt: PropTypes.string,
+    children: PropTypes.array,
+};
 
 export default DiscussionThreadItemFooter;

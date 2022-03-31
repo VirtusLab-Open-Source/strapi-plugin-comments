@@ -29,7 +29,7 @@ import {
   unblockItem,
   unblockItemThread,
 } from "../../pages/utils/api";
-import pluginId from "../../pluginId";
+import { pluginId } from "../../pluginId";
 import { LockIcon, UnlockIcon } from "../icons";
 import DiscussionThreadItemApprovalFlowActions from "../DiscussionThreadItemApprovalFlowActions";
 import StatusBadge from "../StatusBadge";
@@ -349,14 +349,14 @@ const DiscussionThreadItemActions = ({
   );
 };
 
-// DiscussionThreadItemActions.propTypes = {
-//     isRoot: PropTypes.bool,
-//     blocked: PropTypes.bool.isRequired,
-//     blockedThread: PropTypes.bool.isRequired,
-//     approvalStatus: PropTypes.oneOfType([PropTypes.nullable, PropTypes.oneOf(['PENDING', 'APPROVED', 'REJECTED'])]),
-//     allowedActions: PropTypes.shape({
-//         canModerate: PropTypes.bool,
-//     }),
-// };
+DiscussionThreadItemActions.propTypes = {
+    isRoot: PropTypes.bool,
+    blocked: PropTypes.bool.isRequired,
+    blockedThread: PropTypes.bool.isRequired,
+    approvalStatus: PropTypes.oneOfType([PropTypes.nullable, PropTypes.oneOf(['PENDING', 'APPROVED', 'REJECTED'])]),
+    allowedActions: PropTypes.shape({
+        canModerate: PropTypes.bool,
+    }),
+};
 
 export default DiscussionThreadItemActions;

@@ -800,10 +800,46 @@
     pluralize "^8.0.0"
     subscriptions-transport-ws "0.9.19"
 
+"@strapi/plugin-graphql@^4.1.6":
+  version "4.1.6"
+  resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.1.6.tgz#c5c5c5fe5581a953803142c6836a12a4f0e1207c"
+  integrity sha512-TiGFbX6HdTHikWi4sPwiNZih6HOVLh1Y6wmEfjpxTsm4pYog9KE78Jr7SIIIcXaXrfZAHdT0xAOaB9W8assN7w==
+  dependencies:
+    "@apollo/federation" "^0.28.0"
+    "@graphql-tools/schema" "8.1.2"
+    "@graphql-tools/utils" "^8.0.2"
+    "@strapi/utils" "4.1.6"
+    apollo-server-core "3.1.2"
+    apollo-server-koa "3.1.2"
+    glob "^7.1.7"
+    graphql "^15.5.1"
+    graphql-depth-limit "^1.1.0"
+    graphql-iso-date "^3.6.1"
+    graphql-playground-middleware-koa "^1.6.21"
+    graphql-type-json "^0.3.2"
+    graphql-type-long "^0.1.1"
+    graphql-upload "^13.0.0"
+    koa-compose "^4.1.0"
+    lodash "4.17.21"
+    nexus "1.2.0"
+    pluralize "^8.0.0"
+    subscriptions-transport-ws "0.9.19"
+
 "@strapi/utils@4.1.2", "@strapi/utils@^4.1.2":
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.1.2.tgz#1772b66490dcc0aff1e51345f79cdfe1284af9af"
   integrity sha512-MMT6zIg9G0SMUCHAB27OrDrrU7bIXcg0FXSlyOAyzXMV5aZKXp9vbS5pPmxSc5nxOvooPxjWRLJB8sLyM6f7sw==
+  dependencies:
+    "@sindresorhus/slugify" "1.1.0"
+    date-fns "2.24.0"
+    http-errors "1.8.0"
+    lodash "4.17.21"
+    yup "0.32.9"
+
+"@strapi/utils@4.1.6", "@strapi/utils@^4.1.6":
+  version "4.1.6"
+  resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.1.6.tgz#edfdec2470143b2437cc95a5119ef5fa7d892eb4"
+  integrity sha512-QVuxGKHw9uh72CwtpKJTPz5ECgFBbtydvUjY34PCZMPkJ0EQ7/spz3KZbB+v2JSPgy1apZJn5qkBGFcvSvBxRw==
   dependencies:
     "@sindresorhus/slugify" "1.1.0"
     date-fns "2.24.0"

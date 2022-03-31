@@ -45,14 +45,14 @@ const TableFilters = ({ displayedFilters }) => {
   );
 };
 
-// TableFilters.propTypes = {
-//   displayedFilters: PropTypes.arrayOf(
-//     PropTypes.shape({
-//       name: PropTypes.string.isRequired,
-//       metadatas: PropTypes.shape({ label: PropTypes.string }),
-//       fieldSchema: PropTypes.shape({ type: PropTypes.string }),
-//     })
-//   ).isRequired,
-// };
+TableFilters.propTypes = {
+  displayedFilters: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      metadatas: PropTypes.shape({ label: PropTypes.string }),
+      fieldSchema: PropTypes.shape({ type: PropTypes.string }),
+    })
+  ).isRequired,
+};
 
 export default TableFilters;
