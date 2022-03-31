@@ -1,53 +1,59 @@
-const PluginError = require('../../../utils/error');
-const { resolveUserContextError, getModelUid, buildConfigQueryProp } = require('../functions');
+const PluginError = require("../../../utils/error");
+const {
+  resolveUserContextError,
+  getModelUid,
+  buildConfigQueryProp,
+} = require("../functions");
 
 beforeEach(() => {
-  Object.defineProperty(global, 'strapi', {
-    value: require('../../../../__mocks__/initSetup')(),
+  Object.defineProperty(global, "strapi", {
+    value: require("../../../../__mocks__/initSetup")(),
     writable: true,
   });
-})
+});
 
-describe('Test service functions utils', () => {
-
-  describe('Getting models uid\'s ', () => {
-    test('Should get comments uid', () => {
-      expect(getModelUid('comment')).toBe('plugins::comments.comment');
+describe("Test service functions utils", () => {
+  describe("Getting models uid's ", () => {
+    test("Should get comments uid", () => {
+      expect(getModelUid("comment")).toBe("plugins::comments.comment");
     });
 
-    test('Should get report uid', () => {
-      expect(getModelUid('comment-report')).toBe('plugins::comments.comment-report');
+    test("Should get report uid", () => {
+      expect(getModelUid("comment-report")).toBe(
+        "plugins::comments.comment-report"
+      );
     });
   });
 
-  describe('Resolve user context error', () => {
-    test('Should throw 401', () => {
+  describe("Resolve user context error", () => {
+    test("Should throw 401", () => {
       try {
         resolveUserContextError({ id: 1 });
       } catch (e) {
         expect(e).toBeInstanceOf(PluginError);
-        expect(e).toHaveProperty('status', 401);
+        expect(e).toHaveProperty("status", 401);
       }
     });
 
-    test('Should throw 403', () => {
+    test("Should throw 403", () => {
       try {
         resolveUserContextError();
       } catch (e) {
         expect(e).toBeInstanceOf(PluginError);
-        expect(e).toHaveProperty('status', 403);
+        expect(e).toHaveProperty("status", 403);
       }
     });
   });
 
-  describe('Building config query props', () => {
-    test('Should return prop as is', () => {
-      expect(buildConfigQueryProp('my.sample.prop')).toBe('my.sample.prop');
+  describe("Building config query props", () => {
+    test("Should return prop as is", () => {
+      expect(buildConfigQueryProp("my.sample.prop")).toBe("my.sample.prop");
     });
 
-    test('Should build query prop with \'.\'', () => {
-      expect(buildConfigQueryProp(['my', 'sample', 'prop'])).toBe('my.sample.prop');
+    test("Should build query prop with '.'", () => {
+      expect(buildConfigQueryProp(["my", "sample", "prop"])).toBe(
+        "my.sample.prop"
+      );
     });
   });
-  
 });
