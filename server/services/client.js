@@ -73,6 +73,7 @@ module.exports = ({ strapi }) => ({
                     authorName: author.name,
                     authorEmail: author.email,
                     authorAvatar: author.avatar,
+		    authorUrl: author.url,
                 };
             }
             
