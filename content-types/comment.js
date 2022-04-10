@@ -64,6 +64,10 @@ module.exports = {
       type: 'string',
       configurable: false
     },
+    authorUrl: {
+      type: 'string',
+      configurable: false
+    },
     removed: {
       type: 'boolean',
       configurable: false
