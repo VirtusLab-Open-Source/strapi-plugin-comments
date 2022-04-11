@@ -4,15 +4,17 @@ import PluginError from "../../utils/error";
 
 type ParseResponse = StringMap<string | number | Id>;
 
-export const parseParams = (params: StringMap<string | number>) =>
-  Object.keys(params).reduce((prev, curr): ParseResponse => {
+export const parseParams = <T extends ParseResponse>(
+  params: StringMap<string | number>
+) =>
+  Object.keys(params).reduce((prev, curr): T => {
     const value = params[curr];
     const parsedValue = Number(value);
     return {
       ...prev,
       [curr]: isNaN(parsedValue) ? value : parsedValue,
     };
-  }, {} as ParseResponse);
+  }, {} as T);
 
 export const throwError = <T extends {} = never>(
   ctx: StrapiRequestContext<T>,

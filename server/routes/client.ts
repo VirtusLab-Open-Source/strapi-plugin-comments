@@ -43,7 +43,7 @@ const routes: StrapiRoute[] = [
   },
   {
     method: "DELETE",
-    path: "/:relationId/comment/:commentId",
+    path: "/:relation/comment/:commentId",
     handler: "client.removeComment",
     config: {
       policies: [],

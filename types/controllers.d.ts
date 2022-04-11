@@ -18,7 +18,13 @@ import {
   SettingsCommentsPluginConfig,
   ViewCommentsPluginConfig,
 } from "./config";
-import { Comment, CommentReport, RelatedEntity } from "./contentTypes";
+import {
+  Comment,
+  CommentAuthor,
+  CommentModelKeys,
+  CommentReport,
+  RelatedEntity,
+} from "./contentTypes";
 
 import PluginError from "../server/utils/error";
 import {
@@ -30,6 +36,25 @@ import {
 
 export type ThrowableResponse<T> = T | PluginError | never;
 export type ThrowablePromisedResponse<T> = Promise<ThrowableResponse<T>>;
+
+export type CreateCommentPayload = {
+  content: Comment["content"];
+  threadOf: Comment["threadOf"];
+  author?: Comment["author"];
+  approvalStatus?: Comment["approvalStatus"];
+};
+
+export type UpdateCommentPayload = {
+  content: Comment["content"];
+  author: {
+    id: CommentAuthor["id"];
+  };
+};
+
+export type CreateCommentReportPayload = {
+  reason: CommentReport["reason"];
+  content: CommentReport["content"];
+};
 
 export interface IControllerAdmin {
   getService<T extends CommentsPluginServices>(name?: string): T;
@@ -65,4 +90,24 @@ export interface IControllerAdmin {
   ): ThrowablePromisedResponse<CommentReport>;
   approveComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
   rejectComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
+}
+
+export interface IControllerClient {
+  getService<T extends CommentsPluginServices>(name?: string): T;
+  findAllFlat(
+    ctx: StrapiRequestContext<never>
+  ): ThrowablePromisedResponse<StrapiPaginatedResponse<Comment>>;
+  findAllInHierarchy(
+    ctx: StrapiRequestContext<never>
+  ): ThrowablePromisedResponse<Array<Comment>>;
+  post(ctx: StrapiRequestContext<CreateCommentPayload>): ThrowablePromisedResponse<Comment>;
+  put(
+    ctx: StrapiRequestContext<UpdateCommentPayload>
+  ): ThrowablePromisedResponse<Comment>;
+  reportAbuse(
+    ctx: StrapiRequestContext<CreateCommentReportPayload>
+  ): ThrowablePromisedResponse<CommentReport>;
+  removeComment(
+    ctx: StrapiRequestContext<never>
+  ): ThrowablePromisedResponse<Comment>;
 }

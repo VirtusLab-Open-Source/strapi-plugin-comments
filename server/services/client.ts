@@ -6,7 +6,9 @@ import {
   RelatedEntity,
   IServiceClient,
   IServiceCommon,
-  ToBeFixed,
+  CreateCommentPayload,
+  UpdateCommentPayload,
+  CreateCommentReportPayload,
 } from "../../types";
 
 import { getPluginService } from "./../utils/functions";
@@ -32,7 +34,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
   async create(
     this: IServiceClient,
     relation: string,
-    data: ToBeFixed,
+    data: CreateCommentPayload,
     user: StrapiUser = undefined
   ): Promise<Comment> {
     const { content, threadOf } = data;
@@ -70,10 +72,10 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
           id: threadOf,
           related: relation,
         })
-      : undefined;
+      : null;
     const validContext = this.getCommonService().isValidUserContext(user);
 
-    if (linkToThread === null) {
+    if (linkToThread === null && !isNil(threadOf)) {
       throw new PluginError(400, "Thread does not exist");
     }
 
@@ -85,13 +87,13 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
       (await this.getCommonService().checkBadWords(content)) &&
       singleRelationFulfilled
     ) {
-      const { author = {}, ...rest } = data;
+      const { author, ...rest } = data;
       let authorData: CommentAuthorPartial = {};
       if (validContext && user) {
         authorData = {
           authorUser: user?.id,
         };
-      } else {
+      } else if (author) {
         if (author.email && !REGEX.email.test(author.email)) {
           throw new PluginError(
             400,
@@ -142,7 +144,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
         });
       return this.getCommonService().sanitizeCommentEntity({
         ...entity,
-        threadOf: !isNil(threadOf) ? linkToThread : null,
+        threadOf: linkToThread,
       });
     }
     throw new PluginError(400, "No content received");
@@ -153,7 +155,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
     this: IServiceClient,
     id: Id,
     relation: string,
-    data: ToBeFixed,
+    data: UpdateCommentPayload,
     user: StrapiUser = undefined
   ): Promise<Comment> {
     const { content } = data;
@@ -203,7 +205,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
     this: IServiceClient,
     id: Id,
     relation: string,
-    payload: ToBeFixed,
+    payload: CreateCommentReportPayload,
     user: StrapiUser = undefined
   ): Promise<CommentReport> {
     if (!this.getCommonService().isValidUserContext(user)) {

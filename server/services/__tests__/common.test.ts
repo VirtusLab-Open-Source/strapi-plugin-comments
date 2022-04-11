@@ -110,6 +110,7 @@ describe("Test Comments service functions utils", () => {
       content: "Test text",
       blocked: false,
       removed: true,
+      threadOf: null,
     };
 
     const authorSample = {

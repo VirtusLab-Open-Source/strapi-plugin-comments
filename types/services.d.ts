@@ -123,17 +123,17 @@ export interface IServiceAdmin {
 
 export interface IServiceClient {
   getCommonService(): IServiceCommon;
-  create(relation: string, data: ToBeFixed, user: StrapiUser): Promise<Comment>;
+  create(relation: string, data: CreateCommentPayload, user: StrapiUser): Promise<Comment>;
   update(
     id: Id,
     relation: string,
-    data: ToBeFixed,
+    data: UpdateCommentPayload,
     user: StrapiUser
   ): Promise<Comment>;
   reportAbuse(
     id: Id,
     relation: string,
-    payload: ToBeFixed,
+    payload: CreateCommentReportPayload,
     user: StrapiUser
   ): Promise<CommentReport>;
   markAsRemoved(

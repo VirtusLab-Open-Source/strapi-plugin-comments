@@ -185,7 +185,11 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       };
     }
 
-    const entriesWithThreads = await Promise.all(
+    const entriesWithThreads = await Promise.all<{
+      id: Id;
+      itemsInTread: number;
+      firstThreadItemId: Id | undefined;
+    }>(
       entries.map(async (_: Comment) => {
         const [nestedEntries, count] = await strapi.db
           .query<Comment>(getModelUid("comment"))
@@ -197,7 +201,7 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
         return {
           id: _.id,
           itemsInTread: count,
-          firstThreadItemId: first<ToBeFixed>(nestedEntries)?.id,
+          firstThreadItemId: first<Comment | undefined>(nestedEntries)?.id,
         };
       })
     );
@@ -207,11 +211,15 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
         ? [relatedEntity]
         : await this.findRelatedEntitiesFor([...entries]);
     const hasRelatedEntitiesToMap =
-      relatedEntities.filter((_: Comment) => _).length > 0;
+      relatedEntities.filter((_: RelatedEntity) => _).length > 0;
 
     const result = entries.map((_: Comment) => {
       const threadedItem = entriesWithThreads.find(
-        (item: Comment) => item.id === _.id
+        (item: {
+          id: Id;
+          itemsInTread: number;
+          firstThreadItemId: Id | undefined;
+        }) => item.id === _.id
       );
       const parsedThreadOf = isString(query.threadOf)
         ? parseInt(query.threadOf)

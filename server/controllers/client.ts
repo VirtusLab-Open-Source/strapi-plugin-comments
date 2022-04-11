@@ -1,4 +1,17 @@
-import { ToBeFixed } from "../../types";
+import {
+  Comment,
+  CommentReport,
+  CreateCommentPayload,
+  CreateCommentReportPayload,
+  IControllerClient,
+  Id,
+  IServiceClient,
+  IServiceCommon,
+  ThrowablePromisedResponse,
+  ToBeFixed,
+  UpdateCommentPayload,
+} from "../../types";
+import { StrapiRequestContext, StrapiPaginatedResponse } from "strapi-typed";
 
 import {
   assertNotEmpty,
@@ -7,15 +20,19 @@ import {
 } from "./../utils/functions";
 import { parseParams, throwError } from "./utils/functions";
 import { flatInput } from "./utils/parsers";
+import PluginError from "../utils/error";
 
-const controllers: ToBeFixed = {
+const controllers: IControllerClient = {
   getService(name = "client") {
     return getPluginService(name);
   },
 
-  async findAllFlat(ctx: ToBeFixed) {
+  async findAllFlat(
+    this: IControllerClient,
+    ctx: StrapiRequestContext<never, ToBeFixed>
+  ): ThrowablePromisedResponse<StrapiPaginatedResponse<Comment>> {
     const { params = {}, query, sort, pagination } = ctx;
-    const { relation } = parseParams(params);
+    const { relation } = parseParams<{ relation: string }>(params);
 
     const {
       sort: querySort,
@@ -24,9 +41,9 @@ const controllers: ToBeFixed = {
     } = query || {};
 
     try {
-      assertParamsPresent(params, ["relation"]);
+      assertParamsPresent<{ relation: string }>(params, ["relation"]);
 
-      return this.getService("common").findAllFlat(
+      return this.getService<IServiceCommon>("common").findAllFlat(
         flatInput(
           relation,
           filterQuery,
@@ -34,111 +51,156 @@ const controllers: ToBeFixed = {
           pagination || queryPagination
         )
       );
-    } catch (e) {
-      throwError(ctx, e);
+    } catch (e: ToBeFixed) {
+      throw throwError(ctx, e);
     }
   },
 
-  async findAllInHierarchy(ctx: ToBeFixed) {
-    const { params = {}, query, sort } = ctx;
-    const { relation } = parseParams(params);
+  async findAllInHierarchy(
+    this: IControllerClient,
+    ctx: StrapiRequestContext<never, ToBeFixed>
+  ): ThrowablePromisedResponse<Array<Comment>> {
+    const { params, query, sort } = ctx;
+    const { relation } = parseParams<{ relation: string }>(params);
 
     const { sort: querySort, ...filterQuery } = query || {};
 
     try {
-      assertParamsPresent(params, ["relation"]);
+      assertParamsPresent<{ relation: string }>(params, ["relation"]);
 
-      return await this.getService("common").findAllInHierarchy({
-        ...flatInput(relation, filterQuery, sort || querySort),
-        dropBlockedThreads: true,
-      });
-    } catch (e) {
-      throwError(ctx, e);
+      return await this.getService<IServiceCommon>("common").findAllInHierarchy(
+        {
+          ...flatInput(relation, filterQuery, sort || querySort),
+          dropBlockedThreads: true,
+        }
+      );
+    } catch (e: ToBeFixed) {
+      throw throwError(ctx, e);
     }
   },
 
-  async post(ctx: ToBeFixed) {
-    const { request, params = {}, state = {} } = ctx;
-    const { relation } = parseParams(params);
+  async post(
+    this: IControllerClient,
+    ctx: StrapiRequestContext<CreateCommentPayload>
+  ): ThrowablePromisedResponse<Comment> {
+    const { request, params, state = {} } = ctx;
+    const { relation } = parseParams<{
+      relation: string;
+    }>(params);
     const { user } = state;
-    const { body = {} } = request;
+    const { body } = request;
     try {
-      assertParamsPresent(params, ["relation"]);
-      assertNotEmpty(body);
+      assertParamsPresent<{ relation: string }>(params, ["relation"]);
+      assertNotEmpty<CreateCommentPayload>(body);
 
-      const entity = await this.getService().create(relation, body, user);
+      const entity = await this.getService<IServiceClient>().create(
+        relation,
+        body,
+        user
+      );
 
       if (entity) {
         return entity;
       }
-    } catch (e) {
-      throwError(ctx, e);
+      throw new PluginError(400, "Comment hasn't been created");
+    } catch (e: ToBeFixed) {
+      throw throwError(ctx, e);
     }
   },
 
-  async put(ctx: ToBeFixed) {
+  async put(
+    this: IControllerClient,
+    ctx: StrapiRequestContext<UpdateCommentPayload>
+  ): ThrowablePromisedResponse<Comment> {
     const { request, state, params = {} } = ctx;
-    const { body = {} } = request;
+    const { body } = request;
     const { user } = state;
-    const { commentId, relation } = parseParams(params);
+    const { commentId, relation } = parseParams<{
+      relation: string;
+      commentId: Id;
+    }>(params);
     try {
-      assertParamsPresent(params, ["commentId", "relation"]);
-      assertNotEmpty(body);
+      assertParamsPresent<{
+        relation: string;
+        commentId: Id;
+      }>(params, ["commentId", "relation"]);
+      assertNotEmpty<UpdateCommentPayload>(body);
 
-      return await this.getService().update(commentId, relation, body, user);
-    } catch (e) {
-      throwError(ctx, e);
+      return await this.getService<IServiceClient>().update(
+        commentId,
+        relation,
+        body,
+        user
+      );
+    } catch (e: ToBeFixed) {
+      throw throwError(ctx, e);
     }
   },
 
-  async reportAbuse(ctx: ToBeFixed) {
+  async reportAbuse(
+    this: IControllerClient,
+    ctx: StrapiRequestContext<CreateCommentReportPayload>
+  ): ThrowablePromisedResponse<CommentReport> {
     const { request, state, params = {} } = ctx;
-    const { body = {} } = request;
-
-    assertNotEmpty(body);
-
-    if (!body.content) {
-      return ctx.badRequest(null, "Content field is required");
-    }
+    const { body } = request;
     const { user } = state;
-    const { relation, commentId } = parseParams(params);
+    const { relation, commentId } = parseParams<{
+      relation: string;
+      commentId: Id;
+    }>(params);
+
     try {
       assertParamsPresent(params, ["commentId", "relation"]);
+      assertNotEmpty<CreateCommentReportPayload>(body);
 
-      return await this.getService().reportAbuse(
+      if (!body.content) {
+        throw new PluginError(400, "Content field is required");
+      }
+      return await this.getService<IServiceClient>().reportAbuse(
         commentId,
         relation,
         body,
         user
       );
     } catch (e) {
-      throwError(ctx, e);
+      throw throwError(ctx, e);
     }
   },
 
-  async removeComment(ctx: ToBeFixed) {
+  async removeComment(
+    this: IControllerClient,
+    ctx: StrapiRequestContext<never>
+  ): ThrowablePromisedResponse<Comment> {
     const {
       params,
       query,
       state: { user },
     } = ctx;
 
-    const { relationId, commentId } = parseParams(params);
+    const { relation, commentId } = parseParams<{
+      relation: string;
+      commentId: Id;
+    }>(params);
     const { authorId } = parseParams(query);
 
     try {
-      assertParamsPresent(params, ["commentId", "relationId"]);
-      assertParamsPresent(query, ["authorId"]);
+      assertParamsPresent<{
+        relation: string;
+        commentId: Id;
+      }>(params, ["commentId", "relation"]);
+      assertParamsPresent<{
+        authorId: Id;
+      }>(query, ["authorId"]);
 
       if (authorId || user?.id) {
-        return await this.getService().markAsRemoved(
+        return await this.getService<IServiceClient>().markAsRemoved(
           commentId,
-          relationId,
+          relation,
           authorId,
           user
         );
       }
-      return ctx.badRequest("Not provided authorId");
+      return new PluginError(400, "Not provided authorId");
     } catch (e: ToBeFixed) {
       if (!e.isBoom) {
         throwError(ctx, e);

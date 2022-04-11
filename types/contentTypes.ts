@@ -1,24 +1,27 @@
 import { StrapiUser } from "strapi-typed";
-import { ToBeFixed } from "./common";
 
 export type Id = number | string;
 
 export type Comment = {
   id: Id;
-  content?: string;
+  content: string;
   author?: CommentAuthor | undefined;
   children?: Array<Comment>;
   reports?: Array<CommentReport>;
-  threadOf?: Comment | number | null;
+  threadOf: Comment | number | null;
   gotThread?: boolean;
   related?: any;
   blocked?: boolean;
   blockedThread?: boolean;
   itemsInTread?: number;
-  approvalStatus?: ToBeFixed | null;
+  approvalStatus?: CommentApprovalStatus | null;
   firstThreadItemId?: Id;
   threadFirstItemId?: Id;
 } & CommentAuthorPartial;
+
+export type CommentModelKeys = keyof Comment;
+
+type CommentApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export type CommentAuthor = {
   id: Id;
@@ -28,7 +31,7 @@ export type CommentAuthor = {
 };
 
 export type CommentAuthorPartial = {
-  authorId?: number;
+  authorId?: Id;
   authorName?: string;
   authorEmail?: string;
   authorAvatar?: string;
