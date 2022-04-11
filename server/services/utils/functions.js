@@ -70,7 +70,7 @@ module.exports = {
     buildNestedStructure,
 
     buildAuthorModel: (item) => {
-        const { authorUser, authorId, authorName, authorEmail, authorAvatar, ...rest } = item;
+        const { authorUser, authorId, authorName, authorEmail, authorAvatar, authorUrl, ...rest } = item;
         let author = {};
         if (authorUser) {
             author = {
@@ -85,6 +85,7 @@ module.exports = {
                 name: authorName,
                 email: authorEmail,
                 avatar: authorAvatar,
+                url: authorUrl,
             };
         }
         return {
