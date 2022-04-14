@@ -35,16 +35,16 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 
 ### Table of Contents
 
-1. [✨ Features](#✨-features)
-2. [⏳ Installation](#⏳-installation)
-3. [🖐 Requirements](#🖐-requirements)
-4. [🔧 Configuration](#🔧-configuration)
+1. [✨ Features](#-features)
+2. [⏳ Installation](#-installation)
+3. [🖐 Requirements](#-requirements)
+4. [🔧 Configuration](#-configuration)
    - [Settings page](#in-v203-and-newer)
    - [Plugin file](#in-v202-and-older--default-configuration-state-for-v203-and-newer)
-5. [🕸️ Public API - REST](#🕸️-public-rest-api-specification)
-6. [🕸️ Public API - GraphQL](#🕸️-public-graphql-specification)
-7. [🤝 Contributing](#🤝-contributing)
-8. [👨‍💻 Community support](#👨‍💻-community-support)
+5. [🕸️ Public API - REST](#%EF%B8%8F-public-rest-api-specification)
+6. [🕸️ Public API - GraphQL](#%EF%B8%8F-public-graphql-specification)
+7. [🤝 Contributing](#-contributing)
+8. [👨‍💻 Community support](#-community-support)
 
 ## ✨ Features
 
