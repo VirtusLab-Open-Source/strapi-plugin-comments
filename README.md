@@ -33,6 +33,20 @@
 
 A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provides end to end comments feature with their moderation panel, bad words filtering, abuse reporting and much more.
 
+### Table of Contents
+
+1. [✨ Features](#✨-features)
+2. [⏳ Installation](#⏳-installation)
+3. [🖐 Requirements](#🖐-requirements)
+4. [🔧 Basic Configuration](#🔧-configuration)
+   - [Settings page](#in-v203-and-newer)
+   - [Plugin file](#in-v202-and-older--default-configuration-state-for-v203-and-newer)
+5. [🔧 GraphQL Configuration](#🔧-gql-configuration)
+6. [🕸️ Public API - REST](#🕸️-public-rest-api-specification)
+7. [🕸️ Public API - GraphQL](#🕸️-public-graphql-specification)
+9. [🤝 Contributing](#🤝-contributing)
+10. [👨‍💻 Community support](#👨‍💻-community-support)
+
 ## ✨ Features
 
 - **Comments Public REST + GraphQL API:** Elegant, entirely customizable and a fully extensible admin panel.
@@ -49,13 +63,23 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 
 ## ⏳ Installation
 
+### Via Strapi Markerplace
+
+As a ✅ **verified** plugin by Strapi team we're available on the [**Strapi Marketplace**](https://market.strapi.io/plugins/strapi-plugin-comments) as well as **In-App Marketplace** where you can follow the installation instructions.
+
+<div style="margin: 20px 0" align="center">
+  <img style="width: 100%; height: auto;" src="public/assets/marketplace.png" alt="Strapi In-App Marketplace" />
+</div>
+
+### Via command line
+
 (Use **yarn** to install this plugin within your Strapi project (recommended). [Install yarn with these docs](https://yarnpkg.com/lang/en/docs/install/).)
 
 ```bash
 yarn add strapi-plugin-comments@latest
 ```
 
-After successful installation you've to build a fresh package that includes  plugin UI. To archive that simply use:
+After successful installation you've to re-build your Strapi instance. To archive that simply use:
 
 ```bash
 yarn build
@@ -70,7 +94,9 @@ yarn develop --watch-admin
 
 The **Comments** plugin should appear in the **Plugins** section of Strapi sidebar after you run app again.
 
-Enjoy 🎉
+As a next step you must configure your the plugin by the way you want to. See [**Configuration**](#🔧-configuration) section.
+
+All done. Enjoy 🎉
 
 ## 🖐 Requirements
 
@@ -84,7 +110,7 @@ In our minimum support we're following [official Node.js releases timelines](htt
 
 **Supported Strapi versions**:
 
-- Strapi v4.1.2 (recently tested)
+- Strapi v4.1.7 (recently tested)
 - Strapi v4.x
 
 > This plugin is designed for **Strapi v4** and is not working with v3.x. To get version for **Strapi v3** install version [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3).
@@ -93,14 +119,22 @@ In our minimum support we're following [official Node.js releases timelines](htt
 
 ## 🔧 Configuration
 
-### In `v2.0.3` and newest
+To start your journey with **Comments plugin** you must first setup it using the dedicated Settings page (`v2.0.3` and newer) or for any version, put your configuration in `config/plugins.js`. Anyway we're recommending the click-through option where your configuration is going to be properly validated.
+
+### In `v2.0.3` and newer
 
 Version `2.0.3` introduce the intuitive **Settings** page which you can easly access via `Strapi Settings -> Section: Comments Plugin -> Configuration`. On dedicated page you will be able to setup all crucial properties which drives the plugin and customize each individual collection for which **Comments plugin** should be enabled.
+
+On the dedicated page, you will be able to set up all crucial properties which drive the plugin and customize each individual collection for which **Comments plugin** should be enabled.
+
+<div style="margin: 20px 0" align="center">
+  <img style="width: 100%; height: auto;" src="public/assets/configuration.png" alt="Plugin configuration" />
+</div>
 
 > *Note*
 > Default configuration for your plugin is fetched from `config/plugins.js` or directly from the plugin itself. If you would like to customize the default state to which you might revert, please follow the next section.
 
-### In `v2.0.2` and older + default configuration state for `v2.0.3` and newest
+### In `v2.0.2` and older + default configuration state for `v2.0.3` and newer
 
 To setup amend default plugin configuration we recommend to put following snippet as part of `config/plugins.js` or `config/<env>/plugins.js` file. If the file does not exist yet, you have to create it manually. If you've got already configurations for other plugins stores by this way, use just the `comments` part within exising `plugins` item.
 
@@ -131,6 +165,7 @@ To setup amend default plugin configuration we recommend to put following snippe
 ```
 
 ### Properties
+- `enabledCollections` - list of Collection and Single Types for which plugin should be enabled in format like `'api::<collection name>.<content type name>'`. By default it's empty and none comments are not enabled for any of type in Strapi.
 - `badWords` - Enabled support for [bad words filtering](https://www.npmjs.com/package/bad-words). Can be turned off or overwritten using [options reference](https://www.npmjs.com/package/bad-words#constructor). Default value: `true`. 
 - `moderatorRoles` - Optional list of names of roles. Users with those roles will be notified by email when a new abuse report is created. This feature requires a built-in [Strapi email plugin](https://docs.strapi.io/developer-docs/latest/plugins/email.html) configured.
 - `approvalFlow` - list of Content Types which are supporting approval flow. Values must be in format like `'api::<collection name>.<content type name>'`. For not included, posted comments are going to be immediately visible. 
