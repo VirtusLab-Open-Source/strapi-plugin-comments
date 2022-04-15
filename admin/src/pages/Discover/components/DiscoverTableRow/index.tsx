@@ -5,7 +5,6 @@ import PropTypes from "prop-types";
 import { useIntl } from "react-intl";
 import { useMutation, useQueryClient } from "react-query";
 import { isNil, isEmpty } from "lodash";
-import { Avatar, Initials } from "@strapi/design-system/Avatar";
 import { Flex } from "@strapi/design-system/Flex";
 import { IconButton } from "@strapi/design-system/IconButton";
 import { Link } from "@strapi/design-system/Link";
@@ -18,7 +17,6 @@ import {
   getMessage,
   getUrl,
   handleAPIError,
-  renderInitials,
   resolveCommentStatus,
   resolveCommentStatusColor,
 } from "../../../../utils";
@@ -31,6 +29,7 @@ import DiscussionThreadItemApprovalFlowActions from "../../../../components/Disc
 import StatusBadge from "../../../../components/StatusBadge";
 import { IconButtonGroupStyled } from "../../../../components/IconButton/styles";
 import DiscussionThreadItemReviewAction from "../../../../components/DiscussionThreadItemReviewAction";
+import UserAvatar from "../../../../components/Avatar";
 
 const DiscoverTableRow = ({
   config,
@@ -154,11 +153,7 @@ const DiscoverTableRow = ({
       </Td>
       <Td>
         <Stack size={2} horizontal>
-          {item.author?.avatar ? (
-            <Avatar src={item.author?.avatar} alt={item.author.name} />
-          ) : (
-            <Initials>{renderInitials(item.author.name)}</Initials>
-          )}
+          <UserAvatar avatar={item.author?.avatar} name={item.author.name} />
           <Typography textColor="neutral800" variant="pi">
             {item.author.name}
           </Typography>

@@ -168,7 +168,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       .findMany({
         ...params,
         populate: {
-          authorUser: true,
+          authorUser: { populate: { avatar: true } },
           threadOf: true,
           reports: {
             where: {
@@ -185,7 +185,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     const result = entities
       .map((_) =>
         filterOurResolvedReports(
-          this.getCommonService().sanitizeCommentEntity(_)
+          this.getCommonService().sanitizeCommentEntity(_, { avatar: true })
         )
       )
       .map((_) =>
@@ -226,10 +226,14 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
 
     const defaultPopulate = {
       populate: {
-        authorUser: true,
+        authorUser: {
+          populate: { avatar: true }
+        },
         threadOf: {
           populate: {
-            authorUser: true,
+            authorUser: {
+              populate: { avatar: true }
+            },
             ...reportsPopulation,
           },
         },
@@ -288,7 +292,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     const selectedEntity = this.getCommonService().sanitizeCommentEntity({
       ...entity,
       threadOf: entity.threadOf || null,
-    });
+    }, { avatar: true });
 
     return {
       entity: relatedEntity,

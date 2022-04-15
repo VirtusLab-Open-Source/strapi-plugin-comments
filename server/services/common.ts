@@ -20,6 +20,7 @@ import {
   StrapiResponseMeta,
   StrapiPaginatedResponse,
   StrapiDBQueryArgs,
+  StringMap,
 } from "strapi-typed";
 import {
   CommentsPluginConfig,
@@ -240,7 +241,7 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
         threadOf: parsedThreadOf || _.threadOf || null,
         gotThread: (threadedItem?.itemsInTread || 0) > 0,
         threadFirstItemId: threadedItem?.firstThreadItemId,
-      });
+      }, populate?.authorUser?.populate);
     });
 
     return {
@@ -386,14 +387,16 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
     }
   },
 
-  sanitizeCommentEntity(entity: Comment): Comment {
+  sanitizeCommentEntity(entity: Comment, populate?: StringMap<boolean | Array<string> | StringMap<unknown>>): Comment {
+    const fieldsToPopulate = isArray(populate) ? populate : Object.keys(populate || {});
+
     return {
       ...buildAuthorModel({
         ...entity,
         threadOf: isObject(entity.threadOf)
-          ? buildAuthorModel(entity.threadOf)
+          ? buildAuthorModel(entity.threadOf, fieldsToPopulate)
           : entity.threadOf,
-      }),
+      }, fieldsToPopulate),
     };
   },
 

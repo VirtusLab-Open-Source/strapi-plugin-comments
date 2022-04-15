@@ -1,11 +1,11 @@
-import { StrapiUser } from "strapi-typed";
+import { StrapiUser, StringMap } from "strapi-typed";
 
 export type Id = number | string;
 
-export type Comment = {
+export type Comment<TAuthor = CommentAuthor> = {
   id: Id;
   content: string;
-  author?: CommentAuthor | undefined;
+  author?: TAuthor | undefined;
   children?: Array<Comment>;
   reports?: Array<CommentReport>;
   threadOf: Comment | number | null;
@@ -37,6 +37,8 @@ export type CommentAuthorPartial = {
   authorAvatar?: string;
   authorUser?: StrapiUser;
 };
+
+export type CommentAuthorResolved = CommentAuthor & StringMap<unknown>;
 
 export type CommentReport = {
   id: Id;

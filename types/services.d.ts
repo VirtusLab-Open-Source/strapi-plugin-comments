@@ -92,7 +92,7 @@ export interface IServiceCommon {
     fieldName: string,
     value: any
   ): Promise<boolean>;
-  sanitizeCommentEntity(entity: Comment): Comment;
+  sanitizeCommentEntity(entity: Comment, populate?: StringMap<boolean | Array<string> | StringMap<unknown>>): Comment;
   isValidUserContext(user?: any): boolean;
   parseRelationString(
     relation: string

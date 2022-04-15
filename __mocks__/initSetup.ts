@@ -22,7 +22,7 @@ export = (config: any = {}, toStore: boolean = false, database: any = {}) => {
         const parseValues = (values: any[], args: any = {}) => values.map(_ => {
           const { select = [] } = args;
           if (!isEmpty(select)) {
-            return pick(_, [...select, 'threadOf', 'authorUser']); // Relation fields can't be "unselected"
+            return pick(_, [...select, 'threadOf']);
           }
           return _;
         })

@@ -10,10 +10,43 @@ export const flatInput = <T, TKeys = keyof T>(payload: FlatInput<OnlyStrings<TKe
     fields
   } = payload;
 
-  const filters = query?.filters || query;
+  
+  const { populate = {}, ...restQuery } = query;
+  const filters = restQuery?.filters || restQuery;
   const orOperator = (filters?.$or || []).filter(
     (_: ToBeFixed) => !Object.keys(_).includes("removed")
   );
+
+  let basePopulate = {
+    ...populate,
+  };
+
+  let threadOfPopulate = {
+    threadOf: {
+      populate: { 
+        authorUser: true,
+        ...populate,
+      },
+    },
+  };
+  
+  // Cover case when someone wants to populate author instead of authorUser
+  if (populate.author) { 
+    const { author, ...restPopulate } = populate;
+    basePopulate = {
+      ...restPopulate,
+      authorUser: author
+    };
+    threadOfPopulate = {
+      threadOf: {
+        populate: { 
+          authorUser: author,
+          ...restPopulate,
+        },
+      },
+    };
+  }
+
   return {
     query: {
       ...filters,
@@ -21,9 +54,8 @@ export const flatInput = <T, TKeys = keyof T>(payload: FlatInput<OnlyStrings<TKe
       related: relation,
     },
     populate: {
-      threadOf: {
-        populate: { authorUser: true },
-      },
+      ...basePopulate,
+      ...threadOfPopulate,
     },
     pagination,
     sort,
