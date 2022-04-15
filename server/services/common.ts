@@ -10,6 +10,7 @@ import {
   parseInt,
   set,
   get,
+  uniq,
 } from "lodash";
 import {
   Id,
@@ -18,6 +19,7 @@ import {
   StrapiPagination,
   StrapiResponseMeta,
   StrapiPaginatedResponse,
+  StrapiDBQueryArgs,
 } from "strapi-typed";
 import {
   CommentsPluginConfig,
@@ -25,8 +27,9 @@ import {
   FindAllInHierarhyProps,
   IServiceCommon,
   ToBeFixed,
+  Comment, 
+  RelatedEntity
 } from "../../types";
-import { Comment, RelatedEntity } from "../../types/contentTypes";
 import { REGEX, CONFIG_PARAMS } from "../utils/constants";
 import PluginError from "./../utils/error";
 import {
@@ -81,14 +84,15 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
   // Find comments in the flat structure
   async findAllFlat(
     this: IServiceCommon,
-    { query = {}, populate = {}, sort, pagination }: FindAllFlatProps,
+    { query = {}, populate = {}, sort, pagination, fields }: FindAllFlatProps<Comment>,
     relatedEntity: RelatedEntity | null = null
   ): Promise<StrapiPaginatedResponse<Comment>> {
+    const defaultSelect: Array<keyof Comment> = ['id', 'related'];
     const defaultPopulate = {
       authorUser: true,
     };
 
-    let queryExtension = {};
+    let queryExtension: StrapiDBQueryArgs<keyof Comment> = {};
 
     if (sort && (isString(sort) || isArray(sort))) {
       queryExtension = {
@@ -99,6 +103,13 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
             const [type = "asc", ...parts] = curr.split(":").reverse();
             return { ...set(prev, parts.reverse().join("."), type) };
           }, {}),
+      };
+    }
+
+    if (!isNil(fields)) {
+      queryExtension = {
+        ...queryExtension,
+        select: isArray(fields) ? uniq([...fields, ...defaultSelect]) : fields
       };
     }
 
@@ -249,13 +260,14 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       query,
       populate = {},
       sort,
+      fields,
       startingFromId = null,
       dropBlockedThreads = false,
     }: FindAllInHierarhyProps,
     relatedEntity?: RelatedEntity | null | boolean
   ): Promise<Array<Comment>> {
     const entities = await this.findAllFlat(
-      { query, populate, sort },
+      { query, populate, sort, fields },
       relatedEntity
     );
     return buildNestedStructure(

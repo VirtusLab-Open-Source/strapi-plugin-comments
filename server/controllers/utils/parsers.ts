@@ -1,11 +1,12 @@
-import { Id } from "strapi-typed";
+import { Id, OnlyStrings, StrapiRequestQueryFieldsClause } from "strapi-typed";
 import { ToBeFixed } from "../../../types";
 
-export const flatInput = (
+export const flatInput = <T, TKeys = keyof T>(
   relation: Id,
   query: ToBeFixed,
   sort: ToBeFixed,
-  pagination?: ToBeFixed
+  pagination?: ToBeFixed,
+  fields?: StrapiRequestQueryFieldsClause<OnlyStrings<TKeys>>,
 ) => {
   const filters = query?.filters || query;
   const orOperator = (filters?.$or || []).filter(
@@ -24,5 +25,6 @@ export const flatInput = (
     },
     pagination,
     sort,
+    fields,
   };
 };

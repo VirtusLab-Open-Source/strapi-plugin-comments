@@ -14,7 +14,6 @@ type findAllInHierarchyProps = {
   relation: Id;
   filters: ToBeFixed;
   sort: ToBeFixed;
-  pagination: ToBeFixed;
 };
 
 export = ({ strapi, nexus }: StrapiGraphQLContext) => {

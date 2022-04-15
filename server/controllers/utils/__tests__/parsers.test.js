@@ -17,6 +17,7 @@ describe("Test Comments controller parsers utils", () => {
       page: 3,
       pageSize: 5,
     };
+    const fields = ["content"];
 
     test("Should contain default property 'populate'", () => {
       expect(flatInput()).toHaveProperty(
@@ -64,6 +65,11 @@ describe("Test Comments controller parsers utils", () => {
         ["pagination", "pageSize"],
         pagination.pageSize
       );
+    });
+
+    test("Should assign fields", () => {
+      const result = flatInput(relation, filters, sort, undefined, fields);
+      expect(result).toHaveProperty(["fields", 0], fields[0]);
     });
 
     test("Should build complex output", () => {

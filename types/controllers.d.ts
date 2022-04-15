@@ -65,7 +65,7 @@ export interface IControllerAdmin {
     ctx: StrapiRequestContext
   ): ThrowablePromisedResponse<SettingsCommentsPluginConfig>;
   settingsUpdateConfig(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext<SettingsCommentsPluginConfig>
   ): ThrowablePromisedResponse<SettingsCommentsPluginConfig>;
   settingsRestoreConfig(
     ctx: StrapiRequestContext<SettingsCommentsPluginConfig>

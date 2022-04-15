@@ -309,6 +309,7 @@ Return a hierarchical tree structure of comments for specified instance of Conte
 
 #### Strapi REST API properties support:
 
+- [field selection](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/populating-fields.html#field-selection)
 - [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
 
 ### Get Comments (flat structure)
@@ -350,6 +351,7 @@ Return a flat structure of comments for specified instance of Content Type like 
 #### Strapi REST API properties support:
 
 - [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/filtering-locale-publication.html#filtering)
+- [field selection](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/populating-fields.html#field-selection)
 - [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
 - [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#pagination)
 

@@ -37,6 +37,7 @@ const controllers: IControllerClient = {
     const {
       sort: querySort,
       pagination: queryPagination,
+      fields,
       ...filterQuery
     } = query || {};
 
@@ -48,7 +49,8 @@ const controllers: IControllerClient = {
           relation,
           filterQuery,
           sort || querySort,
-          pagination || queryPagination
+          pagination || queryPagination,
+          fields
         )
       );
     } catch (e: ToBeFixed) {
@@ -63,14 +65,14 @@ const controllers: IControllerClient = {
     const { params, query, sort } = ctx;
     const { relation } = parseParams<{ relation: string }>(params);
 
-    const { sort: querySort, ...filterQuery } = query || {};
+    const { sort: querySort, fields, ...filterQuery } = query || {};
 
     try {
       assertParamsPresent<{ relation: string }>(params, ["relation"]);
 
       return await this.getService<IServiceCommon>("common").findAllInHierarchy(
         {
-          ...flatInput(relation, filterQuery, sort || querySort),
+          ...flatInput<Comment>(relation, filterQuery, sort || querySort, undefined, fields),
           dropBlockedThreads: true,
         }
       );
