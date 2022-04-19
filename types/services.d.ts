@@ -99,6 +99,7 @@ export interface IServiceCommon {
     relation: string
   ): Promise<[uid: string, relatedId: string | number]>;
   checkBadWords(content: string): Promise<boolean | string | PluginError>;
+  isEnabledCollection(uid: string): Promise<boolean>;
 }
 
 export interface IServiceAdmin {
