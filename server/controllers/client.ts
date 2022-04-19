@@ -45,13 +45,13 @@ const controllers: IControllerClient = {
       assertParamsPresent<{ relation: string }>(params, ["relation"]);
 
       return this.getService<IServiceCommon>("common").findAllFlat(
-        flatInput(
+        flatInput({
           relation,
-          filterQuery,
-          sort || querySort,
-          pagination || queryPagination,
+          query: filterQuery,
+          sort: sort || querySort,
+          pagination: pagination || queryPagination,
           fields
-        )
+        })
       );
     } catch (e: ToBeFixed) {
       throw throwError(ctx, e);
@@ -72,7 +72,12 @@ const controllers: IControllerClient = {
 
       return await this.getService<IServiceCommon>("common").findAllInHierarchy(
         {
-          ...flatInput<Comment>(relation, filterQuery, sort || querySort, undefined, fields),
+          ...flatInput<Comment>({
+            relation, 
+            query: filterQuery, 
+            sort: sort || querySort, 
+            fields
+          }),
           dropBlockedThreads: true,
         }
       );

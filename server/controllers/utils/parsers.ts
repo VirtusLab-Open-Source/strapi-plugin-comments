@@ -1,13 +1,15 @@
-import { Id, OnlyStrings, StrapiRequestQueryFieldsClause } from "strapi-typed";
-import { ToBeFixed } from "../../../types";
+import { OnlyStrings } from "strapi-typed";
+import { FlatInput, ToBeFixed } from "../../../types";
 
-export const flatInput = <T, TKeys = keyof T>(
-  relation: Id,
-  query: ToBeFixed,
-  sort: ToBeFixed,
-  pagination?: ToBeFixed,
-  fields?: StrapiRequestQueryFieldsClause<OnlyStrings<TKeys>>,
-) => {
+export const flatInput = <T, TKeys = keyof T>(payload: FlatInput<OnlyStrings<TKeys>>) => {
+  const { 
+    relation,
+    query,
+    sort,
+    pagination,
+    fields
+  } = payload;
+
   const filters = query?.filters || query;
   const orOperator = (filters?.$or || []).filter(
     (_: ToBeFixed) => !Object.keys(_).includes("removed")

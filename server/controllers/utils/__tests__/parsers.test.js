@@ -5,7 +5,7 @@ jest.mock;
 describe("Test Comments controller parsers utils", () => {
   describe("Flat Input properties", () => {
     const relation = "api::test.relation";
-    const filters = {
+    const query = {
       content: {
         $eq: "Test",
       },
@@ -27,17 +27,20 @@ describe("Test Comments controller parsers utils", () => {
     });
 
     test("Should assign relation to 'query'", () => {
-      expect(flatInput(relation)).toHaveProperty(
+      expect(flatInput({ relation })).toHaveProperty(
         ["query", "related"],
         relation
       );
     });
 
     test("Should assign filters to 'query'", () => {
-      const result = flatInput(relation, filters);
+      const result = flatInput({
+        relation, 
+        query,
+      });
       expect(result).toHaveProperty(
         ["query", "content", "$eq"],
-        filters.content["$eq"]
+        query.content["$eq"]
       );
     });
 
@@ -45,7 +48,10 @@ describe("Test Comments controller parsers utils", () => {
       const overwrittenOrOperator = {
         $or: [{ removed: true }, { removed: false }, { removed: null }],
       };
-      const result = flatInput(relation, overwrittenOrOperator);
+      const result = flatInput({
+        relation, 
+        query: overwrittenOrOperator,
+      });
       expect(result).toHaveProperty(
         ["query", "$or", 0, "removed", "$null"],
         true
@@ -54,12 +60,21 @@ describe("Test Comments controller parsers utils", () => {
     });
 
     test("Should assign sort", () => {
-      const result = flatInput(relation, filters, sort);
+      const result = flatInput({
+        relation, 
+        query, 
+        sort
+      });
       expect(result).toHaveProperty(["sort", "createdAt"], sort.createdAt);
     });
 
     test("Should assign pagination", () => {
-      const result = flatInput(relation, filters, sort, pagination);
+      const result = flatInput({
+        relation, 
+        query,
+        sort,
+        pagination,
+      });
       expect(result).toHaveProperty(["pagination", "page"], pagination.page);
       expect(result).toHaveProperty(
         ["pagination", "pageSize"],
@@ -68,7 +83,12 @@ describe("Test Comments controller parsers utils", () => {
     });
 
     test("Should assign fields", () => {
-      const result = flatInput(relation, filters, sort, undefined, fields);
+      const result = flatInput({
+        relation, 
+        query, 
+        sort, 
+        fields,
+      });
       expect(result).toHaveProperty(["fields", 0], fields[0]);
     });
 
@@ -103,12 +123,12 @@ describe("Test Comments controller parsers utils", () => {
         },
       ];
 
-      const result = flatInput(
+      const result = flatInput({
         relation,
-        complexFilters,
-        complexSort,
-        pagination
-      );
+        query: complexFilters,
+        sort: complexSort,
+        pagination,
+      });
 
       expect(result).toHaveProperty(["query", "related"], relation);
       expect(result).toHaveProperty(

@@ -33,14 +33,14 @@ export = ({ strapi, nexus }: StrapiGraphQLContext) => {
       return await getPluginService<IServiceCommon>(
         "common"
       ).findAllInHierarchy({
-        ...flatInput(
+        ...flatInput({
           relation,
-          getPluginService<IServiceGraphQL>("gql").graphQLFiltersToStrapiQuery(
+          query: getPluginService<IServiceGraphQL>("gql").graphQLFiltersToStrapiQuery(
             filters,
             contentType
           ),
-          sort
-        ),
+          sort,
+        }),
         dropBlockedThreads: true,
       });
     },

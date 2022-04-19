@@ -11,6 +11,8 @@ import {
   StrapiQueryParamsParsedFilters,
   StrapiQueryParamsParsedOrderBy,
   StrapiUser,
+  StrapiRequestQueryFieldsClause,
+  OnlyStrings,
 } from "strapi-typed";
 import { ToBeFixed } from "./common";
 import {
@@ -33,6 +35,14 @@ import {
   AdminSinglePageResponse,
   CommentsPluginServices,
 } from "./services";
+
+export type FlatInput<TKeys extends string> = {
+  relation: Id,
+  query: ToBeFixed,
+  sort: ToBeFixed,
+  pagination?: ToBeFixed,
+  fields?: StrapiRequestQueryFieldsClause<TKeys>,
+}
 
 export type ThrowableResponse<T> = T | PluginError | never;
 export type ThrowablePromisedResponse<T> = Promise<ThrowableResponse<T>>;
