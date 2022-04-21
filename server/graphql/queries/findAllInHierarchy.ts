@@ -14,7 +14,6 @@ type findAllInHierarchyProps = {
   relation: Id;
   filters: ToBeFixed;
   sort: ToBeFixed;
-  pagination: ToBeFixed;
 };
 
 export = ({ strapi, nexus }: StrapiGraphQLContext) => {
@@ -34,14 +33,14 @@ export = ({ strapi, nexus }: StrapiGraphQLContext) => {
       return await getPluginService<IServiceCommon>(
         "common"
       ).findAllInHierarchy({
-        ...flatInput(
+        ...flatInput({
           relation,
-          getPluginService<IServiceGraphQL>("gql").graphQLFiltersToStrapiQuery(
+          query: getPluginService<IServiceGraphQL>("gql").graphQLFiltersToStrapiQuery(
             filters,
             contentType
           ),
-          sort
-        ),
+          sort,
+        }),
         dropBlockedThreads: true,
       });
     },

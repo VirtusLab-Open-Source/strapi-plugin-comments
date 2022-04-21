@@ -1,4 +1,4 @@
-import { get, set, isEmpty } from "lodash";
+import { get, set, pick, isEmpty } from "lodash";
 
 // @ts-ignore
 export = (config: any = {}, toStore: boolean = false, database: any = {}) => {
@@ -18,9 +18,18 @@ export = (config: any = {}, toStore: boolean = false, database: any = {}) => {
         const [handler, rest] = uid.split("::");
         const [collection] = rest.split(".");
         const values = get(mock.db, `${handler}.${collection}.records`, []);
+
+        const parseValues = (values: any[], args: any = {}) => values.map(_ => {
+          const { select = [] } = args;
+          if (!isEmpty(select)) {
+            return pick(_, [...select, 'threadOf', 'authorUser']); // Relation fields can't be "unselected"
+          }
+          return _;
+        })
+
         return {
-          findOne: async () => new Promise((resolve) => resolve(values[0])),
-          findMany: async () => new Promise((resolve) => resolve(values)),
+          findOne: async (args: any) => new Promise((resolve) => resolve(parseValues(values, args)[0])),
+          findMany: async (args: any) => new Promise((resolve) => resolve(parseValues(values, args))),
           findWithCount: async () =>
             new Promise((resolve) => resolve([values, values.length])),
           count: async () => new Promise((resolve) => resolve(values.length)),

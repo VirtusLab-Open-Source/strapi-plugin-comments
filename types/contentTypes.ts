@@ -40,6 +40,7 @@ export type CommentAuthorPartial = {
 
 export type CommentReport = {
   id: Id;
+  related: Comment | Id;
   reason: any;
   content: string;
   resolved: boolean;

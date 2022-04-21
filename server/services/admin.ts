@@ -140,7 +140,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       $or: [{ removed: false }, { removed: null }],
     };
 
-    let params: StrapiDBQueryArgs = {
+    let params: StrapiDBQueryArgs<keyof Comment> = {
       where: !isEmpty(filters)
         ? {
             ...defaultWhere,
@@ -177,7 +177,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
           },
         },
       });
-    const total = await strapi.db.query<number>(getModelUid("comment")).count({
+    const total = await strapi.db.query<Comment>(getModelUid("comment")).count({
       where: params.where,
     });
     const relatedEntities =

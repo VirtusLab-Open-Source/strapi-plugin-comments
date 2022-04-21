@@ -10,6 +10,9 @@ import {
   StrapiQueryParamsParsedFilters,
   StrapiQueryParamsParsedOrderBy,
   StrapiUser,
+  OnlyStrings,
+  StringMap,
+  StrapiRequestQueryFieldsClause,
 } from "strapi-typed";
 import { ToBeFixed } from "./common";
 import {
@@ -26,17 +29,14 @@ export type AdminPaginatedResponse<T> = {
   result: Array<T>;
 } & StrapiResponseMeta;
 
-export type FindAllFlatProps = {
+export type FindAllFlatProps<T, TFields = keyof T> = {
   query: {
     threadOf?: number | string | null;
     [key: string]: any;
   } & {};
-  populate?: {
-    [key: string]: any;
-  };
-  sort?: {
-    [key: string]: any;
-  };
+  populate?: StringMap<unknown>;
+  sort?: StringMap<unknown>;
+  fields?: StrapiRequestQueryFieldsClause<OnlyStrings<TFields>>
   pagination?: StrapiPagination;
 };
 
@@ -74,7 +74,7 @@ export interface IServiceCommon {
   getPluginStore(): Promise<StrapiStore>;
   getLocalConfig<T>(path?: string, defaultValue?: any): T;
   findAllFlat(
-    props: FindAllFlatProps,
+    props: FindAllFlatProps<Comment>,
     relatedEntity?: RelatedEntity | null | boolean
   ): Promise<StrapiPaginatedResponse<Comment>>;
   findAllInHierarchy(

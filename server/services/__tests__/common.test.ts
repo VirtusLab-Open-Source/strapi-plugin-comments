@@ -13,6 +13,16 @@ const setup = (config = {}, toStore = false, database = {}) => {
   });
 };
 
+const filterOutUndefined = (_: any) => Object.keys(_).reduce((prev, curr) => {
+  if (_[curr] !== undefined) {
+    return {
+      ...prev,
+      [curr]: _[curr],
+    }
+  }
+  return prev;
+}, {});
+
 afterEach(() => {
   Object.defineProperty(global, "strapi", {});
 });
@@ -410,6 +420,19 @@ describe("Test Comments service functions utils", () => {
           expect(result.data.length).toBe(4);
           expect(result).toHaveProperty(["data", 0, "content"], db[0].content);
           expect(result).toHaveProperty(["data", 3, "content"], db[3].content);
+        });
+
+        test("Should return structure with selected fields only (+mandatory ones for logic)", async () => { // Default fields are: id, related, threadOf, gotThread
+          const result = await getPluginService<IServiceCommon>(
+            "common"
+          ).findAllFlat({ query: { related }, fields: ['content'] }, relatedEntity);
+          expect(result).toHaveProperty("data");
+          expect(result).not.toHaveProperty("meta");
+          expect(result.data.length).toBe(4);
+          expect(Object.keys(filterOutUndefined(result.data[0]))).toHaveLength(6);
+          expect(Object.keys(filterOutUndefined(result.data[1]))).toHaveLength(6);
+          expect(Object.keys(filterOutUndefined(result.data[2]))).toHaveLength(6);
+          expect(Object.keys(filterOutUndefined(result.data[3]))).toHaveLength(6);
         });
 
         test("Should return structure with pagination", async () => {
