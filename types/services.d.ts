@@ -34,8 +34,8 @@ export type FindAllFlatProps<T, TFields = keyof T> = {
     threadOf?: number | string | null;
     [key: string]: any;
   } & {};
-  populate?: StringMap<any>;
-  sort?: StringMap<any>;
+  populate?: StringMap<unknown>;
+  sort?: StringMap<unknown>;
   fields?: StrapiRequestQueryFieldsClause<OnlyStrings<TFields>>
   pagination?: StrapiPagination;
 };
