@@ -1,11 +1,11 @@
-import { StrapiUser, StringMap } from "strapi-typed";
+import { OnlyStrings, StrapiUser, StringMap } from "strapi-typed";
 
 export type Id = number | string;
 
 export type Comment<TAuthor = CommentAuthor> = {
   id: Id;
   content: string;
-  author?: TAuthor | undefined;
+  author?: TAuthor;
   children?: Array<Comment>;
   reports?: Array<CommentReport>;
   threadOf: Comment | number | null;
@@ -19,7 +19,7 @@ export type Comment<TAuthor = CommentAuthor> = {
   threadFirstItemId?: Id;
 } & CommentAuthorPartial;
 
-export type CommentModelKeys = keyof Comment;
+export type CommentModelKeys = OnlyStrings<keyof Comment>;
 
 type CommentApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
 
@@ -38,7 +38,7 @@ export type CommentAuthorPartial = {
   authorUser?: StrapiUser;
 };
 
-export type CommentAuthorResolved = CommentAuthor & StringMap<unknown>;
+export type CommentAuthorResolved<TExtension = StringMap<unknown>> = CommentAuthor & TExtension;
 
 export type CommentReport = {
   id: Id;

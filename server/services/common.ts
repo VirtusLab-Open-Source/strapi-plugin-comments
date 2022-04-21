@@ -20,7 +20,9 @@ import {
   StrapiResponseMeta,
   StrapiPaginatedResponse,
   StrapiDBQueryArgs,
-  StringMap,
+  PopulateClause,
+  StrapiUser,
+  OnlyStrings,
 } from "strapi-typed";
 import {
   CommentsPluginConfig,
@@ -29,7 +31,8 @@ import {
   IServiceCommon,
   ToBeFixed,
   Comment, 
-  RelatedEntity
+  RelatedEntity,
+  CommentModelKeys
 } from "../../types";
 import { REGEX, CONFIG_PARAMS } from "../utils/constants";
 import PluginError from "./../utils/error";
@@ -88,12 +91,14 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
     { query = {}, populate = {}, sort, pagination, fields }: FindAllFlatProps<Comment>,
     relatedEntity: RelatedEntity | null = null
   ): Promise<StrapiPaginatedResponse<Comment>> {
-    const defaultSelect: Array<keyof Comment> = ['id', 'related'];
-    const defaultPopulate = {
+    const defaultSelect: Array<CommentModelKeys> = ['id', 'related'];
+    
+    const populateClause: PopulateClause<CommentModelKeys> = {
       authorUser: true,
+      ...(isObject(populate) ? populate : {}),
     };
 
-    let queryExtension: StrapiDBQueryArgs<keyof Comment> = {};
+    let queryExtension: StrapiDBQueryArgs<CommentModelKeys> = {};
 
     if (sort && (isString(sort) || isArray(sort))) {
       queryExtension = {
@@ -164,8 +169,7 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
           ...query,
         },
         populate: {
-          ...defaultPopulate,
-          ...populate,
+          ...populateClause
         },
         ...queryExtension,
       });
@@ -236,12 +240,18 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       const parsedThreadOf = isString(query.threadOf)
         ? parseInt(query.threadOf)
         : query.threadOf;
+
+      let authorUserPopulate = {};
+      if (isObject(populateClause?.authorUser)) {
+        authorUserPopulate = populateClause.authorUser;
+      }
+
       return this.sanitizeCommentEntity({
         ..._,
         threadOf: parsedThreadOf || _.threadOf || null,
         gotThread: (threadedItem?.itemsInTread || 0) > 0,
         threadFirstItemId: threadedItem?.firstThreadItemId,
-      }, populate?.authorUser?.populate);
+      }, authorUserPopulate);
     });
 
     return {
@@ -387,7 +397,7 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
     }
   },
 
-  sanitizeCommentEntity(entity: Comment, populate?: StringMap<boolean | Array<string> | StringMap<unknown>>): Comment {
+  sanitizeCommentEntity(entity: Comment, populate?: PopulateClause<OnlyStrings<keyof StrapiUser>>): Comment {
     const fieldsToPopulate = isArray(populate) ? populate : Object.keys(populate || {});
 
     return {
