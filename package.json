@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "2.0.11",
+  "version": "2.1.0-beta.1",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
@@ -10,29 +10,59 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "publish:latest": "npm publish --tag latest",
-    "test:unit": "jest --verbose --coverage"
+    "publish:latest": "cd build && npm publish --tag latest",
+    "prepublish:latest": "npm run clean && npm run build && node build/setup-package.js",
+    "build": "tsc && yarn copy-translations",
+    "build:dev": "yarn run build && cp ./package.json ./build",
+    "copy-translations": "copyfiles admin/src/translations/*.json build/",
+    "clean": "rm -rf build",
+    "develop": "nodemon --exec \"yarn build:dev\"",
+    "test:unit": "jest --verbose --coverage",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/VirtusLab-Open-Source/strapi-plugin-comments"
   },
   "dependencies": {
-    "@strapi/utils": "^4.1.7",
-    "@strapi/plugin-graphql": "^4.1.7",
+    "@strapi/utils": "^4.1.8",
+    "@strapi/plugin-graphql": "^4.1.8",
     "bad-words": "^3.0.4"
   },
   "devDependencies": {
+    "@types/bad-words": "^3.0.1",
+    "@types/jest": "^27.4.1",
     "codecov": "^3.7.2",
-    "jest": "^26.0.1",
-    "jest-cli": "^26.0.1",
-    "jest-styled-components": "^7.0.2",
-    "koa": "2.13.3",
+    "copyfiles": "^2.4.1",
     "husky": "7.0.4",
-    "prettier": "2.5.1"
+    "jest": "^27.5.1",
+    "jest-cli": "^27.5.1",
+    "jest-styled-components": "^7.0.8",
+    "koa": "2.13.3",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.6.0",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^27.1.3",
+    "ts-node": "^10.7.0",
+    "strapi-typed": "^1.0.9",
+    "typescript": "^4.6.3"
   },
   "peerDependencies": {
     "@strapi/strapi": "4.x"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "./build/**/*",
+      "./__mocks__/*",
+      "./**/__tests__/*"
+    ],
+    "ext": "js,json,ts"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn format && yarn test:unit"
+    }
   },
   "author": {
     "name": "VirtusLab",
@@ -55,6 +85,10 @@
     "node": ">=14.x.x <=17.x.x",
     "npm": ">=7.x.x"
   },
-  "keywords": ["strapi", "plugin", "comments"],
+  "keywords": [
+    "strapi",
+    "plugin",
+    "comments"
+  ],
   "license": "MIT"
 }

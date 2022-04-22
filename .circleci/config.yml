@@ -43,6 +43,6 @@ jobs:
             - ./node_modules
           key: strapi-plugin-comments-v2-{{ checksum "yarn.lock" }}
 workflows:
-    build-and-test:
-      jobs:
-        - build-and-test
+  build-and-test:
+    jobs:
+      - build-and-test

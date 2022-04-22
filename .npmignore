@@ -5,3 +5,8 @@ coverage/
 .nvmrc
 .eslintrc
 codecov.yml
+*.map
+*.spec.*
+setup-package.*
+**/__tests__/**
+**/__mocks__/** 
