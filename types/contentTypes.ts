@@ -38,7 +38,8 @@ export type CommentAuthorPartial = {
   authorUser?: StrapiUser;
 };
 
-export type CommentAuthorResolved<TExtension = StringMap<unknown>> = CommentAuthor & TExtension;
+export type CommentAuthorResolved<TExtension = StringMap<unknown>> =
+  CommentAuthor & TExtension;
 
 export type CommentReport = {
   id: Id;

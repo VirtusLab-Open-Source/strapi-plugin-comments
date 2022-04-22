@@ -37,12 +37,12 @@ import {
 } from "./services";
 
 export type FlatInput<TKeys extends string> = {
-  relation: Id,
-  query: ToBeFixed,
-  sort: ToBeFixed,
-  pagination?: ToBeFixed,
-  fields?: StrapiRequestQueryFieldsClause<TKeys>,
-}
+  relation: Id;
+  query: ToBeFixed;
+  sort: ToBeFixed;
+  pagination?: ToBeFixed;
+  fields?: StrapiRequestQueryFieldsClause<TKeys>;
+};
 
 export type ThrowableResponse<T> = T | PluginError | never;
 export type ThrowablePromisedResponse<T> = Promise<ThrowableResponse<T>>;
@@ -110,7 +110,9 @@ export interface IControllerClient {
   findAllInHierarchy(
     ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<Array<Comment>>;
-  post(ctx: StrapiRequestContext<CreateCommentPayload>): ThrowablePromisedResponse<Comment>;
+  post(
+    ctx: StrapiRequestContext<CreateCommentPayload>
+  ): ThrowablePromisedResponse<Comment>;
   put(
     ctx: StrapiRequestContext<UpdateCommentPayload>
   ): ThrowablePromisedResponse<Comment>;

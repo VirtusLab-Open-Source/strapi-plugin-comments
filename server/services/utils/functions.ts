@@ -94,7 +94,10 @@ export const convertContentTypeNameToSlug = (str: string): string => {
     : plainConversion;
 };
 
-export const buildAuthorModel = (item: Comment, fieldsToPopulate: Array<string> = []): Comment => {
+export const buildAuthorModel = (
+  item: Comment,
+  fieldsToPopulate: Array<string> = []
+): Comment => {
   const {
     authorUser,
     authorId,
@@ -105,16 +108,21 @@ export const buildAuthorModel = (item: Comment, fieldsToPopulate: Array<string> 
   } = item;
   let author: CommentAuthor = {} as CommentAuthor;
   if (authorUser) {
-    author = fieldsToPopulate
-      .reduce((prev, curr) => ({
+    author = fieldsToPopulate.reduce(
+      (prev, curr) => ({
         ...prev,
         [curr]: authorUser[curr],
-      }), {
+      }),
+      {
         id: authorUser.id,
         name: authorUser.username,
         email: authorUser.email,
-        avatar: isString(authorUser.avatar) || isObject(authorUser.avatar) ? authorUser.avatar : undefined,
-      });
+        avatar:
+          isString(authorUser.avatar) || isObject(authorUser.avatar)
+            ? authorUser.avatar
+            : undefined,
+      }
+    );
   } else if (authorId) {
     author = {
       id: authorId,

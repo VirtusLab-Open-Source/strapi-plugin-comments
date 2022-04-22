@@ -37,7 +37,7 @@ export type FindAllFlatProps<T, TFields = keyof T> = {
   } & {};
   populate?: PopulateClause<OnlyStrings<TFields>>;
   sort?: StringMap<unknown>;
-  fields?: StrapiRequestQueryFieldsClause<OnlyStrings<TFields>>
+  fields?: StrapiRequestQueryFieldsClause<OnlyStrings<TFields>>;
   pagination?: StrapiPagination;
 };
 
@@ -93,7 +93,10 @@ export interface IServiceCommon {
     fieldName: string,
     value: any
   ): Promise<boolean>;
-  sanitizeCommentEntity(entity: Comment, populate?: PopulateClause<OnlyStrings<keyof StrapiUser>>): Comment;
+  sanitizeCommentEntity(
+    entity: Comment,
+    populate?: PopulateClause<OnlyStrings<keyof StrapiUser>>
+  ): Comment;
   isValidUserContext(user?: any): boolean;
   parseRelationString(
     relation: string
@@ -125,7 +128,11 @@ export interface IServiceAdmin {
 
 export interface IServiceClient {
   getCommonService(): IServiceCommon;
-  create(relation: string, data: CreateCommentPayload, user?: StrapiUser): Promise<Comment>;
+  create(
+    relation: string,
+    data: CreateCommentPayload,
+    user?: StrapiUser
+  ): Promise<Comment>;
   update(
     id: Id,
     relation: string,

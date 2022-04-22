@@ -30,10 +30,10 @@ import {
   FindAllInHierarhyProps,
   IServiceCommon,
   ToBeFixed,
-  Comment, 
+  Comment,
   RelatedEntity,
   CommentModelKeys,
-  SettingsCommentsPluginConfig
+  SettingsCommentsPluginConfig,
 } from "../../types";
 import { REGEX, CONFIG_PARAMS } from "../utils/constants";
 import PluginError from "./../utils/error";
@@ -89,11 +89,17 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
   // Find comments in the flat structure
   async findAllFlat(
     this: IServiceCommon,
-    { query = {}, populate = {}, sort, pagination, fields }: FindAllFlatProps<Comment>,
+    {
+      query = {},
+      populate = {},
+      sort,
+      pagination,
+      fields,
+    }: FindAllFlatProps<Comment>,
     relatedEntity: RelatedEntity | null = null
   ): Promise<StrapiPaginatedResponse<Comment>> {
-    const defaultSelect: Array<CommentModelKeys> = ['id', 'related'];
-    
+    const defaultSelect: Array<CommentModelKeys> = ["id", "related"];
+
     const populateClause: PopulateClause<CommentModelKeys> = {
       authorUser: true,
       ...(isObject(populate) ? populate : {}),
@@ -116,7 +122,7 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
     if (!isNil(fields)) {
       queryExtension = {
         ...queryExtension,
-        select: isArray(fields) ? uniq([...fields, ...defaultSelect]) : fields
+        select: isArray(fields) ? uniq([...fields, ...defaultSelect]) : fields,
       };
     }
 
@@ -170,7 +176,7 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
           ...query,
         },
         populate: {
-          ...populateClause
+          ...populateClause,
         },
         ...queryExtension,
       });
@@ -247,12 +253,15 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
         authorUserPopulate = populateClause.authorUser;
       }
 
-      return this.sanitizeCommentEntity({
-        ..._,
-        threadOf: parsedThreadOf || _.threadOf || null,
-        gotThread: (threadedItem?.itemsInTread || 0) > 0,
-        threadFirstItemId: threadedItem?.firstThreadItemId,
-      }, authorUserPopulate);
+      return this.sanitizeCommentEntity(
+        {
+          ..._,
+          threadOf: parsedThreadOf || _.threadOf || null,
+          gotThread: (threadedItem?.itemsInTread || 0) > 0,
+          threadFirstItemId: threadedItem?.firstThreadItemId,
+        },
+        authorUserPopulate
+      );
     });
 
     return {
@@ -398,16 +407,24 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
     }
   },
 
-  sanitizeCommentEntity(entity: Comment, populate?: PopulateClause<OnlyStrings<keyof StrapiUser>>): Comment {
-    const fieldsToPopulate = isArray(populate) ? populate : Object.keys(populate || {});
+  sanitizeCommentEntity(
+    entity: Comment,
+    populate?: PopulateClause<OnlyStrings<keyof StrapiUser>>
+  ): Comment {
+    const fieldsToPopulate = isArray(populate)
+      ? populate
+      : Object.keys(populate || {});
 
     return {
-      ...buildAuthorModel({
-        ...entity,
-        threadOf: isObject(entity.threadOf)
-          ? buildAuthorModel(entity.threadOf, fieldsToPopulate)
-          : entity.threadOf,
-      }, fieldsToPopulate),
+      ...buildAuthorModel(
+        {
+          ...entity,
+          threadOf: isObject(entity.threadOf)
+            ? buildAuthorModel(entity.threadOf, fieldsToPopulate)
+            : entity.threadOf,
+        },
+        fieldsToPopulate
+      ),
     };
   },
 
@@ -424,7 +441,6 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
     const relatedId = isNumber(parsedRelatedId)
       ? parsedRelatedId
       : relatedStringId;
-
 
     const isEnabledCollection: boolean = await this.isEnabledCollection(uid);
     const enabledCollections: Array<string> = await this.getConfig<
@@ -474,7 +490,9 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
     this: IServiceCommon,
     uid: string
   ): Promise<boolean> {
-    const enabledCollections = await this.getConfig<SettingsCommentsPluginConfig['enabledCollections']>('enabledCollections', []);
+    const enabledCollections = await this.getConfig<
+      SettingsCommentsPluginConfig["enabledCollections"]
+    >("enabledCollections", []);
     return enabledCollections.includes(uid);
-  }
+  },
 });

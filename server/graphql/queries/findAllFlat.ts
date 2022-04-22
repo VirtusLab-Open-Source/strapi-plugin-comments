@@ -40,18 +40,17 @@ export = ({ strapi, nexus }: StrapiGraphQLContext) => {
       return await getPluginService<IServiceCommon>("common").findAllFlat(
         flatInput({
           relation,
-          query: getPluginService<IServiceGraphQL>("gql").graphQLFiltersToStrapiQuery(
-            filters,
-            contentType
-          ),
+          query: getPluginService<IServiceGraphQL>(
+            "gql"
+          ).graphQLFiltersToStrapiQuery(filters, contentType),
           sort,
           pagination: pagination
             ? {
                 ...pagination,
                 withCount: !isEmpty(pagination),
               }
-            : undefined
-            }),
+            : undefined,
+        }),
         undefined
       );
     },

@@ -50,7 +50,7 @@ const controllers: IControllerClient = {
           query: filterQuery,
           sort: sort || querySort,
           pagination: pagination || queryPagination,
-          fields
+          fields,
         })
       );
     } catch (e: ToBeFixed) {
@@ -73,10 +73,10 @@ const controllers: IControllerClient = {
       return await this.getService<IServiceCommon>("common").findAllInHierarchy(
         {
           ...flatInput<Comment>({
-            relation, 
-            query: filterQuery, 
-            sort: sort || querySort, 
-            fields
+            relation,
+            query: filterQuery,
+            sort: sort || querySort,
+            fields,
           }),
           dropBlockedThreads: true,
         }

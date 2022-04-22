@@ -51,7 +51,8 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
       relation
     );
 
-    const isEnabledCollection = await this.getCommonService().isEnabledCollection(uid);
+    const isEnabledCollection =
+      await this.getCommonService().isEnabledCollection(uid);
     if (!isEnabledCollection) {
       throw new PluginError(
         400,
@@ -75,7 +76,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
     const isApprovalFlowEnabled =
       approvalFlow.includes(uid) || relatedEntity.requireCommentsApproval;
 
-    let  linkToThread;
+    let linkToThread;
     try {
       linkToThread = !isNil(threadOf)
         ? await this.getCommonService().findOne({
@@ -83,7 +84,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
             related: relation,
           })
         : null;
-    } catch(e: unknown) {
+    } catch (e: unknown) {
       throw new PluginError(400, "Thread does not exist");
     }
 
@@ -119,8 +120,8 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
         };
       }
 
-      const authorNotProperlyProvided = !isEmpty(authorData) &&
-        !(authorData.authorId || authorData.authorUser);
+      const authorNotProperlyProvided =
+        !isEmpty(authorData) && !(authorData.authorId || authorData.authorUser);
       if (isEmpty(authorData) || authorNotProperlyProvided) {
         throw new PluginError(
           400,
@@ -264,7 +265,6 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
         `You're not allowed to take an action on that entity. Make sure that comment exist or you've authenticated your request properly.`
       );
     }
-  
   },
 
   async markAsRemoved(

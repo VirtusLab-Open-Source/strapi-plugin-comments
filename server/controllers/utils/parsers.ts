@@ -1,16 +1,11 @@
 import { OnlyStrings } from "strapi-typed";
 import { FlatInput, ToBeFixed } from "../../../types";
 
-export const flatInput = <T, TKeys = keyof T>(payload: FlatInput<OnlyStrings<TKeys>>) => {
-  const { 
-    relation,
-    query,
-    sort,
-    pagination,
-    fields
-  } = payload;
+export const flatInput = <T, TKeys = keyof T>(
+  payload: FlatInput<OnlyStrings<TKeys>>
+) => {
+  const { relation, query, sort, pagination, fields } = payload;
 
-  
   const { populate = {}, ...restQuery } = query;
   const filters = restQuery?.filters || restQuery;
   const orOperator = (filters?.$or || []).filter(
@@ -23,23 +18,23 @@ export const flatInput = <T, TKeys = keyof T>(payload: FlatInput<OnlyStrings<TKe
 
   let threadOfPopulate = {
     threadOf: {
-      populate: { 
+      populate: {
         authorUser: true,
         ...populate,
       },
     },
   };
-  
+
   // Cover case when someone wants to populate author instead of authorUser
-  if (populate.author) { 
+  if (populate.author) {
     const { author, ...restPopulate } = populate;
     basePopulate = {
       ...restPopulate,
-      authorUser: author
+      authorUser: author,
     };
     threadOfPopulate = {
       threadOf: {
-        populate: { 
+        populate: {
           authorUser: author,
           ...restPopulate,
         },

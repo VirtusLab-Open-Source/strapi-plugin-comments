@@ -188,7 +188,10 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     const result = entities
       .map((_) =>
         filterOurResolvedReports(
-          this.getCommonService().sanitizeCommentEntity(_, DEFAULT_AUTHOR_POPULATE)
+          this.getCommonService().sanitizeCommentEntity(
+            _,
+            DEFAULT_AUTHOR_POPULATE
+          )
         )
       )
       .map((_) =>
@@ -292,10 +295,13 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
         },
         false
       );
-    const selectedEntity = this.getCommonService().sanitizeCommentEntity({
-      ...entity,
-      threadOf: entity.threadOf || null,
-    }, DEFAULT_AUTHOR_POPULATE);
+    const selectedEntity = this.getCommonService().sanitizeCommentEntity(
+      {
+        ...entity,
+        threadOf: entity.threadOf || null,
+      },
+      DEFAULT_AUTHOR_POPULATE
+    );
 
     return {
       entity: relatedEntity,

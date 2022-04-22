@@ -35,7 +35,7 @@ describe("Test Comments controller parsers utils", () => {
 
     test("Should assign filters to 'query'", () => {
       const result = flatInput({
-        relation, 
+        relation,
         query,
       });
       expect(result).toHaveProperty(
@@ -49,7 +49,7 @@ describe("Test Comments controller parsers utils", () => {
         $or: [{ removed: true }, { removed: false }, { removed: null }],
       };
       const result = flatInput({
-        relation, 
+        relation,
         query: overwrittenOrOperator,
       });
       expect(result).toHaveProperty(
@@ -61,16 +61,16 @@ describe("Test Comments controller parsers utils", () => {
 
     test("Should assign sort", () => {
       const result = flatInput({
-        relation, 
-        query, 
-        sort
+        relation,
+        query,
+        sort,
       });
       expect(result).toHaveProperty(["sort", "createdAt"], sort.createdAt);
     });
 
     test("Should assign pagination", () => {
       const result = flatInput({
-        relation, 
+        relation,
         query,
         sort,
         pagination,
@@ -84,9 +84,9 @@ describe("Test Comments controller parsers utils", () => {
 
     test("Should assign fields", () => {
       const result = flatInput({
-        relation, 
-        query, 
-        sort, 
+        relation,
+        query,
+        sort,
         fields,
       });
       expect(result).toHaveProperty(["fields", 0], fields[0]);

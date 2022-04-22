@@ -13,15 +13,16 @@ const setup = (config = {}, toStore = false, database = {}) => {
   });
 };
 
-const filterOutUndefined = (_: any) => Object.keys(_).reduce((prev, curr) => {
-  if (_[curr] !== undefined) {
-    return {
-      ...prev,
-      [curr]: _[curr],
+const filterOutUndefined = (_: any) =>
+  Object.keys(_).reduce((prev, curr) => {
+    if (_[curr] !== undefined) {
+      return {
+        ...prev,
+        [curr]: _[curr],
+      };
     }
-  }
-  return prev;
-}, {});
+    return prev;
+  }, {});
 
 afterEach(() => {
   Object.defineProperty(global, "strapi", {});
@@ -337,7 +338,7 @@ describe("Test Comments service - Common", () => {
         ).isEnabledCollection(wrongUid);
         expect(result).toBe(false);
       });
-      
+
       test("Should return true", async () => {
         const result = await getPluginService<IServiceCommon>(
           "common"
@@ -369,10 +370,7 @@ describe("Test Comments service - Common", () => {
       ).mergeRelatedEntityTo(comment, [relatedEntity]);
       expect(result).toHaveProperty("id", 1);
       expect(result).not.toHaveProperty("related", related);
-      expect(result).toHaveProperty(
-        ["related", "title"],
-        relatedEntity.title
-      );
+      expect(result).toHaveProperty(["related", "title"], relatedEntity.title);
     });
   });
 
@@ -419,9 +417,9 @@ describe("Test Comments service - Common", () => {
           email: "joe@example.com",
           avatar: {
             id: 1,
-            url: 'http://example.com'
-          }
-        }
+            url: "http://example.com",
+          },
+        },
       },
     ];
     const relatedEntity = { id: 1, title: "Test", uid: collection };
@@ -448,10 +446,14 @@ describe("Test Comments service - Common", () => {
         expect(result).toHaveProperty(["data", 3, "content"], db[3].content);
       });
 
-      test("Should return structure with selected fields only (+mandatory ones for logic)", async () => { // Default fields are: id, related, threadOf, gotThread
+      test("Should return structure with selected fields only (+mandatory ones for logic)", async () => {
+        // Default fields are: id, related, threadOf, gotThread
         const result = await getPluginService<IServiceCommon>(
           "common"
-        ).findAllFlat({ query: { related }, fields: ['content'] }, relatedEntity);
+        ).findAllFlat(
+          { query: { related }, fields: ["content"] },
+          relatedEntity
+        );
         expect(result).toHaveProperty("data");
         expect(result).not.toHaveProperty("meta");
         expect(result.data.length).toBe(4);
@@ -464,18 +466,25 @@ describe("Test Comments service - Common", () => {
       test("Should return structure with populated avatar field", async () => {
         const result = await getPluginService<IServiceCommon>(
           "common"
-        ).findAllFlat({ 
-          query: { related },
-          populate: { 
-            authorUser: { 
-              populate: { avatar: true },
+        ).findAllFlat(
+          {
+            query: { related },
+            populate: {
+              authorUser: {
+                populate: { avatar: true },
+              },
             },
-          }
-        }, relatedEntity);
+          },
+          relatedEntity
+        );
         expect(result).toHaveProperty("data");
         expect(result).not.toHaveProperty("meta");
         expect(result.data.length).toBe(4);
-        expect(result).toHaveProperty(["data", 3, "author", "avatar", "url"], db[3].authorUser.avatar.url);
+        expect(result).toHaveProperty(
+          ["data", 3, "author", "avatar", "url"],
+          // @ts-ignore
+          db[3].authorUser.avatar.url
+        );
       });
 
       test("Should return structure with pagination", async () => {
@@ -564,9 +573,9 @@ describe("Test Comments service - Common", () => {
 
     describe("findOne", () => {
       test("Should return proper structure", async () => {
-        const result = await getPluginService<IServiceCommon>(
-          "common"
-        ).findOne({ related });
+        const result = await getPluginService<IServiceCommon>("common").findOne(
+          { related }
+        );
         expect(result).toHaveProperty("id", db[0].id);
         expect(result).toHaveProperty("content", db[0].content);
         expect(result).toHaveProperty(["author", "id"], db[0].authorId);

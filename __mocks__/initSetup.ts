@@ -19,17 +19,20 @@ export = (config: any = {}, toStore: boolean = false, database: any = {}) => {
         const [collection] = rest.split(".");
         const values = get(mock.db, `${handler}.${collection}.records`, []);
 
-        const parseValues = (values: any[], args: any = {}) => values.map(_ => {
-          const { select = [] } = args;
-          if (!isEmpty(select)) {
-            return pick(_, [...select, 'threadOf']);
-          }
-          return _;
-        })
+        const parseValues = (values: any[], args: any = {}) =>
+          values.map((_) => {
+            const { select = [] } = args;
+            if (!isEmpty(select)) {
+              return pick(_, [...select, "threadOf"]);
+            }
+            return _;
+          });
 
         return {
-          findOne: async (args: any) => new Promise((resolve) => resolve(parseValues(values, args)[0])),
-          findMany: async (args: any) => new Promise((resolve) => resolve(parseValues(values, args))),
+          findOne: async (args: any) =>
+            new Promise((resolve) => resolve(parseValues(values, args)[0])),
+          findMany: async (args: any) =>
+            new Promise((resolve) => resolve(parseValues(values, args))),
           findWithCount: async () =>
             new Promise((resolve) => resolve([values, values.length])),
           count: async () => new Promise((resolve) => resolve(values.length)),
