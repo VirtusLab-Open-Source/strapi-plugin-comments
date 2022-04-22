@@ -521,7 +521,6 @@ describe("Test Comments service - Common", () => {
         expect(result[0]?.children?.length).toBe(1);
         expect(result).toHaveProperty([0, "children", 0, "content"], "DEF");
         expect(result).toHaveProperty([0, "children", 0, "children"]);
-
         // @ts-ignore
         expect(result[0]?.children[0]?.children?.length).toBe(1);
         expect(result).toHaveProperty(
