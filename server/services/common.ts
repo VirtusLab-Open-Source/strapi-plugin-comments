@@ -32,7 +32,8 @@ import {
   ToBeFixed,
   Comment, 
   RelatedEntity,
-  CommentModelKeys
+  CommentModelKeys,
+  SettingsCommentsPluginConfig
 } from "../../types";
 import { REGEX, CONFIG_PARAMS } from "../utils/constants";
 import PluginError from "./../utils/error";
@@ -424,10 +425,13 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       ? parsedRelatedId
       : relatedStringId;
 
+
+    const isEnabledCollection: boolean = await this.isEnabledCollection(uid);
     const enabledCollections: Array<string> = await this.getConfig<
       Array<string>
     >(CONFIG_PARAMS.ENABLED_COLLECTIONS, []);
-    if (!enabledCollections.includes(uid)) {
+
+    if (!isEnabledCollection) {
       throw new PluginError(
         403,
         `Action not allowed for collection '${uid}'. Use one of: ${enabledCollections.join(
@@ -465,4 +469,12 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
     }
     return content;
   },
+
+  async isEnabledCollection(
+    this: IServiceCommon,
+    uid: string
+  ): Promise<boolean> {
+    const enabledCollections = await this.getConfig<SettingsCommentsPluginConfig['enabledCollections']>('enabledCollections', []);
+    return enabledCollections.includes(uid);
+  }
 });

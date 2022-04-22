@@ -99,6 +99,7 @@ export interface IServiceCommon {
     relation: string
   ): Promise<[uid: string, relatedId: string | number]>;
   checkBadWords(content: string): Promise<boolean | string | PluginError>;
+  isEnabledCollection(uid: string): Promise<boolean>;
 }
 
 export interface IServiceAdmin {
@@ -124,24 +125,24 @@ export interface IServiceAdmin {
 
 export interface IServiceClient {
   getCommonService(): IServiceCommon;
-  create(relation: string, data: CreateCommentPayload, user: StrapiUser): Promise<Comment>;
+  create(relation: string, data: CreateCommentPayload, user?: StrapiUser): Promise<Comment>;
   update(
     id: Id,
     relation: string,
     data: UpdateCommentPayload,
-    user: StrapiUser
+    user?: StrapiUser
   ): Promise<Comment>;
   reportAbuse(
     id: Id,
     relation: string,
     payload: CreateCommentReportPayload,
-    user: StrapiUser
+    user?: StrapiUser
   ): Promise<CommentReport>;
   markAsRemoved(
     id: Id,
     relation: string,
     authorId: Id,
-    user: StrapiUser
+    user?: StrapiUser
   ): Promise<Comment>;
   sendAbuseReportEmail(reason: string, content: string): Promise<void>;
   markAsRemovedNested(id: Id, status: boolean): Promise<boolean>;

@@ -12,7 +12,7 @@ import {
 } from "../../types";
 
 import { getPluginService } from "./../utils/functions";
-import { isNil, isEmpty } from "lodash";
+import { isNil, isEmpty, isString } from "lodash";
 import PluginError from "./../utils/error";
 import {
   isEqualEntity,
@@ -51,6 +51,14 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
       relation
     );
 
+    const isEnabledCollection = await this.getCommonService().isEnabledCollection(uid);
+    if (!isEnabledCollection) {
+      throw new PluginError(
+        400,
+        `Field "related" refer to not enabled collection. Please amend the plugin settings and try again`
+      );
+    }
+
     const relatedEntity = await strapi.db
       .query<RelatedEntity>(uid)
       .findOne(relatedId);
@@ -67,17 +75,19 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
     const isApprovalFlowEnabled =
       approvalFlow.includes(uid) || relatedEntity.requireCommentsApproval;
 
-    const linkToThread = !isNil(threadOf)
-      ? await this.getCommonService().findOne({
-          id: threadOf,
-          related: relation,
-        })
-      : null;
-    const validContext = this.getCommonService().isValidUserContext(user);
-
-    if (linkToThread === null && !isNil(threadOf)) {
+    let  linkToThread;
+    try {
+      linkToThread = !isNil(threadOf)
+        ? await this.getCommonService().findOne({
+            id: threadOf,
+            related: relation,
+          })
+        : null;
+    } catch(e: unknown) {
       throw new PluginError(400, "Thread does not exist");
     }
+
+    const validContext = this.getCommonService().isValidUserContext(user);
 
     if (!validContext) {
       throw resolveUserContextError(user);
@@ -105,14 +115,13 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
           authorId: author.id,
           authorName: author.name,
           authorEmail: author.email,
-          authorAvatar: author.avatar,
+          authorAvatar: isString(author.avatar) ? author.avatar : undefined,
         };
       }
 
-      if (
-        !isEmpty(authorData) &&
-        !(authorData.authorId || authorData.authorUser)
-      ) {
+      const authorNotProperlyProvided = !isEmpty(authorData) &&
+        !(authorData.authorId || authorData.authorUser);
+      if (isEmpty(authorData) || authorNotProperlyProvided) {
         throw new PluginError(
           400,
           `Not able to recognise author of a comment. Make sure you've provided "author" property in a payload or authenticated your request properly.`
@@ -214,39 +223,48 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
 
     await this.getCommonService().parseRelationString(relation);
 
-    const reportAgainstEntity = await this.getCommonService().findOne({
-      id,
-      related: relation,
-    });
-    if (reportAgainstEntity) {
-      const entity = await strapi.db
-        .query<CommentReport>(getModelUid("comment-report"))
-        .create({
-          data: {
-            ...payload,
-            resolved: false,
-            related: id,
-          },
-        });
-      if (entity) {
-        const response = {
-          ...entity,
-          related: reportAgainstEntity,
-        };
-        try {
-          await this.sendAbuseReportEmail(entity.reason, entity.content); // Could also add some info about relation
-          return response;
-        } catch (err) {
-          return response;
+    try {
+      const reportAgainstEntity = await this.getCommonService().findOne({
+        id,
+        related: relation,
+      });
+
+      if (reportAgainstEntity) {
+        const entity = await strapi.db
+          .query<CommentReport>(getModelUid("comment-report"))
+          .create({
+            data: {
+              ...payload,
+              resolved: false,
+              related: id,
+            },
+          });
+        if (entity) {
+          const response = {
+            ...entity,
+            related: reportAgainstEntity,
+          };
+          try {
+            await this.sendAbuseReportEmail(entity.reason, entity.content); // Could also add some info about relation
+            return response;
+          } catch (err) {
+            return response;
+          }
+        } else {
+          throw new PluginError(500, "Report cannot be created");
         }
-      } else {
-        throw new PluginError(500, "Report cannot be created");
       }
+      throw new PluginError(
+        403,
+        `You're not allowed to take an action on that entity. Make sure that comment exist or you've authenticated your request properly.`
+      );
+    } catch (e) {
+      throw new PluginError(
+        403,
+        `You're not allowed to take an action on that entity. Make sure that comment exist or you've authenticated your request properly.`
+      );
     }
-    throw new PluginError(
-      403,
-      `You're not allowed to take an action on that entity. Make sure that comment exist or you've authenticated your request properly.`
-    );
+  
   },
 
   async markAsRemoved(

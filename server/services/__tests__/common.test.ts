@@ -27,7 +27,7 @@ afterEach(() => {
   Object.defineProperty(global, "strapi", {});
 });
 
-describe("Test Comments service functions utils", () => {
+describe("Test Comments service - Common", () => {
   describe("Get plugin store", () => {
     beforeEach(() => setup());
 
@@ -328,11 +328,59 @@ describe("Test Comments service functions utils", () => {
       });
     });
 
-    describe("Merge related entity", () => {
+    describe("Validate if collection is enabled", () => {
       beforeEach(() => setup({ enabledCollections: [uid] }));
-      const collection = "api::collection.test";
-      const related = `${collection}:1`;
-      const comment = {
+
+      test("Should return false", async () => {
+        const result = await getPluginService<IServiceCommon>(
+          "common"
+        ).isEnabledCollection(wrongUid);
+        expect(result).toBe(false);
+      });
+      
+      test("Should return true", async () => {
+        const result = await getPluginService<IServiceCommon>(
+          "common"
+        ).isEnabledCollection(uid);
+        expect(result).toBe(true);
+      });
+    });
+  });
+
+  describe("Merge related entity", () => {
+    const collection = "api::collection.test";
+    const related = `${collection}:1`;
+    const comment = {
+      id: 1,
+      content: "ABC",
+      threadOf: null,
+      related,
+      authorId: 1,
+      authorName: "Joe Doe",
+      authorEmail: "joe@example.com",
+    };
+    const relatedEntity = { id: 1, title: "Test", uid: collection };
+
+    beforeEach(() => setup({ enabledCollections: [collection] }));
+
+    test("Should merge related entity", async () => {
+      const result = await getPluginService<IServiceCommon>(
+        "common"
+      ).mergeRelatedEntityTo(comment, [relatedEntity]);
+      expect(result).toHaveProperty("id", 1);
+      expect(result).not.toHaveProperty("related", related);
+      expect(result).toHaveProperty(
+        ["related", "title"],
+        relatedEntity.title
+      );
+    });
+  });
+
+  describe("Common API", () => {
+    const collection = "api::collection.test";
+    const related = `${collection}:1`;
+    const db: Array<Comment> = [
+      {
         id: 1,
         content: "ABC",
         threadOf: null,
@@ -340,231 +388,201 @@ describe("Test Comments service functions utils", () => {
         authorId: 1,
         authorName: "Joe Doe",
         authorEmail: "joe@example.com",
-      };
-      const relatedEntity = { id: 1, title: "Test", uid: collection };
+      },
+      {
+        id: 2,
+        content: "DEF",
+        threadOf: 1,
+        related,
+        authorId: 1,
+        authorName: "Joe Doe",
+        authorEmail: "joe@example.com",
+        blockedThread: true,
+      },
+      {
+        id: 3,
+        content: "GHJ",
+        threadOf: null,
+        related,
+        authorId: 1,
+        authorName: "Joe Doe",
+        authorEmail: "joe@example.com",
+      },
+      {
+        id: 4,
+        content: "IKL",
+        threadOf: 2,
+        related,
+        authorUser: {
+          id: 1,
+          username: "Joe Doe",
+          email: "joe@example.com",
+          avatar: {
+            id: 1,
+            url: 'http://example.com'
+          }
+        }
+      },
+    ];
+    const relatedEntity = { id: 1, title: "Test", uid: collection };
 
-      test("Should merge related entity", async () => {
+    beforeEach(() =>
+      setup({ enabledCollections: [collection] }, true, {
+        "plugins::comments": db,
+        "api::collection": [
+          relatedEntity,
+          { id: 2, title: "Test 2", uid: collection },
+        ],
+      })
+    );
+
+    describe("findAllFlat", () => {
+      test("Should return proper structure", async () => {
         const result = await getPluginService<IServiceCommon>(
           "common"
-        ).mergeRelatedEntityTo(comment, [relatedEntity]);
-        expect(result).toHaveProperty("id", 1);
-        expect(result).not.toHaveProperty("related", related);
-        expect(result).toHaveProperty(
-          ["related", "title"],
-          relatedEntity.title
+        ).findAllFlat({ query: { related } }, relatedEntity);
+        expect(result).toHaveProperty("data");
+        expect(result).not.toHaveProperty("meta");
+        expect(result.data.length).toBe(4);
+        expect(result).toHaveProperty(["data", 0, "content"], db[0].content);
+        expect(result).toHaveProperty(["data", 3, "content"], db[3].content);
+      });
+
+      test("Should return structure with selected fields only (+mandatory ones for logic)", async () => { // Default fields are: id, related, threadOf, gotThread
+        const result = await getPluginService<IServiceCommon>(
+          "common"
+        ).findAllFlat({ query: { related }, fields: ['content'] }, relatedEntity);
+        expect(result).toHaveProperty("data");
+        expect(result).not.toHaveProperty("meta");
+        expect(result.data.length).toBe(4);
+        expect(Object.keys(filterOutUndefined(result.data[0]))).toHaveLength(6);
+        expect(Object.keys(filterOutUndefined(result.data[1]))).toHaveLength(6);
+        expect(Object.keys(filterOutUndefined(result.data[2]))).toHaveLength(6);
+        expect(Object.keys(filterOutUndefined(result.data[3]))).toHaveLength(6);
+      });
+
+      test("Should return structure with populated avatar field", async () => {
+        const result = await getPluginService<IServiceCommon>(
+          "common"
+        ).findAllFlat({ 
+          query: { related },
+          populate: { 
+            authorUser: { 
+              populate: { avatar: true },
+            },
+          }
+        }, relatedEntity);
+        expect(result).toHaveProperty("data");
+        expect(result).not.toHaveProperty("meta");
+        expect(result.data.length).toBe(4);
+        expect(result).toHaveProperty(["data", 3, "author", "avatar", "url"], db[3].authorUser.avatar.url);
+      });
+
+      test("Should return structure with pagination", async () => {
+        const result = await getPluginService<IServiceCommon>(
+          "common"
+        ).findAllFlat(
+          { query: { related }, pagination: { page: 1, pageSize: 5 } },
+          relatedEntity
         );
+        expect(result).toHaveProperty("data");
+        expect(result).toHaveProperty("meta");
+        expect(result.data.length).toBe(4);
+        expect(result).toHaveProperty(["data", 0, "content"], db[0].content);
+        expect(result).toHaveProperty(["data", 0, "author"]);
+        expect(result).toHaveProperty(
+          ["data", 0, "author", "id"],
+          db[0].authorId
+        );
+        expect(result).toHaveProperty(
+          ["data", 0, "author", "name"],
+          db[0].authorName
+        );
+        expect(result).toHaveProperty(
+          ["data", 0, "author", "email"],
+          db[0].authorEmail
+        );
+        expect(result).toHaveProperty(["data", 3, "content"], db[3].content);
+        expect(result).toHaveProperty(["meta", "pagination", "page"], 1);
+        expect(result).toHaveProperty(["meta", "pagination", "pageSize"], 5);
       });
     });
 
-    describe("Client API", () => {
-      const collection = "api::collection.test";
-      const related = `${collection}:1`;
-      const db: Array<Comment> = [
-        {
-          id: 1,
-          content: "ABC",
-          threadOf: null,
-          related,
-          authorId: 1,
-          authorName: "Joe Doe",
-          authorEmail: "joe@example.com",
-        },
-        {
-          id: 2,
-          content: "DEF",
-          threadOf: 1,
-          related,
-          authorId: 1,
-          authorName: "Joe Doe",
-          authorEmail: "joe@example.com",
-          blockedThread: true,
-        },
-        {
-          id: 3,
-          content: "GHJ",
-          threadOf: null,
-          related,
-          authorId: 1,
-          authorName: "Joe Doe",
-          authorEmail: "joe@example.com",
-        },
-        {
-          id: 4,
-          content: "IKL",
-          threadOf: 2,
-          related,
-          authorUser: {
-            id: 1,
-            username: "Joe Doe",
-            email: "joe@example.com",
-            avatar: {
-              id: 1,
-              url: 'http://example.com'
-            }
-          }
-        },
-      ];
-      const relatedEntity = { id: 1, title: "Test", uid: collection };
-
-      beforeEach(() =>
-        setup({ enabledCollections: [collection] }, true, {
-          "plugins::comments": db,
-          "api::collection": [
-            relatedEntity,
-            { id: 2, title: "Test 2", uid: collection },
-          ],
-        })
-      );
-
-      describe("findAllFlat", () => {
-        test("Should return proper structure", async () => {
-          const result = await getPluginService<IServiceCommon>(
-            "common"
-          ).findAllFlat({ query: { related } }, relatedEntity);
-          expect(result).toHaveProperty("data");
-          expect(result).not.toHaveProperty("meta");
-          expect(result.data.length).toBe(4);
-          expect(result).toHaveProperty(["data", 0, "content"], db[0].content);
-          expect(result).toHaveProperty(["data", 3, "content"], db[3].content);
-        });
-
-        test("Should return structure with selected fields only (+mandatory ones for logic)", async () => { // Default fields are: id, related, threadOf, gotThread
-          const result = await getPluginService<IServiceCommon>(
-            "common"
-          ).findAllFlat({ query: { related }, fields: ['content'] }, relatedEntity);
-          expect(result).toHaveProperty("data");
-          expect(result).not.toHaveProperty("meta");
-          expect(result.data.length).toBe(4);
-          expect(Object.keys(filterOutUndefined(result.data[0]))).toHaveLength(6);
-          expect(Object.keys(filterOutUndefined(result.data[1]))).toHaveLength(6);
-          expect(Object.keys(filterOutUndefined(result.data[2]))).toHaveLength(6);
-          expect(Object.keys(filterOutUndefined(result.data[3]))).toHaveLength(6);
-        });
-
-        test("Should return structure with populated avatar field", async () => {
-          const result = await getPluginService<IServiceCommon>(
-            "common"
-          ).findAllFlat({ 
-            query: { related },
-            populate: { 
-              authorUser: { 
-                populate: { avatar: true },
-              },
-            }
-          }, relatedEntity);
-          expect(result).toHaveProperty("data");
-          expect(result).not.toHaveProperty("meta");
-          expect(result.data.length).toBe(4);
-          expect(result).toHaveProperty(["data", 3, "author", "avatar", "url"], db[3].authorUser.avatar.url);
-        });
-
-        test("Should return structure with pagination", async () => {
-          const result = await getPluginService<IServiceCommon>(
-            "common"
-          ).findAllFlat(
-            { query: { related }, pagination: { page: 1, pageSize: 5 } },
-            relatedEntity
-          );
-          expect(result).toHaveProperty("data");
-          expect(result).toHaveProperty("meta");
-          expect(result.data.length).toBe(4);
-          expect(result).toHaveProperty(["data", 0, "content"], db[0].content);
-          expect(result).toHaveProperty(["data", 0, "author"]);
-          expect(result).toHaveProperty(
-            ["data", 0, "author", "id"],
-            db[0].authorId
-          );
-          expect(result).toHaveProperty(
-            ["data", 0, "author", "name"],
-            db[0].authorName
-          );
-          expect(result).toHaveProperty(
-            ["data", 0, "author", "email"],
-            db[0].authorEmail
-          );
-          expect(result).toHaveProperty(["data", 3, "content"], db[3].content);
-          expect(result).toHaveProperty(["meta", "pagination", "page"], 1);
-          expect(result).toHaveProperty(["meta", "pagination", "pageSize"], 5);
-        });
+    describe("findAllInHierarchy", () => {
+      test("Should return nested structure starting for root", async () => {
+        const result = await getPluginService<IServiceCommon>(
+          "common"
+        ).findAllInHierarchy({ query: { related } }, relatedEntity);
+        expect(result).not.toHaveProperty("data");
+        expect(result).not.toHaveProperty("meta");
+        expect(result.length).toBe(2);
+        expect(result).toHaveProperty([0, "content"], db[0].content);
+        expect(result).toHaveProperty([0, "children"]);
+        expect(result[0]?.children?.length).toBe(1);
+        expect(result).toHaveProperty([0, "children", 0, "content"], "DEF");
+        expect(result).toHaveProperty([0, "children", 0, "children"]);
+        // @ts-ignore
+        expect(result[0]?.children[0]?.children?.length).toBe(1);
+        expect(result).toHaveProperty(
+          [0, "children", 0, "children", 0, "content"],
+          "IKL"
+        );
+        expect(result).toHaveProperty([1, "content"], db[2].content);
       });
 
-      describe("findAllInHierarchy", () => {
-        test("Should return nested structure starting for root", async () => {
-          const result = await getPluginService<IServiceCommon>(
-            "common"
-          ).findAllInHierarchy({ query: { related } }, relatedEntity);
-          expect(result).not.toHaveProperty("data");
-          expect(result).not.toHaveProperty("meta");
-          expect(result.length).toBe(2);
-          expect(result).toHaveProperty([0, "content"], db[0].content);
-          expect(result).toHaveProperty([0, "children"]);
-          expect(result[0]?.children?.length).toBe(1);
-          expect(result).toHaveProperty([0, "children", 0, "content"], "DEF");
-          expect(result).toHaveProperty([0, "children", 0, "children"]);
-
-          // @ts-ignore
-          expect(result[0]?.children[0]?.children?.length).toBe(1);
-          expect(result).toHaveProperty(
-            [0, "children", 0, "children", 0, "content"],
-            "IKL"
-          );
-          expect(result).toHaveProperty([1, "content"], db[2].content);
-        });
-
-        test("Should return nested structure starting for comment id: 1", async () => {
-          const result = await getPluginService<IServiceCommon>(
-            "common"
-          ).findAllInHierarchy(
-            { query: { related }, startingFromId: 1 },
-            relatedEntity
-          );
-          expect(result).not.toHaveProperty("data");
-          expect(result).not.toHaveProperty("meta");
-          expect(result.length).toBe(1);
-          expect(result).toHaveProperty([0, "content"], db[1].content);
-          expect(result).toHaveProperty([0, "children"]);
-          expect(result[0]?.children?.length).toBe(1);
-          expect(result).toHaveProperty([0, "children", 0, "content"], "IKL");
-        });
-
-        test("Should return nested structure starting for comment id: 1 without blocked comments", async () => {
-          const result = await getPluginService<IServiceCommon>(
-            "common"
-          ).findAllInHierarchy(
-            { query: { related }, startingFromId: 1, dropBlockedThreads: true },
-            relatedEntity
-          );
-          expect(result).not.toHaveProperty("data");
-          expect(result).not.toHaveProperty("meta");
-          expect(result.length).toBe(1);
-          expect(result).toHaveProperty([0, "content"], db[1].content);
-          expect(result).toHaveProperty([0, "children"]);
-          expect(result[0]?.children?.length).toBe(0);
-        });
+      test("Should return nested structure starting for comment id: 1", async () => {
+        const result = await getPluginService<IServiceCommon>(
+          "common"
+        ).findAllInHierarchy(
+          { query: { related }, startingFromId: 1 },
+          relatedEntity
+        );
+        expect(result).not.toHaveProperty("data");
+        expect(result).not.toHaveProperty("meta");
+        expect(result.length).toBe(1);
+        expect(result).toHaveProperty([0, "content"], db[1].content);
+        expect(result).toHaveProperty([0, "children"]);
+        expect(result[0]?.children?.length).toBe(1);
+        expect(result).toHaveProperty([0, "children", 0, "content"], "IKL");
       });
 
-      describe("findOne", () => {
-        test("Should return proper structure", async () => {
-          const result = await getPluginService<IServiceCommon>(
-            "common"
-          ).findOne({ related });
-          expect(result).toHaveProperty("id", db[0].id);
-          expect(result).toHaveProperty("content", db[0].content);
-          expect(result).toHaveProperty(["author", "id"], db[0].authorId);
-          expect(result).toHaveProperty(["author", "name"], db[0].authorName);
-          expect(result).toHaveProperty(["author", "email"], db[0].authorEmail);
-        });
+      test("Should return nested structure starting for comment id: 1 without blocked comments", async () => {
+        const result = await getPluginService<IServiceCommon>(
+          "common"
+        ).findAllInHierarchy(
+          { query: { related }, startingFromId: 1, dropBlockedThreads: true },
+          relatedEntity
+        );
+        expect(result).not.toHaveProperty("data");
+        expect(result).not.toHaveProperty("meta");
+        expect(result.length).toBe(1);
+        expect(result).toHaveProperty([0, "content"], db[1].content);
+        expect(result).toHaveProperty([0, "children"]);
+        expect(result[0]?.children?.length).toBe(0);
       });
+    });
 
-      describe("findRelatedEntitiesFor", () => {
-        test("Should return proper structure", async () => {
-          const result = await getPluginService<IServiceCommon>(
-            "common"
-          ).findRelatedEntitiesFor(db);
-          expect(result).toHaveProperty([0, "id"], relatedEntity.id);
-          expect(result).toHaveProperty([0, "title"], relatedEntity.title);
-          expect(result).toHaveProperty([0, "uid"], relatedEntity.uid);
-        });
+    describe("findOne", () => {
+      test("Should return proper structure", async () => {
+        const result = await getPluginService<IServiceCommon>(
+          "common"
+        ).findOne({ related });
+        expect(result).toHaveProperty("id", db[0].id);
+        expect(result).toHaveProperty("content", db[0].content);
+        expect(result).toHaveProperty(["author", "id"], db[0].authorId);
+        expect(result).toHaveProperty(["author", "name"], db[0].authorName);
+        expect(result).toHaveProperty(["author", "email"], db[0].authorEmail);
+      });
+    });
+
+    describe("findRelatedEntitiesFor", () => {
+      test("Should return proper structure", async () => {
+        const result = await getPluginService<IServiceCommon>(
+          "common"
+        ).findRelatedEntitiesFor(db);
+        expect(result).toHaveProperty([0, "id"], relatedEntity.id);
+        expect(result).toHaveProperty([0, "title"], relatedEntity.title);
+        expect(result).toHaveProperty([0, "uid"], relatedEntity.uid);
       });
     });
   });
