@@ -1,3 +1,4 @@
+import { StrapiUser } from "strapi-typed";
 import { IServiceClient } from "../../../types";
 import { Comment } from "../../../types/contentTypes";
 import { APPROVAL_STATUS } from "../../utils/constants";
@@ -620,6 +621,12 @@ describe("Test Comments service - Client", () => {
 
         test("Should fail with 403 because of try to modify not owned comment by strapi user", async () => {
             
+          const user: StrapiUser = {
+            id: 100,
+            email: 'example@example.com',
+            username: 'I\'m not an author'
+          }
+
           // @ts-ignore
           const spy = jest.spyOn(global.strapi.db, 'query').mockImplementation((type: string) => ({
             findOne: async (_: any) => new Promise((resolve) => {
@@ -639,7 +646,7 @@ describe("Test Comments service - Client", () => {
               { 
                 content: "Test content",
               },
-              { id: 100 }
+              user
             );
           } catch (e) {
             errorThrown(e, "You're not allowed to take an action on that entity. Make sure you've provided \"author\" property in a payload or authenticated your request properly.", 403);
@@ -855,10 +862,10 @@ describe("Test Comments service - Client", () => {
 
         test("Should remove a comment for strapi user", async () => {
 
-          const user = {
+          const user: StrapiUser = {
             id: 1,
             email: "example@example.com",
-            name: "Author"
+            username: "Author"
           };
 
           // @ts-ignore

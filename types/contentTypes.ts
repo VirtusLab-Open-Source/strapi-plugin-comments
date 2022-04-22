@@ -27,7 +27,7 @@ export type CommentAuthor = {
   id: Id;
   name?: string;
   email?: string;
-  avatar?: string;
+  avatar?: string | object;
 };
 
 export type CommentAuthorPartial = {

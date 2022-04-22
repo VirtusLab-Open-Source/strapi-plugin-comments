@@ -3,7 +3,7 @@ import { Comment, CommentAuthor, ToBeFixed } from "../../../types";
 
 import PluginError from "./../../utils/error";
 import { REGEX } from "./../../utils/constants";
-import { first, get, isObject, isArray, isEmpty } from "lodash";
+import { first, get, isObject, isArray, isEmpty, isString } from "lodash";
 
 declare var strapi: IStrapi;
 
@@ -113,7 +113,7 @@ export const buildAuthorModel = (item: Comment, fieldsToPopulate: Array<string> 
         id: authorUser.id,
         name: authorUser.username,
         email: authorUser.email,
-        avatar: authorUser.avatar,
+        avatar: isString(authorUser.avatar) || isObject(authorUser.avatar) ? authorUser.avatar : undefined,
       });
   } else if (authorId) {
     author = {

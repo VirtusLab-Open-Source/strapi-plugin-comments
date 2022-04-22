@@ -12,7 +12,7 @@ import {
 } from "../../types";
 
 import { getPluginService } from "./../utils/functions";
-import { isNil, isEmpty } from "lodash";
+import { isNil, isEmpty, isString } from "lodash";
 import PluginError from "./../utils/error";
 import {
   isEqualEntity,
@@ -115,7 +115,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
           authorId: author.id,
           authorName: author.name,
           authorEmail: author.email,
-          authorAvatar: author.avatar,
+          authorAvatar: isString(author.avatar) ? author.avatar : undefined,
         };
       }
 
