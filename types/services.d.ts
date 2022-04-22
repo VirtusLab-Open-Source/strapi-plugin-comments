@@ -13,6 +13,7 @@ import {
   OnlyStrings,
   StringMap,
   StrapiRequestQueryFieldsClause,
+  PopulateClause,
 } from "strapi-typed";
 import { ToBeFixed } from "./common";
 import {
@@ -34,7 +35,7 @@ export type FindAllFlatProps<T, TFields = keyof T> = {
     threadOf?: number | string | null;
     [key: string]: any;
   } & {};
-  populate?: StringMap<unknown>;
+  populate?: PopulateClause<OnlyStrings<TFields>>;
   sort?: StringMap<unknown>;
   fields?: StrapiRequestQueryFieldsClause<OnlyStrings<TFields>>
   pagination?: StrapiPagination;
@@ -92,7 +93,7 @@ export interface IServiceCommon {
     fieldName: string,
     value: any
   ): Promise<boolean>;
-  sanitizeCommentEntity(entity: Comment): Comment;
+  sanitizeCommentEntity(entity: Comment, populate?: PopulateClause<OnlyStrings<keyof StrapiUser>>): Comment;
   isValidUserContext(user?: any): boolean;
   parseRelationString(
     relation: string

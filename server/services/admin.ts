@@ -7,6 +7,7 @@ import {
   AdminSinglePageResponse,
   AnyConfig,
   Comment,
+  CommentModelKeys,
   CommentReport,
   IServiceAdmin,
   IServiceCommon,
@@ -24,6 +25,8 @@ import {
   filterOurResolvedReports,
 } from "./utils/functions";
 import { APPROVAL_STATUS, REGEX } from "./../utils/constants";
+
+const DEFAULT_AUTHOR_POPULATE = { avatar: true };
 
 /**
  * Comments Plugin - Moderation services
@@ -140,7 +143,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       $or: [{ removed: false }, { removed: null }],
     };
 
-    let params: StrapiDBQueryArgs<keyof Comment> = {
+    let params: StrapiDBQueryArgs<CommentModelKeys> = {
       where: !isEmpty(filters)
         ? {
             ...defaultWhere,
@@ -168,7 +171,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       .findMany({
         ...params,
         populate: {
-          authorUser: true,
+          authorUser: { populate: DEFAULT_AUTHOR_POPULATE },
           threadOf: true,
           reports: {
             where: {
@@ -185,7 +188,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     const result = entities
       .map((_) =>
         filterOurResolvedReports(
-          this.getCommonService().sanitizeCommentEntity(_)
+          this.getCommonService().sanitizeCommentEntity(_, DEFAULT_AUTHOR_POPULATE)
         )
       )
       .map((_) =>
@@ -226,10 +229,14 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
 
     const defaultPopulate = {
       populate: {
-        authorUser: true,
+        authorUser: {
+          populate: DEFAULT_AUTHOR_POPULATE,
+        },
         threadOf: {
           populate: {
-            authorUser: true,
+            authorUser: {
+              populate: DEFAULT_AUTHOR_POPULATE,
+            },
             ...reportsPopulation,
           },
         },
@@ -288,7 +295,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     const selectedEntity = this.getCommonService().sanitizeCommentEntity({
       ...entity,
       threadOf: entity.threadOf || null,
-    });
+    }, DEFAULT_AUTHOR_POPULATE);
 
     return {
       entity: relatedEntity,

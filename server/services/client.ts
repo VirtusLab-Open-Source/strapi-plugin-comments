@@ -35,7 +35,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
     this: IServiceClient,
     relation: string,
     data: CreateCommentPayload,
-    user: StrapiUser = undefined
+    user: StrapiUser
   ): Promise<Comment> {
     const { content, threadOf } = data;
     const singleRelationFulfilled = relation && REGEX.relatedUid.test(relation);
@@ -156,7 +156,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
     id: Id,
     relation: string,
     data: UpdateCommentPayload,
-    user: StrapiUser = undefined
+    user: StrapiUser
   ): Promise<Comment> {
     const { content } = data;
 
@@ -206,7 +206,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
     id: Id,
     relation: string,
     payload: CreateCommentReportPayload,
-    user: StrapiUser = undefined
+    user: StrapiUser
   ): Promise<CommentReport> {
     if (!this.getCommonService().isValidUserContext(user)) {
       throw resolveUserContextError(user);
@@ -254,7 +254,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
     id: Id,
     relation: string,
     authorId: Id,
-    user: StrapiUser = undefined
+    user: StrapiUser
   ): Promise<Comment> {
     if (!this.getCommonService().isValidUserContext(user)) {
       throw resolveUserContextError(user);

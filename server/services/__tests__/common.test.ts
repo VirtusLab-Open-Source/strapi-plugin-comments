@@ -393,9 +393,15 @@ describe("Test Comments service functions utils", () => {
           content: "IKL",
           threadOf: 2,
           related,
-          authorId: 1,
-          authorName: "Joe Doe",
-          authorEmail: "joe@example.com",
+          authorUser: {
+            id: 1,
+            username: "Joe Doe",
+            email: "joe@example.com",
+            avatar: {
+              id: 1,
+              url: 'http://example.com'
+            }
+          }
         },
       ];
       const relatedEntity = { id: 1, title: "Test", uid: collection };
@@ -433,6 +439,23 @@ describe("Test Comments service functions utils", () => {
           expect(Object.keys(filterOutUndefined(result.data[1]))).toHaveLength(6);
           expect(Object.keys(filterOutUndefined(result.data[2]))).toHaveLength(6);
           expect(Object.keys(filterOutUndefined(result.data[3]))).toHaveLength(6);
+        });
+
+        test("Should return structure with populated avatar field", async () => {
+          const result = await getPluginService<IServiceCommon>(
+            "common"
+          ).findAllFlat({ 
+            query: { related },
+            populate: { 
+              authorUser: { 
+                populate: { avatar: true },
+              },
+            }
+          }, relatedEntity);
+          expect(result).toHaveProperty("data");
+          expect(result).not.toHaveProperty("meta");
+          expect(result.data.length).toBe(4);
+          expect(result).toHaveProperty(["data", 3, "author", "avatar", "url"], db[3].authorUser.avatar.url);
         });
 
         test("Should return structure with pagination", async () => {
