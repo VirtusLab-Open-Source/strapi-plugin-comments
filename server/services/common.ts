@@ -23,6 +23,7 @@ import {
   PopulateClause,
   StrapiUser,
   OnlyStrings,
+  StringMap,
 } from "strapi-typed";
 import {
   CommentsPluginConfig,
@@ -250,7 +251,9 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
 
       let authorUserPopulate = {};
       if (isObject(populateClause?.authorUser)) {
-        authorUserPopulate = populateClause.authorUser;
+        authorUserPopulate = 'populate' in populateClause.authorUser ? 
+          populateClause.authorUser.populate as StringMap<unknown> : 
+          populateClause.authorUser;
       }
 
       return this.sanitizeCommentEntity(
@@ -414,6 +417,8 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
     const fieldsToPopulate = isArray(populate)
       ? populate
       : Object.keys(populate || {});
+
+      console.log(fieldsToPopulate);
 
     return {
       ...buildAuthorModel(

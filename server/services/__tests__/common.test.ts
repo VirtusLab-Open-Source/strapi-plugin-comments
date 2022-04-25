@@ -419,6 +419,10 @@ describe("Test Comments service - Common", () => {
             id: 1,
             url: "http://example.com",
           },
+          role: {
+            id: 1,
+            name: "my role"
+          }
         },
       },
     ];
@@ -484,6 +488,35 @@ describe("Test Comments service - Common", () => {
           ["data", 3, "author", "avatar", "url"],
           // @ts-ignore
           db[3].authorUser.avatar.url
+        );
+      });
+
+      test("Should return structure with populated avatar and role fields", async () => {
+        const result = await getPluginService<IServiceCommon>(
+          "common"
+        ).findAllFlat(
+          {
+            query: { related },
+            populate: {
+              authorUser: {
+                populate: { avatar: true, role: true },
+              },
+            },
+          },
+          relatedEntity
+        );
+        expect(result).toHaveProperty("data");
+        expect(result).not.toHaveProperty("meta");
+        expect(result.data.length).toBe(4);
+        expect(result).toHaveProperty(
+          ["data", 3, "author", "avatar", "url"],
+          // @ts-ignore
+          db[3].authorUser.avatar.url
+        );
+        expect(result).toHaveProperty(
+          ["data", 3, "author", "role", "id"],
+          // @ts-ignore
+          db[3].authorUser.role.id
         );
       });
 
