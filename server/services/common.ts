@@ -418,8 +418,6 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       ? populate
       : Object.keys(populate || {});
 
-      console.log(fieldsToPopulate);
-
     return {
       ...buildAuthorModel(
         {
