@@ -128,5 +128,6 @@
   "compontents.confirmation.dialog.button.confirm": "Sim eu quero",
   "compontents.confirmation.dialog.button.cancel": "Cancelar",
   "compontents.toogle.enabled": "Habilitado",
-  "compontents.toogle.disabled": "Desabilitado"
+  "compontents.toogle.disabled": "Desabilitado",
+  "compontents.author.unknown": "Autor removido"
 }
