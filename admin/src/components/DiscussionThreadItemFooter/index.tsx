@@ -16,6 +16,7 @@ import {
   DiscussionThreadItemFooterStyled,
 } from "./styles";
 import UserAvatar from "../Avatar";
+import { getMessage } from "../../utils";
 
 const DiscussionThreadItemFooter = ({
   children,
@@ -29,14 +30,14 @@ const DiscussionThreadItemFooter = ({
     dateStyle: "medium",
     timeStyle: "short",
   });
-  const { name, avatar } = author;
+  const { name, avatar } = author || {};
 
   return (
     <DiscussionThreadItemFooterStyled as={Box} paddingTop={2} direction="row">
       <DiscussionThreadItemFooterMeta size={3} horizontal>
-        <UserAvatar avatar={avatar} name={name} />
+        { author && (<UserAvatar avatar={avatar} name={name} />) }
         <Typography variant="pi" fontWeight="bold" textColor="neutral800">
-          {name}
+          {name || getMessage('compontents.author.unknown')}
         </Typography>
         <Typography variant="pi" textColor="neutral600">
           {dateTime}

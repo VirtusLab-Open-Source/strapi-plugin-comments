@@ -128,5 +128,6 @@
   "compontents.confirmation.dialog.button.confirm": "Oui, je le veux",
   "compontents.confirmation.dialog.button.cancel": "Annuler",
   "compontents.toogle.enabled": "Activé",
-  "compontents.toogle.disabled": "Désactivé"
+  "compontents.toogle.disabled": "Désactivé",
+  "compontents.author.unknown": "Auteur supprimé"
 }
