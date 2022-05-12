@@ -1,4 +1,4 @@
-import { StrapiPluginConfig, TypeResult } from "strapi-typed";
+import { StrapiPluginConfig, StringMap, TypeResult } from "strapi-typed";
 import { RegExpCollection } from "./constants";
 
 export type CommentsPluginConfig = StrapiPluginConfig<{
@@ -8,7 +8,13 @@ export type CommentsPluginConfig = StrapiPluginConfig<{
   entryLabel: PluginConfigEntryLabels;
   reportReasons: PluginConfigReportReasons;
   badWords?: boolean;
+  client?: PluginConfigClientService;
 }>;
+
+export type PluginConfigClientService = {
+  url?: string;
+  contactEmail?: string;
+};
 
 export type PluginConfigKeys = keyof CommentsPluginConfig;
 

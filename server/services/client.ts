@@ -12,7 +12,7 @@ import {
 } from "../../types";
 
 import { getPluginService } from "./../utils/functions";
-import { isNil, isEmpty, isString } from "lodash";
+import { isNil, isEmpty, isString, isObject } from "lodash";
 import PluginError from "./../utils/error";
 import {
   isEqualEntity,
@@ -152,10 +152,14 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
             authorUser: true,
           },
         });
-      return this.getCommonService().sanitizeCommentEntity({
+      const sanitizedEntity = this.getCommonService().sanitizeCommentEntity({
         ...entity,
         threadOf: linkToThread,
       });
+
+      await this.sendResponseNotification(sanitizedEntity);
+
+      return sanitizedEntity;
     }
     throw new PluginError(400, "No content received");
   },
@@ -391,4 +395,60 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
       status
     );
   },
+
+
+  async sendResponseNotification(
+    this: IServiceClient,
+    entity: Comment
+  ): Promise<void> {
+
+    if (entity.threadOf) {
+      const thread = isObject(entity.threadOf) ? entity.threadOf : await this.getCommonService().findOne({ id: entity.threadOf });
+      let emailToSend = thread?.author?.email;
+      if (thread.authorUser && !emailToSend) {
+        const strapiUser = isObject(thread.authorUser) ? thread.authorUser : await strapi.db.query<StrapiUser>("api::user").findOne({ 
+          where: { id: thread.authorUser }
+        });
+        emailToSend = strapiUser?.email;
+      }
+
+      if (emailToSend) {
+        const superAdmin = await strapi.db
+          .query<StrapiAdminUser>("admin::user")
+          .findOne({
+            where: {
+              roles: { code: "strapi-super-admin" },
+            },
+          });
+
+        const emailFrom = await this.getCommonService().getConfig('client.contactEmail', superAdmin.email);
+        const clientAppUrl = await this.getCommonService().getConfig('client.url', 'our site');
+
+        try {
+          await strapi
+            .plugin("email")
+            .service("email")
+            .send({
+              to: [emailToSend],
+              from: emailFrom,
+              subject: "You've got a new response to your comment",
+              text: `Hello ${thread?.author?.name || emailToSend}!
+                You've got a new response to your comment by ${entity?.author?.name || entity?.author?.email}.
+                
+                ------
+
+                "${entity.content}"
+
+                ------
+                
+                Visit ${clientAppUrl} and continue the discussion.
+                `,
+            });
+        } catch (err) {
+          strapi.log.error(err);
+          throw err;
+        }
+      }
+    }
+  }, 
 });

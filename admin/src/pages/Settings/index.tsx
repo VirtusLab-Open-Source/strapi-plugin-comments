@@ -30,6 +30,7 @@ import { Stack } from "@strapi/design-system/Stack";
 import { Switch } from "@strapi/design-system/Switch";
 import { Typography } from "@strapi/design-system/Typography";
 import { Grid, GridItem } from "@strapi/design-system/Grid";
+import { TextInput } from "@strapi/design-system/TextInput";
 import { ToggleInput } from "@strapi/design-system/ToggleInput";
 import { Select, Option } from "@strapi/design-system/Select";
 import { useNotifyAT } from "@strapi/design-system/LiveRegions";
@@ -108,6 +109,8 @@ const Settings = () => {
     gqlAuthEnabled,
     approvalFlow,
     entryLabel,
+    clientUrl,
+    clientEmail,
     ...rest
   }: ToBeFixed) => ({
     ...rest,
@@ -126,6 +129,10 @@ const Settings = () => {
       "*": entryLabel["*"],
     },
     reportReasons: configData?.reportReasons,
+    client: clientEmail || clientUrl ? {
+      contactEmail: clientEmail,
+      url: clientUrl,
+    } : undefined,
     gql: gqlAuthEnabled ? { auth: true } : undefined,
   });
 
@@ -166,6 +173,8 @@ const Settings = () => {
     configData?.moderatorRoles?.filter((code: ToBeFixed) =>
       allRoles.find((_: ToBeFixed) => _.code === code)
     ) || [];
+  const clientUrl = configData?.client?.url;
+  const clientEmail = configData?.client?.contactEmail;
 
   const changeApprovalFlowFor = (
     uid: ToBeFixed,
@@ -248,6 +257,8 @@ const Settings = () => {
           badWords,
           approvalFlow,
           entryLabel,
+          clientEmail,
+          clientUrl,
           gqlAuthEnabled,
         }}
         enableReinitialize={true}
@@ -478,6 +489,80 @@ const Settings = () => {
                     </Typography>
                     <Grid gap={4}>
                       <GridItem col={6} xs={12}>
+                        <ToggleInput
+                          name="badWords"
+                          label={getMessage(
+                            "page.settings.form.badWords.label"
+                          )}
+                          hint={getMessage("page.settings.form.badWords.hint")}
+                          checked={values.badWords}
+                          onChange={({ target: { checked } }: ToBeFixed) =>
+                            setFieldValue("badWords", checked, false)
+                          }
+                          onLabel={getMessage("compontents.toogle.enabled")}
+                          offLabel={getMessage("compontents.toogle.disabled")}
+                          disabled={restartRequired}
+                        />
+                      </GridItem>
+                      {isGQLPluginEnabled && (
+                        <GridItem col={6} xs={12}>
+                          <ToggleInput
+                            name="gqlAuthEnabled"
+                            label={getMessage(
+                              "page.settings.form.gqlAuth.label"
+                            )}
+                            hint={getMessage("page.settings.form.gqlAuth.hint")}
+                            checked={values.gqlAuthEnabled}
+                            onChange={({ target: { checked } }: ToBeFixed) =>
+                              setFieldValue("gqlAuthEnabled", checked, false)
+                            }
+                            onLabel={getMessage("compontents.toogle.enabled")}
+                            offLabel={getMessage("compontents.toogle.disabled")}
+                            disabled={restartRequired}
+                          />
+                        </GridItem>
+                      )}
+                    </Grid>
+                  </Stack>
+                </Box>
+
+                <Box {...boxDefaultProps}>
+                  <Stack size={4}>
+                    <Typography variant="delta" as="h2">
+                      {getMessage("page.settings.section.client")}
+                    </Typography>
+                    <Grid gap={4}>
+                      <GridItem col={3} xs={12}>
+                        <TextInput
+                          type="url"
+                          name="clientUrl"
+                          label={getMessage(
+                            "page.settings.form.client.url.label"
+                          )}
+                          hint={getMessage("page.settings.form.client.url.hint")}
+                          value={values.clientUrl}
+                          onChange={({ target: { value } }: ToBeFixed) =>
+                            setFieldValue("clientUrl", value, false)
+                          }
+                          disabled={restartRequired}
+                        />
+                      </GridItem>
+                      <GridItem col={3} xs={12}>
+                        <TextInput
+                          type="email"
+                          name="clientEmail"
+                          label={getMessage(
+                            "page.settings.form.client.email.label"
+                          )}
+                          hint={getMessage("page.settings.form.client.email.hint")}
+                          value={values.clientEmail}
+                          onChange={({ target: { value } }: ToBeFixed) =>
+                            setFieldValue("clientEmail", value, false)
+                          }
+                          disabled={restartRequired}
+                        />
+                      </GridItem>
+                      <GridItem col={6} xs={12}>
                         <Select
                           name="moderatorRoles"
                           label={getMessage(
@@ -507,40 +592,6 @@ const Settings = () => {
                           ))}
                         </Select>
                       </GridItem>
-                      <GridItem col={6} xs={12}>
-                        <ToggleInput
-                          name="badWords"
-                          label={getMessage(
-                            "page.settings.form.badWords.label"
-                          )}
-                          hint={getMessage("page.settings.form.badWords.hint")}
-                          checked={values.badWords}
-                          onChange={({ target: { checked } }: ToBeFixed) =>
-                            setFieldValue("badWords", checked, false)
-                          }
-                          onLabel={getMessage("compontents.toogle.enabled")}
-                          offLabel={getMessage("compontents.toogle.disabled")}
-                          disabled={restartRequired}
-                        />
-                      </GridItem>
-                      {isGQLPluginEnabled && (
-                        <GridItem col={6} xs={12}>
-                          <ToggleInput
-                            name="badWords"
-                            label={getMessage(
-                              "page.settings.form.gqlAuth.label"
-                            )}
-                            hint={getMessage("page.settings.form.gqlAuth.hint")}
-                            checked={values.gqlAuthEnabled}
-                            onChange={({ target: { checked } }: ToBeFixed) =>
-                              setFieldValue("gqlAuthEnabled", checked, false)
-                            }
-                            onLabel={getMessage("compontents.toogle.enabled")}
-                            offLabel={getMessage("compontents.toogle.disabled")}
-                            disabled={restartRequired}
-                          />
-                        </GridItem>
-                      )}
                     </Grid>
                   </Stack>
                 </Box>

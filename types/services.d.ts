@@ -124,6 +124,7 @@ export interface IServiceAdmin {
   rejectComment(id: Id): Promise<Comment>;
   blockNestedThreads(id: Id, blockStatus?: boolean): Promise<boolean>;
   resolveAbuseReport(id: Id, commentId: Id): Promise<CommentReport>;
+  getDefaultAuthorPopulate(): any;
 }
 
 export interface IServiceClient {
@@ -153,6 +154,7 @@ export interface IServiceClient {
   ): Promise<Comment>;
   sendAbuseReportEmail(reason: string, content: string): Promise<void>;
   markAsRemovedNested(id: Id, status: boolean): Promise<boolean>;
+  sendResponseNotification(entity: Comment): Promise<void>
 }
 
 export interface IServiceGraphQL {
