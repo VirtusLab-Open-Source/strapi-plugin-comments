@@ -1,4 +1,4 @@
-import { StrapiPluginConfig, StringMap, TypeResult } from "strapi-typed";
+import { StrapiPluginConfig, TypeResult } from "strapi-typed";
 import { RegExpCollection } from "./constants";
 
 export type CommentsPluginConfig = StrapiPluginConfig<{

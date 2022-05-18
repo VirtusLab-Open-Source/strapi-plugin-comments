@@ -157,7 +157,11 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
         threadOf: linkToThread,
       });
 
-      await this.sendResponseNotification(sanitizedEntity);
+      try {
+        await this.sendResponseNotification(sanitizedEntity);
+      } catch (e) {
+        console.error(e);
+      }
 
       return sanitizedEntity;
     }
@@ -360,7 +364,9 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
         where: {
           roles: { code: "strapi-super-admin" },
         },
-      });
+      }); 
+
+      console.log(emails);
 
     if (emails.length > 0) {
       try {
@@ -404,15 +410,15 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
 
     if (entity.threadOf) {
       const thread = isObject(entity.threadOf) ? entity.threadOf : await this.getCommonService().findOne({ id: entity.threadOf });
-      let emailToSend = thread?.author?.email;
-      if (thread.authorUser && !emailToSend) {
+      let emailRecipient = thread?.author?.email;
+      if (thread.authorUser && !emailRecipient) {
         const strapiUser = isObject(thread.authorUser) ? thread.authorUser : await strapi.db.query<StrapiUser>("api::user").findOne({ 
           where: { id: thread.authorUser }
         });
-        emailToSend = strapiUser?.email;
+        emailRecipient = strapiUser?.email;
       }
 
-      if (emailToSend) {
+      if (emailRecipient) {
         const superAdmin = await strapi.db
           .query<StrapiAdminUser>("admin::user")
           .findOne({
@@ -421,7 +427,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
             },
           });
 
-        const emailFrom = await this.getCommonService().getConfig('client.contactEmail', superAdmin.email);
+        const emailSender = await this.getCommonService().getConfig('client.contactEmail', superAdmin.email);
         const clientAppUrl = await this.getCommonService().getConfig('client.url', 'our site');
 
         try {
@@ -429,10 +435,10 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
             .plugin("email")
             .service("email")
             .send({
-              to: [emailToSend],
-              from: emailFrom,
+              to: [emailRecipient],
+              from: emailSender,
               subject: "You've got a new response to your comment",
-              text: `Hello ${thread?.author?.name || emailToSend}!
+              text: `Hello ${thread?.author?.name || emailRecipient}!
                 You've got a new response to your comment by ${entity?.author?.name || entity?.author?.email}.
                 
                 ------

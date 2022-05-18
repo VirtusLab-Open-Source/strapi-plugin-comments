@@ -124,7 +124,7 @@ export interface IServiceAdmin {
   rejectComment(id: Id): Promise<Comment>;
   blockNestedThreads(id: Id, blockStatus?: boolean): Promise<boolean>;
   resolveAbuseReport(id: Id, commentId: Id): Promise<CommentReport>;
-  getDefaultAuthorPopulate(): any;
+  getDefaultAuthorPopulate(): { populate: PopulateClause<"avatar"> } | undefined;
 }
 
 export interface IServiceClient {
