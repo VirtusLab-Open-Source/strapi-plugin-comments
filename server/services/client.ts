@@ -366,8 +366,6 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
         },
       }); 
 
-      console.log(emails);
-
     if (emails.length > 0) {
       try {
         await strapi
