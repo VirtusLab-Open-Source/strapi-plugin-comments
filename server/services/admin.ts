@@ -26,8 +26,6 @@ import {
 } from "./utils/functions";
 import { APPROVAL_STATUS, REGEX } from "./../utils/constants";
 
-const DEFAULT_AUTHOR_POPULATE = { avatar: true };
-
 /**
  * Comments Plugin - Moderation services
  */
@@ -143,6 +141,8 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       $or: [{ removed: false }, { removed: null }],
     };
 
+    const defaultAuthorUserPopulate = this.getDefaultAuthorPopulate();
+
     let params: StrapiDBQueryArgs<CommentModelKeys> = {
       where: !isEmpty(filters)
         ? {
@@ -171,7 +171,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       .findMany({
         ...params,
         populate: {
-          authorUser: { populate: DEFAULT_AUTHOR_POPULATE },
+          authorUser: defaultAuthorUserPopulate,
           threadOf: true,
           reports: {
             where: {
@@ -190,7 +190,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
         filterOurResolvedReports(
           this.getCommonService().sanitizeCommentEntity(
             _,
-            DEFAULT_AUTHOR_POPULATE
+            defaultAuthorUserPopulate?.populate
           )
         )
       )
@@ -216,6 +216,9 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     id: Id,
     { removed, ...query }: AdminFindOneAndThreadProps
   ): Promise<AdminSinglePageResponse> {
+
+    const defaultAuthorUserPopulate = this.getDefaultAuthorPopulate();
+
     const defaultWhere = !removed
       ? {
           $or: [{ removed: false }, { removed: null }],
@@ -232,14 +235,10 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
 
     const defaultPopulate = {
       populate: {
-        authorUser: {
-          populate: DEFAULT_AUTHOR_POPULATE,
-        },
+        authorUser: defaultAuthorUserPopulate,
         threadOf: {
           populate: {
-            authorUser: {
-              populate: DEFAULT_AUTHOR_POPULATE,
-            },
+            authorUser: defaultAuthorUserPopulate,
             ...reportsPopulation,
           },
         },
@@ -300,7 +299,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
         ...entity,
         threadOf: entity.threadOf || null,
       },
-      DEFAULT_AUTHOR_POPULATE
+      defaultAuthorUserPopulate?.populate
     );
 
     return {
@@ -403,4 +402,20 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
         data: { resolved: true },
       });
   },
+
+  // Recognize Strapi User fields possible to populate
+  getDefaultAuthorPopulate(this: IServiceAdmin): undefined | any {
+    const strapiUserTypeUid = 'plugin::users-permissions.user';
+    const allowedTypes = ['media', 'relation'];
+
+    const { attributes } = strapi.contentTypes[strapiUserTypeUid] || {};
+    const relationTypes = Object.keys(attributes)
+      ?.filter((key: string) => allowedTypes.includes(attributes[key]?.type));
+    if (relationTypes.includes('avatar')) {
+      return {
+        populate: { avatar: true },
+      };
+    }
+    return undefined;
+  }
 });

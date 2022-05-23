@@ -102,6 +102,17 @@ export = (config: any = {}, toStore: boolean = false, database: any = {}) => {
           },
         },
       },
+      email: {
+        service: function (name: string) {
+          const service = get(this.services, name);
+          return service;
+        },
+        services: {
+          email: {
+            send: async () => { }
+          }
+        }
+      }
     },
     config: {
       get: function (prop: string = "") {
