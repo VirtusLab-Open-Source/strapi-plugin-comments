@@ -768,6 +768,31 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@strapi/plugin-graphql@^4.1.11":
+  version "4.1.11"
+  resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.1.11.tgz#2f40923e6315c60ef87c782aa21911d9b3bc795f"
+  integrity sha512-hfBea4InDnWnav6G5s84jnhdq6azRTG3Qiwmvs0zpczpWQyoKAEyr4VWY8XK3UBRRstcpqwFP23ghCPBRnH7cg==
+  dependencies:
+    "@apollo/federation" "^0.28.0"
+    "@graphql-tools/schema" "8.1.2"
+    "@graphql-tools/utils" "^8.0.2"
+    "@strapi/utils" "4.1.11"
+    apollo-server-core "3.1.2"
+    apollo-server-koa "3.1.2"
+    glob "^7.1.7"
+    graphql "^15.5.1"
+    graphql-depth-limit "^1.1.0"
+    graphql-iso-date "^3.6.1"
+    graphql-playground-middleware-koa "^1.6.21"
+    graphql-type-json "^0.3.2"
+    graphql-type-long "^0.1.1"
+    graphql-upload "^13.0.0"
+    koa-compose "^4.1.0"
+    lodash "4.17.21"
+    nexus "1.2.0"
+    pluralize "^8.0.0"
+    subscriptions-transport-ws "0.9.19"
+
 "@strapi/plugin-graphql@^4.1.8":
   version "4.1.8"
   resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.1.8.tgz#7c3c9698bd191cfed130ddc9f2024ea936228a0e"
@@ -792,6 +817,17 @@
     nexus "1.2.0"
     pluralize "^8.0.0"
     subscriptions-transport-ws "0.9.19"
+
+"@strapi/utils@4.1.11", "@strapi/utils@^4.1.11":
+  version "4.1.11"
+  resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.1.11.tgz#6d54d4a3f6d29a487e741f6846ff0fd2a14a199d"
+  integrity sha512-BiYYn4Er1VQhFXdqtSPScHS5Pbc8H2sjK1K5MKnI0ri7ckAeEOUUISU6G0HHEZPiN5EGRbxup5igtizOFoaROA==
+  dependencies:
+    "@sindresorhus/slugify" "1.1.0"
+    date-fns "2.24.0"
+    http-errors "1.8.0"
+    lodash "4.17.21"
+    yup "0.32.9"
 
 "@strapi/utils@4.1.8", "@strapi/utils@^4.1.8":
   version "4.1.8"
