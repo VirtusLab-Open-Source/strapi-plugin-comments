@@ -26,8 +26,8 @@
     "url": "https://github.com/VirtusLab-Open-Source/strapi-plugin-comments"
   },
   "dependencies": {
-    "@strapi/utils": "^4.1.11",
-    "@strapi/plugin-graphql": "^4.1.11",
+    "@strapi/utils": "^4.1.12",
+    "@strapi/plugin-graphql": "^4.1.12",
     "bad-words": "^3.0.4"
   },
   "devDependencies": {
