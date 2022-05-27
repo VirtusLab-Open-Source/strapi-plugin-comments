@@ -1,22 +1,14 @@
 import { StrapiUser } from "strapi-typed";
 import { IServiceClient } from "../../../types";
 import { Comment } from "../../../types/contentTypes";
+import { setupStrapi, resetStrapi } from "../../../__mocks__/initSetup";
 import { APPROVAL_STATUS } from "../../utils/constants";
 import PluginError from "../../utils/error";
 import { getPluginService } from "../../utils/functions";
 
 jest.mock;
 
-const setup = (config = {}, toStore = false, database = {}) => {
-  Object.defineProperty(global, "strapi", {
-    value: require("../../../__mocks__/initSetup")(config, toStore, database),
-    writable: true,
-  });
-};
-
-afterEach(() => {
-  Object.defineProperty(global, "strapi", {});
-});
+afterEach(resetStrapi);
 
 describe("Test Comments service - Client", () => {
   const collection = "api::collection.test";
@@ -80,7 +72,7 @@ describe("Test Comments service - Client", () => {
     describe("Create", () => {
       describe("Common behaviours", () => {
         beforeEach(() =>
-          setup({ enabledCollections: [collection] }, true, {
+          setupStrapi({ enabledCollections: [collection] }, true, {
             "plugins::comments": db,
             "api::collection": [
               relatedEntity,
@@ -292,7 +284,7 @@ describe("Test Comments service - Client", () => {
 
       describe("Approval flow", () => {
         beforeEach(() =>
-          setup(
+          setupStrapi(
             {
               enabledCollections: [collection],
               approvalFlow: [collection],
@@ -453,7 +445,7 @@ describe("Test Comments service - Client", () => {
 
       describe("Non-approval flow", () => {
         beforeEach(() =>
-          setup(
+          setupStrapi(
             {
               enabledCollections: [collection],
               approvalFlow: [collection],
@@ -583,7 +575,7 @@ describe("Test Comments service - Client", () => {
 
     describe("Update", () => {
       beforeEach(() =>
-        setup({ enabledCollections: [collection] }, true, {
+        setupStrapi({ enabledCollections: [collection] }, true, {
           "plugins::comments": db,
           "api::collection": [
             relatedEntity,
@@ -826,7 +818,7 @@ describe("Test Comments service - Client", () => {
 
     describe("Remove", () => {
       beforeEach(() =>
-        setup({ enabledCollections: [collection] }, true, {
+        setupStrapi({ enabledCollections: [collection] }, true, {
           "plugins::comments": db,
           "api::collection": [
             relatedEntity,
@@ -986,7 +978,7 @@ describe("Test Comments service - Client", () => {
 
     describe("Report abuse", () => {
       beforeEach(() =>
-        setup({ enabledCollections: [collection] }, true, {
+        setupStrapi({ enabledCollections: [collection] }, true, {
           "plugins::comments": db,
           "api::collection": [
             relatedEntity,
@@ -1132,7 +1124,7 @@ describe("Test Comments service - Client", () => {
       };
 
       beforeEach(() =>
-        setup({ enabledCollections: [collection], client: { ...clientSettings } }, true, {
+        setupStrapi({ enabledCollections: [collection], client: { ...clientSettings } }, true, {
           "plugins::comments": db,
           "api::collection": [
             relatedEntity,

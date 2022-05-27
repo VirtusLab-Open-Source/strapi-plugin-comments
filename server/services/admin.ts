@@ -1,4 +1,4 @@
-import { StrapiContext, Id, StrapiDBQueryArgs, PropType } from "strapi-typed";
+import { StrapiContext, Id, StrapiDBQueryArgs, PropType, StrapiDBBulkActionResponse } from "strapi-typed";
 import {
   AdminFindAllProps,
   AdminFindAllQueryParamsParsed,
@@ -125,7 +125,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   // Find all comments
   async findAll(
     this: IServiceAdmin,
-    { related, entity, ...query }: AdminFindAllProps
+    { ...query }: AdminFindAllProps
   ): Promise<AdminPaginatedResponse<Comment>> {
     const {
       _q,
@@ -401,6 +401,47 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
         },
         data: { resolved: true },
       });
+  },
+
+  // Resolve multiple reported abuse for comment
+  async resolveMultipleAbuseReports(
+    this: IServiceAdmin,
+    ids: Array<Id>,
+    commentId: Id
+  ): Promise<StrapiDBBulkActionResponse> {
+
+    /**
+     *  Built-in ORM solution names the `id` columns wrongly (leaves one without prefix) what causes error: ER_NON_UNIQ_ERROR: Column 'id' in where clause is ambiguous
+     *  
+     *  Following workaround findMany call solves the `related` condition before making single updateMany like:
+     * 
+     * .updateMany({
+     *  where: { id: ids, related: commentId },
+     *  data: { resolved: true },
+     * });
+     * 
+     */
+
+    const reportsToResolve = await strapi.db
+      .query<CommentReport>(getModelUid("comment-report"))
+      .findMany({
+        where: {
+          id: ids,
+          related: commentId,
+        },
+        populate: ['related']
+      });
+
+    if (reportsToResolve.length === ids.length) {
+      return strapi.db
+        .query<CommentReport>(getModelUid("comment-report"))
+        .updateMany({
+          where: { id: ids },
+          data: { resolved: true },
+        });
+    }
+
+    throw new PluginError(400, 'At least one of selected reports got invalid comment entity relation. Try again.');
   },
 
   // Recognize Strapi User fields possible to populate

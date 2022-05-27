@@ -1,4 +1,4 @@
-import { StrapiRequestContext } from "strapi-typed";
+import { Id, StrapiDBBulkActionResponse, StrapiRequestContext } from "strapi-typed";
 import {
   AdminFindAllProps,
   AdminFindOneAndThreadProps,
@@ -167,6 +167,25 @@ const controllers: IControllerAdmin = {
       throw throwError(ctx, e);
     }
   },
+
+  async resolveMultipleAbuseReports(
+    ctx: StrapiRequestContext<never>
+  ): ThrowablePromisedResponse<StrapiDBBulkActionResponse> {
+    const { params = {}, request } = ctx;
+    const { body } = request;
+    const { id: commentId } = parseParams(params);
+
+    assertNotEmpty<Array<Id>>(body);
+
+    try {
+      return await this.getService<IServiceAdmin>().resolveMultipleAbuseReports(
+        body,
+        commentId
+      );
+    } catch (e) {
+      throw throwError(ctx, e);
+    }
+  },  
 
   async approveComment(
     ctx: StrapiRequestContext<never>

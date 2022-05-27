@@ -66,6 +66,14 @@ const routes: StrapiRoute[] = [
     },
   },
   {
+    method: "PUT",
+    path: "/moderate/single/:id/report/resolve",
+    handler: "admin.resolveMultipleAbuseReports",
+    config: {
+      policies: [],
+    },
+  },
+  {
     method: "PATCH",
     path: "/moderate/thread/:id/block",
     handler: "admin.blockCommentThread",

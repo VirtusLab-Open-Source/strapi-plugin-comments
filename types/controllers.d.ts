@@ -13,6 +13,7 @@ import {
   StrapiUser,
   StrapiRequestQueryFieldsClause,
   OnlyStrings,
+  StrapiDBBulkActionResponse,
 } from "strapi-typed";
 import { ToBeFixed } from "./common";
 import {
@@ -98,6 +99,9 @@ export interface IControllerAdmin {
   resolveAbuseReport(
     ctx: StrapiRequestContext
   ): ThrowablePromisedResponse<CommentReport>;
+  resolveMultipleAbuseReports(
+    ctx: StrapiRequestContext
+  ): ThrowablePromisedResponse<StrapiDBBulkActionResponse>;
   approveComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
   rejectComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
 }
