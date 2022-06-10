@@ -394,15 +394,15 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
           data: { [fieldName]: value },
         });
       if (
-        entitiesToChange.length === changedEntities.length &&
-        changedEntities.length > 0
+        entitiesToChange.length === changedEntities.count &&
+        changedEntities.count > 0
       ) {
         const nestedTransactions = await Promise.all(
-          changedEntities.map((item: Comment) =>
+          entitiesToChange.map((item: Comment) =>
             this.modifiedNestedNestedComments(item.id, fieldName, value)
           )
         );
-        return nestedTransactions.length === changedEntities.length;
+        return nestedTransactions.length === changedEntities.count;
       }
       return true;
     } catch (e) {

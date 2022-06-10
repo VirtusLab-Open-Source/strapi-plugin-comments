@@ -6,10 +6,10 @@
 
 // @ts-nocheck
 
-import React, { useState, useEffect } from "react";
+import React, { useCallback } from "react";
 import { useIntl } from "react-intl";
 import PropTypes from "prop-types";
-import { isEmpty } from "lodash";
+import { isEmpty, isArray } from "lodash";
 import { BaseCheckbox } from "@strapi/design-system/BaseCheckbox";
 import { Flex } from "@strapi/design-system/Flex";
 import {
@@ -33,12 +33,13 @@ import { ActionButton } from "../ActionButton/styles";
 const ReportsReviewTable = ({
   commentId,
   items,
+  selectedItems = [],
   mutation,
+  updateItems,
   allowedActions: { canAccessReports, canReviewReports },
   onBlockButtonsStateChange,
+  onSelectionChange,
 }) => {
-  const [storedItems, setStoredItems] = useState([]);
-
   const { formatDate } = useIntl();
 
   const { lockApp } = useOverlayBlocker();
@@ -90,6 +91,23 @@ const ReportsReviewTable = ({
     );
   };
 
+  const handleItemSelectionChange = (selection, value) => {
+    if (isArray(selection)) {
+      onSelectionChange(value ? selection : [])
+    } else {
+      onSelectionChange([...selectedItems, selection].filter(item => value || selection !== item));
+    }
+  };
+
+  const isNotResolved = entry => !entry.resolved;
+  const unresolvedItems = items.filter(isNotResolved);
+
+  const areAllItemsSelected = () => !isEmpty(selectedItems) ? 
+    selectedItems.length === unresolvedItems.length : 
+    false;
+
+  const isItemSelected = id => selectedItems.includes(id);
+
   const handleClickResolve = async (reportId) => {
     if (canReviewReports) {
       lockApp();
@@ -98,23 +116,20 @@ const ReportsReviewTable = ({
         reportId,
       });
       if (item) {
-        const updatedItems = storedItems.map((_) => ({
+        const updatedItems = items.map((_) => ({
           ..._,
           resolved: reportId === _.id ? true : _.resolved,
         }));
-        setStoredItems(updatedItems);
+        updateItems(updatedItems);
+        onSelectionChange(selectedItems.filter(_ => _ !== reportId));
         onBlockButtonsStateChange(
-          updatedItems.filter((_) => !_.resolved).length === 0
+          updatedItems.filter(isNotResolved).length === 0
         );
       }
     }
   };
 
-  useEffect(() => {
-    setStoredItems(items);
-  }, []);
-
-  if (isEmpty(storedItems)) {
+  if (isEmpty(items)) {
     return null;
   }
 
@@ -122,11 +137,15 @@ const ReportsReviewTable = ({
 
   if (canAccessReports) {
     return (
-      <Table colCount={COL_COUNT} rowCount={storedItems.length}>
+      <Table colCount={COL_COUNT} rowCount={items.length}>
         <Thead>
           <Tr>
             <Th>
-              <BaseCheckbox aria-label="Select all entries" />
+              <BaseCheckbox 
+                aria-label={getMessage("page.details.panel.discussion.warnings.reports.dialog.selectAll")} 
+                value={areAllItemsSelected()} 
+                disabled={isEmpty(unresolvedItems)}
+                onValueChange={useCallback((value) => handleItemSelectionChange(unresolvedItems.map(_ => _.id), value), [unresolvedItems])} />
             </Th>
             <Th>
               <Typography variant="sigma">
@@ -168,10 +187,14 @@ const ReportsReviewTable = ({
           </Tr>
         </Thead>
         <Tbody>
-          {storedItems.map((entry) => (
+          {items.map((entry) => (
             <Tr key={entry.id}>
               <Td>
-                <BaseCheckbox aria-label={`Select report`} />
+                <BaseCheckbox 
+                aria-label={getMessage("page.details.panel.discussion.warnings.reports.dialog.select")}
+                value={isItemSelected(entry.id)} 
+                disabled={entry.resolved}
+                onValueChange={(value) => handleItemSelectionChange(entry.id, value)} />
               </Td>
               <Td>
                 <Typography textColor="neutral800">
@@ -222,12 +245,15 @@ const ReportsReviewTable = ({
 ReportsReviewTable.propTypes = {
   commentId: PropTypes.oneOfType(PropTypes.string, PropTypes.number).isRequired,
   items: PropTypes.array.isRequired,
+  selectedItems: PropTypes.array.isRequired,
   mutation: PropTypes.func.isRequired,
   allowedActions: PropTypes.shape({
     canAccessReports: PropTypes.bool,
     canReviewReports: PropTypes.bool,
   }),
   onBlockButtonsStateChange: PropTypes.func.isRequired,
+  onSelectionChange: PropTypes.func.isRequired,
+  updateItems: PropTypes.func.isRequired,
 };
 
 export default ReportsReviewTable;

@@ -14,6 +14,7 @@ import {
   StringMap,
   StrapiRequestQueryFieldsClause,
   PopulateClause,
+  StrapiDBBulkActionResponse,
 } from "strapi-typed";
 import { ToBeFixed } from "./common";
 import {
@@ -48,8 +49,8 @@ export type FindAllInHierarhyProps = Omit<FindAllFlatProps, "pagination"> & {
 };
 
 export type AdminFindAllProps = {
-  related: string;
-  entity: any;
+  related?: string;
+  entity?: any;
 } & StrapiQueryParams;
 
 export type AdminFindAllQueryParamsParsed = {
@@ -61,7 +62,7 @@ export type AdminFindAllQueryParamsParsed = {
 } & StrapiQueryParamsParsed;
 
 export type AdminFindOneAndThreadProps = {
-  removed: boolean;
+  removed?: boolean;
 } & StrapiQueryParams;
 
 export type AdminSinglePageResponse = {
@@ -124,6 +125,7 @@ export interface IServiceAdmin {
   rejectComment(id: Id): Promise<Comment>;
   blockNestedThreads(id: Id, blockStatus?: boolean): Promise<boolean>;
   resolveAbuseReport(id: Id, commentId: Id): Promise<CommentReport>;
+  resolveMultipleAbuseReports(ids: Array<Id>, commentId: Id): Promise<StrapiDBBulkActionResponse>;
   getDefaultAuthorPopulate(): { populate: PopulateClause<"avatar"> } | undefined;
 }
 

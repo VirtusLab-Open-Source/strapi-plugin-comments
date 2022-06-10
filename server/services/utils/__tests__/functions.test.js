@@ -1,3 +1,4 @@
+const { setupStrapi, resetStrapi } = require("../../../../__mocks__/initSetup");
 const PluginError = require("../../../utils/error");
 const {
   resolveUserContextError,
@@ -5,12 +6,8 @@ const {
   buildConfigQueryProp,
 } = require("../functions");
 
-beforeEach(() => {
-  Object.defineProperty(global, "strapi", {
-    value: require("../../../../__mocks__/initSetup")(),
-    writable: true,
-  });
-});
+beforeEach(setupStrapi);
+afterEach(resetStrapi);
 
 describe("Test service functions utils", () => {
   describe("Getting models uid's ", () => {
