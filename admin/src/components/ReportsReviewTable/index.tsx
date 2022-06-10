@@ -6,7 +6,7 @@
 
 // @ts-nocheck
 
-import React from "react";
+import React, { useCallback } from "react";
 import { useIntl } from "react-intl";
 import PropTypes from "prop-types";
 import { isEmpty, isArray } from "lodash";
@@ -99,8 +99,11 @@ const ReportsReviewTable = ({
     }
   };
 
+  const isNotResolved = entry => !entry.resolved;
+  const unresolvedItems = items.filter(isNotResolved);
+
   const areAllItemsSelected = () => !isEmpty(selectedItems) ? 
-    selectedItems.length === items.filter((_) => !_.resolved).length : 
+    selectedItems.length === unresolvedItems.length : 
     false;
 
   const isItemSelected = id => selectedItems.includes(id);
@@ -120,7 +123,7 @@ const ReportsReviewTable = ({
         updateItems(updatedItems);
         onSelectionChange(selectedItems.filter(_ => _ !== reportId));
         onBlockButtonsStateChange(
-          updatedItems.filter((_) => !_.resolved).length === 0
+          updatedItems.filter(isNotResolved).length === 0
         );
       }
     }
@@ -141,8 +144,8 @@ const ReportsReviewTable = ({
               <BaseCheckbox 
                 aria-label={getMessage("page.details.panel.discussion.warnings.reports.dialog.selectAll")} 
                 value={areAllItemsSelected()} 
-                disabled={isEmpty(items.filter((_) => !_.resolved))}
-                onValueChange={useCallback((value) => handleItemSelectionChange(unresolved.map(prop("id")), value), [unResolved])} />
+                disabled={isEmpty(unresolvedItems)}
+                onValueChange={useCallback((value) => handleItemSelectionChange(unresolvedItems.map(_ => _.id), value), [unresolvedItems])} />
             </Th>
             <Th>
               <Typography variant="sigma">

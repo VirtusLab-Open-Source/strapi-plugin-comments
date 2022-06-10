@@ -62,6 +62,8 @@ const DiscussionThreadItemReviewAction = ({
     handleAPIError(err, toggleNotification);
   };
 
+  const isNotResolved = entry => !entry.resolved;
+
   const resolveReportMutation = useMutation(resolveReport, {
     onSuccess: onSuccess(
       "page.details.panel.discussion.warnings.reports.dialog.confirmation.success",
@@ -115,7 +117,7 @@ const DiscussionThreadItemReviewAction = ({
         setStoredItems(updatedItems);
         setSelectedItems([], false);
         onBlockButtonsStateChange(
-          updatedItems.filter((_) => !_.resolved).length === 0
+          updatedItems.filter(isNotResolved).length === 0
         );
       }
     }
@@ -129,7 +131,7 @@ const DiscussionThreadItemReviewAction = ({
   const onSelectionChange = selection => setSelectedItems(selection);
 
   const isLoading = isAnyActionLoading && resolveReportMutation.isLoading;
-  const openReports = reports?.filter((_) => !_.resolved);
+  const openReports = reports?.filter(isNotResolved);
   const hasReports = !isEmpty(openReports);
   const reviewFlowEnabled =
     canAccessReports && hasReports && !(item.blocked || item.blockedThread);
