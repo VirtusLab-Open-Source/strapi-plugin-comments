@@ -14,7 +14,7 @@ import {
   SubNavSections,
   SubNavLink,
 } from "@strapi/design-system/SubNav";
-import { ExclamationMarkCircle, Apps } from "@strapi/icons";
+import { apps } from "../icons";
 import getMessage from "../../utils/getMessage";
 
 // import PropTypes from 'prop-types';
@@ -26,33 +26,34 @@ const Nav = ({ visible = false, hasNewComments, hasNewReports }) => {
   }
 
   return (
-    <SubNav ariaLabel="Comments sub nav">
-      <SubNavHeader label={getMessage("plugin.name")} />
+    <SubNav ariaLabel='Comments sub nav'>
+      <SubNavHeader label={getMessage('plugin.name')} />
       <SubNavSections>
-        <SubNavLink
+        {/* TODO - further subpages development */}
+        {/* <SubNavLink
           to={getUrl("dashboard")}
           withBullet={hasNewComments}
-          icon={<Apps />}
+          icon={apps}
         >
           {getMessage("nav.item.updates")}
-        </SubNavLink>
-        <SubNavSection label={getMessage("nav.header.moderation")}>
-          <SubNavLink to={getUrl("discover")} icon={<Apps />}>
-            {getMessage("nav.item.discover")}
+        </SubNavLink> */}
+        <SubNavSection label={getMessage('nav.header.moderation')}>
+          <SubNavLink to={getUrl('discover')} icon={apps}>
+            {getMessage('nav.item.discover')}
           </SubNavLink>
           <SubNavLink
-            to={getUrl("reports")}
+            to={getUrl('reports')}
             withBullet={hasNewReports}
-            icon={<Apps />}
-          >
-            {getMessage("nav.item.reports")}
+            icon={apps}>
+            {getMessage('nav.item.reports')}
           </SubNavLink>
         </SubNavSection>
-        <SubNavSection label={getMessage("nav.header.settings")}>
-          <SubNavLink to={getUrl("settings")} icon={<Apps />}>
+        {/* TODO - further subpages development */}
+        {/* <SubNavSection label={getMessage("nav.header.settings")}>
+          <SubNavLink to={getUrl("settings")} icon={apps}>
             {getMessage("nav.item.settings")}
           </SubNavLink>
-        </SubNavSection>
+        </SubNavSection> */}
       </SubNavSections>
     </SubNav>
   );

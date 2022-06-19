@@ -7,6 +7,8 @@ export const APPROVAL_STATUS = {
 export const REPORT_STATUS = {
   RESOLVED: "RESOLVED",
   OPEN: "OPEN",
+  BLOCKED: "BLOCKED",
+  ...APPROVAL_STATUS,
 };
 
 export const REPORT_REASON = {

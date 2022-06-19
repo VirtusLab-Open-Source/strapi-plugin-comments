@@ -1,18 +1,17 @@
 // @ts-nocheck
 
-import { stringify } from "qs";
+import {stringify} from 'qs';
 
-import { getApiURL, axiosInstance, handleAPIError } from "../../../utils";
+import {getApiURL, axiosInstance, handleAPIError} from '../../../utils';
 
-
-export const fetchData = async (queryParams, toggleNotification) => {
+export const fetchReportsData = async (queryParams, toggleNotification) => {
   try {
     const { data } = await axiosInstance.get(
       getApiURL(
-        `moderate/all${
+        `moderate/reports${
           queryParams ? `?${stringify(queryParams, { encode: false })}` : ""
-        }`
-      )
+        }`,
+      ),
     );
 
     return data;

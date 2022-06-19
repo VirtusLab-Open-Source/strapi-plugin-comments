@@ -5,7 +5,7 @@ import { getApiURL, axiosInstance, handleAPIError } from "../../utils";
 import { Id } from "strapi-typed";
 import { ToBeFixed } from "../../../../types";
 
-// eslint-disable-next-line import/prefer-default-export
+
 export const fetchDetailsData = async (
   id: Id,
   queryParams: ToBeFixed,
@@ -69,9 +69,27 @@ export const resolveReport = ({ id, reportId }: ToBeFixed) => {
   );
 };
 
-export const resolveMultipleReports = ({ id, reportIds }: { id: Id, reportIds: Array<Id> }) => {
+export const resolveCommentMultipleReports = ({
+  id,
+  reportIds,
+}: {
+  id: Id;
+  reportIds: Array<Id>;
+}) => {
   return axiosInstance.put(
     getApiURL(`moderate/single/${id}/report/resolve`),
-    reportIds
+    reportIds,
   );
 };
+
+export const resolveMultipleReports = (reportsIds: Array<Id>) =>
+  axiosInstance.put(getApiURL(`moderate/multiple/report/resolve`), reportsIds);
+;
+
+export const resolveAllAbuseReportsForComment = (commentId: Id) =>
+  axiosInstance.put(getApiURL(`moderate/all/${commentId}/report/resolve`));
+
+export const resolveAllAbuseReportsForThread = (commentId: Id) =>
+  axiosInstance.put(
+    getApiURL(`moderate/all/${commentId}/report/resolve-thread`),
+  );

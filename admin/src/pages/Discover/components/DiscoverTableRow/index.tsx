@@ -11,7 +11,6 @@ import { Link } from "@strapi/design-system/Link";
 import { Stack } from "@strapi/design-system/Stack";
 import { Tr, Td } from "@strapi/design-system/Table";
 import { Typography } from "@strapi/design-system/Typography";
-import { Eye } from "@strapi/icons";
 import { useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
 import {
   getMessage,
@@ -22,7 +21,7 @@ import {
 } from "../../../../utils";
 import { blockItem, blockItemThread } from "../../../utils/api";
 import { pluginId } from "../../../../pluginId";
-import { ReviewIcon, LockIcon } from "../../../../components/icons";
+import { ReviewIcon, LockIcon, eye } from "../../../../components/icons";
 import { TableLink } from "./styles";
 import renderEntryTitle from "../../../../utils/renderEntryTitle";
 import DiscussionThreadItemApprovalFlowActions from "../../../../components/DiscussionThreadItemApprovalFlowActions";
@@ -229,7 +228,7 @@ const DiscoverTableRow = ({
             <IconButton
               onClick={handleClick}
               label={getMessage("page.discover.table.action.display")}
-              icon={<Eye />}
+              icon={eye}
             />
           </IconButtonGroupStyled>
         </Flex>

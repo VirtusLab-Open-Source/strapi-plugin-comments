@@ -21,7 +21,7 @@ import { Box } from "@strapi/design-system/Box";
 import { Link } from "@strapi/design-system/Link";
 import { Loader } from "@strapi/design-system/Loader";
 import { useNotifyAT } from "@strapi/design-system/LiveRegions";
-import { ArrowLeft } from "@strapi/icons";
+import { arrowLeft } from "../../components/icons";
 
 import { isEmpty } from "lodash";
 import {
@@ -117,7 +117,7 @@ const Details = ({ config }) => {
             <>
               <HeaderLayout
                 navigationAction={
-                  <Link startIcon={<ArrowLeft />} to={getUrl(`discover`)}>
+                    <Link startIcon={arrowLeft} to={getUrl(`discover`)}>
                     {getMessage("HeaderLayout.link.go-back", "Back", false)}
                   </Link>
                 }

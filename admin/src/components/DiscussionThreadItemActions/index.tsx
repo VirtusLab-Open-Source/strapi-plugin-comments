@@ -13,7 +13,6 @@ import { isNil, isEmpty } from "lodash";
 import { Flex } from "@strapi/design-system/Flex";
 import { IconButton } from "@strapi/design-system/IconButton";
 import { useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
-import { Eye } from "@strapi/icons";
 import {
   getMessage,
   getUrl,
@@ -28,9 +27,10 @@ import {
   blockItemThread,
   unblockItem,
   unblockItemThread,
+  resolveAllAbuseReportsForThread,
 } from "../../pages/utils/api";
 import { pluginId } from "../../pluginId";
-import { LockIcon, UnlockIcon } from "../icons";
+import { LockIcon, UnlockIcon, eye } from "../icons";
 import DiscussionThreadItemApprovalFlowActions from "../DiscussionThreadItemApprovalFlowActions";
 import StatusBadge from "../StatusBadge";
 import { IconButtonGroupStyled } from "../IconButton/styles";
@@ -82,6 +82,15 @@ const DiscussionThreadItemActions = ({
   const onError = (err) => {
     handleAPIError(err, toggleNotification);
   };
+
+  const resolveAllAbuseReportsForThreadMutation = useMutation(
+    resolveAllAbuseReportsForThread,
+    {
+      onSuccess: () => { },
+      onError,
+      refetchActive: false,
+    }
+  )
 
   const blockItemMutation = useMutation(blockItem, {
     onSuccess: onSuccess(
@@ -148,6 +157,13 @@ const DiscussionThreadItemActions = ({
       </StatusBadge>
     );
   };
+
+  const handleResolveAllAbuseReportsForThread = async () => {
+    if (canModerate) {
+      lockApp();
+      resolveAllAbuseReportsForThreadMutation.mutate(id);
+    }
+  }
 
   const handleBlockClick = () => setBlockConfirmationVisible(true);
   const handleBlockConfirm = async () => {
@@ -293,7 +309,7 @@ const DiscussionThreadItemActions = ({
           <IconButtonGroupStyled isSingle withMargin>
             <IconButton
               onClick={handleDrilldownClick}
-              icon={<Eye />}
+              icon={eye}
               label={getMessage(
                 "page.details.panel.discussion.nav.drilldown",
                 "Drilldown thread"
@@ -337,7 +353,11 @@ const DiscussionThreadItemActions = ({
             "page.details.actions.thread.block.confirmation.button.confirm"
           )}
           iconConfirm={<LockIcon />}
-          onConfirm={handleBlockThreadConfirm}
+          onConfirm={() => {
+            console.log(id);
+            handleBlockThreadConfirm(id);
+            handleResolveAllAbuseReportsForThread(id);
+          }}
           onCancel={handleBlockThreadCancel}
         >
           {getMessage(

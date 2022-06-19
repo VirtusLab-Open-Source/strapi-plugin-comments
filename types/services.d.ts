@@ -112,14 +112,15 @@ export interface IServiceAdmin {
   getCommonService(): IServiceCommon;
   config<T extends AnyConfig>(viaSettingsPage?: boolean): Promise<T>;
   updateConfig(
-    body: SettingsCommentsPluginConfig | undefined
+    body: SettingsCommentsPluginConfig | undefined,
   ): Promise<SettingsCommentsPluginConfig>;
   restoreConfig(): Promise<SettingsCommentsPluginConfig>;
   restart(): void;
   findAll(props: AdminFindAllProps): Promise<AdminPaginatedResponse<Comment>>;
+  findReports(props: AdminFindAllProps): Promise<ToBeFixed>;
   findOneAndThread(
     id: Id,
-    props: AdminFindOneAndThreadProps
+    props: AdminFindOneAndThreadProps,
   ): Promise<AdminSinglePageResponse>;
   blockComment(id: Id, forceStatus?: boolean): Promise<Comment>;
   blockCommentThread(id: Id, forceStatus?: boolean): Promise<Comment>;
@@ -127,8 +128,25 @@ export interface IServiceAdmin {
   rejectComment(id: Id): Promise<Comment>;
   blockNestedThreads(id: Id, blockStatus?: boolean): Promise<boolean>;
   resolveAbuseReport(id: Id, commentId: Id): Promise<CommentReport>;
-  resolveMultipleAbuseReports(ids: Array<Id>, commentId: Id): Promise<StrapiDBBulkActionResponse>;
-  getDefaultAuthorPopulate(): { populate: PopulateClause<"avatar"> } | undefined;
+  resolveCommentMultipleAbuseReports(
+    ids: Array<Id>,
+    commentId: Id,
+  ): Promise<StrapiDBBulkActionResponse>;
+  resolveAllAbuseReportsForComment(
+    this: IServiceAdmin,
+    commentId: Id,
+  ): Promise<StrapiDBBulkActionResponse>;
+  resolveAllAbuseReportsForThread(
+    this: IServiceAdmin,
+    commentId: Id,
+  ): Promise<any>;
+  resolveMultipleAbuseReports(
+    this: IServiceAdmin,
+    ids: Array<Id>,
+  ): Promise<StrapiDBBulkActionResponse>;
+  getDefaultAuthorPopulate():
+    | { populate: PopulateClause<"avatar"> }
+    | undefined;
 }
 
 export interface IServiceClient {

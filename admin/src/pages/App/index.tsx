@@ -9,34 +9,35 @@
 import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators, compose } from "redux";
-import { Switch, Route } from "react-router-dom";
-import { useQuery } from "react-query";
+import {Switch, Route, Redirect} from 'react-router-dom';
+import {useQuery} from 'react-query';
 import {
   NotFound,
   LoadingIndicatorPage,
   useNotification,
-} from "@strapi/helper-plugin";
+} from '@strapi/helper-plugin';
 
-import ComingSoonPage from "../ComingSoonPage";
-import getUrl from "../../utils/getUrl";
-import Discover from "../Discover";
-import Details from "../Details";
-import { fetchConfig } from "./utils/api";
-import { setConfig } from "./reducer/actions";
-import makeAppView from "./reducer/selectors";
+import ComingSoonPage from '../ComingSoonPage';
+import getUrl from '../../utils/getUrl';
+import Discover from '../Discover';
+import Details from '../Details';
+import Reports from '../Reports';
+import {fetchConfig} from './utils/api';
+import {setConfig} from './reducer/actions';
+import makeAppView from './reducer/selectors';
 
-const App = ({ setConfig }) => {
+const App = ({setConfig}) => {
   const toggleNotification = useNotification();
 
-  const { isLoading, isFetching } = useQuery(
-    "get-config",
+  const {isLoading, isFetching} = useQuery(
+    'get-config',
     () => fetchConfig(toggleNotification),
     {
       initialData: {},
       onSuccess: (response) => {
         setConfig(response);
       },
-    }
+    },
   );
 
   if (isLoading || isFetching) {
@@ -46,12 +47,16 @@ const App = ({ setConfig }) => {
   return (
     <div>
       <Switch>
-        <Route path={getUrl("dashboard")} component={ComingSoonPage} exact />
-        <Route path={getUrl("discover")} component={Discover} exact />
-        <Route path={getUrl("discover/:id")} component={Details} exact />
-        <Route path={getUrl("reports")} component={ComingSoonPage} exact />
-        <Route path={getUrl("settings")} component={ComingSoonPage} exact />
-        <Route component={NotFound} />
+        <Route path={getUrl('discover/:id')} component={Details} />
+        <Route path={getUrl('dashboard')} component={ComingSoonPage} />
+        <Route path={getUrl('discover')} component={Discover} />
+        <Route path={getUrl('settings')} component={ComingSoonPage} />
+        <Route path={getUrl('reports')} component={Reports} />
+        <Route
+          path={getUrl()}
+          exact
+          children={<Redirect to={getUrl('discover')} />}
+        />
       </Switch>
     </div>
   );
