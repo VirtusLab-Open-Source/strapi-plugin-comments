@@ -90,6 +90,14 @@ const routes: StrapiRoute[] = [
     },
   },
   {
+    method: "POST",
+    path: "/moderate/thread/:id/postComment",
+    handler: "admin.postComment",
+    config: {
+      policies: [],
+    },
+  },
+  {
     method: "GET",
     path: "/settings/config",
     handler: "admin.settingsConfig",

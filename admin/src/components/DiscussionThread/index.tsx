@@ -19,6 +19,7 @@ import { getMessage, getUrl } from "../../utils";
 import LoadingIndicatorOverlay from "../LoadingIndicatorOverlay";
 import { LoadingIndicatorContainer } from "../LoadingIndicatorOverlay/styles";
 
+
 const DiscussionThread = ({
   level = [],
   selected = {},
@@ -51,7 +52,7 @@ const DiscussionThread = ({
           </Link>
         )}
       </Flex>
-      <Flex as="ul" direction="column" alignItems="flex-start">
+      <Flex as="ul" direction="column" alignItems="flex-start" marginBottom={4}>
         {rootThread && (
           <DiscussionThreadItem
             {...rootThread}

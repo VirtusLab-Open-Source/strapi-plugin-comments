@@ -22,7 +22,6 @@ import { Link } from "@strapi/design-system/Link";
 import { Loader } from "@strapi/design-system/Loader";
 import { useNotifyAT } from "@strapi/design-system/LiveRegions";
 import { ArrowLeft } from "@strapi/icons";
-
 import { isEmpty } from "lodash";
 import {
   LoadingIndicatorPage,
@@ -39,6 +38,7 @@ import Nav from "../../components/Nav";
 import DetailsEntity from "./components/DetailsEntity";
 import DiscussionThread from "../../components/DiscussionThread";
 import makeAppView from "../App/reducer/selectors";
+import ModeratorResponse from "../../components/ModeratorResponse/index";
 
 const Details = ({ config }) => {
   useFocusWhenNavigate();
@@ -73,6 +73,7 @@ const Details = ({ config }) => {
   } = useRBAC(viewPermissions);
 
   const [filters, setFilters] = useState({});
+  const [refresher, setRefresher] = useState<Boolean>(true);
 
   const regexUID = new RegExp(
     parseRegExp(config.regex.uid).value,
@@ -84,7 +85,7 @@ const Details = ({ config }) => {
     data,
     isFetching,
   } = useQuery(
-    ["get-details-data", id, filters, canAccess],
+    ["get-details-data", id, filters, canAccess,refresher],
     () => fetchDetailsData(id, filters, toggleNotification),
     {
       initialData: {},
@@ -104,6 +105,7 @@ const Details = ({ config }) => {
   );
 
   const handleChangeFilters = (props) => setFilters(props);
+  const handleRefresh = () => setRefresher(!refresher)
 
   const isLoading = isLoadingForData || isFetching;
 
@@ -128,16 +130,24 @@ const Details = ({ config }) => {
               <ContentLayout>
                 <TwoColsLayout
                   startCol={
-                    <DiscussionThread
-                      level={level}
-                      selected={selected}
-                      isReloading={isLoading}
-                      allowedActions={{
-                        canModerate,
-                        canAccessReports,
-                        canReviewReports,
-                      }}
-                    />
+                    <>
+                      <DiscussionThread
+                        level={level}
+                        selected={selected}
+                        isReloading={isLoading}
+                        allowedActions={{
+                          canModerate,
+                          canAccessReports,
+                          canReviewReports,
+                        }}
+                      />
+                      {selected?.threadOf && 
+                          <ModeratorResponse 
+                            rootThread={...selected.threadOf}
+                            onRefresh={handleRefresh}  
+                          />
+                      }
+                    </>
                   }
                   endCol={
                     <DetailsEntity

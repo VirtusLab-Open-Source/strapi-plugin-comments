@@ -2,7 +2,7 @@ import { stringify } from "qs";
 import { isEmpty } from "lodash";
 
 import { getApiURL, axiosInstance, handleAPIError } from "../../utils";
-import { Id } from "strapi-typed";
+import { Id, StrapiAdminUser } from "strapi-typed";
 import { ToBeFixed } from "../../../../types";
 
 // eslint-disable-next-line import/prefer-default-export
@@ -75,3 +75,14 @@ export const resolveMultipleReports = ({ id, reportIds }: { id: Id, reportIds: A
     reportIds
   );
 };
+
+export const postComment = (threadId: Id, body: string, author:StrapiAdminUser) => {
+  const axiosTest = axiosInstance.post(
+    getApiURL(`moderate/thread/${threadId}/postComment`),
+    {
+      content: body,
+      author: author
+    },
+  )
+  return axiosTest
+}

@@ -1,4 +1,4 @@
-import { StrapiContext, Id, StrapiDBQueryArgs, PropType, StrapiDBBulkActionResponse } from "strapi-typed";
+import { StrapiContext, Id, StrapiDBQueryArgs, PropType, StrapiDBBulkActionResponse, StrapiAdminUser } from "strapi-typed";
 import {
   AdminFindAllProps,
   AdminFindAllQueryParamsParsed,
@@ -14,6 +14,7 @@ import {
   PluginConfigKeys,
   RelatedEntity,
   SettingsCommentsPluginConfig,
+  ToBeFixed,
 } from "../../types";
 
 import { getPluginService, parseParams } from "./../utils/functions";
@@ -442,6 +443,40 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     }
 
     throw new PluginError(400, 'At least one of selected reports got invalid comment entity relation. Try again.');
+  },
+
+  //Post moderator comment
+  async postComment(
+    this: IServiceAdmin,
+    threadId: Id,
+    body: ToBeFixed,
+    author: StrapiAdminUser
+  ):Promise<Comment> {
+
+
+    const entity = await strapi.db
+      .query<Comment>(getModelUid("comment"))
+      .findOne({
+        where: {
+          id: threadId,
+        },
+      });
+
+    const postComment = await strapi.db
+      .query<Comment>(getModelUid("comment"))
+      .create({
+        data: {
+          approvalStatus: "APPROVED",
+          authorId: author.id,
+          authorName: author.username,
+          authorEmail: author.email,
+          content: body,
+          threadOf: threadId,
+          related: entity.related
+        },
+      });
+
+      return postComment
   },
 
   // Recognize Strapi User fields possible to populate

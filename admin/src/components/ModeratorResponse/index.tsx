@@ -8,6 +8,7 @@ import React, { useState,useEffect } from "react";
 import { useMutation } from "react-query";
 import { unblockItemThread } from "../../pages/utils/api";
 import { ModeratorResponseStyled } from "./styles";
+import { postComment } from "../../pages/utils/api"
 //@ts-ignore
 import { Box } from "@strapi/design-system/Box";
 //@ts-ignore
@@ -20,12 +21,13 @@ import { Button } from '@strapi/design-system/Button';
 import { Divider } from '@strapi/design-system/Divider';
 import { getMessage } from "../../utils";
 import Wysiwyg from "../Wysiwyg";
+import { Comment } from "../../../../types/contentTypes"
+// @ts-ignore
+import { auth } from "@strapi/helper-plugin";
+import { StrapiAdminUser } from "strapi-typed";
 
 type ModeratorResponseProps = {
-    rootThread: {
-        id: number,
-        blockedThread:boolean
-    };
+    rootThread: Comment
     onRefresh: ()=> void;
 }
 
@@ -48,28 +50,30 @@ const ModeratorResponse: React.FC<ModeratorResponseProps> = ({ rootThread,onRefr
     setCommentField(e.target.value);
   }
 
+  const user: StrapiAdminUser = auth.get('userInfo')
+    
   useEffect(() => {
     commentField.length 
         ? setIsFieldEmpty(false) 
         : setIsFieldEmpty(true)
   }, [commentField])
   
-
   const unblockItemThreadMutation = useMutation(unblockItemThread);
 
-  const handleSave = (): void => {
-    console.log("Save");
+  const handleSave = async (): Promise<void> => {
+    await postComment(threadID,commentField,user);
+    onRefresh();
   }
 
-  const handleReopen =  (): void => {
-    unblockItemThreadMutation.mutate(threadID);
+  const handleReopen =  async (): Promise<void> => {
+    await unblockItemThreadMutation.mutate(threadID);
+    await postComment(threadID,commentField,user);
     onRefresh();
-    console.log("Re-Open");
   }
   
   const intlLabel: intlLabel = {
-    id:"ModeratorResponse",
-    defaultMessage:"ModeratorResponse",
+    id:"",
+    defaultMessage:"",
     values:{}
   }
 
@@ -91,7 +95,7 @@ const ModeratorResponse: React.FC<ModeratorResponseProps> = ({ rootThread,onRefr
             </Box>
             <Box paddingTop={2} paddingBottom={4}>
                 <Wysiwyg
-                    name="rich-text"
+                    name=""
                     value={commentField}
                     onChange={handleCommentChange}
                     intlLabel = {intlLabel}
@@ -114,7 +118,7 @@ const ModeratorResponse: React.FC<ModeratorResponseProps> = ({ rootThread,onRefr
                     onClick={handleSave}
                     disabled={isFieldEmpty}
                 >
-                    Send   
+                    Send
                 </Button>
             </Flex> 
         </Box>
