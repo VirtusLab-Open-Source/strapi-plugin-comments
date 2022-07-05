@@ -5,7 +5,7 @@
  */
 
 import React, { useState,useEffect } from "react";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { unblockItemThread } from "../../pages/utils/api";
 import { ModeratorResponseStyled } from "./styles";
 import { postComment } from "../../pages/utils/api"
@@ -19,16 +19,17 @@ import { Flex } from "@strapi/design-system/Flex";
 import { Button } from '@strapi/design-system/Button';
 //@ts-ignore
 import { Divider } from '@strapi/design-system/Divider';
-import { getMessage } from "../../utils";
+import { getMessage, handleAPIError } from "../../utils";
 import Wysiwyg from "../Wysiwyg";
 import { Comment } from "../../../../types/contentTypes"
 // @ts-ignore
-import { auth } from "@strapi/helper-plugin";
-import { StrapiAdminUser } from "strapi-typed";
+import { auth, useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
+import { StrapiAdminUser, Id } from "strapi-typed";
+import { pluginId } from "../../pluginId";
+import { ToBeFixed } from "../../../../types";
 
 type ModeratorResponseProps = {
     rootThread: Comment
-    onRefresh: ()=> void;
 }
 
 type intlLabel = {
@@ -37,9 +38,15 @@ type intlLabel = {
     values:{}
 }
 
-const ModeratorResponse: React.FC<ModeratorResponseProps> = ({ rootThread,onRefresh }) => {
+type postCommentRequest = {
+    threadId: Id, 
+    body: string,
+    author:StrapiAdminUser
+}
+
+const ModeratorResponse: React.FC<ModeratorResponseProps> = ({ rootThread }) => {
     const { 
-        id:threadID,
+        id:threadId,
         blockedThread 
     } = rootThread;
 
@@ -58,17 +65,52 @@ const ModeratorResponse: React.FC<ModeratorResponseProps> = ({ rootThread,onRefr
         : setIsFieldEmpty(true)
   }, [commentField])
   
-  const unblockItemThreadMutation = useMutation(unblockItemThread);
+  const toggleNotification = useNotification();
+  const queryClient = useQueryClient();
+  const { lockApp, unlockApp } = useOverlayBlocker();
+
+  const onSuccess =
+    (message:string, stateAction = (_func:boolean):void => {}) =>
+    async ():Promise<void> => {
+      await queryClient.invalidateQueries("get-details-data");
+      toggleNotification({
+        type: "success",
+        message: `${pluginId}.${message}`,
+      });
+      stateAction(false);
+      unlockApp();
+    };
+
+  const onError = (err:ToBeFixed) => {
+    handleAPIError(err, toggleNotification);
+  };
+
+  const unblockItemThreadMutation = useMutation<Response, Error, Id,unknown>(unblockItemThread);
+
+  const postCommentMutation = useMutation<Response, Error,postCommentRequest>(postComment, {
+    onSuccess: onSuccess(
+      "page.details.actions.comment.post.confirmation"
+    ),
+    onError
+  });
 
   const handleSave = async (): Promise<void> => {
-    await postComment(threadID,commentField,user);
-    onRefresh();
+    lockApp();
+    await postCommentMutation.mutate({
+        threadId,
+        body: commentField,
+        author: user
+        });
   }
 
   const handleReopen =  async (): Promise<void> => {
-    await unblockItemThreadMutation.mutate(threadID);
-    await postComment(threadID,commentField,user);
-    onRefresh();
+    lockApp();
+    await unblockItemThreadMutation.mutate(threadId);
+    await postCommentMutation.mutate({
+        threadId,
+        body: commentField,
+        author: user
+        });
   }
   
   const intlLabel: intlLabel = {

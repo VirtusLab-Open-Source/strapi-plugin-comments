@@ -80,7 +80,7 @@ export const resolveMultipleReports = ({ id, reportIds }: { id: Id, reportIds: A
   );
 };
 
-export const postComment = (threadId: Id, body: string, author:StrapiAdminUser) => {
+export const postComment = ({threadId, body, author} :{threadId: Id, body: string, author:StrapiAdminUser}):Promise<Response> => {
   const axiosTest = axiosInstance.post(
     getApiURL(`moderate/thread/${threadId}/postComment`),
     {

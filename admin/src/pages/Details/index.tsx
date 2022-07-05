@@ -73,7 +73,6 @@ const Details = ({ config }) => {
   } = useRBAC(viewPermissions);
 
   const [filters, setFilters] = useState({});
-  const [refresher, setRefresher] = useState<Boolean>(true);
 
   const regexUID = new RegExp(
     parseRegExp(config.regex.uid).value,
@@ -85,7 +84,7 @@ const Details = ({ config }) => {
     data,
     isFetching,
   } = useQuery(
-    ["get-details-data", id, filters, canAccess,refresher],
+    ["get-details-data", id, filters, canAccess],
     () => fetchDetailsData(id, filters, toggleNotification),
     {
       initialData: {},
@@ -105,7 +104,6 @@ const Details = ({ config }) => {
   );
 
   const handleChangeFilters = (props) => setFilters(props);
-  const handleRefresh = () => setRefresher(!refresher)
 
   const isLoading = isLoadingForData || isFetching;
 
@@ -144,7 +142,6 @@ const Details = ({ config }) => {
                       {selected?.threadOf && 
                           <ModeratorResponse 
                             rootThread={...selected.threadOf}
-                            onRefresh={handleRefresh}  
                           />
                       }
                     </>
