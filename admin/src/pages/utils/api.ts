@@ -55,6 +55,10 @@ export const rejectItem = (id: Id) => {
   return axiosInstance.patch(getApiURL(`moderate/single/${id}/reject`));
 };
 
+export const deleteItem = (id: Id) => {
+  return axiosInstance.delete(getApiURL(`moderate/single/${id}/delete`));
+};
+
 export const blockItemThread = (id: Id) => {
   return axiosInstance.patch(getApiURL(`moderate/thread/${id}/block`));
 };

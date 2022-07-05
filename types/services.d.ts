@@ -121,6 +121,7 @@ export interface IServiceAdmin {
     props: AdminFindOneAndThreadProps
   ): Promise<AdminSinglePageResponse>;
   blockComment(id: Id, forceStatus?: boolean): Promise<Comment>;
+  deleteComment(id: Id): Promise<Comment>;
   blockCommentThread(id: Id, forceStatus?: boolean): Promise<Comment>;
   approveComment(id: Id): Promise<Comment>;
   rejectComment(id: Id): Promise<Comment>;

@@ -13,7 +13,7 @@ import { isNil, isEmpty } from "lodash";
 import { Flex } from "@strapi/design-system/Flex";
 import { IconButton } from "@strapi/design-system/IconButton";
 import { useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
-import { Eye } from "@strapi/icons";
+import { Eye, Trash } from "@strapi/icons";
 import {
   getMessage,
   getUrl,
@@ -28,6 +28,7 @@ import {
   blockItemThread,
   unblockItem,
   unblockItemThread,
+  deleteItem
 } from "../../pages/utils/api";
 import { pluginId } from "../../pluginId";
 import { LockIcon, UnlockIcon } from "../icons";
@@ -36,6 +37,9 @@ import StatusBadge from "../StatusBadge";
 import { IconButtonGroupStyled } from "../IconButton/styles";
 import { ActionButton } from "../ActionButton/styles";
 import DiscussionThreadItemReviewAction from "../DiscussionThreadItemReviewAction";
+// @ts-ignore
+import { auth } from "@strapi/helper-plugin";
+import { StrapiAdminUser } from "strapi-typed";
 
 const DiscussionThreadItemActions = ({
   allowedActions: { canModerate, canAccessReports, canReviewReports },
@@ -53,7 +57,10 @@ const DiscussionThreadItemActions = ({
     preview,
     reports = [],
     approvalStatus,
+    author
   } = item;
+
+  const user: StrapiAdminUser = auth.get('userInfo')
 
   const [blockConfirmationVisible, setBlockConfirmationVisible] =
     useState(false);
@@ -98,6 +105,13 @@ const DiscussionThreadItemActions = ({
     onError,
     refetchActive: false,
   });
+  const deleteItemMutation = useMutation(deleteItem, {
+    onSuccess: onSuccess(
+      "page.details.actions.comment.delete.confirmation.success"
+    ),
+    onError,
+    refetchActive: true,
+  });
   const blockItemThreadMutation = useMutation(blockItemThread, {
     onSuccess: onSuccess(
       "page.details.actions.thread.block.confirmation.success",
@@ -125,6 +139,7 @@ const DiscussionThreadItemActions = ({
   const hasActiveThread =
     gotThread && !(removed || preview || pinned || blockedThread);
   const isStatusBadgeVisible = isBlocked || reviewFlowEnabled;
+  const isAdminAuthor = user.id == author.id
 
   const renderStatus = (props) => {
     const status = resolveCommentStatus({ ...props, reviewFlowEnabled });
@@ -163,6 +178,13 @@ const DiscussionThreadItemActions = ({
     if (canModerate) {
       lockApp();
       unblockItemMutation.mutate(id);
+    }
+  };
+
+  const handleDeleteClick = async () => {
+    if (canModerate) {
+      lockApp();
+      deleteItemMutation.mutate(id);
     }
   };
 
@@ -270,6 +292,17 @@ const DiscussionThreadItemActions = ({
                 id={id}
                 allowedActions={{ canModerate }}
                 queryToInvalidate="get-details-data"
+              />
+            )}
+            {!blockedThread && !blocked && isAdminAuthor && (
+              <IconButton
+                onClick={handleDeleteClick}
+                loading={unblockItemMutation.isLoading}
+                icon={<Trash/>}
+                label={getMessage(
+                  "page.details.actions.comment.delete",
+                  "Delete comment"
+                )}
               />
             )}
             <DiscussionThreadItemReviewAction

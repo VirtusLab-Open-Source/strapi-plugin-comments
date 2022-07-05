@@ -58,6 +58,14 @@ const routes: StrapiRoute[] = [
     },
   },
   {
+    method: "DELETE",
+    path: "/moderate/single/:id/delete",
+    handler: "admin.deleteComment",
+    config: {
+      policies: [],
+    },
+  },
+  {
     method: "PATCH",
     path: "/moderate/single/:id/report/:reportId/resolve",
     handler: "admin.resolveAbuseReport",

@@ -90,6 +90,7 @@ export interface IControllerAdmin {
   ): ThrowablePromisedResponse<AdminSinglePageResponse>;
   blockComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
   unblockComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
+  deleteComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
   blockCommentThread(
     ctx: StrapiRequestContext
   ): ThrowablePromisedResponse<Comment>;

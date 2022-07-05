@@ -123,6 +123,18 @@ const controllers: IControllerAdmin = {
     }
   },
 
+  async deleteComment(
+    ctx: StrapiRequestContext<never>
+  ): ThrowablePromisedResponse<Comment> {
+    const { params = {} } = ctx;
+    const { id } = parseParams(params);
+    try {
+      return await this.getService<IServiceAdmin>().deleteComment(id);
+    } catch (e) {
+      throw throwError(ctx, e);
+    }
+  },
+
   async blockCommentThread(
     ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<Comment> {

@@ -328,6 +328,23 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     return this.getCommonService().sanitizeCommentEntity(changedEntity);
   },
 
+  // Delete a comment
+  async deleteComment(
+    this: IServiceAdmin,
+    id: Id,
+  ): Promise<Comment> {
+
+    const changedEntity = await strapi.db
+      .query<Comment>(getModelUid("comment"))
+      .update({
+        where: { id },
+        data: {
+          removed: true,
+        },
+      });
+    return this.getCommonService().sanitizeCommentEntity(changedEntity);
+  },
+
   // Block / Unblock a comment thread
   async blockCommentThread(
     this: IServiceAdmin,

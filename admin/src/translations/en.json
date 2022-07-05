@@ -74,6 +74,8 @@
   "page.details.actions.comment.block.confirmation.success": "Comment has been blocked",
   "page.details.actions.comment.unblock": "Unblock comment",
   "page.details.actions.comment.unblock.confirmation.success": "Comment has been unblocked",
+  "page.details.actions.comment.delete": "Delete comment",
+  "page.details.actions.comment.delete.confirmation.success": "Comment has been deleted",
   "page.details.actions.comment.reports.review": "Review",
   "page.details.actions.thread.block": "Block thread",
   "page.details.actions.thread.block.confirmation.header": "Moderation: Block thread",
