@@ -173,19 +173,17 @@ const DiscussionThreadItemReviewAction = ({
                     "Block comment"
                   )}
                 </Button>
-                {item.gotThread && (
-                  <Button
-                    onClick={handleBlockItemThreadClick}
-                    variant="danger"
-                    startIcon={<LockIcon />}
-                    disabled={areBlockButtonsDisabled}
-                  >
-                    {getMessage(
-                      `page.details.actions.thread.block`,
-                      "Block thread"
-                    )}
-                  </Button>
-                )}
+                <Button
+                  onClick={handleBlockItemThreadClick}
+                  variant="danger"
+                  startIcon={<LockIcon />}
+                  disabled={areBlockButtonsDisabled}
+                >
+                  {getMessage(
+                    `page.details.actions.thread.block`,
+                    "Block thread"
+                  )}
+                </Button>
                 {hasAnySelectedItems && (<Button
                   onClick={handleClickResolveSelected}
                   variant="success"
