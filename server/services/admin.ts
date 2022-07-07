@@ -496,6 +496,25 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       return postComment
   },
 
+  //Update moderator comment
+  async updateComment(
+    this: IServiceAdmin,
+    id: Id,
+    body: ToBeFixed,
+  ):Promise<Comment> {
+
+
+    const updateComment = await strapi.db
+      .query<Comment>(getModelUid("comment"))
+      .update({
+        where: {id},
+        data: {
+          content: body
+        }
+      });
+    return this.getCommonService().sanitizeCommentEntity(updateComment);
+  },
+
   // Recognize Strapi User fields possible to populate
   getDefaultAuthorPopulate(this: IServiceAdmin): undefined | any {
     const strapiUserTypeUid = 'plugin::users-permissions.user';

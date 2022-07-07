@@ -129,6 +129,7 @@ export interface IServiceAdmin {
   resolveAbuseReport(id: Id, commentId: Id): Promise<CommentReport>;
   resolveMultipleAbuseReports(ids: Array<Id>, commentId: Id): Promise<StrapiDBBulkActionResponse>;
   postComment(threadId: Id, body: string, author: StrapiAdminUser): Promise<Comment>;
+  updateComment(id: Id, body: string): Promise<Comment>;
   getDefaultAuthorPopulate(): { populate: PopulateClause<"avatar"> } | undefined;
 }
 

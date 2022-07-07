@@ -218,6 +218,24 @@ const controllers: IControllerAdmin = {
     }
   },  
 
+  async updateComment(
+    ctx: StrapiRequestContext<never>
+  ): ThrowablePromisedResponse<Comment> {
+    
+    const { params = {}, request } = ctx;
+    const { body }:ToBeFixed = request;
+    const { id } = parseParams(params);
+    
+    try {
+      return await this.getService<IServiceAdmin>().updateComment(
+        id,
+        body.content,
+      );
+    } catch (e) {
+      throw throwError(ctx, e);
+    }
+  },  
+
   async approveComment(
     ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<Comment> {
