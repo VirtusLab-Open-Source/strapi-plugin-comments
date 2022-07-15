@@ -4,13 +4,13 @@
  *
  */
 
-//@ts-nocheck
+//@ts-ignore
 import styled, {ThemeInterface} from 'styled-components';
 
 /* eslint-disable */
 /* stylelint-disable */
 export const EditorStylesContainer = styled.div`
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed !important' : 'auto')};
+  cursor: ${({ disabled }: ThemeInterface) => (disabled ? 'not-allowed !important' : 'auto')};
   height: 100%;
   /* BASICS */
   .CodeMirror-placeholder {
@@ -20,7 +20,7 @@ export const EditorStylesContainer = styled.div`
   .CodeMirror {
     /* Set height, width, borders, and global font properties here */
     font-size: ${14 / 16}rem;
-    height: ${({ isExpandMode }) => (isExpandMode ? '100%' : '290px')};
+    height: ${({ isExpandMode }: ThemeInterface) => (isExpandMode ? '100%' : '290px')};
     color: ${({ theme }:ThemeInterface) => theme.colors.neutral800};
     direction: ltr;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,

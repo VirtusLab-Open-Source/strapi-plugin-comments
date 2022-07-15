@@ -12,7 +12,7 @@ import { useHistory } from "react-router-dom";
 import { isNil, isEmpty } from "lodash";
 import { Flex } from "@strapi/design-system/Flex";
 import { IconButton } from "@strapi/design-system/IconButton";
-import { useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
+import { useNotification, useOverlayBlocker, auth } from "@strapi/helper-plugin";
 import { Eye, Trash, Plus, Pencil } from "@strapi/icons";
 import {
   getMessage,
@@ -37,8 +37,6 @@ import StatusBadge from "../StatusBadge";
 import { IconButtonGroupStyled } from "../IconButton/styles";
 import { ActionButton } from "../ActionButton/styles";
 import DiscussionThreadItemReviewAction from "../DiscussionThreadItemReviewAction";
-// @ts-ignore
-import { auth } from "@strapi/helper-plugin";
 import { StrapiAdminUser } from "strapi-typed";
 import ModeratorResponseModal from "../ModeratorResponseModal/ModeratorResponseModal";
 

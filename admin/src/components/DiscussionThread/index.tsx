@@ -19,7 +19,6 @@ import { getMessage, getUrl } from "../../utils";
 import LoadingIndicatorOverlay from "../LoadingIndicatorOverlay";
 import { LoadingIndicatorContainer } from "../LoadingIndicatorOverlay/styles";
 
-
 const DiscussionThread = ({
   level = [],
   selected = {},
