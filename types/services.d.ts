@@ -15,6 +15,8 @@ import {
   StrapiRequestQueryFieldsClause,
   PopulateClause,
   StrapiDBBulkActionResponse,
+  StrapiAdminUser,
+  WhereClause,
 } from "strapi-typed";
 import { ToBeFixed } from "./common";
 import {
@@ -42,7 +44,7 @@ export type FindAllFlatProps<T, TFields = keyof T> = {
   pagination?: StrapiPagination;
 };
 
-export type FindAllInHierarhyProps = Omit<FindAllFlatProps, "pagination"> & {
+export type FindAllInHierarchyProps = Omit<FindAllFlatProps, "pagination"> & {
   startingFromId?: Id | null;
   dropBlockedThreads?: boolean;
   isAdmin?: boolean;
@@ -80,10 +82,10 @@ export interface IServiceCommon {
     relatedEntity?: RelatedEntity | null | boolean
   ): Promise<StrapiPaginatedResponse<Comment>>;
   findAllInHierarchy(
-    props: FindAllInHierarhyProps,
+    props: FindAllInHierarchyProps,
     relatedEntity?: RelatedEntity | null | boolean
   ): Promise<Array<Comment>>;
-  findOne(criteria: KeyValueSet<any>): Promise<Comment>;
+  findOne(criteria: WhereClause): Promise<Comment>;
   findRelatedEntitiesFor(entities: Array<Comment>): Promise<RelatedEntity[]>;
   mergeRelatedEntityTo(
     entity: ToBeFixed,
