@@ -62,7 +62,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
 
     const relatedEntity = await strapi.db
       .query<RelatedEntity>(uid)
-      .findOne(relatedId);
+      .findOne({ where: { id: relatedId } });
     if (!relatedEntity) {
       throw new PluginError(
         400,

@@ -28,7 +28,7 @@ import {
 import {
   CommentsPluginConfig,
   FindAllFlatProps,
-  FindAllInHierarhyProps,
+  FindAllInHierarchyProps,
   IServiceCommon,
   ToBeFixed,
   Comment,
@@ -287,7 +287,7 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       fields,
       startingFromId = null,
       dropBlockedThreads = false,
-    }: FindAllInHierarhyProps,
+    }: FindAllInHierarchyProps,
     relatedEntity?: RelatedEntity | null | boolean
   ): Promise<Array<Comment>> {
     const entities = await this.findAllFlat(
