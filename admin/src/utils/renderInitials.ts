@@ -1,10 +1,10 @@
-import { first } from "lodash";
+import { first, isString } from "lodash";
 
-const renderInitials = (value = "") =>
+const renderInitials = (value = "") => isString(value) ?
   value
     .split(" ")
     .map((_) => first(_))
     .join("")
-    .toUpperCase();
+    .toUpperCase() : "";
 
 export default renderInitials;
