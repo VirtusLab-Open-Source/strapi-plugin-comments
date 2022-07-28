@@ -139,7 +139,7 @@ const DiscussionThreadItemActions = ({
   const hasActiveThread =
     gotThread && !(removed || preview || pinned || blockedThread);
   const isStatusBadgeVisible = isBlocked || reviewFlowEnabled;
-  const isAdminAuthor = user.id == author.id
+  const isAdminAuthor = String(user.id) === author.id
 
   const renderStatus = (props) => {
     const status = resolveCommentStatus({ ...props, reviewFlowEnabled });
@@ -165,7 +165,7 @@ const DiscussionThreadItemActions = ({
   };
 
   const handleBlockClick = () => setBlockConfirmationVisible(true);
-  const handleBlockConfirm = async () => {
+  const handleBlockConfirm = () => {
     if (canModerate) {
       lockApp();
       blockItemMutation.mutate(id);
@@ -174,14 +174,14 @@ const DiscussionThreadItemActions = ({
   const handleBlockCancel = () => {
     setBlockConfirmationVisible(false);
   };
-  const handleUnblockClick = async () => {
+  const handleUnblockClick = () => {
     if (canModerate) {
       lockApp();
       unblockItemMutation.mutate(id);
     }
   };
 
-  const handleDeleteClick = async () => {
+  const handleDeleteClick = () => {
     if (canModerate) {
       lockApp();
       deleteItemMutation.mutate(id);
@@ -189,7 +189,7 @@ const DiscussionThreadItemActions = ({
   };
 
   const handleBlockThreadClick = () => setBlockThreadConfirmationVisible(true);
-  const handleBlockThreadConfirm = async () => {
+  const handleBlockThreadConfirm = () => {
     if (canModerate) {
       lockApp();
       blockItemThreadMutation.mutate(id);
@@ -199,15 +199,15 @@ const DiscussionThreadItemActions = ({
     setBlockThreadConfirmationVisible(false);
   };
 
-  const handleStartThreadVisibility = () => {
+  const toggleStartThreadVisibility = () => {
     setStartThreadVisible(!startThreadVisible);
   }
 
-  const handleUpdateCommentVisibility = () => {
+  const toggleUpdateCommentVisibility = () => {
     setUpdateCommentVisible(!updateCommentVisible);
   }
 
-  const handleUnblockThreadClick = async () => {
+  const handleUnblockThreadClick = () => {
     if (canModerate) {
       lockApp();
       unblockItemThreadMutation.mutate(id);
@@ -256,7 +256,10 @@ const DiscussionThreadItemActions = ({
             loading={blockItemThreadMutation.isLoading}
             variant="danger"
           >
-            {getMessage("page.details.actions.thread.block", "Block thread")}
+            {getMessage(
+              "page.details.actions.thread.block", 
+              "Block thread"
+            )}
           </ActionButton>
         )}
         {blockedThread && (gotThread || pinned) && (
@@ -306,7 +309,7 @@ const DiscussionThreadItemActions = ({
             {!blockedThread && !blocked && isAdminAuthor && (
               <IconButton
                 onClick={handleDeleteClick}
-                loading={unblockItemMutation.isLoading}
+                loading={deleteItemMutation.isLoading}
                 icon={<Trash/>}
                 label={getMessage(
                   "page.details.actions.comment.delete",
@@ -314,14 +317,15 @@ const DiscussionThreadItemActions = ({
                 )}
               />
             )}
-            {isAdminAuthor && !isBlocked && <IconButton
-                onClick={handleUpdateCommentVisibility}
+            {isAdminAuthor && !isBlocked && ( 
+              <IconButton
+                onClick={toggleUpdateCommentVisibility}
                 icon={<Pencil />}
                 label={getMessage(
                   "page.details.actions.thread.modal.update.comment"
                 )}
               />
-            }
+            )}
             <DiscussionThreadItemReviewAction
               item={item}
               queryToInvalidate="get-details-data"
@@ -357,9 +361,9 @@ const DiscussionThreadItemActions = ({
           </IconButtonGroupStyled>
         )}
         <IconButtonGroupStyled>
-           {!hasActiveThread && !pinned && (
+           {!hasActiveThread && !pinned && (!blockedThread && !blocked) &&  (
             <IconButton
-              onClick={handleStartThreadVisibility}
+              onClick={toggleStartThreadVisibility}
               icon={<Plus />}
               label={getMessage(
                 "page.details.actions.thread.modal.start.thread"
@@ -375,10 +379,8 @@ const DiscussionThreadItemActions = ({
           title={getMessage(
             "page.details.actions.thread.modal.start.thread"
           )}
-          onClose={handleStartThreadVisibility}
-          >
-
-        </ModeratorResponseModal>
+          onClose={toggleStartThreadVisibility}
+        />
       }
       {updateCommentVisible && 
         <ModeratorResponseModal
@@ -387,10 +389,8 @@ const DiscussionThreadItemActions = ({
           title={getMessage(
             "page.details.actions.thread.modal.update.comment"
           )}
-          onClose={handleUpdateCommentVisibility}
-          >
-
-        </ModeratorResponseModal>
+          onClose={toggleUpdateCommentVisibility}
+        />
       }
       {!blocked && (
         <ConfirmationDialog

@@ -61,6 +61,8 @@
   "page.details.panel.discussion.warnings.reports.selected.dialog.confirmation.success": "Open reports has been resolved",
   "page.details.panel.discussion.status.blocked": "Blocked",
   "page.details.panel.discussion.reply":"Reply",
+  "page.details.panel.discussion.reopen":"Re-open",
+  "page.details.panel.discussion.send":"Send",
   "page.details.actions.comment.post.confirmation": "Comment has been posted",
   "page.details.actions.comment.update.confirmation": "Comment has been updated",
   "page.details.panel.entity": "Entity details",

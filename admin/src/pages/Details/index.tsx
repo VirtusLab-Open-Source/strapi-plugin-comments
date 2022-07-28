@@ -139,11 +139,11 @@ const Details = ({ config }) => {
                           canReviewReports,
                         }}
                       />
-                      {selected?.threadOf && 
-                          <ModeratorResponse 
-                            rootThread={...selected.threadOf}
-                          />
-                      }
+                      {selected?.threadOf && (
+                        <ModeratorResponse
+                          rootThread={{ ...selected.threadOf }}
+                        />
+                      )}
                     </>
                   }
                   endCol={

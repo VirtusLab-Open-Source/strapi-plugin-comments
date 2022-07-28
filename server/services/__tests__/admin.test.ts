@@ -59,6 +59,7 @@ describe("Test Comments service - Admin", () => {
   const relatedEntity = { id: 1, title: "Test", uid: collection };
   const reportEntity = { id: 1, related: db[0].id, content: "Abuse report", reason: "OTHER" };
   const adminUser = { id: 1, username: "Admin", email: "admin@example.com" }
+  const newCommentEntity = { approvalStatus: APPROVAL_STATUS.APPROVED, related }
 
   describe("Admin API", () => {
     describe("Config", () => {
@@ -646,5 +647,132 @@ describe("Test Comments service - Admin", () => {
         spy.mockRestore();
       });
     });
+    
+    describe("Modifying comments from moderators panel", () => {
+
+      beforeEach(() =>
+        setupStrapi({ enabledCollections: [collection] }, true, {
+          "plugins::comments": db,
+          "api::collection": [
+            relatedEntity,
+            { id: 2, title: "Test 2", uid: collection },
+          ],
+        })
+      );
+
+      test("Should remove comment", async () => {
+        const spy = jest
+          .spyOn(global.strapi.db, "query")
+          // @ts-ignore
+          .mockImplementation( (type: string) => ({
+            findOne: async (_: any) =>
+              new Promise((resolve) => {
+                switch (type) {
+                  case "plugins::comments.comment":
+                    return resolve(db[0]);
+                  case "plugins::comments.report":
+                    return resolve(reportEntity);
+                  default:
+                    return resolve(relatedEntity);
+                }
+              }),
+            update: async (_: any) => 
+              new Promise((resolve) => {
+                return resolve({
+                  ...db[0],
+                  ..._.data,
+                });
+              })
+          }));
+
+          const result = await getPluginService<IServiceAdmin>("admin").deleteComment(db[0].id);
+          expect(result).toHaveProperty(["id"], db[0].id);
+          expect(result).toHaveProperty(["removed"], true);
+
+          spy.mockRestore();
+      });
+
+      test("Should update comment", async () => {
+        const spy = jest
+          .spyOn(global.strapi.db, "query")
+          // @ts-ignore
+          .mockImplementation( (type: string) => ({
+            findOne: async (_: any) =>
+              new Promise((resolve) => {
+                switch (type) {
+                  case "plugins::comments.comment":
+                    return resolve(db[0]);
+                  case "plugins::comments.report":
+                    return resolve(reportEntity);
+                  default:
+                    return resolve(relatedEntity);
+                }
+              }),
+            update: async (_: any) => 
+              new Promise((resolve) => {
+                return resolve({
+                  ...db[0],
+                  ..._.data,
+                });
+              })
+          }));
+         
+        const updatedComment = "Updated Comment";  
+        const result = await getPluginService<IServiceAdmin>("admin").updateComment(db[0].id,updatedComment);
+        expect(result).toHaveProperty(["id"], db[0].id);
+        expect(result).toHaveProperty(["content"], updatedComment);
+
+        spy.mockRestore();
+      });
+    });
+    
+    describe("Posting comments from moderators panel", () => {
+
+      beforeEach(() =>
+        setupStrapi({ enabledCollections: [collection] }, true, {
+          "plugins::comments": db,
+          "api::collection": [
+            relatedEntity,
+            { id: 2, title: "Test 2", uid: collection },
+          ],
+        })
+      );
+
+      test("Should post new comment", async () => {
+        const lastCommentId = (Math.max(...db.map(comment=>Number(comment.id))));
+        const spy = jest
+          .spyOn(global.strapi.db, "query")
+          // @ts-ignore
+          .mockImplementation( (type: string) => ({
+            findOne: async (_: any) =>
+              new Promise((resolve) => {
+                switch (type) {
+                  case "plugins::comments.comment":
+                    return resolve(db[0]);
+                  case "plugins::comments.report":
+                    return resolve(reportEntity);
+                  default:
+                    return resolve(relatedEntity);
+                }
+              }),
+            create: async (_: any) => 
+              new Promise((resolve) => {
+                return resolve({
+                  id: lastCommentId + 1,
+                  ...newCommentEntity,
+                  ..._.data,
+                });
+              })
+          }));
+
+          const newComment = "New Comment";
+          const result = await getPluginService<IServiceAdmin>("admin").postComment(db[0].id,newComment,adminUser);
+          expect(result).toHaveProperty(["id"], lastCommentId + 1);
+          expect(result).toHaveProperty(["threadOf"], db[0].id);
+          expect(result).toHaveProperty(["content"], newComment);
+
+          spy.mockRestore();
+      });
+    })
   });
 });

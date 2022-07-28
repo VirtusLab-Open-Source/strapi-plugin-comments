@@ -223,7 +223,7 @@ const controllers: IControllerAdmin = {
   ): ThrowablePromisedResponse<Comment> {
     
     const { params = {}, request } = ctx;
-    const { body }:ToBeFixed = request;
+    const { body }: ToBeFixed = request;
     const { id } = parseParams(params);
     
     try {

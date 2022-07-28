@@ -469,8 +469,6 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     body: ToBeFixed,
     author: StrapiAdminUser
   ):Promise<Comment> {
-
-
     const entity = await strapi.db
       .query<Comment>(getModelUid("comment"))
       .findOne({
@@ -479,7 +477,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
         },
       });
 
-    const postComment = await strapi.db
+    return await strapi.db
       .query<Comment>(getModelUid("comment"))
       .create({
         data: {
@@ -492,8 +490,6 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
           related: entity.related
         },
       });
-
-      return postComment
   },
 
   //Update moderator comment
@@ -502,12 +498,10 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     id: Id,
     body: ToBeFixed,
   ):Promise<Comment> {
-
-
     const updateComment = await strapi.db
       .query<Comment>(getModelUid("comment"))
       .update({
-        where: {id},
+        where: { id },
         data: {
           content: body
         }

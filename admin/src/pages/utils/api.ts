@@ -2,7 +2,8 @@ import { stringify } from "qs";
 import { isEmpty } from "lodash";
 
 import { getApiURL, axiosInstance, handleAPIError } from "../../utils";
-import { Id, StrapiAdminUser } from "strapi-typed";
+import { Id } from "strapi-typed";
+import { CommentDetails, CommentUpdateDetails } from "../../../../types/api"
 import { ToBeFixed } from "../../../../types";
 
 // eslint-disable-next-line import/prefer-default-export
@@ -80,7 +81,7 @@ export const resolveMultipleReports = ({ id, reportIds }: { id: Id, reportIds: A
   );
 };
 
-export const postComment = ({threadId, body, author} :{threadId: Id, body: string, author:StrapiAdminUser}):Promise<Response> => {
+export const postComment = ({threadId, body, author} : CommentDetails):Promise<Response> => {
   return axiosInstance.post(
     getApiURL(`moderate/thread/${threadId}/postComment`),
     {
@@ -90,7 +91,7 @@ export const postComment = ({threadId, body, author} :{threadId: Id, body: strin
   )
 }
 
-export const updateComment = ({id, body} :{id: Id, body: string}):Promise<Response> => {
+export const updateComment = ({id, body} : CommentUpdateDetails):Promise<Response> => {
   return axiosInstance.put(
     getApiURL(`moderate/single/${id}/update`),
     {
