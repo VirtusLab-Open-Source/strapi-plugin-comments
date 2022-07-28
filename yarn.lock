@@ -763,7 +763,7 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@strapi/plugin-graphql@^4.1.12", "@strapi/plugin-graphql@^4.1.8":
+"@strapi/plugin-graphql@^4.1.8":
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.2.3.tgz#02b412de14956320abc660e94ac810cfe0fc9745"
   integrity sha512-D8qXhjbHR7mmelQEOhG91p+0wAeuMXexm+Li9q1eKVd2rkNEjU9UNZrJgwSKB8awQQJnooe5hOEpyN90tn+VyQ==
@@ -788,10 +788,46 @@
     pluralize "^8.0.0"
     subscriptions-transport-ws "0.9.19"
 
-"@strapi/utils@4.2.3", "@strapi/utils@^4.1.12", "@strapi/utils@^4.1.8":
+"@strapi/plugin-graphql@^4.3.0":
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.3.0.tgz#08f9af907806671d73798993db6886cfb5f7ff9e"
+  integrity sha512-h/Iet6bTlQCduVnIJOnRAtlbcK/cDFkl2rFw2JwnuScTRxSgREzdqSCqIao34m8FN/avUEFK3EZY+HuIMuW4NA==
+  dependencies:
+    "@apollo/federation" "^0.28.0"
+    "@graphql-tools/schema" "8.1.2"
+    "@graphql-tools/utils" "^8.0.2"
+    "@strapi/utils" "4.3.0"
+    apollo-server-core "3.1.2"
+    apollo-server-koa "3.1.2"
+    glob "^7.1.7"
+    graphql "^15.5.1"
+    graphql-depth-limit "^1.1.0"
+    graphql-iso-date "^3.6.1"
+    graphql-playground-middleware-koa "^1.6.21"
+    graphql-type-json "^0.3.2"
+    graphql-type-long "^0.1.1"
+    graphql-upload "^13.0.0"
+    koa-compose "^4.1.0"
+    lodash "4.17.21"
+    nexus "1.2.0"
+    pluralize "^8.0.0"
+    subscriptions-transport-ws "0.9.19"
+
+"@strapi/utils@4.2.3", "@strapi/utils@^4.1.8":
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.2.3.tgz#4970361779581e5e01b7b824f8ee4c189bc87857"
   integrity sha512-ICkOI+JqSYyocwazZlaUz6oHgacyx3H5V9edeAdhISXjfZRX6GjtUDElTfQdGj9xsUUYSApFvY0DaiLTc0Utpg==
+  dependencies:
+    "@sindresorhus/slugify" "1.1.0"
+    date-fns "2.28.0"
+    http-errors "1.8.1"
+    lodash "4.17.21"
+    yup "0.32.9"
+
+"@strapi/utils@4.3.0", "@strapi/utils@^4.3.0":
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.3.0.tgz#335bbec19c5c82a14542502e4ea275af39b86c1c"
+  integrity sha512-wizuvJX8yGB3T+VU83ZJ0hiWS+rBsLFLMzbSR54b858HSyjWHQWotcxMboxRKu1MZsmX3uXzY1RK8pF22bLTng==
   dependencies:
     "@sindresorhus/slugify" "1.1.0"
     date-fns "2.28.0"
