@@ -1,22 +1,14 @@
 import { StrapiUser } from "strapi-typed";
 import { IServiceClient } from "../../../types";
 import { Comment } from "../../../types/contentTypes";
+import { setupStrapi, resetStrapi } from "../../../__mocks__/initSetup";
 import { APPROVAL_STATUS } from "../../utils/constants";
 import PluginError from "../../utils/error";
 import { getPluginService } from "../../utils/functions";
 
 jest.mock;
 
-const setup = (config = {}, toStore = false, database = {}) => {
-  Object.defineProperty(global, "strapi", {
-    value: require("../../../__mocks__/initSetup")(config, toStore, database),
-    writable: true,
-  });
-};
-
-afterEach(() => {
-  Object.defineProperty(global, "strapi", {});
-});
+afterEach(resetStrapi);
 
 describe("Test Comments service - Client", () => {
   const collection = "api::collection.test";
@@ -67,6 +59,7 @@ describe("Test Comments service - Client", () => {
     },
   ];
   const relatedEntity = { id: 1, title: "Test", uid: collection };
+  const adminUser = { id: 1, username: "Admin", email: "admin@example.com" }
 
   const errorThrown = (e: unknown, message: string, status: number = 400) => {
     expect(e).toBeInstanceOf(PluginError);
@@ -79,7 +72,7 @@ describe("Test Comments service - Client", () => {
     describe("Create", () => {
       describe("Common behaviours", () => {
         beforeEach(() =>
-          setup({ enabledCollections: [collection] }, true, {
+          setupStrapi({ enabledCollections: [collection] }, true, {
             "plugins::comments": db,
             "api::collection": [
               relatedEntity,
@@ -291,7 +284,7 @@ describe("Test Comments service - Client", () => {
 
       describe("Approval flow", () => {
         beforeEach(() =>
-          setup(
+          setupStrapi(
             {
               enabledCollections: [collection],
               approvalFlow: [collection],
@@ -452,7 +445,7 @@ describe("Test Comments service - Client", () => {
 
       describe("Non-approval flow", () => {
         beforeEach(() =>
-          setup(
+          setupStrapi(
             {
               enabledCollections: [collection],
               approvalFlow: [collection],
@@ -582,7 +575,7 @@ describe("Test Comments service - Client", () => {
 
     describe("Update", () => {
       beforeEach(() =>
-        setup({ enabledCollections: [collection] }, true, {
+        setupStrapi({ enabledCollections: [collection] }, true, {
           "plugins::comments": db,
           "api::collection": [
             relatedEntity,
@@ -825,7 +818,7 @@ describe("Test Comments service - Client", () => {
 
     describe("Remove", () => {
       beforeEach(() =>
-        setup({ enabledCollections: [collection] }, true, {
+        setupStrapi({ enabledCollections: [collection] }, true, {
           "plugins::comments": db,
           "api::collection": [
             relatedEntity,
@@ -985,7 +978,7 @@ describe("Test Comments service - Client", () => {
 
     describe("Report abuse", () => {
       beforeEach(() =>
-        setup({ enabledCollections: [collection] }, true, {
+        setupStrapi({ enabledCollections: [collection] }, true, {
           "plugins::comments": db,
           "api::collection": [
             relatedEntity,
@@ -1060,7 +1053,7 @@ describe("Test Comments service - Client", () => {
             reason: "BAD_LANGUAGE",
           };
 
-          const spy = jest
+          const spyQuery = jest
             .spyOn(global.strapi.db, "query")
             // @ts-ignore
             .mockImplementation((type: string) => ({
@@ -1069,10 +1062,23 @@ describe("Test Comments service - Client", () => {
                   switch (type) {
                     case "plugins::comments.comment":
                       return resolve(db[0]);
+                    case "admin::user":
+                      return resolve(adminUser);
                     default:
                       return resolve(related);
                   }
                 }),
+              findMany: async (_: any) =>
+                new Promise((resolve) => {
+                  switch (type) {
+                    case "plugins::comments.comment":
+                      return resolve(db);
+                    case "admin::user":
+                      return resolve([adminUser]);
+                    default:
+                      return resolve([related]);
+                  }
+              }),  
               create: async (args: any) =>
                 new Promise((resolve) => {
                   return resolve({
@@ -1081,6 +1087,15 @@ describe("Test Comments service - Client", () => {
                   });
                 }),
             }));
+
+          const spyPluginEmail = jest
+            .spyOn(global.strapi.plugins.email.services.email, 'send')
+            // @ts-ignore
+            .mockImplementation((args: any) => ({
+                status: 200,
+                params: args,
+              })  
+            );
 
           const result = await getPluginService<IServiceClient>(
             "client"
@@ -1091,7 +1106,88 @@ describe("Test Comments service - Client", () => {
           expect(result).toHaveProperty(["content"], payload.content);
           expect(result).toHaveProperty(["reason"], payload.reason);
 
-          spy.mockRestore();
+          expect(spyPluginEmail).toHaveBeenCalledTimes(1);
+          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(["from"], adminUser.email);
+          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(["to", 0], adminUser.email);
+          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(["subject"], "New abuse report on comment");
+
+          spyQuery.mockRestore();
+          spyPluginEmail.mockRestore();
+        });
+      });
+    });
+
+    describe("Inform about response", () => {
+      const clientSettings = {
+        url: 'http://testsite.com',
+        contactEmail: 'contact@example.com',
+      };
+
+      beforeEach(() =>
+        setupStrapi({ enabledCollections: [collection], client: { ...clientSettings } }, true, {
+          "plugins::comments": db,
+          "api::collection": [
+            relatedEntity,
+            { id: 2, title: "Test 2", uid: collection },
+          ],
+        })
+      );
+
+      describe("Successful path", () => {
+
+        test("Should sent e-mail with proper content to comment author", async () => {
+
+          const spyQuery = jest
+            .spyOn(global.strapi.db, "query")
+            // @ts-ignore
+            .mockImplementation((type: string) => ({
+              findOne: async (_: any) =>
+                new Promise((resolve) => {
+                  switch (type) {
+                    case "plugins::comments.comment":
+                      return resolve(db[0]);
+                    case "admin::user":
+                      return resolve(adminUser);
+                    default:
+                      return resolve(related);
+                  }
+                }),
+              findMany: async (_: any) =>
+                new Promise((resolve) => {
+                  switch (type) {
+                    case "plugins::comments.comment":
+                      return resolve(db);
+                    case "admin::user":
+                      return resolve([adminUser]);
+                    default:
+                      return resolve([related]);
+                  }
+              }),  
+            }));
+
+          const spyPluginEmail = jest
+            .spyOn(global.strapi.plugins.email.services.email, 'send')
+            // @ts-ignore
+            .mockImplementation((args: any) => ({
+                status: 200,
+                params: args,
+              })  
+            );
+
+          const result = await getPluginService<IServiceClient>(
+            "client"
+          ).sendResponseNotification(db[1]);
+
+          expect(spyPluginEmail).toHaveBeenCalledTimes(1);
+          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(["from"], clientSettings.contactEmail);
+          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(["to", 0], db[0].authorEmail);
+          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(["subject"], "You've got a new response to your comment");
+          expect(spyPluginEmail.mock.results[0].value.params.text).toContain(db[0].authorName);
+          expect(spyPluginEmail.mock.results[0].value.params.text).toContain(db[1].authorName);
+          expect(spyPluginEmail.mock.results[0].value.params.text).toContain(clientSettings.url);
+
+          spyQuery.mockRestore();
+          spyPluginEmail.mockRestore();
         });
       });
     });

@@ -8,7 +8,18 @@ export type CommentsPluginConfig = StrapiPluginConfig<{
   entryLabel: PluginConfigEntryLabels;
   reportReasons: PluginConfigReportReasons;
   badWords?: boolean;
+  client?: PluginConfigClientService;
+  gql?: PluginConfigGraphQL;
 }>;
+
+export type PluginConfigClientService = {
+  url?: string;
+  contactEmail?: string;
+};
+
+export type PluginConfigGraphQL = {
+  auth: boolean;
+};
 
 export type PluginConfigKeys = keyof CommentsPluginConfig;
 

@@ -14,6 +14,9 @@ import {
   StringMap,
   StrapiRequestQueryFieldsClause,
   PopulateClause,
+  StrapiDBBulkActionResponse,
+  StrapiAdminUser,
+  WhereClause,
 } from "strapi-typed";
 import { ToBeFixed } from "./common";
 import {
@@ -41,15 +44,15 @@ export type FindAllFlatProps<T, TFields = keyof T> = {
   pagination?: StrapiPagination;
 };
 
-export type FindAllInHierarhyProps = Omit<FindAllFlatProps, "pagination"> & {
+export type FindAllInHierarchyProps = Omit<FindAllFlatProps, "pagination"> & {
   startingFromId?: Id | null;
   dropBlockedThreads?: boolean;
   isAdmin?: boolean;
 };
 
 export type AdminFindAllProps = {
-  related: string;
-  entity: any;
+  related?: string;
+  entity?: any;
 } & StrapiQueryParams;
 
 export type AdminFindAllQueryParamsParsed = {
@@ -61,7 +64,7 @@ export type AdminFindAllQueryParamsParsed = {
 } & StrapiQueryParamsParsed;
 
 export type AdminFindOneAndThreadProps = {
-  removed: boolean;
+  removed?: boolean;
 } & StrapiQueryParams;
 
 export type AdminSinglePageResponse = {
@@ -79,10 +82,10 @@ export interface IServiceCommon {
     relatedEntity?: RelatedEntity | null | boolean
   ): Promise<StrapiPaginatedResponse<Comment>>;
   findAllInHierarchy(
-    props: FindAllInHierarhyProps,
+    props: FindAllInHierarchyProps,
     relatedEntity?: RelatedEntity | null | boolean
   ): Promise<Array<Comment>>;
-  findOne(criteria: KeyValueSet<any>): Promise<Comment>;
+  findOne(criteria: WhereClause): Promise<Comment>;
   findRelatedEntitiesFor(entities: Array<Comment>): Promise<RelatedEntity[]>;
   mergeRelatedEntityTo(
     entity: ToBeFixed,
@@ -124,6 +127,8 @@ export interface IServiceAdmin {
   rejectComment(id: Id): Promise<Comment>;
   blockNestedThreads(id: Id, blockStatus?: boolean): Promise<boolean>;
   resolveAbuseReport(id: Id, commentId: Id): Promise<CommentReport>;
+  resolveMultipleAbuseReports(ids: Array<Id>, commentId: Id): Promise<StrapiDBBulkActionResponse>;
+  getDefaultAuthorPopulate(): { populate: PopulateClause<"avatar"> } | undefined;
 }
 
 export interface IServiceClient {
@@ -153,6 +158,7 @@ export interface IServiceClient {
   ): Promise<Comment>;
   sendAbuseReportEmail(reason: string, content: string): Promise<void>;
   markAsRemovedNested(id: Id, status: boolean): Promise<boolean>;
+  sendResponseNotification(entity: Comment): Promise<void>
 }
 
 export interface IServiceGraphQL {

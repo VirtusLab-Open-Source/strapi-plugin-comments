@@ -1,11 +1,8 @@
+import { setupStrapi, resetStrapi } from "../../../__mocks__/initSetup";
 import { getPluginService } from "../functions";
 
-beforeEach(() => {
-  Object.defineProperty(global, "strapi", {
-    value: require("../../../__mocks__/initSetup")(),
-    writable: true,
-  });
-});
+beforeEach(setupStrapi);
+afterEach(resetStrapi);
 
 describe("Test plugin functions utils", () => {
   describe("Get plugin service", () => {

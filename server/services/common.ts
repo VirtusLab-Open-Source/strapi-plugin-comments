@@ -23,11 +23,12 @@ import {
   PopulateClause,
   StrapiUser,
   OnlyStrings,
+  StringMap,
 } from "strapi-typed";
 import {
   CommentsPluginConfig,
   FindAllFlatProps,
-  FindAllInHierarhyProps,
+  FindAllInHierarchyProps,
   IServiceCommon,
   ToBeFixed,
   Comment,
@@ -250,7 +251,9 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
 
       let authorUserPopulate = {};
       if (isObject(populateClause?.authorUser)) {
-        authorUserPopulate = populateClause.authorUser;
+        authorUserPopulate = 'populate' in populateClause.authorUser ? 
+          populateClause.authorUser.populate as StringMap<unknown> : 
+          populateClause.authorUser;
       }
 
       return this.sanitizeCommentEntity(
@@ -284,7 +287,7 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       fields,
       startingFromId = null,
       dropBlockedThreads = false,
-    }: FindAllInHierarhyProps,
+    }: FindAllInHierarchyProps,
     relatedEntity?: RelatedEntity | null | boolean
   ): Promise<Array<Comment>> {
     const entities = await this.findAllFlat(
@@ -391,15 +394,15 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
           data: { [fieldName]: value },
         });
       if (
-        entitiesToChange.length === changedEntities.length &&
-        changedEntities.length > 0
+        entitiesToChange.length === changedEntities.count &&
+        changedEntities.count > 0
       ) {
         const nestedTransactions = await Promise.all(
-          changedEntities.map((item: Comment) =>
+          entitiesToChange.map((item: Comment) =>
             this.modifiedNestedNestedComments(item.id, fieldName, value)
           )
         );
-        return nestedTransactions.length === changedEntities.length;
+        return nestedTransactions.length === changedEntities.count;
       }
       return true;
     } catch (e) {

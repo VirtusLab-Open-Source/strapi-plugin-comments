@@ -1,17 +1,11 @@
 import { IServiceCommon } from "../../../types";
 import { Comment } from "../../../types/contentTypes";
+import { setupStrapi, resetStrapi } from "../../../__mocks__/initSetup";
 import { CONFIG_PARAMS } from "../../utils/constants";
 import PluginError from "../../utils/error";
 import { getPluginService } from "../../utils/functions";
 
 jest.mock;
-
-const setup = (config = {}, toStore = false, database = {}) => {
-  Object.defineProperty(global, "strapi", {
-    value: require("../../../__mocks__/initSetup")(config, toStore, database),
-    writable: true,
-  });
-};
 
 const filterOutUndefined = (_: any) =>
   Object.keys(_).reduce((prev, curr) => {
@@ -24,13 +18,11 @@ const filterOutUndefined = (_: any) =>
     return prev;
   }, {});
 
-afterEach(() => {
-  Object.defineProperty(global, "strapi", {});
-});
+afterEach(resetStrapi);
 
 describe("Test Comments service - Common", () => {
   describe("Get plugin store", () => {
-    beforeEach(() => setup());
+    beforeEach(() => setupStrapi());
 
     test("Should return store", async () => {
       const pluginStore = await getPluginService<IServiceCommon>(
@@ -45,7 +37,7 @@ describe("Test Comments service - Common", () => {
   describe("Get plugin config", () => {
     describe("Local config", () => {
       beforeEach(() =>
-        setup({
+        setupStrapi({
           test: "sample",
         })
       );
@@ -67,7 +59,7 @@ describe("Test Comments service - Common", () => {
 
     describe("Store config", () => {
       beforeEach(() =>
-        setup(
+        setupStrapi(
           {
             test: "sample",
           },
@@ -92,7 +84,7 @@ describe("Test Comments service - Common", () => {
   });
 
   describe("Validate user context", () => {
-    beforeEach(() => setup());
+    beforeEach(() => setupStrapi());
 
     test("Should context be valid", () => {
       expect(
@@ -114,7 +106,7 @@ describe("Test Comments service - Common", () => {
   });
 
   describe("Sanitize comments entity", () => {
-    beforeEach(() => setup());
+    beforeEach(() => setupStrapi());
 
     const sample = {
       id: 1,
@@ -197,7 +189,7 @@ describe("Test Comments service - Common", () => {
   });
 
   describe("Bad Words filtering", () => {
-    beforeEach(() => setup());
+    beforeEach(() => setupStrapi());
 
     const text = "Lorem ipsum dolor sit fuck amet";
 
@@ -232,7 +224,7 @@ describe("Test Comments service - Common", () => {
   });
 
   describe("Bad Words filtering", () => {
-    beforeEach(() => setup({ badWords: false }));
+    beforeEach(() => setupStrapi({ badWords: false }));
 
     const text = "Lorem ipsum dolor sit fuck amet";
 
@@ -254,7 +246,7 @@ describe("Test Comments service - Common", () => {
     const testCollection = `${wrongUid}:${wrongId}`;
 
     describe("Store config", () => {
-      beforeEach(() => setup({ enabledCollections: [uid] }, true));
+      beforeEach(() => setupStrapi({ enabledCollections: [uid] }, true));
 
       test("Should pass", async () => {
         expect(
@@ -292,7 +284,7 @@ describe("Test Comments service - Common", () => {
     });
 
     describe("Local config", () => {
-      beforeEach(() => setup({ enabledCollections: [uid] }));
+      beforeEach(() => setupStrapi({ enabledCollections: [uid] }));
 
       test("Should pass", async () => {
         expect(
@@ -330,7 +322,7 @@ describe("Test Comments service - Common", () => {
     });
 
     describe("Validate if collection is enabled", () => {
-      beforeEach(() => setup({ enabledCollections: [uid] }));
+      beforeEach(() => setupStrapi({ enabledCollections: [uid] }));
 
       test("Should return false", async () => {
         const result = await getPluginService<IServiceCommon>(
@@ -362,7 +354,7 @@ describe("Test Comments service - Common", () => {
     };
     const relatedEntity = { id: 1, title: "Test", uid: collection };
 
-    beforeEach(() => setup({ enabledCollections: [collection] }));
+    beforeEach(() => setupStrapi({ enabledCollections: [collection] }));
 
     test("Should merge related entity", async () => {
       const result = await getPluginService<IServiceCommon>(
@@ -419,13 +411,17 @@ describe("Test Comments service - Common", () => {
             id: 1,
             url: "http://example.com",
           },
+          role: {
+            id: 1,
+            name: "my role"
+          }
         },
       },
     ];
     const relatedEntity = { id: 1, title: "Test", uid: collection };
 
     beforeEach(() =>
-      setup({ enabledCollections: [collection] }, true, {
+      setupStrapi({ enabledCollections: [collection] }, true, {
         "plugins::comments": db,
         "api::collection": [
           relatedEntity,
@@ -484,6 +480,35 @@ describe("Test Comments service - Common", () => {
           ["data", 3, "author", "avatar", "url"],
           // @ts-ignore
           db[3].authorUser.avatar.url
+        );
+      });
+
+      test("Should return structure with populated avatar and role fields", async () => {
+        const result = await getPluginService<IServiceCommon>(
+          "common"
+        ).findAllFlat(
+          {
+            query: { related },
+            populate: {
+              authorUser: {
+                populate: { avatar: true, role: true },
+              },
+            },
+          },
+          relatedEntity
+        );
+        expect(result).toHaveProperty("data");
+        expect(result).not.toHaveProperty("meta");
+        expect(result.data.length).toBe(4);
+        expect(result).toHaveProperty(
+          ["data", 3, "author", "avatar", "url"],
+          // @ts-ignore
+          db[3].authorUser.avatar.url
+        );
+        expect(result).toHaveProperty(
+          ["data", 3, "author", "role", "id"],
+          // @ts-ignore
+          db[3].authorUser.role.id
         );
       });
 

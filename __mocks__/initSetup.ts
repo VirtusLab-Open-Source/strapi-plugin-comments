@@ -1,7 +1,8 @@
 import { get, set, pick, isEmpty } from "lodash";
 
+
 // @ts-ignore
-export = (config: any = {}, toStore: boolean = false, database: any = {}) => {
+const mockStrapi = (config: any = {}, toStore: boolean = false, database: any = {}) => {
   const dbConfig = toStore
     ? {
         plugin: {
@@ -102,6 +103,25 @@ export = (config: any = {}, toStore: boolean = false, database: any = {}) => {
           },
         },
       },
+      email: {
+        service: function (name: string) {
+          const service = get(this.services, name);
+          return service;
+        },
+        services: {
+          email: {
+            send: async () => { }
+          }
+        }
+      },
+      graphql: {},
+      "users-permissions": {
+        contentTypes: {
+          user: {
+            uid: 'plugin::users-permissions.user',
+          }
+        }
+      },
     },
     config: {
       get: function (prop: string = "") {
@@ -120,6 +140,12 @@ export = (config: any = {}, toStore: boolean = false, database: any = {}) => {
         },
       },
     },
+    contentTypes: {
+      'plugin::users-permissions.user': {
+        uid: 'plugin::users-permissions.user',
+        attributes: {}
+      }
+    }
   };
 
   if (!isEmpty(database)) {
@@ -130,4 +156,15 @@ export = (config: any = {}, toStore: boolean = false, database: any = {}) => {
   }
 
   return mock;
+};
+
+export const resetStrapi = () => {
+  Object.defineProperty(global, "strapi", {});
+};
+
+export const setupStrapi = (config = {}, toStore = false, database = {}) => {
+  Object.defineProperty(global, "strapi", {
+    value: mockStrapi(config, toStore, database),
+    writable: true,
+  });
 };

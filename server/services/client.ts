@@ -12,7 +12,7 @@ import {
 } from "../../types";
 
 import { getPluginService } from "./../utils/functions";
-import { isNil, isEmpty, isString } from "lodash";
+import { isNil, isEmpty, isString, isObject } from "lodash";
 import PluginError from "./../utils/error";
 import {
   isEqualEntity,
@@ -62,7 +62,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
 
     const relatedEntity = await strapi.db
       .query<RelatedEntity>(uid)
-      .findOne(relatedId);
+      .findOne({ where: { id: relatedId } });
     if (!relatedEntity) {
       throw new PluginError(
         400,
@@ -152,10 +152,18 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
             authorUser: true,
           },
         });
-      return this.getCommonService().sanitizeCommentEntity({
+      const sanitizedEntity = this.getCommonService().sanitizeCommentEntity({
         ...entity,
         threadOf: linkToThread,
       });
+
+      try {
+        await this.sendResponseNotification(sanitizedEntity);
+      } catch (e) {
+        console.error(e);
+      }
+
+      return sanitizedEntity;
     }
     throw new PluginError(400, "No content received");
   },
@@ -356,7 +364,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
         where: {
           roles: { code: "strapi-super-admin" },
         },
-      });
+      }); 
 
     if (emails.length > 0) {
       try {
@@ -391,4 +399,60 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
       status
     );
   },
+
+
+  async sendResponseNotification(
+    this: IServiceClient,
+    entity: Comment
+  ): Promise<void> {
+
+    if (entity.threadOf) {
+      const thread = isObject(entity.threadOf) ? entity.threadOf : await this.getCommonService().findOne({ id: entity.threadOf });
+      let emailRecipient = thread?.author?.email;
+      if (thread.authorUser && !emailRecipient) {
+        const strapiUser = isObject(thread.authorUser) ? thread.authorUser : await strapi.db.query<StrapiUser>("api::user").findOne({ 
+          where: { id: thread.authorUser }
+        });
+        emailRecipient = strapiUser?.email;
+      }
+
+      if (emailRecipient) {
+        const superAdmin = await strapi.db
+          .query<StrapiAdminUser>("admin::user")
+          .findOne({
+            where: {
+              roles: { code: "strapi-super-admin" },
+            },
+          });
+
+        const emailSender = await this.getCommonService().getConfig('client.contactEmail', superAdmin.email);
+        const clientAppUrl = await this.getCommonService().getConfig('client.url', 'our site');
+
+        try {
+          await strapi
+            .plugin("email")
+            .service("email")
+            .send({
+              to: [emailRecipient],
+              from: emailSender,
+              subject: "You've got a new response to your comment",
+              text: `Hello ${thread?.author?.name || emailRecipient}!
+                You've got a new response to your comment by ${entity?.author?.name || entity?.author?.email}.
+                
+                ------
+
+                "${entity.content}"
+
+                ------
+                
+                Visit ${clientAppUrl} and continue the discussion.
+                `,
+            });
+        } catch (err) {
+          strapi.log.error(err);
+          throw err;
+        }
+      }
+    }
+  }, 
 });

@@ -61,7 +61,7 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 
 ## ⏳ Installation
 
-### Via Strapi Markerplace
+### Via Strapi Marketplace
 
 As a ✅ **verified** plugin by Strapi team we're available on the [**Strapi Marketplace**](https://market.strapi.io/plugins/strapi-plugin-comments) as well as **In-App Marketplace** where you can follow the installation instructions.
 
@@ -132,10 +132,13 @@ In our minimum support we're following [official Node.js releases timelines](htt
 
 **Supported Strapi versions**:
 
-- Strapi v4.1.7 (recently tested)
+- Strapi v4.1.12 (recently tested)
 - Strapi v4.x
 
 > This plugin is designed for **Strapi v4** and is not working with v3.x. To get version for **Strapi v3** install version [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3).
+
+**Plugin dependencies**
+- `@strapi/plugin-graphql` - required to run because built-in support for GraphQL handled by this plugin 
 
 **We recommend always using the latest version of Strapi to start your new projects**.
 
@@ -146,8 +149,6 @@ To start your journey with **Comments plugin** you must first setup it using the
 ### In `v2.0.3` and newer
 
 Version `2.0.3` introduce the intuitive **Settings** page which you can easly access via `Strapi Settings -> Section: Comments Plugin -> Configuration`. On dedicated page you will be able to setup all crucial properties which drives the plugin and customize each individual collection for which **Comments plugin** should be enabled.
-
-On the dedicated page, you will be able to set up all crucial properties which drive the plugin and customize each individual collection for which **Comments plugin** should be enabled.
 
 <div style="margin: 20px 0" align="center">
   <img style="width: 100%; height: auto;" src="public/assets/configuration.png" alt="Plugin configuration" />
