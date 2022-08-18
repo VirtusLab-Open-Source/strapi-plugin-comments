@@ -1,6 +1,6 @@
+// TODO
 // @ts-nocheck
-
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 
 import { useMutation, useQueryClient } from "react-query";
 import { useOverlayBlocker, useNotification } from "@strapi/helper-plugin";
@@ -14,7 +14,7 @@ import {
   unblockItemThread,
 } from "../pages/utils/api";
 
-const useReportsActionsHandlers = (
+const useReportsActionsHandlers = ({
   allowedActions,
   commentId,
   mutation,
@@ -22,71 +22,46 @@ const useReportsActionsHandlers = (
   reports,
   selectedReports,
   updateReports,
-) => {
+}) => {
   const { canModerate, canReviewReports } = allowedActions;
-
+    
   const { lockApp, unlockApp } = useOverlayBlocker();
 
   const queryClient = useQueryClient();
   const toggleNotification = useNotification();
 
-  const onSuccess =
-    (stateAction = () => {}, indalidate = true) =>
-    async () => {
-      if (indalidate) {
-        await queryClient.invalidateQueries("get-data");
-      }
-      stateAction(false);
-      unlockApp();
-    };
+  const onSuccess = async () => {
+    await queryClient.invalidateQueries("get-data");
+    unlockApp();
+  };
 
-  const onError = useCallback(
-    (err) => {
-      handleAPIError(err, toggleNotification);
-    },
-    [toggleNotification],
-  );
+  const onError = (err) => {
+    handleAPIError(err, toggleNotification);
+  };
+
+  const mutationConfig = {
+    onSuccess,
+    onError,
+    refetchActive: false,
+  };
 
   const resolveAllAbuseReportsForCommentMutation = useMutation(
     resolveAllAbuseReportsForComment,
-    {
-      onSuccess: onSuccess(),
-      onError,
-      refetchActive: false,
-    },
+    mutationConfig,
   );
 
   const resolveAllAbuseReportsForThreadMutation = useMutation(
     resolveAllAbuseReportsForThread,
-    {
-      onSuccess: onSuccess(),
-      onError,
-      refetchActive: false,
-    },
+    mutationConfig,
   );
 
-  const blockItemMutation = useMutation(blockItem, {
-    onSuccess: onSuccess(),
-    onError,
-    refetchActive: false,
-  });
+  const blockItemMutation = useMutation(blockItem, mutationConfig);
 
-  const unblockItemMutation = useMutation(unblockItem, {
-    onSuccess: onSuccess(),
-    onError,
-    refetchActive: false,
-  });
+  const unblockItemMutation = useMutation(unblockItem, mutationConfig);
 
-  const blockItemThreadMutation = useMutation(blockItemThread, {
-    onSuccess: onSuccess(),
-    onError,
-    refetchActive: false,
-  });
-  const unblockItemThreadMutation = useMutation(unblockItemThread, {
-    onSuccess: onSuccess(),
-    onError,
-    refetchActive: false,
-  });
+  const blockItemThreadMutation = useMutation(blockItemThread, mutationConfig);
+
+  const unblockItemThreadMutation = useMutation(unblockItemThread, mutationConfig);
 
   const handleClickResolve = async (reportId) => {
     if (canReviewReports) {
@@ -96,12 +71,12 @@ const useReportsActionsHandlers = (
         reportId,
       });
       if (item) {
-        const updatedReports = reports.map((_) => ({
-          ..._,
-          resolved: reportId === _.id ? true : _.resolved,
+        const updatedReports = reports.map((report) => ({
+          ...report,
+          resolved: reportId === report.id ? true : report.resolved,
         }));
         updateReports(updatedReports);
-        onSelectionChange(selectedReports.filter((_) => _ !== reportId));
+        onSelectionChange(selectedReports.filter((id) => id !== reportId));
       }
     }
   };

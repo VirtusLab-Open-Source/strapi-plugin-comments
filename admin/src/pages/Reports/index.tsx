@@ -4,6 +4,7 @@
  *
  */
 
+// TODO
 // @ts-nocheck
 
 import { BaseCheckbox } from "@strapi/design-system/BaseCheckbox";
@@ -133,7 +134,6 @@ const Reports = ({ config }) => {
 
   const onSuccess = () => async () => {
     await queryClient.invalidateQueries("get-data");
-
     unlockApp();
   };
 
@@ -144,15 +144,15 @@ const Reports = ({ config }) => {
   const onSelectionChange = (selection) => setSelectedReports(selection);
 
   const handleItemSelectionChange = (selection, value) => {
-      if (isArray(selection)) {
-        onSelectionChange(value ? selection : []);
-      } else {
-        onSelectionChange(
-          [...selectedReports, selection].filter(
-            (item) => value || selection !== item,
-          ),
-        );
-      }
+    if (isArray(selection)) {
+      onSelectionChange(value ? selection : []);
+    } else {
+      onSelectionChange(
+        [...selectedReports, selection].filter(
+          (item) => value || selection !== item,
+        ),
+      );
+    }
   };
 
   const areAllItemsSelected = () =>
@@ -185,7 +185,6 @@ const Reports = ({ config }) => {
     onError,
     refetchActive: false,
   });
-
 
   const handleClickResolveSelected = async () => {
     if (canReviewReports) {
@@ -221,126 +220,123 @@ const Reports = ({ config }) => {
   const emptyContent = _q ? "search" : "comments";
 
   return canAccess ? (
-      <Box background="neutral100">
-        <Layout>
-          {isLoading || isLoadingForPermissions ? (
-            <LoadingIndicatorPage />
-          ) : (
-              <Layout sideNav={<Nav visible />}>
-              <>
-                <HeaderLayout
-                    title={getMessage("page.reports.header")}
-                  subtitle={`${total} ${getMessage(
-                    "page.discover.header.count",
-                  )}`}
-                    as="h2"
-                />
-                <ActionLayout
-                  startActions={
-                    <>
-                      <SearchURLQuery
-                          label={getMessage("search.label", "Search", false)}
-                      />
-                      <TableFilters displayedFilters={filtersSchema} />
-                      {hasAnySelectedReports && (
-                        <Button
-                            variant="success"
-                          onClick={handleClickResolveSelected}
-                            startIcon={check}>
-                          {getMessage(
-                            {
-                              id: `page.details.panel.discussion.warnings.reports.dialog.actions.resolve.selected`,
-                              props: {
-                                count: selectedReports.length,
-                              },
+    <Box background="neutral100">
+      <Layout>
+        {isLoading || isLoadingForPermissions ? (
+          <LoadingIndicatorPage />
+        ) : (
+          <Layout sideNav={<Nav visible />}>
+            <>
+              <HeaderLayout
+                title={getMessage("page.reports.header")}
+                subtitle={`${total} ${getMessage(
+                  "page.discover.header.count",
+                )}`}
+                as="h2"
+              />
+              <ActionLayout
+                startActions={
+                  <>
+                    <SearchURLQuery
+                      label={getMessage("search.label", "Search", false)}
+                    />
+                    <TableFilters displayedFilters={filtersSchema} />
+                    {hasAnySelectedReports && (
+                      <Button
+                        variant="success"
+                        onClick={handleClickResolveSelected}
+                        startIcon={check}>
+                        {getMessage(
+                          {
+                            id: `page.details.panel.discussion.warnings.reports.dialog.actions.resolve.selected`,
+                            props: {
+                              count: selectedReports.length,
                             },
-                            "Resolve selected",
-                          )}
-                        </Button>
-                      )}
-                    </>
-                  }
-                />
-                <ContentLayout>
-                  {!isEmpty(result) ? (
-                    <>
-                      <Table colCount={COL_COUNT} rowCount={result.length}>
-                        <Thead>
-                          <Tr>
-                            <Th>
-                              <BaseCheckbox
-                                aria-label={getMessage(
-                                  "page.details.panel.discussion.warnings.reports.dialog.selectAll",
-                                )}
-                                value={areAllItemsSelected()}
-                                disabled={isEmpty(storedReports)}
-                                onValueChange={onValueChange}
-                              />
-                            </Th>
+                          },
+                          "Resolve selected",
+                        )}
+                      </Button>
+                    )}
+                  </>
+                }
+              />
+              <ContentLayout>
+                {!isEmpty(result) ? (
+                  <>
+                    <Table colCount={COL_COUNT} rowCount={result.length}>
+                      <Thead>
+                        <Tr>
+                          <Th>
+                            <BaseCheckbox
+                              aria-label={getMessage(
+                                "page.details.panel.discussion.warnings.reports.dialog.selectAll",
+                              )}
+                              value={areAllItemsSelected()}
+                              disabled={isEmpty(storedReports)}
+                              onValueChange={onValueChange}
+                            />
+                          </Th>
 
-                              {tableHeaders.map((title) => (
-                                <Th>
-                                  <Typography variant="sigma">
-                                    {getMessage(title)}
-                                  </Typography>
-                                </Th>
-                              ))}
-                          </Tr>
-                        </Thead>
-                        <Tbody>
-                          {result.map((entry) => {
-                            return (
-                              <ReportsTableRow
-                                key={`comment-${entry.id}`}
-                                config={config}
-                                item={entry}
-                                allowedActions={{
-                                  canModerate,
-                                  canAccessReports,
-                                  canReviewReports,
-                                }}
-                                onClick={() =>
-                                  handleClickDisplay(entry.related.id)
-                                }
-                                mutation={resolveReportMutation}
-                                reports={storedReports}
-                                updateReports={setStoredReports}
-                                selectedReports={selectedReports}
-                                onSelectionChange={onSelectionChange}
-                                isChecked={isItemSelected}
-                                handleItemSelectionChange={
-                                  handleItemSelectionChange
-                                }
-                              />
-                            );
-                          })}
-                        </Tbody>
-                      </Table>
-                      <TablePagination
-                          pagination={{ pageCount: pagination?.pageCount || 1 }}
-                      />
-                    </>
-                  ) : (
-                    <EmptyStateLayout content={emptyLayout[emptyContent]} />
-                  )}
-                </ContentLayout>
-              </>
-            </Layout>
-          )}
-        </Layout>
-      </Box>
+                          {tableHeaders.map((title) => (
+                            <Th>
+                              <Typography variant="sigma">
+                                {getMessage(title)}
+                              </Typography>
+                            </Th>
+                          ))}
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {result.map((entry) => {
+                          return (
+                            <ReportsTableRow
+                              key={`comment-${entry.id}`}
+                              config={config}
+                              item={entry}
+                              allowedActions={{
+                                canModerate,
+                                canAccessReports,
+                                canReviewReports,
+                              }}
+                              onClick={() =>
+                                handleClickDisplay(entry.related.id)
+                              }
+                              mutation={resolveReportMutation}
+                              reports={storedReports}
+                              updateReports={setStoredReports}
+                              selectedReports={selectedReports}
+                              onSelectionChange={onSelectionChange}
+                              isChecked={isItemSelected}
+                              handleItemSelectionChange={
+                                handleItemSelectionChange
+                              }
+                            />
+                          );
+                        })}
+                      </Tbody>
+                    </Table>
+                    <TablePagination
+                      pagination={{ pageCount: pagination?.pageCount || 1 }}
+                    />
+                  </>
+                ) : (
+                  <EmptyStateLayout content={emptyLayout[emptyContent]} />
+                )}
+              </ContentLayout>
+            </>
+          </Layout>
+        )}
+      </Layout>
+    </Box>
   ) :
-    <NoAcccessPage />
+    <NoAcccessPage />;
 
 };
 const mapStateToProps = makeAppView();
 
-export function mapDispatchToProps(dispatch) {
+export const mapDispatchToProps = (dispatch) => {
   return bindActionCreators({}, dispatch);
 }
 const withConnect = connect(mapStateToProps, mapDispatchToProps);
-
-
-
 
 export default compose(withConnect)(memo(Reports, isEqual));

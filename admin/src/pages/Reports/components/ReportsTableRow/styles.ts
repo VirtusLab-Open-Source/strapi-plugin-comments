@@ -1,6 +1,7 @@
+// TODO
 // @ts-nocheck
-import styled from 'styled-components';
-import {Link} from '@strapi/design-system/Link';
+import styled from "styled-components";
+import { Link } from "@strapi/design-system/Link";
 
 export const TableLink = styled(Link)`
   display: block;

@@ -1,3 +1,4 @@
+// TODO
 // @ts-nocheck
 
 import { Button } from "@strapi/design-system/Button";
@@ -5,10 +6,12 @@ import { IconButton } from "@strapi/design-system/IconButton";
 import { useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
 import { isNil, isEmpty, orderBy } from "lodash";
 import PropTypes from "prop-types";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useMutation, useQueryClient } from "react-query";
 
 import {
+  blockItem,
+  blockItemThread,
   resolveReport,
   resolveCommentMultipleReports,
   resolveAllAbuseReportsForComment,
@@ -18,24 +21,23 @@ import { pluginId } from "../../pluginId";
 import { getMessage, handleAPIError } from "../../utils";
 import ReportsReviewModal from "../ReportsReviewModal";
 import ReportsReviewTable from "../ReportsReviewTable";
-import { ReviewIcon, LockIcon, check } from "../icons";
+import { review, lock, check } from "../icons";
 
 const DiscussionThreadItemReviewAction = ({
-  item,
-  isAnyActionLoading: isAnyActionLoading,
-  queryToInvalidate,
-  areBlockButtonsDisabled,
   allowedActions: { canModerate, canAccessReports, canReviewReports },
-  blockItemMutation,
-  blockItemThreadMutation,
-  onBlockButtonsStateChange,
-  onBlockActionClick,
+  isAnyActionLoading,
+  item,
+  queryToInvalidate
 }) => {
-  const { reports } = item;
+  const { blockedThread, reports } = item;
 
   const [reportsReviewVisible, setReportsReviewVisible] = useState(false);
   const [storedItems, setStoredItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [blockButtonsDisabled, setBlockButtonsDisabled] = useState(blockedThread);
+
+  const handleBlockButtonsStateChange = (disabled) =>
+    setBlockButtonsDisabled(disabled);
 
   const toggleNotification = useNotification();
   const queryClient = useQueryClient();
@@ -43,86 +45,73 @@ const DiscussionThreadItemReviewAction = ({
 
   useEffect(() => {
     setStoredItems(
-      orderBy( reports, [ "resolved", "createdAt" ], [ "DESC", "DESC" ] ),
+      orderBy(reports, ["resolved", "createdAt"], ["DESC", "DESC"]),
     );
-  }, [ reportsReviewVisible, reports ] );
+  }, [reportsReviewVisible, reports]);
 
-  const onSuccess =
-    (message, stateAction = () => {}, indalidate = true) =>
-    async () => {
-      if (indalidate) {
-        await queryClient.invalidateQueries(queryToInvalidate);
-      }
+  const onSuccess = (message = "") => () => {
+    queryClient.invalidateQueries(queryToInvalidate);
+    if (message) {
       toggleNotification({
         type: "success",
         message: `${pluginId}.${message}`,
       });
-      stateAction(false);
-      unlockApp();
-    };
+    }
+    unlockApp();
+  };
 
-  const onError = ( err ) => () => {
+  const onError = (err) => () => {
     handleAPIError(err, toggleNotification);
+  };
+
+  const mutationConfig = (message) => {
+    return {
+      onSuccess: onSuccess(message),
+      onError
+    };
+  };
+
+  const onBlockActionClick = async (mutation, onCallback) => {
+    lockApp();
+    await mutation.mutateAsync(item.id);
+    setReportsReviewVisible(false);
   };
 
   const isNotResolved = (entry) => !entry.resolved;
 
-  const resolveReportMutation = useMutation(resolveReport, {
-    onSuccess: onSuccess(
-      "page.details.panel.discussion.warnings.reports.dialog.confirmation.success",
-      () => {},
-      false,
-    ),
-    onError,
-    refetchActive: false,
-  });
+  const resolveReportMutation = useMutation(resolveReport, mutationConfig("page.details.panel.discussion.warnings.reports.dialog.confirmation.success"));
 
   const resolveCommentMultipleReportsMutation = useMutation(
-    resolveCommentMultipleReports,
-    {
-      onSuccess: onSuccess(
-        "page.details.panel.discussion.warnings.reports.selected.dialog.confirmation.success",
-        () => {},
-        false,
-      ),
-      onError,
-      refetchActive: false,
-    },
+    resolveCommentMultipleReports, mutationConfig("page.details.panel.discussion.warnings.reports.selected.dialog.confirmation.success")
   );
 
   const resolveAllAbuseReportsForCommentMutation = useMutation(
     resolveAllAbuseReportsForComment,
-    {
-      onSuccess: () => { },
-      onError,
-      refetchActive: false
-    },
-  )
+    mutationConfig()
+  );
 
   const resolveAllAbuseReportsForThreadMutation = useMutation(
     resolveAllAbuseReportsForThread,
-    {
-      onSuccess: () => { },
-      onError,
-      refetchActive: false
-    },
-  )
+    mutationConfig()
+  );
 
-  const handleBlockActionClick = () => setReportsReviewVisible(false);
+  const blockItemMutation = useMutation(blockItem, mutationConfig("page.details.actions.comment.block.confirmation.success"));
+
+  const blockItemThreadMutation = useMutation(blockItemThread, mutationConfig("page.details.actions.thread.block.confirmation.success"));
 
   const handleReportsReviewClick = () => {
     if (canAccessReports) {
       setReportsReviewVisible(true);
     }
   };
-  const handleBlockItemClick = async () => {
+  const handleBlockItemClick = () => {
     if (canModerate) {
-      await onBlockActionClick(blockItemMutation, handleBlockActionClick);
+      onBlockActionClick(blockItemMutation);
     }
   };
-  const handleBlockItemThreadClick = async () => {
+  const handleBlockItemThreadClick = () => {
     if (canModerate) {
-      await onBlockActionClick(blockItemThreadMutation, handleBlockActionClick);
+      onBlockActionClick(blockItemThreadMutation);
     }
   };
 
@@ -140,7 +129,7 @@ const DiscussionThreadItemReviewAction = ({
         }));
         setStoredItems(updatedItems);
         setSelectedItems([], false);
-        onBlockButtonsStateChange(
+        handleBlockButtonsStateChange(
           updatedItems.filter(isNotResolved).length === 0,
         );
       }
@@ -149,20 +138,30 @@ const DiscussionThreadItemReviewAction = ({
 
   const handleResolveAllAbuseReportsForComment = async () => {
     if (canModerate) {
-      await onBlockActionClick(resolveAllAbuseReportsForCommentMutation, handleBlockActionClick);
+      await onBlockActionClick(resolveAllAbuseReportsForCommentMutation);
     }
-  }
+  };
 
   const handleResolveAllAbuseReportsForThread = async () => {
     if (canModerate) {
-      await onBlockActionClick(resolveAllAbuseReportsForThreadMutation, handleBlockActionClick);
+      await onBlockActionClick(resolveAllAbuseReportsForThreadMutation);
     }
-  }
+  };
 
   const handleReportsReviewClose = async () => {
     await queryClient.invalidateQueries(queryToInvalidate);
     setReportsReviewVisible(false);
   };
+
+  const handleOnClikcBlockComment = useCallback(() => {
+    handleResolveAllAbuseReportsForComment();
+    handleBlockItemClick();
+  }, [handleResolveAllAbuseReportsForComment, handleBlockItemClick]);
+
+  const handleOnClikcBlockThread = useCallback(() => {
+    handleBlockItemThreadClick();
+    handleResolveAllAbuseReportsForThread();
+  }, [handleBlockItemThreadClick, handleResolveAllAbuseReportsForThread]);
 
   const onSelectionChange = (selection) => setSelectedItems(selection);
 
@@ -179,16 +178,16 @@ const DiscussionThreadItemReviewAction = ({
       <>
         <IconButton
           onClick={handleReportsReviewClick}
-          label={ getMessage( "page.discover.table.reports.review" ) }
-          icon={<ReviewIcon />}
+          label={getMessage("page.discover.table.reports.review")}
+          icon={review}
         />
         <ReportsReviewModal
           isVisible={reportsReviewVisible}
           isActionAsync={isLoading}
-          allowedActions={ { canModerate, canAccessReports, canReviewReports } }
+          allowedActions={{ canModerate, canAccessReports, canReviewReports }}
           onClose={handleReportsReviewClose}
           startActions={
-            <Button onClick={ handleReportsReviewClose } variant="tertiary">
+            <Button onClick={handleReportsReviewClose} variant="tertiary">
               {getMessage(
                 "compontents.confirmation.dialog.button.cancel",
                 "Cancel",
@@ -199,14 +198,10 @@ const DiscussionThreadItemReviewAction = ({
             canModerate && (
               <>
                 <Button
-                  onClick={() => {
-                    console.log("action");
-                    handleResolveAllAbuseReportsForComment();
-                    handleBlockItemClick();
-                  }}
+                  onClick={handleOnClikcBlockComment}
                   variant="danger-light"
-                  startIcon={<LockIcon />}
-                  disabled={areBlockButtonsDisabled}>
+                  startIcon={lock}
+                  disabled={blockButtonsDisabled}>
                   {getMessage(
                     `page.details.actions.comment.block`,
                     "Block comment",
@@ -214,13 +209,10 @@ const DiscussionThreadItemReviewAction = ({
                 </Button>
                 {item.gotThread && (
                   <Button
-                    onClick={() => {
-                      handleBlockItemThreadClick;
-                      handleResolveAllAbuseReportsForThread;
-                    }}
+                    onClick={handleOnClikcBlockThread}
                     variant="danger"
-                    startIcon={<LockIcon />}
-                    disabled={areBlockButtonsDisabled}>
+                    startIcon={lock}
+                    disabled={blockButtonsDisabled}>
                     {getMessage(
                       `page.details.actions.thread.block`,
                       "Block thread",
@@ -253,8 +245,8 @@ const DiscussionThreadItemReviewAction = ({
             selectedItems={selectedItems}
             mutation={resolveReportMutation}
             updateItems={setStoredItems}
-            allowedActions={ { canAccessReports, canReviewReports } }
-            onBlockButtonsStateChange={onBlockButtonsStateChange}
+            allowedActions={{ canAccessReports, canReviewReports }}
+            onBlockButtonsStateChange={handleBlockButtonsStateChange}
             onSelectionChange={onSelectionChange}
           />
         </ReportsReviewModal>
@@ -266,18 +258,13 @@ const DiscussionThreadItemReviewAction = ({
 
 DiscussionThreadItemReviewAction.propTypes = {
   item: PropTypes.object.isRequired,
-  isLoading: PropTypes.bool,
-  queryToInvalidate: PropTypes.string.isRequired,
-  areBlockButtonsDisabled: PropTypes.bool,
+  isAnyActionLoading: PropTypes.bool,
   allowedActions: PropTypes.shape({
     canModerate: PropTypes.bool,
     canAccessReports: PropTypes.bool,
     canReviewReports: PropTypes.bool,
   }),
-  blockItemMutation: PropTypes.func.isRequired,
-  blockItemThreadMutation: PropTypes.func.isRequired,
-  onBlockButtonsStateChange: PropTypes.func.isRequired,
-  onBlockActionClick: PropTypes.func.isRequired,
+  queryToInvalidate: PropTypes.string
 };
 
 export default DiscussionThreadItemReviewAction;

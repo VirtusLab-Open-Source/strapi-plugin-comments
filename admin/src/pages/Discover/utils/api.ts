@@ -1,9 +1,9 @@
+// TODO
 // @ts-nocheck
 
 import { stringify } from "qs";
 
 import { getApiURL, axiosInstance, handleAPIError } from "../../../utils";
-
 
 export const fetchData = async (queryParams, toggleNotification) => {
   try {
@@ -11,8 +11,8 @@ export const fetchData = async (queryParams, toggleNotification) => {
       getApiURL(
         `moderate/all${
           queryParams ? `?${stringify(queryParams, { encode: false })}` : ""
-        }`
-      )
+        }`,
+      ),
     );
 
     return data;

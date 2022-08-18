@@ -5,10 +5,10 @@ export const APPROVAL_STATUS = {
 };
 
 export const REPORT_STATUS = {
-  RESOLVED: "RESOLVED",
-  OPEN: "OPEN",
-  BLOCKED: "BLOCKED",
   ...APPROVAL_STATUS,
+  BLOCKED: "BLOCKED",
+  OPEN: "OPEN",
+  RESOLVED: "RESOLVED",
 };
 
 export const REPORT_REASON = {
@@ -18,10 +18,10 @@ export const REPORT_REASON = {
 };
 
 export const COMMENT_STATUS = {
-  UNKNOWN: "UNKNOWN",
+  ...APPROVAL_STATUS,
   BLOCKED: "BLOCKED",
   OPEN: "OPEN",
   REMOVED: "REMOVED",
   TO_REVIEW: "TO_REVIEW",
-  ...APPROVAL_STATUS,
+  UNKNOWN: "UNKNOWN",
 };

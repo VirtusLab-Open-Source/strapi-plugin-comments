@@ -4,6 +4,7 @@
  *
  */
 
+// TODO
 // @ts-nocheck
 
 import React, { useCallback } from "react";
@@ -138,7 +139,7 @@ const ReportsReviewTable = ({
         unresolvedItems.map((_) => _.id),
         value,
       ),
-    [unresolvedItems],
+    [unresolvedItems, handleItemSelectionChange],
   );
 
   if (isEmpty(items)) {

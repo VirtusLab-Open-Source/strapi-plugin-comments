@@ -6,9 +6,9 @@ import { ToBeFixed } from "../../../types";
 
 const getMessage = (
   input: ToBeFixed,
-  defaultMessage: string = "",
-  inPluginScope: boolean = true,
-): string => {
+  defaultMessage = "",
+  inPluginScope = true,
+) => {
   const { formatMessage } = useIntl();
   let formattedId = "";
   if (isString(input)) {

@@ -4,6 +4,7 @@
  *
  */
 
+// TODO
 // @ts-nocheck
 import React, { memo, useRef, useMemo, useState } from "react";
 import { connect } from "react-redux";
@@ -118,8 +119,8 @@ const Details = ({ config }) => {
               <HeaderLayout
                 navigationAction={
                     <Link startIcon={arrowLeft} to={getUrl(`discover`)}>
-                    {getMessage("HeaderLayout.link.go-back", "Back", false)}
-                  </Link>
+                      {getMessage("HeaderLayout.link.go-back", "Back", false)}
+                    </Link>
                 }
                 title={getMessage("page.details.header")}
                 subtitle={getMessage("page.details.header.description")}

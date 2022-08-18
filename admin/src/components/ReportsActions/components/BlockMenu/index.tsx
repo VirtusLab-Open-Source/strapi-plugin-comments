@@ -1,10 +1,12 @@
+// TODO
 // @ts-nocheck
 
-import React from "react";
+import React, { useCallback } from "react";
 import { SimpleMenu, MenuItem } from '@strapi/design-system/SimpleMenu';
 import { carretDown } from "../../../icons";
 import { getMessage } from "../../../../utils";
 
+const iconButtonStyle = { minHeight: "2em", paddingLeft: '5px', paddingRight: "12px" };
 
 const BlockMenu = ({
   handlers: {
@@ -29,61 +31,64 @@ const BlockMenu = ({
     } } = item;
 
   const isIconButton = type === "icon";
-  const iconButtonStyle = { minHeight: "2em", paddingLeft: '5px', paddingRight: "12px" };
+
+  const handleBlockComment = useCallback(() => {
+    handleBlockItemClick(commentId);
+    handleResolveAllAbuseReportsForComment(commentId);
+  }, [handleBlockItemClick, handleResolveAllAbuseReportsForComment]);
+
+  const handleUnblockComment = useCallback(() => handleUnblockItemClick(commentId), [handleUnblockItemClick]);
+
+  const handleBlockThread = useCallback(() => {
+    handleBlockItemThreadClick(commentId);
+    handleResolveAllAbuseReportsForThread(commentId);
+  }, [handleBlockItemThreadClick, handleResolveAllAbuseReportsForThread]);
+
+  const handleUnblockThread = useCallback(() => {
+    handleUnblockThreadClick(commentId);
+  }, [handleUnblockThreadClick]);
 
   return (
     <SimpleMenu
       label={isIconButton ? null : "Block"}
       variant={"danger-light"}
-      style={isIconButton ? iconButtonStyle : null}
-    >
+      style={isIconButton ? iconButtonStyle : null}>
       {!blockedComment ? (
         <MenuItem
           disabled={blockedThread}
-          onClick={() => {
-            handleBlockItemClick(commentId);
-            handleResolveAllAbuseReportsForComment(commentId);
-          }}
-        >
+          onClick={handleBlockComment}>
           {getMessage(
             "page.details.actions.comment.block",
             "Block comment",
-          )}</MenuItem>
-      ) : (
-        <MenuItem
-            disabled={blockedThread}
-          onClick={() => {
-            handleUnblockItemClick(commentId);
-          }}
-        >
-          {getMessage(
-            "page.details.actions.comment.unblock",
-            "Unblock comment",
-          )}</MenuItem>)
-      }
-      {gotThread && (!blockedThread ? (
-        <MenuItem
-          onClick={() => {
-            handleBlockItemThreadClick(commentId);
-            handleResolveAllAbuseReportsForThread(commentId);
-          }}
-        >
-          {getMessage(
-            "page.details.actions.thread.block",
-            "Block thread",
           )}
         </MenuItem>
       ) : (
         <MenuItem
-          onClick={() => {
-            handleUnblockThreadClick(commentId);
-          }}
-        >
+          disabled={blockedThread}
+          onClick={handleUnblockComment}>
           {getMessage(
-            "page.details.actions.thread.unblock",
-            "Unblock thread",
+            "page.details.actions.comment.unblock",
+            "Unblock comment",
           )}
-        </MenuItem>))
+        </MenuItem>)
+      }
+      {gotThread &&
+        (!blockedThread ? (
+          <MenuItem
+            onClick={handleBlockThread}>
+            {getMessage(
+              "page.details.actions.thread.block",
+              "Block thread",
+            )}
+          </MenuItem>
+        ) : (
+          <MenuItem
+            onClick={handleUnblockThread}>
+            {getMessage(
+              "page.details.actions.thread.unblock",
+              "Unblock thread",
+            )}
+          </MenuItem>))
       }
     </SimpleMenu>
   );

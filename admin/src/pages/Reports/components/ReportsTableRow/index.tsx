@@ -1,3 +1,4 @@
+// TODO
 // @ts-nocheck
 
 
@@ -11,8 +12,6 @@ import { eye } from "../../../../components/icons";
 
 import React, { useState, useCallback } from "react";
 import { useIntl } from "react-intl";
-
-
 
 import CommentReviewModal from "../../../../components/CommentReviewModal";
 
@@ -53,12 +52,11 @@ const ReportsTableRow = ({
 
   const handleOpenModal = useCallback(() => {
     setModalVisible(true);
-  }, []);
+  }, [setModalVisible]);
 
   const handleCloseModal = useCallback(() => {
     setModalVisible(false);
-  }, []);
-
+  }, [setModalVisible]);
 
   const renderStatus = (props) => {
     const status = resolveReportStatus(props);
@@ -81,8 +79,6 @@ const ReportsTableRow = ({
       </StatusBadge>
     );
   };
-
-
 
   return (
     <Tr key={item.id}>

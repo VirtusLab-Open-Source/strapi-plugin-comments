@@ -13,6 +13,7 @@ import {
   AdminSinglePageResponse,
   AnyConfig,
   Comment,
+  CommentAuthor,
   CommentModelKeys,
   CommentReport,
   IServiceAdmin,
@@ -20,12 +21,11 @@ import {
   PluginConfigKeys,
   RelatedEntity,
   SettingsCommentsPluginConfig,
-  ToBeFixed,
-} from '../../types';
+} from "../../types";
 
-import {getPluginService, parseParams} from './../utils/functions';
-import {isEmpty, isNil, isNumber, parseInt} from 'lodash';
-import PluginError from './../utils/error';
+import { getPluginService, parseParams } from "./../utils/functions";
+import { isEmpty, isNil, isNumber, parseInt } from "lodash";
+import PluginError from "./../utils/error";
 import { assertComment } from "./../../types/utils";
 import {
   getModelUid,
@@ -222,7 +222,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   async findReports(
     this: IServiceAdmin,
     query: AdminFindAllProps,
-  ): Promise<ToBeFixed> {
+  ): Promise<AdminPaginatedResponse<Comment>> {
     const {
       _q,
       filters,
@@ -262,14 +262,14 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       };
     }
 
-    const entities = await strapi.db
+    const entities: Comment<CommentAuthor>[] = await strapi.db
       .query<Comment>(getModelUid("comment-report"))
       .findMany({
         ...params,
         populate: ["related"],
       });
 
-    const total = await strapi.db
+    const total: number = await strapi.db
       .query<Comment>(getModelUid("comment-report"))
       .count({
         where: params.where,
@@ -566,9 +566,9 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   async resolveAllAbuseReportsForComment(
     this: IServiceAdmin,
     commentId: Id,
-  ): Promise<any> {
+  ): Promise<StrapiDBBulkActionResponse> {
     if (commentId) {
-      const blockedCommentReports = strapi.db
+      const blockedCommentReports: Promise<CommentReport[]> = strapi.db
         .query<CommentReport>(getModelUid("comment-report"))
         .findMany({
           where: {
@@ -578,7 +578,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
           populate: ["related"],
         });
 
-      const reportIds = (await blockedCommentReports).map(
+      const reportIds: Id[] = (await blockedCommentReports).map(
         (report: { id: Id }) => report.id,
       );
 
@@ -601,7 +601,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   async resolveAllAbuseReportsForThread(
     this: IServiceAdmin,
     commentId: Id,
-  ): Promise<any> {
+  ): Promise<StrapiDBBulkActionResponse> {
     if (commentId) {
       const commentsInThread = strapi.db
         .query<Comment>(getModelUid("comment"))

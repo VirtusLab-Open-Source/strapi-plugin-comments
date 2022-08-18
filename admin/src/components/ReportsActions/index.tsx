@@ -1,3 +1,4 @@
+// TODO
 // @ts-nocheck
 
 import React from "react";
@@ -5,7 +6,6 @@ import { ActionButton } from "../ActionButton/styles";
 import { Flex } from "@strapi/design-system/Flex";
 import { SimpleMenu, MenuItem } from '@strapi/design-system/SimpleMenu';
 import { carretDown, check } from "../icons";
-
 
 import { getMessage } from '../../utils';
 import useReportsActionsHandlers from "../../hooks/useReportsActionsHandlers";
@@ -31,16 +31,18 @@ const ReportsActions = ({
     } } = item;
 
   const handlers = useReportsActionsHandlers(
-    allowedActions,
-    commentId,
-    mutation,
-    onSelectionChange,
-    reports,
-    selectedReports,
-    updateReports
+    {
+      allowedActions,
+      commentId,
+      mutation,
+      onSelectionChange,
+      reports,
+      selectedReports,
+      updateReports
+    }
   );
 
-  const { handleClickResolve } = handlers
+  const { handleClickResolve } = handlers;
 
   return (
     <Flex>
@@ -49,7 +51,7 @@ const ReportsActions = ({
           isSingle
           onClick={() => handleClickResolve(reportId)}
           startIcon={check}
-          variant={"success"}>
+          variant="success">
           {getMessage(
             "page.details.panel.discussion.warnings.reports.dialog.actions.resolve",
             "resolve",
@@ -65,7 +67,7 @@ const ReportsActions = ({
         <BlockMenu
           handlers={handlers}
           item={item}
-          type={"icon"}
+          type="icon"
         />
       }
     </Flex >

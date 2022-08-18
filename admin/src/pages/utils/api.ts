@@ -5,18 +5,17 @@ import { getApiURL, axiosInstance, handleAPIError } from "../../utils";
 import { Id } from "strapi-typed";
 import { ToBeFixed } from "../../../../types";
 
-
 export const fetchDetailsData = async (
   id: Id,
   queryParams: ToBeFixed,
-  toggleNotification: Function
-) => {
+  toggleNotification: Function,
+): Promise<ToBeFixed> => {
   try {
     const stringifiedProps = !isEmpty(queryParams)
       ? `?${stringify(queryParams, { encode: false })}`
       : "";
     const { data } = await axiosInstance.get(
-      getApiURL(`moderate/single/${id}${stringifiedProps}`)
+      getApiURL(`moderate/single/${id}${stringifiedProps}`),
     );
 
     return data;
@@ -27,11 +26,11 @@ export const fetchDetailsData = async (
 
 export const fetchContentTypeData = async (
   uid: string,
-  toggleNotification: Function
+  toggleNotification: Function,
 ) => {
   try {
     const { data } = await axiosInstance.get(
-      `/content-type-builder/content-types/${uid}`
+      `/content-type-builder/content-types/${uid}`,
     );
     return data?.data;
   } catch (err: ToBeFixed) {
@@ -65,7 +64,7 @@ export const unblockItemThread = (id: Id) => {
 
 export const resolveReport = ({ id, reportId }: ToBeFixed) => {
   return axiosInstance.patch(
-    getApiURL(`moderate/single/${id}/report/${reportId}/resolve`)
+    getApiURL(`moderate/single/${id}/report/${reportId}/resolve`),
   );
 };
 
@@ -84,7 +83,7 @@ export const resolveCommentMultipleReports = ({
 
 export const resolveMultipleReports = (reportsIds: Array<Id>) =>
   axiosInstance.put(getApiURL(`moderate/multiple/report/resolve`), reportsIds);
-;
+
 
 export const resolveAllAbuseReportsForComment = (commentId: Id) =>
   axiosInstance.put(getApiURL(`moderate/all/${commentId}/report/resolve`));

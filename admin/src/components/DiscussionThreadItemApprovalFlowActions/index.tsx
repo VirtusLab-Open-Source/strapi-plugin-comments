@@ -4,6 +4,7 @@
  *
  */
 
+// TODO
 // @ts-nocheck
 import React from "react";
 import PropTypes from "prop-types";
@@ -18,16 +19,14 @@ import { pluginId } from "../../pluginId";
 const DiscussionThreadItemApprovalFlowActions = ({
   id,
   allowedActions: { canModerate },
-  queryToInvalidate,
+  queryToInvalidate
 }) => {
   const toggleNotification = useNotification();
   const queryClient = useQueryClient();
   const { lockApp, unlockApp } = useOverlayBlocker();
 
-  const onSuccess = (message) => async () => {
-    if (queryToInvalidate) {
-      await queryClient.invalidateQueries(queryToInvalidate);
-    }
+  const onSuccess = (message) => () => {
+    queryClient.invalidateQueries(queryToInvalidate);
     toggleNotification({
       type: "success",
       message: `${pluginId}.${message}`,
@@ -89,7 +88,6 @@ const DiscussionThreadItemApprovalFlowActions = ({
 
 DiscussionThreadItemApprovalFlowActions.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  queryToInvalidate: PropTypes.string,
   allowedActions: PropTypes.shape({
     canModerate: PropTypes.bool,
   }),

@@ -117,7 +117,9 @@ export interface IServiceAdmin {
   restoreConfig(): Promise<SettingsCommentsPluginConfig>;
   restart(): void;
   findAll(props: AdminFindAllProps): Promise<AdminPaginatedResponse<Comment>>;
-  findReports(props: AdminFindAllProps): Promise<ToBeFixed>;
+  findReports(
+    props: AdminFindAllProps,
+  ): Promise<AdminPaginatedResponse<Comment>>;
   findOneAndThread(
     id: Id,
     props: AdminFindOneAndThreadProps,
@@ -139,7 +141,7 @@ export interface IServiceAdmin {
   resolveAllAbuseReportsForThread(
     this: IServiceAdmin,
     commentId: Id,
-  ): Promise<any>;
+  ): Promise<StrapiDBBulkActionResponse>;
   resolveMultipleAbuseReports(
     this: IServiceAdmin,
     ids: Array<Id>,

@@ -10,7 +10,6 @@ import {
   IServiceAdmin,
   SettingsCommentsPluginConfig,
   ThrowablePromisedResponse,
-  ToBeFixed,
   ViewCommentsPluginConfig,
 } from "../../types";
 
@@ -89,7 +88,7 @@ const controllers: IControllerAdmin = {
 
   async findReports(
     ctx: StrapiRequestContext<never, AdminFindAllProps>,
-  ): Promise<ToBeFixed> {
+  ): Promise<AdminPaginatedResponse<Comment>> {
     return this.getService<IServiceAdmin>().findReports(ctx.query);
   },
 
@@ -97,7 +96,7 @@ const controllers: IControllerAdmin = {
     ctx: StrapiRequestContext<never, AdminFindOneAndThreadProps>,
   ): ThrowablePromisedResponse<AdminSinglePageResponse> {
     const { params = {}, query } = ctx;
-    const { id }: ToBeFixed = parseParams(params);
+    const { id } = parseParams(params);
     try {
       return await this.getService<IServiceAdmin>().findOneAndThread(id, query);
     } catch (e) {
