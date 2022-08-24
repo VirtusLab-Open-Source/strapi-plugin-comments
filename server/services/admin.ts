@@ -1,4 +1,10 @@
-import { StrapiContext, Id, StrapiDBQueryArgs, PropType, StrapiDBBulkActionResponse } from "strapi-typed";
+import {
+  StrapiContext,
+  Id,
+  StrapiDBQueryArgs,
+  PropType,
+  StrapiDBBulkActionResponse,
+} from 'strapi-typed';
 import {
   AdminFindAllProps,
   AdminFindAllQueryParamsParsed,
@@ -7,6 +13,7 @@ import {
   AdminSinglePageResponse,
   AnyConfig,
   Comment,
+  CommentAuthor,
   CommentModelKeys,
   CommentReport,
   IServiceAdmin,
@@ -19,6 +26,7 @@ import {
 import { getPluginService, parseParams } from "./../utils/functions";
 import { isEmpty, isNil, isNumber, parseInt } from "lodash";
 import PluginError from "./../utils/error";
+import { assertComment } from "./../../types/utils";
 import {
   getModelUid,
   getRelatedGroups,
@@ -38,7 +46,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   // Config
   async config<T extends AnyConfig>(
     this: IServiceAdmin,
-    viaSettingsPage = false
+    viaSettingsPage = false,
   ): Promise<T> {
     const pluginStore = await this.getCommonService().getPluginStore();
     const config: SettingsCommentsPluginConfig = await pluginStore.get({
@@ -50,7 +58,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
           ...prev,
           [curr]: REGEX[curr].toString(),
         }),
-        {}
+        {},
       ),
     };
 
@@ -99,7 +107,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
 
   async updateConfig(
     this: IServiceAdmin,
-    body: SettingsCommentsPluginConfig
+    body: SettingsCommentsPluginConfig,
   ): Promise<SettingsCommentsPluginConfig> {
     const pluginStore = await this.getCommonService().getPluginStore();
 
@@ -109,7 +117,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   },
 
   async restoreConfig(
-    this: IServiceAdmin
+    this: IServiceAdmin,
   ): Promise<SettingsCommentsPluginConfig> {
     const pluginStore = await this.getCommonService().getPluginStore();
 
@@ -125,7 +133,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   // Find all comments
   async findAll(
     this: IServiceAdmin,
-    { ...query }: AdminFindAllProps
+    { ...query }: AdminFindAllProps,
   ): Promise<AdminPaginatedResponse<Comment>> {
     const {
       _q,
@@ -134,7 +142,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       page = 1,
       filters,
     }: AdminFindAllQueryParamsParsed = parseParams<AdminFindAllQueryParamsParsed>(
-      query
+      query,
     );
 
     const defaultWhere = {
@@ -190,15 +198,125 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
         filterOurResolvedReports(
           this.getCommonService().sanitizeCommentEntity(
             _,
-            defaultAuthorUserPopulate?.populate
-          )
-        )
+            defaultAuthorUserPopulate?.populate,
+          ),
+        ),
       )
       .map((_) =>
-        this.getCommonService().mergeRelatedEntityTo(_, relatedEntities)
+        this.getCommonService().mergeRelatedEntityTo(_, relatedEntities),
       );
 
     const pageCount = Math.floor(total / pageSize);
+    return {
+      result,
+      pagination: {
+        page: page,
+        pageSize: pageSize,
+        pageCount: total % pageSize === 0 ? pageCount : pageCount + 1,
+        total,
+      },
+    };
+  },
+
+  //Find all reports
+  async findReports(
+    this: IServiceAdmin,
+    query: AdminFindAllProps,
+  ): Promise<AdminPaginatedResponse<Comment>> {
+    const {
+      _q,
+      filters,
+      orderBy,
+      page = 1,
+      pageSize = 10,
+    }: AdminFindAllQueryParamsParsed = parseParams<AdminFindAllQueryParamsParsed>(
+      query,
+    );
+
+    const defaultWhere = {
+      resolved: { $notNull: true },
+    };
+
+    const defaultAuthorUserPopulate = this.getDefaultAuthorPopulate();
+
+    let params: StrapiDBQueryArgs<CommentModelKeys> = {
+      where: !isEmpty(filters)
+        ? {
+            ...defaultWhere,
+            ...filters,
+          }
+        : { ...defaultWhere },
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+      orderBy: orderBy || [{ resolved: "asc" }, { createdAt: "desc" }],
+    };
+    if (_q) {
+      params = {
+        ...params,
+        where: {
+          ...params.where,
+          content: {
+            $contains: _q,
+          },
+        },
+      };
+    }
+
+    const entities: Comment<CommentAuthor>[] = await strapi.db
+      .query<Comment>(getModelUid("comment-report"))
+      .findMany({
+        ...params,
+        populate: ["related"],
+      });
+
+    const total: number = await strapi.db
+      .query<Comment>(getModelUid("comment-report"))
+      .count({
+        where: params.where,
+      });
+
+    const reportedCommentsIds: Id[] = entities.map(
+      (report) => report.related.id,
+    );
+
+    const commentsInThreads: Comment[] = await strapi.db
+      .query<Comment>(getModelUid("comment"))
+      .findMany({
+        where: {
+          threadOf: reportedCommentsIds,
+        },
+        populate: ["threadOf"],
+        limit: Number.MAX_SAFE_INTEGER,
+      });
+
+    const commentWithThreadIds: Id[] = [
+      ...new Set(
+        commentsInThreads.map(({ threadOf }) => {
+          assertComment(threadOf);
+          return threadOf.id;
+        }),
+      ),
+    ];
+
+    const result = entities.map((_) => {
+      const isCommentWithThread = commentWithThreadIds.includes(_.related.id);
+
+      return filterOurResolvedReports(
+        this.getCommonService().sanitizeCommentEntity(
+          {
+            ..._,
+            related: this.getCommonService().sanitizeCommentEntity({
+              ..._.related,
+              gotThread: isCommentWithThread,
+            }),
+          },
+          defaultAuthorUserPopulate?.populate,
+        ),
+      );
+    });
+
+    const pageCount = Math.floor(total / pageSize);
+
     return {
       result,
       pagination: {
@@ -214,14 +332,13 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   async findOneAndThread(
     this: IServiceAdmin,
     id: Id,
-    { removed, ...query }: AdminFindOneAndThreadProps
+    { removed, ...query }: AdminFindOneAndThreadProps,
   ): Promise<AdminSinglePageResponse> {
-
     const defaultAuthorUserPopulate = this.getDefaultAuthorPopulate();
 
     const defaultWhere = !removed
       ? {
-          $or: [{ removed: false }, { removed: null }],
+          $or: [{ removed: false }, { removed: { $notNull: false } }],
         }
       : {};
 
@@ -292,14 +409,14 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
           startingFromId: levelThreadId,
           isAdmin: true,
         },
-        false
+        false,
       );
     const selectedEntity = this.getCommonService().sanitizeCommentEntity(
       {
         ...entity,
         threadOf: entity.threadOf || null,
       },
-      defaultAuthorUserPopulate?.populate
+      defaultAuthorUserPopulate?.populate,
     );
 
     return {
@@ -313,7 +430,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   async blockComment(
     this: IServiceAdmin,
     id: Id,
-    forceStatus?: boolean
+    forceStatus?: boolean,
   ): Promise<Comment> {
     const existingEntity = await this.getCommonService().findOne({ id });
     const changedEntity = await strapi.db
@@ -331,7 +448,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   async blockCommentThread(
     this: IServiceAdmin,
     id: Id,
-    forceStatus?: boolean
+    forceStatus?: boolean,
   ): Promise<Comment> {
     const existingEntity = await this.getCommonService().findOne({ id });
     const status = !isNil(forceStatus)
@@ -377,12 +494,12 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   async blockNestedThreads(
     this: IServiceAdmin,
     id: Id,
-    blockStatus?: boolean
+    blockStatus?: boolean,
   ): Promise<boolean> {
     return await this.getCommonService().modifiedNestedNestedComments(
       id,
       "blockedThread",
-      blockStatus
+      blockStatus,
     );
   },
 
@@ -390,7 +507,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   async resolveAbuseReport(
     this: IServiceAdmin,
     id: Id,
-    commentId: Id
+    commentId: Id,
   ): Promise<CommentReport> {
     return strapi.db
       .query<CommentReport>(getModelUid("comment-report"))
@@ -403,23 +520,22 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       });
   },
 
-  // Resolve multiple reported abuse for comment
-  async resolveMultipleAbuseReports(
+  // Resolve multiple reported abuse for one chosen comment
+  async resolveCommentMultipleAbuseReports(
     this: IServiceAdmin,
     ids: Array<Id>,
-    commentId: Id
+    commentId: Id,
   ): Promise<StrapiDBBulkActionResponse> {
-
     /**
      *  Built-in ORM solution names the `id` columns wrongly (leaves one without prefix) what causes error: ER_NON_UNIQ_ERROR: Column 'id' in where clause is ambiguous
-     *  
+     *
      *  Following workaround findMany call solves the `related` condition before making single updateMany like:
-     * 
+     *
      * .updateMany({
      *  where: { id: ids, related: commentId },
      *  data: { resolved: true },
      * });
-     * 
+     *
      */
 
     const reportsToResolve = await strapi.db
@@ -429,7 +545,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
           id: ids,
           related: commentId,
         },
-        populate: ['related']
+        populate: ["related"],
       });
 
     if (reportsToResolve.length === ids.length) {
@@ -441,22 +557,128 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
         });
     }
 
-    throw new PluginError(400, 'At least one of selected reports got invalid comment entity relation. Try again.');
+    throw new PluginError(
+      400,
+      "At least one of selected reports got invalid comment entity relation. Try again.",
+    );
+  },
+
+  async resolveAllAbuseReportsForComment(
+    this: IServiceAdmin,
+    commentId: Id,
+  ): Promise<StrapiDBBulkActionResponse> {
+    if (commentId) {
+      const blockedCommentReports: Promise<CommentReport[]> = strapi.db
+        .query<CommentReport>(getModelUid("comment-report"))
+        .findMany({
+          where: {
+            related: commentId,
+            resolved: false,
+          },
+          populate: ["related"],
+        });
+
+      const reportIds: Id[] = (await blockedCommentReports).map(
+        (report: { id: Id }) => report.id,
+      );
+
+      return strapi.db
+        .query<CommentReport>(getModelUid("comment-report"))
+        .updateMany({
+          where: {
+            id: reportIds,
+          },
+          data: { resolved: true },
+        });
+    }
+
+    throw new PluginError(
+      400,
+      "There is something wrong with comment Id. Try again.",
+    );
+  },
+
+  async resolveAllAbuseReportsForThread(
+    this: IServiceAdmin,
+    commentId: Id,
+  ): Promise<StrapiDBBulkActionResponse> {
+    if (commentId) {
+      const commentsInThread = strapi.db
+        .query<Comment>(getModelUid("comment"))
+        .findMany({
+          where: {
+            threadOf: commentId,
+          },
+        });
+
+      const commentsInThreadIds = (await commentsInThread).map(
+        (comment) => comment.id,
+      );
+
+      commentsInThreadIds.push(commentId);
+
+      const reportsInThread = strapi.db
+        .query<CommentReport>(getModelUid("comment-report"))
+        .findMany({
+          where: {
+            related: commentsInThreadIds,
+            resolved: false,
+          },
+          populate: ["related"],
+        });
+
+      const reportsInThreadIds = (await reportsInThread).map(
+        (report) => report.id,
+      );
+
+      return strapi.db
+        .query<CommentReport>(getModelUid("comment-report"))
+        .updateMany({
+          where: {
+            id: reportsInThreadIds,
+          },
+          data: { resolved: true },
+        });
+    }
+
+    throw new PluginError(
+      400,
+      "There is something wrong with comment Id. Try again.",
+    );
+  },
+
+  async resolveMultipleAbuseReports(
+    ids: Array<Id>,
+  ): Promise<StrapiDBBulkActionResponse> {
+    if (!!ids.length) {
+      return strapi.db
+        .query<CommentReport>(getModelUid("comment-report"))
+        .updateMany({
+          where: { id: { $in: ids } },
+          data: { resolved: true },
+        });
+    }
+
+    throw new PluginError(
+      400,
+      "At least one of selected reports got invalid comment entity relation. Try again.",
+    );
   },
 
   // Recognize Strapi User fields possible to populate
   getDefaultAuthorPopulate(this: IServiceAdmin): undefined | any {
-    const strapiUserTypeUid = 'plugin::users-permissions.user';
-    const allowedTypes = ['media', 'relation'];
+    const strapiUserTypeUid = "plugin::users-permissions.user";
+    const allowedTypes = ["media", "relation"];
 
     const { attributes } = strapi.contentTypes[strapiUserTypeUid] || {};
-    const relationTypes = Object.keys(attributes)
-      ?.filter((key: string) => allowedTypes.includes(attributes[key]?.type));
-    if (relationTypes.includes('avatar')) {
+    const relationTypes = Object.keys(attributes)?.filter((key: string) =>
+      allowedTypes.includes(attributes[key]?.type),
+    );
+    if (relationTypes.includes("avatar")) {
       return {
         populate: { avatar: true },
       };
     }
     return undefined;
-  }
+  },
 });

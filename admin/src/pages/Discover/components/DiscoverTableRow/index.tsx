@@ -1,9 +1,9 @@
+// TODO;
 // @ts-nocheck
 
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useIntl } from "react-intl";
-import { useMutation, useQueryClient } from "react-query";
 import { isNil, isEmpty } from "lodash";
 import { Flex } from "@strapi/design-system/Flex";
 import { IconButton } from "@strapi/design-system/IconButton";
@@ -11,18 +11,13 @@ import { Link } from "@strapi/design-system/Link";
 import { Stack } from "@strapi/design-system/Stack";
 import { Tr, Td } from "@strapi/design-system/Table";
 import { Typography } from "@strapi/design-system/Typography";
-import { Eye } from "@strapi/icons";
-import { useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
 import {
   getMessage,
   getUrl,
-  handleAPIError,
   resolveCommentStatus,
   resolveCommentStatusColor,
 } from "../../../../utils";
-import { blockItem, blockItemThread } from "../../../utils/api";
-import { pluginId } from "../../../../pluginId";
-import { ReviewIcon, LockIcon } from "../../../../components/icons";
+import { eye } from "../../../../components/icons";
 import { TableLink } from "./styles";
 import renderEntryTitle from "../../../../utils/renderEntryTitle";
 import DiscussionThreadItemApprovalFlowActions from "../../../../components/DiscussionThreadItemApprovalFlowActions";
@@ -37,77 +32,16 @@ const DiscoverTableRow = ({
   allowedActions: { canModerate, canAccessReports, canReviewReports },
   onClick,
 }) => {
-  const { id, reports } = item;
-
-  const [blockButtonsDisabled, setBlockButtonsDisabled] = useState(false);
+  const { reports } = item;
 
   const { formatDate } = useIntl();
-  const toggleNotification = useNotification();
-  const queryClient = useQueryClient();
-  const { lockApp, unlockApp } = useOverlayBlocker();
 
-  const onSuccess =
-    (message, stateAction = () => {}, indalidate = true) =>
-    async () => {
-      if (indalidate) {
-        await queryClient.invalidateQueries("get-data");
-      }
-      toggleNotification({
-        type: "success",
-        message: `${pluginId}.${message}`,
-      });
-      stateAction(false);
-      unlockApp();
-    };
-
-  const onError = (err) => {
-    handleAPIError(err, toggleNotification);
-  };
-
-  const blockItemMutation = useMutation(blockItem, {
-    onSuccess: onSuccess(
-      "page.details.actions.comment.block.confirmation.success"
-    ),
-    onError,
-    refetchActive: false,
-  });
-  const blockItemThreadMutation = useMutation(blockItemThread, {
-    onSuccess: onSuccess(
-      "page.details.actions.thread.block.confirmation.success"
-    ),
-    onError,
-    refetchActive: false,
-  });
-
-  const handleBlockItemClick = async () => {
-    if (canModerate) {
-      lockApp();
-      blockItemMutation.mutate(id);
-    }
-  };
-  const handleBlockItemThreadClick = async () => {
-    if (canModerate) {
-      lockApp();
-      blockItemThreadMutation.mutate(id);
-    }
-  };
-
-  const handleBlockActionClick = async (mutation, onCallback) => {
-    lockApp();
-    await mutation.mutateAsync(id);
-    onCallback();
-  };
-
-  const isLoading =
-    blockItemMutation.isLoading || blockItemThreadMutation.isLoading;
   const openReports = reports?.filter((_) => !_.resolved);
   const hasReports = !isEmpty(openReports);
   const reviewFlowEnabled =
     canAccessReports && hasReports && !(item.blocked || item.blockedThread);
 
   const handleClick = () => onClick();
-  const handleBlockButtonsStateChange = (disabled) =>
-    setBlockButtonsDisabled(disabled);
 
   const renderStatus = (props) => {
     const status = resolveCommentStatus({ ...props, reviewFlowEnabled });
@@ -134,6 +68,7 @@ const DiscoverTableRow = ({
 
   const renderEntryUrl = (entry) =>
     entry ? `/content-manager/collectionType/${entry.uid}/${entry.id}` : null;
+
   const renderDetailsUrl = (entry) => getUrl(`discover/${entry.id}`);
 
   const gotApprovalFlow = !isNil(item.approvalStatus);
@@ -153,7 +88,7 @@ const DiscoverTableRow = ({
       </Td>
       <Td>
         <Stack size={2} horizontal>
-          { item.author && (<UserAvatar avatar={item?.author?.avatar} name={item?.author?.name} />) }
+          {item.author && (<UserAvatar avatar={item?.author?.avatar} name={item?.author?.name} />)}
           <Typography textColor="neutral800" variant="pi">
             {item?.author?.name || getMessage('compontents.author.unknown')}
           </Typography>
@@ -208,28 +143,21 @@ const DiscoverTableRow = ({
               <DiscussionThreadItemApprovalFlowActions
                 id={item.id}
                 allowedActions={{ canModerate }}
-                queryToInvalidate="get-data"
               />
             )}
             <DiscussionThreadItemReviewAction
               item={item}
               queryToInvalidate="get-data"
-              areBlockButtonsDisabled={blockButtonsDisabled}
-              isLoading={isLoading}
               allowedActions={{
                 canModerate,
                 canAccessReports,
                 canReviewReports,
               }}
-              blockItemMutation={blockItemMutation}
-              blockItemThreadMutation={blockItemThreadMutation}
-              onBlockButtonsStateChange={handleBlockButtonsStateChange}
-              onBlockActionClick={handleBlockActionClick}
             />
             <IconButton
               onClick={handleClick}
               label={getMessage("page.discover.table.action.display")}
-              icon={<Eye />}
+              icon={eye}
             />
           </IconButtonGroupStyled>
         </Flex>

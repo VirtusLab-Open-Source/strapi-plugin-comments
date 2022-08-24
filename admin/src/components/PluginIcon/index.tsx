@@ -4,11 +4,12 @@
  *
  */
 
+// TODO
 // @ts-nocheck
 
 import React from "react";
-import CommentsIcon from "../icons/comments";
+import { comments } from '../icons'
 
-const PluginIcon = () => <CommentsIcon />;
+const PluginIcon = () => comments;
 
 export default PluginIcon;

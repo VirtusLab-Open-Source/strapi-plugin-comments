@@ -4,12 +4,13 @@
  *
  */
 
+// TODO
 // @ts-nocheck
 import React from "react";
 import PropTypes from "prop-types";
 import { useMutation, useQueryClient } from "react-query";
 import { IconButton } from "@strapi/design-system/IconButton";
-import { Check, Cross } from "@strapi/icons";
+import { check, cross } from "../icons";
 import { useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
 import { getMessage, handleAPIError } from "../../utils";
 import { approveItem, rejectItem } from "../../pages/utils/api";
@@ -18,16 +19,14 @@ import { pluginId } from "../../pluginId";
 const DiscussionThreadItemApprovalFlowActions = ({
   id,
   allowedActions: { canModerate },
-  queryToInvalidate,
+  queryToInvalidate
 }) => {
   const toggleNotification = useNotification();
   const queryClient = useQueryClient();
   const { lockApp, unlockApp } = useOverlayBlocker();
 
-  const onSuccess = (message) => async () => {
-    if (queryToInvalidate) {
-      await queryClient.invalidateQueries(queryToInvalidate);
-    }
+  const onSuccess = (message) => () => {
+    queryClient.invalidateQueries(queryToInvalidate);
     toggleNotification({
       type: "success",
       message: `${pluginId}.${message}`,
@@ -72,12 +71,12 @@ const DiscussionThreadItemApprovalFlowActions = ({
     return (
       <>
         <IconButton
-          icon={<Check />}
+          icon={check}
           label={getMessage("page.details.actions.comment.approve", "Approve")}
           onClick={handleApproveClick}
         />
         <IconButton
-          icon={<Cross />}
+          icon={cross}
           label={getMessage("page.details.actions.comment.reject", "Reject")}
           onClick={handleRejectClick}
         />
@@ -89,7 +88,6 @@ const DiscussionThreadItemApprovalFlowActions = ({
 
 DiscussionThreadItemApprovalFlowActions.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  queryToInvalidate: PropTypes.string,
   allowedActions: PropTypes.shape({
     canModerate: PropTypes.bool,
   }),

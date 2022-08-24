@@ -19,6 +19,14 @@ const routes: StrapiRoute[] = [
   },
   {
     method: "GET",
+    path: "/moderate/reports",
+    handler: "admin.findReports",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "GET",
     path: "/moderate/single/:id",
     handler: "admin.findOne",
     config: {
@@ -68,6 +76,30 @@ const routes: StrapiRoute[] = [
   {
     method: "PUT",
     path: "/moderate/single/:id/report/resolve",
+    handler: "admin.resolveCommentMultipleAbuseReports",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "PUT",
+    path: "/moderate/all/:id/report/resolve",
+    handler: "admin.resolveAllAbuseReportsForComment",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "PUT",
+    path: "/moderate/all/:id/report/resolve-thread",
+    handler: "admin.resolveAllAbuseReportsForThread",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "PUT",
+    path: "/moderate/multiple/report/resolve",
     handler: "admin.resolveMultipleAbuseReports",
     config: {
       policies: [],

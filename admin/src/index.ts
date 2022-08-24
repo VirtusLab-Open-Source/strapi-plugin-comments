@@ -13,7 +13,7 @@ const { name, displayName } = pluginPkg.strapi;
 export default {
   register(app: ToBeFixed) {
     app.addMenuLink({
-      to: `/plugins/${pluginId}/discover`,
+      to: `/plugins/${pluginId}`,
       badgeContent: 1,
       icon: PluginIcon,
       intlLabel: {
@@ -22,7 +22,7 @@ export default {
       },
       Component: async () => {
         const component = await import(
-          /* webpackChunkName: "[request]" */ "./pages/App"
+          /* webpackChunkName: "[request]" */ './pages/App'
         );
 
         return component;

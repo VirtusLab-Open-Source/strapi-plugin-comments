@@ -4,16 +4,17 @@
  *
  */
 
+// TODO;
 // @ts-nocheck
-import React, { useState } from "react";
+
+import React, { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { useMutation, useQueryClient } from "react-query";
 import { useHistory } from "react-router-dom";
-import { isNil, isEmpty } from "lodash";
+import { isNil, isEmpty, noop } from "lodash";
 import { Flex } from "@strapi/design-system/Flex";
 import { IconButton } from "@strapi/design-system/IconButton";
 import { useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
-import { Eye } from "@strapi/icons";
 import {
   getMessage,
   getUrl,
@@ -28,9 +29,10 @@ import {
   blockItemThread,
   unblockItem,
   unblockItemThread,
+  resolveAllAbuseReportsForThread,
 } from "../../pages/utils/api";
 import { pluginId } from "../../pluginId";
-import { LockIcon, UnlockIcon } from "../icons";
+import { lock, unlock, eye } from "../icons";
 import DiscussionThreadItemApprovalFlowActions from "../DiscussionThreadItemApprovalFlowActions";
 import StatusBadge from "../StatusBadge";
 import { IconButtonGroupStyled } from "../IconButton/styles";
@@ -47,7 +49,6 @@ const DiscussionThreadItemActions = ({
     removed,
     blockedThread,
     gotThread,
-    threadItemsCount,
     threadFirstItemId,
     pinned,
     preview,
@@ -59,60 +60,47 @@ const DiscussionThreadItemActions = ({
     useState(false);
   const [blockThreadConfirmationVisible, setBlockThreadConfirmationVisible] =
     useState(false);
-  const [blockButtonsDisabled, setBlockButtonsDisabled] =
-    useState(blockedThread);
+
 
   const { push } = useHistory();
   const toggleNotification = useNotification();
   const queryClient = useQueryClient();
   const { lockApp, unlockApp } = useOverlayBlocker();
 
-  const onSuccess =
-    (message, stateAction = () => {}) =>
-    async () => {
-      await queryClient.invalidateQueries("get-details-data");
+  const onSuccess = (message, sideEffectCallback) => () => {
+    queryClient.invalidateQueries("get-details-data");
+    if (message) {
       toggleNotification({
         type: "success",
         message: `${pluginId}.${message}`,
       });
-      stateAction(false);
-      unlockApp();
-    };
+    }
+    sideEffectCallback();
+    unlockApp();
+  };
 
   const onError = (err) => {
     handleAPIError(err, toggleNotification);
   };
 
-  const blockItemMutation = useMutation(blockItem, {
-    onSuccess: onSuccess(
-      "page.details.actions.comment.block.confirmation.success",
-      setBlockConfirmationVisible
-    ),
-    onError,
-    refetchActive: false,
-  });
-  const unblockItemMutation = useMutation(unblockItem, {
-    onSuccess: onSuccess(
-      "page.details.actions.comment.unblock.confirmation.success"
-    ),
-    onError,
-    refetchActive: false,
-  });
-  const blockItemThreadMutation = useMutation(blockItemThread, {
-    onSuccess: onSuccess(
-      "page.details.actions.thread.block.confirmation.success",
-      setBlockThreadConfirmationVisible
-    ),
-    onError,
-    refetchActive: false,
-  });
-  const unblockItemThreadMutation = useMutation(unblockItemThread, {
-    onSuccess: onSuccess(
-      "page.details.actions.thread.unblock.confirmation.success"
-    ),
-    onError,
-    refetchActive: false,
-  });
+  const mutationConfig = (message = "", sideEffectCallback = noop) => {
+    return {
+      onSuccess: onSuccess(message, sideEffectCallback),
+      onError
+    };
+  };
+
+  const resolveAllAbuseReportsForThreadMutation = useMutation(
+    resolveAllAbuseReportsForThread, mutationConfig()
+  );
+
+  const blockItemMutation = useMutation(blockItem, mutationConfig("page.details.actions.comment.block.confirmation.success", setBlockConfirmationVisible));
+
+  const unblockItemMutation = useMutation(unblockItem, mutationConfig("page.details.actions.comment.unblock.confirmation.success"));
+
+  const blockItemThreadMutation = useMutation(blockItemThread, mutationConfig("page.details.actions.thread.block.confirmation.success", setBlockThreadConfirmationVisible));
+
+  const unblockItemThreadMutation = useMutation(unblockItemThread, mutationConfig("page.details.actions.thread.unblock.confirmation.success"));
 
   const gotApprovalFlow = !isNil(approvalStatus);
   const needsApproval = gotApprovalFlow && approvalStatus === "PENDING";
@@ -149,17 +137,33 @@ const DiscussionThreadItemActions = ({
     );
   };
 
+  const isLoading =
+    unblockItemMutation.isLoading ||
+    blockItemMutation.isLoading ||
+    blockItemThreadMutation.isLoading ||
+    unblockItemThreadMutation.isLoading;
+
+  const handleResolveAllAbuseReportsForThread = () => {
+    if (canModerate) {
+      lockApp();
+      resolveAllAbuseReportsForThreadMutation.mutate(id);
+    }
+  };
+
   const handleBlockClick = () => setBlockConfirmationVisible(true);
-  const handleBlockConfirm = async () => {
+
+  const handleBlockConfirm = () => {
     if (canModerate) {
       lockApp();
       blockItemMutation.mutate(id);
     }
   };
+
   const handleBlockCancel = () => {
     setBlockConfirmationVisible(false);
   };
-  const handleUnblockClick = async () => {
+
+  const handleUnblockClick = () => {
     if (canModerate) {
       lockApp();
       unblockItemMutation.mutate(id);
@@ -167,7 +171,8 @@ const DiscussionThreadItemActions = ({
   };
 
   const handleBlockThreadClick = () => setBlockThreadConfirmationVisible(true);
-  const handleBlockThreadConfirm = async () => {
+
+  const handleBlockThreadConfirm = () => {
     if (canModerate) {
       lockApp();
       blockItemThreadMutation.mutate(id);
@@ -176,7 +181,7 @@ const DiscussionThreadItemActions = ({
   const handleBlockThreadCancel = () => {
     setBlockThreadConfirmationVisible(false);
   };
-  const handleUnblockThreadClick = async () => {
+  const handleUnblockThreadClick = () => {
     if (canModerate) {
       lockApp();
       unblockItemThreadMutation.mutate(id);
@@ -189,22 +194,14 @@ const DiscussionThreadItemActions = ({
     }
   };
 
-  const handleBlockActionClick = async (mutation, onCallback) => {
-    lockApp();
-    await mutation.mutateAsync(id);
-    onCallback();
-  };
-
-  const handleBlockButtonsStateChange = (disabled) =>
-    setBlockButtonsDisabled(disabled);
+  const handleOnConfirm = useCallback(() => {
+    handleBlockThreadConfirm(id);
+    handleResolveAllAbuseReportsForThread(id);
+  }, [handleBlockThreadConfirm, handleResolveAllAbuseReportsForThread]);
 
   const anyGroupButtonsVisible =
     needsApproval || reviewFlowEnabled || !blockedThread;
-  const isLoading =
-    unblockItemMutation.isLoading ||
-    blockItemMutation.isLoading ||
-    blockItemThreadMutation.isLoading ||
-    unblockItemThreadMutation.isLoading;
+
 
   if (removed || isRejected || !canModerate) {
     return (
@@ -221,7 +218,7 @@ const DiscussionThreadItemActions = ({
         {!blockedThread && (gotThread || pinned) && (
           <ActionButton
             onClick={handleBlockThreadClick}
-            startIcon={<LockIcon />}
+            startIcon={lock}
             loading={blockItemThreadMutation.isLoading}
             variant="danger"
           >
@@ -231,7 +228,7 @@ const DiscussionThreadItemActions = ({
         {blockedThread && (gotThread || pinned) && (
           <ActionButton
             onClick={handleUnblockThreadClick}
-            startIcon={<UnlockIcon />}
+            startIcon={unlock}
             loading={unblockItemThreadMutation.isLoading}
             variant="success"
           >
@@ -247,7 +244,7 @@ const DiscussionThreadItemActions = ({
               <IconButton
                 onClick={handleBlockClick}
                 loading={blockItemMutation.isLoading}
-                icon={<LockIcon />}
+                icon={lock}
                 label={getMessage(
                   "page.details.actions.comment.block",
                   "Block"
@@ -258,7 +255,7 @@ const DiscussionThreadItemActions = ({
               <IconButton
                 onClick={handleUnblockClick}
                 loading={unblockItemMutation.isLoading}
-                icon={<UnlockIcon />}
+                icon={unlock}
                 label={getMessage(
                   "page.details.actions.comment.unblock",
                   "Unblock"
@@ -275,17 +272,12 @@ const DiscussionThreadItemActions = ({
             <DiscussionThreadItemReviewAction
               item={item}
               queryToInvalidate="get-details-data"
-              areBlockButtonsDisabled={blockButtonsDisabled}
-              isLoading={isLoading}
               allowedActions={{
                 canModerate,
                 canAccessReports,
                 canReviewReports,
               }}
-              blockItemMutation={blockItemMutation}
-              blockItemThreadMutation={blockItemThreadMutation}
-              onBlockButtonsStateChange={handleBlockButtonsStateChange}
-              onBlockActionClick={handleBlockActionClick}
+              isAnyActionLoading={isLoading}
             />
           </IconButtonGroupStyled>
         )}
@@ -293,7 +285,7 @@ const DiscussionThreadItemActions = ({
           <IconButtonGroupStyled isSingle withMargin>
             <IconButton
               onClick={handleDrilldownClick}
-              icon={<Eye />}
+              icon={eye}
               label={getMessage(
                 "page.details.panel.discussion.nav.drilldown",
                 "Drilldown thread"
@@ -317,7 +309,7 @@ const DiscussionThreadItemActions = ({
           labelConfirm={getMessage(
             "page.details.actions.comment.block.confirmation.button.confirm"
           )}
-          iconConfirm={<LockIcon />}
+          iconConfirm={lock}
           onConfirm={handleBlockConfirm}
           onCancel={handleBlockCancel}
         >
@@ -336,8 +328,8 @@ const DiscussionThreadItemActions = ({
           labelConfirm={getMessage(
             "page.details.actions.thread.block.confirmation.button.confirm"
           )}
-          iconConfirm={<LockIcon />}
-          onConfirm={handleBlockThreadConfirm}
+          iconConfirm={lock}
+          onConfirm={handleOnConfirm}
           onCancel={handleBlockThreadCancel}
         >
           {getMessage(
