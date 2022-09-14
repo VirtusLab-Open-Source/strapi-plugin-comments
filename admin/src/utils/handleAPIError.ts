@@ -2,7 +2,7 @@ import { ToBeFixed } from "../../../types";
 import { pluginId } from "../pluginId";
 
 const handleAPIError = (
-  err = null,
+  err: Error | null = null,
   toggleNotification: ToBeFixed = null,
   message = "app.components.notification.error"
 ) => {
