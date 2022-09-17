@@ -3,6 +3,10 @@ import { commentsCustomField } from "./comments";
 
 export const registerCustomFields = ({ strapi }: StrapiContext) => {
   if (!canRegister({ strapi })) {
+    strapi.log.warn(
+      "[Comments Plugin] Custom fields disabled. Upgrade Strapi to use custom fields."
+    );
+
     return;
   }
 

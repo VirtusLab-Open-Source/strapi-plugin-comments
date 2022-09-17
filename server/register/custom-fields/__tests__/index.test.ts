@@ -21,7 +21,17 @@ describe("registerCustomFields()", () => {
       }
     `);
   });
-  it("should not apply custom field when strapi does not supports it", () => {
-    expect(() => registerCustomFields({ strapi: {} } as any)).not.toThrow();
+  it("should not require custom fields functionality to bootstrap comments plugin", () => {
+    expect(() =>
+      registerCustomFields({ strapi: {}, log: { warn: jest.fn() } } as any)
+    ).not.toThrow();
+  });
+  it("should notify about custom field option", () => {
+    const warn = jest.fn();
+
+    expect(() =>
+      registerCustomFields({ strapi: { log: { warn } } } as any)
+    ).not.toThrow();
+    expect(warn).toHaveBeenCalled();
   });
 });
