@@ -59,64 +59,65 @@ export const CustomFieldInput: React.FC<CustomFieldInputProps> = ({
   value,
 }) => {
   const { formatMessage } = useIntl();
-  const [currentValue, setCurrentValue] = useState(
+  const [currentState, setCurrentState] = useState(
     value ? fromInput(value) : DEFAULTS
   );
 
   const onCommentsNumberChange = useCallback(
-    handleStateSliceChange("commentsNumber", setCurrentValue),
-    [setCurrentValue]
+    handleStateSliceChange("commentsNumber", setCurrentState),
+    [setCurrentState]
   );
 
   const onRenderTypeChange = useCallback(
-    handleStateSliceChange("renderType", setCurrentValue),
-    [setCurrentValue]
+    handleStateSliceChange("renderType", setCurrentState),
+    [setCurrentState]
   );
 
   const onSortByDateChange = useCallback(
-    handleStateSliceChange("sortByDate", setCurrentValue),
-    [setCurrentValue]
+    handleStateSliceChange("sortByDate", setCurrentState),
+    [setCurrentState]
   );
 
   const onFilterByChange = useCallback(
     (filterBy: CommentsFieldValue["filterBy"]) => {
-      setCurrentValue((current) => ({
+      setCurrentState((current) => ({
         ...current,
         filterBy,
         filterByValue: undefined,
       }));
     },
-    [setCurrentValue]
+    [setCurrentState]
   );
 
   const onFilterByValueChange = useCallback(
-    handleStateSliceChange("filterByValue", setCurrentValue),
-    [setCurrentValue]
+    handleStateSliceChange("filterByValue", setCurrentState),
+    [setCurrentState]
   );
 
   const onPopulateAuthorChange = useCallback(
-    handlePopulateChange("author", setCurrentValue),
-    [setCurrentValue]
+    handlePopulateChange("author", setCurrentState),
+    [setCurrentState]
   );
 
   const onPopulateAvatarChange = useCallback(
-    handlePopulateChange("avatar", setCurrentValue),
-    [setCurrentValue]
+    handlePopulateChange("avatar", setCurrentState),
+    [setCurrentState]
   );
 
   useEffect(() => {
-    const newValue = toOutput(currentValue);
+    const nextValue = toOutput(currentState);
+    const initialValue = value ? toOutput(fromInput(value)) : "";
 
-    if (value && toOutput(fromInput(value)) !== newValue) {
-      onChange?.({
+    if (initialValue !== nextValue && onChange) {
+      onChange({
         target: {
           name,
-          value: newValue,
+          value: nextValue,
           type: attribute.type,
         },
       });
     }
-  }, [currentValue, value]);
+  }, [currentState, value]);
 
   return (
     <Field
@@ -137,12 +138,12 @@ export const CustomFieldInput: React.FC<CustomFieldInputProps> = ({
             <Box paddingTop={2}>
               <NumberInput
                 disabled={disabled}
-                label={getMessage({
-                  id: "customField.comments.input.commentsNumber.label",
-                  defaultMessage: "Number of comments",
-                })}
+                label={getMessage(
+                  "customField.comments.input.commentsNumber.label",
+                  "Number of comments"
+                )}
                 name={`${name}.commentsNumber`}
-                value={currentValue.commentsNumber}
+                value={currentState.commentsNumber}
                 onValueChange={onCommentsNumberChange}
               />
             </Box>
@@ -150,11 +151,11 @@ export const CustomFieldInput: React.FC<CustomFieldInputProps> = ({
               <Select
                 disabled={disabled}
                 name={`${name}.renderType`}
-                label={getMessage({
-                  id: "customField.comments.input.renderType.label",
-                  defaultMessage: "Render comments as",
-                })}
-                value={currentValue.renderType}
+                label={getMessage(
+                  "customField.comments.input.renderType.label",
+                  "Render comments as"
+                )}
+                value={currentState.renderType}
                 onChange={onRenderTypeChange}
               >
                 {getRenderTypeOptions(getMessage).map(({ value, label }) => (
@@ -168,11 +169,11 @@ export const CustomFieldInput: React.FC<CustomFieldInputProps> = ({
               <Select
                 disabled={disabled}
                 name={`${name}.sortByDate`}
-                label={getMessage({
-                  id: "customField.comments.input.sortByDate.label",
-                  defaultMessage: "Sort by creation date",
-                })}
-                value={currentValue.sortByDate}
+                label={getMessage(
+                  "customField.comments.input.sortByDate.label",
+                  "Sort by creation date"
+                )}
+                value={currentState.sortByDate}
                 onChange={onSortByDateChange}
               >
                 {getSortByDateOptions(getMessage).map(({ value, label }) => (
@@ -188,11 +189,11 @@ export const CustomFieldInput: React.FC<CustomFieldInputProps> = ({
               <Select
                 disabled={disabled}
                 name={`${name}.filterBy`}
-                label={getMessage({
-                  id: "customField.comments.input.filterBy.label",
-                  defaultMessage: "Filter by",
-                })}
-                value={currentValue.filterBy}
+                label={getMessage(
+                  "customField.comments.input.filterBy.label",
+                  "Filter by"
+                )}
+                value={currentState.filterBy}
                 onChange={onFilterByChange}
               >
                 {getFilterByOptions(getMessage).map(({ value, label }) => (
@@ -201,16 +202,16 @@ export const CustomFieldInput: React.FC<CustomFieldInputProps> = ({
                   </Option>
                 ))}
               </Select>
-              <Box paddingTop={2}>
-                {currentValue.filterBy === "APPROVAL_STATUS" ? (
+              <Box paddingTop={currentState.filterBy ? 2 : 0}>
+                {currentState.filterBy === "APPROVAL_STATUS" ? (
                   <Select
-                    label={getMessage({
-                      id: "customField.comments.input.filterBy.option.approvalStatus.label.details.label",
-                      defaultMessage: "Specify date",
-                    })}
+                    label={getMessage(
+                      "customField.comments.input.filterBy.option.approvalStatus.label.details.label",
+                      "Specify date"
+                    )}
                     disabled={disabled}
                     name={`${name}.filterBy.approvalStatus`}
-                    value={currentValue.filterByValue}
+                    value={currentState.filterByValue}
                     onChange={onFilterByValueChange}
                   >
                     {getApprovalStatusOptions(getMessage).map(
@@ -222,42 +223,50 @@ export const CustomFieldInput: React.FC<CustomFieldInputProps> = ({
                     )}
                   </Select>
                 ) : null}
-                {currentValue.filterBy === "DATE_CREATED" ? (
+                {currentState.filterBy === "DATE_CREATED" ? (
                   <DatePicker
-                    label={getMessage({
-                      id: "customField.comments.input.filterBy.option.dateCreated.label.details.label",
-                      defaultMessage: "Specify date",
-                    })}
+                    label={getMessage(
+                      "customField.comments.input.filterBy.option.dateCreated.label.details.label",
+                      "Specify date"
+                    )}
                     disabled={disabled}
                     name={`${name}.filterBy.dateCreated`}
                     onChange={onFilterByValueChange}
-                    selectedDate={currentValue.filterByValue}
+                    selectedDate={currentState.filterByValue}
                     selectedDateLabel={asString}
                   />
                 ) : null}
               </Box>
             </Box>
-            <Box paddingTop={4}>
-              <Checkbox
-                disabled={disabled}
-                children={getMessage({
-                  id: "customField.comments.input.populate.author.label",
-                  defaultMessage: "Populate author field",
-                })}
-                value={currentValue.populate?.includes("author")}
-                name={`${name}.populate.author`}
-                onChange={onPopulateAuthorChange}
-              />
-              <Checkbox
-                disabled={disabled}
-                children={getMessage({
-                  id: "customField.comments.input.populate.avatar.label",
-                  defaultMessage: "Populate avatar field",
-                })}
-                value={currentValue.populate?.includes("avatar")}
-                name={`${name}.populate.avatar`}
-                onChange={onPopulateAvatarChange}
-              />
+            <Box paddingTop={2}>
+              <FieldLabel>
+                {getMessage(
+                  "customField.comments.input.populate.label",
+                  "Populate"
+                )}
+              </FieldLabel>
+              <Box paddingTop={1}>
+                <Checkbox
+                  disabled={disabled}
+                  children={getMessage(
+                    "customField.comments.input.populate.author.label",
+                    "Populate author field"
+                  )}
+                  value={currentState.populate?.includes("author")}
+                  name={`${name}.populate.author`}
+                  onChange={onPopulateAuthorChange}
+                />
+                <Checkbox
+                  disabled={disabled}
+                  children={getMessage(
+                    "customField.comments.input.populate.avatar.label",
+                    "Populate avatar field"
+                  )}
+                  value={currentState.populate?.includes("avatar")}
+                  name={`${name}.populate.avatar`}
+                  onChange={onPopulateAvatarChange}
+                />
+              </Box>
             </Box>
           </GridItem>
         </Grid>

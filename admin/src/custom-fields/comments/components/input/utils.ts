@@ -32,21 +32,16 @@ export function assertCorrectState(
   if (typeof state.commentsNumber !== "number") {
     throw new ValidationError("Comments number is not a number");
   }
-  if (state.renderType && typeof state.renderType !== "string") {
-    throw new ValidationError("Comments renderType is not a string");
-  }
-  if (state.sortByDate && typeof state.sortByDate !== "string") {
-    throw new ValidationError("Comments sortByDate is not a string");
-  }
-  if (state.filterBy && typeof state.filterBy !== "string") {
-    throw new ValidationError("Comments filterBy is not a string");
-  }
-  if (state.filterByValue && typeof state.filterByValue !== "string") {
-    throw new ValidationError("Comments filterByValue is not a string");
-  }
+
   if (state.populate && !Array.isArray(state.populate)) {
     throw new ValidationError("Comments populate is not an array");
   }
+
+  stringFields.forEach((field) => {
+    if (state[field] && typeof state[field] !== "string") {
+      assertString(state[field]);
+    }
+  });
 }
 
 export const handleStateSliceChange =
@@ -165,3 +160,10 @@ export const getApprovalStatusOptions = (translate: typeof getMessage) => [
     }),
   },
 ];
+
+const stringFields = [
+  "renderType",
+  "sortByDate",
+  "filterBy",
+  "filterByValue",
+] as const;

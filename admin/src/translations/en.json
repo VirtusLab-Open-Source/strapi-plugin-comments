@@ -184,6 +184,7 @@
   "customField.comments.input.filterBy.option.approvalStatus.option.pending.label": "Pending",
   "customField.comments.input.filterBy.option.approvalStatus.option.approved.label": "Approved",
   "customField.comments.input.filterBy.option.approvalStatus.option.rejected.label": "Rejected",
+  "customField.comments.input.populate.label": "Populate",
   "customField.comments.input.populate.author.label": "Populate author field",
   "customField.comments.input.populate.avatar.label": "Populate avatar field"
 }

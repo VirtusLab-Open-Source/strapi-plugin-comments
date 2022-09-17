@@ -5,7 +5,7 @@ describe("assertString()", () => {
     expect(() => assertString("Content")).not.toThrow();
   });
 
-  it("should disallow everything that is not a string", () => {
+  it("should reject everything that is not a string", () => {
     expect(() => assertString(1)).toThrow();
     expect(() => assertString(null)).toThrow();
     expect(() => assertString(undefined)).toThrow();
