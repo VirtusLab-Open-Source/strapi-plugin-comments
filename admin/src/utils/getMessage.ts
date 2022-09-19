@@ -1,4 +1,3 @@
-// @ts-ignore
 import { useIntl } from "react-intl";
 import { isString } from "lodash";
 
@@ -8,7 +7,7 @@ import { ToBeFixed } from "../../../types";
 const getMessage = (
   input: ToBeFixed,
   defaultMessage = "",
-  inPluginScope = true
+  inPluginScope = true,
 ) => {
   const { formatMessage } = useIntl();
   let formattedId = "";
@@ -17,12 +16,13 @@ const getMessage = (
   } else {
     formattedId = input?.id;
   }
+
   return formatMessage(
     {
       id: `${inPluginScope ? pluginId : "app.components"}.${formattedId}`,
       defaultMessage,
     },
-    input?.props || undefined
+    input?.props,
   );
 };
 

@@ -4,6 +4,7 @@
  *
  */
 
+// TODO
 // @ts-nocheck
 
 import React from "react";
@@ -18,9 +19,9 @@ const UserAvatar = ({ avatar, name }) => {
     if (isObject(avatar)) {
       image = avatar?.formats?.thumbnail.url || avatar.url;
     }
-    return <Avatar src={image} alt={name} />;
+    return image && (<Avatar src={image} alt={name} />);
   }
-  return <Initials>{renderInitials(name)}</Initials>;
+  return name && (<Initials>{renderInitials(name)}</Initials>);
 };
 
 UserAvatar.propTypes = {

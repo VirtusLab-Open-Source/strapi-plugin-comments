@@ -16,6 +16,7 @@ import {
   PopulateClause,
   StrapiDBBulkActionResponse,
   StrapiAdminUser,
+  WhereClause,
 } from "strapi-typed";
 import { ToBeFixed } from "./common";
 import {
@@ -43,7 +44,7 @@ export type FindAllFlatProps<T, TFields = keyof T> = {
   pagination?: StrapiPagination;
 };
 
-export type FindAllInHierarhyProps = Omit<FindAllFlatProps, "pagination"> & {
+export type FindAllInHierarchyProps = Omit<FindAllFlatProps, "pagination"> & {
   startingFromId?: Id | null;
   dropBlockedThreads?: boolean;
   isAdmin?: boolean;
@@ -81,10 +82,10 @@ export interface IServiceCommon {
     relatedEntity?: RelatedEntity | null | boolean
   ): Promise<StrapiPaginatedResponse<Comment>>;
   findAllInHierarchy(
-    props: FindAllInHierarhyProps,
+    props: FindAllInHierarchyProps,
     relatedEntity?: RelatedEntity | null | boolean
   ): Promise<Array<Comment>>;
-  findOne(criteria: KeyValueSet<any>): Promise<Comment>;
+  findOne(criteria: WhereClause): Promise<Comment>;
   findRelatedEntitiesFor(entities: Array<Comment>): Promise<RelatedEntity[]>;
   mergeRelatedEntityTo(
     entity: ToBeFixed,
@@ -111,14 +112,17 @@ export interface IServiceAdmin {
   getCommonService(): IServiceCommon;
   config<T extends AnyConfig>(viaSettingsPage?: boolean): Promise<T>;
   updateConfig(
-    body: SettingsCommentsPluginConfig | undefined
+    body: SettingsCommentsPluginConfig | undefined,
   ): Promise<SettingsCommentsPluginConfig>;
   restoreConfig(): Promise<SettingsCommentsPluginConfig>;
   restart(): void;
   findAll(props: AdminFindAllProps): Promise<AdminPaginatedResponse<Comment>>;
+  findReports(
+    props: AdminFindAllProps,
+  ): Promise<AdminPaginatedResponse<Comment>>;
   findOneAndThread(
     id: Id,
-    props: AdminFindOneAndThreadProps
+    props: AdminFindOneAndThreadProps,
   ): Promise<AdminSinglePageResponse>;
   blockComment(id: Id, forceStatus?: boolean): Promise<Comment>;
   deleteComment(id: Id): Promise<Comment>;
@@ -127,10 +131,27 @@ export interface IServiceAdmin {
   rejectComment(id: Id): Promise<Comment>;
   blockNestedThreads(id: Id, blockStatus?: boolean): Promise<boolean>;
   resolveAbuseReport(id: Id, commentId: Id): Promise<CommentReport>;
-  resolveMultipleAbuseReports(ids: Array<Id>, commentId: Id): Promise<StrapiDBBulkActionResponse>;
+  resolveCommentMultipleAbuseReports(
+    ids: Array<Id>,
+    commentId: Id,
+  ): Promise<StrapiDBBulkActionResponse>;
+  resolveAllAbuseReportsForComment(
+    this: IServiceAdmin,
+    commentId: Id,
+  ): Promise<StrapiDBBulkActionResponse>;
+  resolveAllAbuseReportsForThread(
+    this: IServiceAdmin,
+    commentId: Id,
+  ): Promise<StrapiDBBulkActionResponse>;
+  resolveMultipleAbuseReports(
+    this: IServiceAdmin,
+    ids: Array<Id>,
+  ): Promise<StrapiDBBulkActionResponse>;
+  getDefaultAuthorPopulate():
+    | { populate: PopulateClause<"avatar"> }
+    | undefined;
   postComment(threadId: Id, body: string, author: StrapiAdminUser): Promise<Comment>;
   updateComment(id: Id, body: string): Promise<Comment>;
-  getDefaultAuthorPopulate(): { populate: PopulateClause<"avatar"> } | undefined;
 }
 
 export interface IServiceClient {

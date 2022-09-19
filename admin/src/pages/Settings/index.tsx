@@ -1,3 +1,4 @@
+// TODO
 // @ts-nocheck
 
 import React, { useRef, useMemo, useState } from "react";
@@ -35,7 +36,7 @@ import { ToggleInput } from "@strapi/design-system/ToggleInput";
 import { Select, Option } from "@strapi/design-system/Select";
 import { useNotifyAT } from "@strapi/design-system/LiveRegions";
 import { Tooltip } from "@strapi/design-system/Tooltip";
-import { Check, Refresh, Play, Information } from "@strapi/icons";
+import { check, refresh, play, information } from "../../components/icons";
 
 import pluginPermissions from "../../permissions";
 import useConfig from "../../hooks/useConfig";
@@ -275,7 +276,7 @@ const Settings = () => {
                 >
                   <Button
                     type="submit"
-                    startIcon={<Check />}
+                    startIcon={check}
                     disabled={restartRequired}
                   >
                     {getMessage("page.settings.actions.submit")}
@@ -295,7 +296,7 @@ const Settings = () => {
                     )}
                     action={
                       <Box>
-                        <Button onClick={handleRestart} startIcon={<Play />}>
+                        <Button onClick={handleRestart} startIcon={play}>
                           {getMessage("page.settings.actions.restart")}
                         </Button>
                       </Box>
@@ -358,7 +359,7 @@ const Settings = () => {
                                   "page.settings.form.contentTypesSettings.tooltip"
                                 )}
                               >
-                                <Information aria-hidden={true} />
+                                {information}
                               </Tooltip>
                             }
                           >
@@ -613,7 +614,7 @@ const Settings = () => {
                         <GridItem col={6}>
                           <Button
                             variant="danger-light"
-                            startIcon={<Refresh />}
+                            startIcon={refresh}
                             onClick={handleRestoreConfirmation}
                           >
                             {getMessage("page.settings.actions.restore")}
@@ -628,7 +629,7 @@ const Settings = () => {
                             labelConfirm={getMessage(
                               "page.settings.actions.restore.confirmation.button.confirm"
                             )}
-                            iconConfirm={<Refresh />}
+                            iconConfirm={refresh}
                             onConfirm={handleRestoreConfiguration}
                             onCancel={handleRestoreCancel}
                           >

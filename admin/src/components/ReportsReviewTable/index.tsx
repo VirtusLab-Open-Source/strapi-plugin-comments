@@ -4,6 +4,7 @@
  *
  */
 
+// TODO
 // @ts-nocheck
 
 import React, { useCallback } from "react";
@@ -23,7 +24,7 @@ import {
 } from "@strapi/design-system/Table";
 import { Typography } from "@strapi/design-system/Typography";
 import { VisuallyHidden } from "@strapi/design-system/VisuallyHidden";
-import { Check } from "@strapi/icons";
+import { check } from "../icons";
 import { useOverlayBlocker } from "@strapi/helper-plugin";
 import { getMessage } from "../../utils";
 import { REPORT_REASON, REPORT_STATUS } from "../../utils/constants";
@@ -36,13 +37,13 @@ const ReportsReviewTable = ({
   selectedItems = [],
   mutation,
   updateItems,
-  allowedActions: { canAccessReports, canReviewReports },
+  allowedActions: {canAccessReports, canReviewReports},
   onBlockButtonsStateChange,
   onSelectionChange,
 }) => {
-  const { formatDate } = useIntl();
+  const {formatDate} = useIntl();
 
-  const { lockApp } = useOverlayBlocker();
+  const {lockApp} = useOverlayBlocker();
 
   const renderStatus = (resolved) => {
     const status = resolved ? REPORT_STATUS.RESOLVED : REPORT_STATUS.OPEN;
@@ -58,11 +59,10 @@ const ReportsReviewTable = ({
       <StatusBadge
         backgroundColor={`${color}100`}
         textColor={`${color}600`}
-        color={color}
-      >
+        color={color}>
         {getMessage(
           `page.details.panel.discussion.warnings.reports.dialog.status.${status}`,
-          status
+          status,
         )}
       </StatusBadge>
     );
@@ -81,11 +81,10 @@ const ReportsReviewTable = ({
       <StatusBadge
         backgroundColor={`${color}100`}
         textColor={`${color}600`}
-        color={color}
-      >
+        color={color}>
         {getMessage(
           `page.details.panel.discussion.warnings.reports.dialog.reason.${reason}`,
-          reason
+          reason,
         )}
       </StatusBadge>
     );
@@ -93,20 +92,25 @@ const ReportsReviewTable = ({
 
   const handleItemSelectionChange = (selection, value) => {
     if (isArray(selection)) {
-      onSelectionChange(value ? selection : [])
+      onSelectionChange(value ? selection : []);
     } else {
-      onSelectionChange([...selectedItems, selection].filter(item => value || selection !== item));
+      onSelectionChange(
+        [...selectedItems, selection].filter(
+          (item) => value || selection !== item,
+        ),
+      );
     }
   };
 
-  const isNotResolved = entry => !entry.resolved;
+  const isNotResolved = (entry) => !entry.resolved;
   const unresolvedItems = items.filter(isNotResolved);
 
-  const areAllItemsSelected = () => !isEmpty(selectedItems) ? 
-    selectedItems.length === unresolvedItems.length : 
-    false;
+  const areAllItemsSelected = () =>
+    !isEmpty(selectedItems)
+      ? selectedItems.length === unresolvedItems.length
+      : false;
 
-  const isItemSelected = id => selectedItems.includes(id);
+  const isItemSelected = (id) => selectedItems.includes(id);
 
   const handleClickResolve = async (reportId) => {
     if (canReviewReports) {
@@ -121,13 +125,22 @@ const ReportsReviewTable = ({
           resolved: reportId === _.id ? true : _.resolved,
         }));
         updateItems(updatedItems);
-        onSelectionChange(selectedItems.filter(_ => _ !== reportId));
+        onSelectionChange(selectedItems.filter((_) => _ !== reportId));
         onBlockButtonsStateChange(
-          updatedItems.filter(isNotResolved).length === 0
+          updatedItems.filter(isNotResolved).length === 0,
         );
       }
     }
   };
+
+  const handleValueChange = useCallback(
+    (value) =>
+      handleItemSelectionChange(
+        unresolvedItems.map((_) => _.id),
+        value,
+      ),
+    [unresolvedItems, handleItemSelectionChange],
+  );
 
   if (isEmpty(items)) {
     return null;
@@ -141,37 +154,40 @@ const ReportsReviewTable = ({
         <Thead>
           <Tr>
             <Th>
-              <BaseCheckbox 
-                aria-label={getMessage("page.details.panel.discussion.warnings.reports.dialog.selectAll")} 
-                value={areAllItemsSelected()} 
+              <BaseCheckbox
+                aria-label={getMessage(
+                  "page.details.panel.discussion.warnings.reports.dialog.selectAll",
+                )}
+                value={areAllItemsSelected()}
                 disabled={isEmpty(unresolvedItems)}
-                onValueChange={useCallback((value) => handleItemSelectionChange(unresolvedItems.map(_ => _.id), value), [unresolvedItems])} />
+                onValueChange={handleValueChange}
+              />
             </Th>
             <Th>
               <Typography variant="sigma">
                 {getMessage(
-                  "page.details.panel.discussion.warnings.reports.dialog.reason"
+                  "page.details.panel.discussion.warnings.reports.dialog.reason",
                 )}
               </Typography>
             </Th>
             <Th>
               <Typography variant="sigma">
                 {getMessage(
-                  "page.details.panel.discussion.warnings.reports.dialog.content"
+                  "page.details.panel.discussion.warnings.reports.dialog.content",
                 )}
               </Typography>
             </Th>
             <Th>
               <Typography variant="sigma">
                 {getMessage(
-                  "page.details.panel.discussion.warnings.reports.dialog.createdAt"
+                  "page.details.panel.discussion.warnings.reports.dialog.createdAt",
                 )}
               </Typography>
             </Th>
             <Th>
               <Typography variant="sigma">
                 {getMessage(
-                  "page.details.panel.discussion.warnings.reports.dialog.status"
+                  "page.details.panel.discussion.warnings.reports.dialog.status",
                 )}
               </Typography>
             </Th>
@@ -179,7 +195,7 @@ const ReportsReviewTable = ({
               <Th>
                 <VisuallyHidden>
                   {getMessage(
-                    "page.details.panel.discussion.warnings.reports.dialog.actions"
+                    "page.details.panel.discussion.warnings.reports.dialog.actions",
                   )}
                 </VisuallyHidden>
               </Th>
@@ -190,11 +206,16 @@ const ReportsReviewTable = ({
           {items.map((entry) => (
             <Tr key={entry.id}>
               <Td>
-                <BaseCheckbox 
-                aria-label={getMessage("page.details.panel.discussion.warnings.reports.dialog.select")}
-                value={isItemSelected(entry.id)} 
-                disabled={entry.resolved}
-                onValueChange={(value) => handleItemSelectionChange(entry.id, value)} />
+                <BaseCheckbox
+                  aria-label={getMessage(
+                    "page.details.panel.discussion.warnings.reports.dialog.select",
+                  )}
+                  value={isItemSelected(entry.id)}
+                  disabled={entry.resolved}
+                  onValueChange={(value) =>
+                    handleItemSelectionChange(entry.id, value)
+                  }
+                />
               </Td>
               <Td>
                 <Typography textColor="neutral800">
@@ -220,12 +241,11 @@ const ReportsReviewTable = ({
                       <ActionButton
                         isSingle
                         onClick={() => handleClickResolve(entry.id)}
-                        startIcon={<Check />}
-                        variant="success"
-                      >
+                        startIcon={check}
+                        variant="success">
                         {getMessage(
                           "page.details.panel.discussion.warnings.reports.dialog.actions.resolve",
-                          "resolve"
+                          "resolve",
                         )}
                       </ActionButton>
                     </Flex>
@@ -235,25 +255,12 @@ const ReportsReviewTable = ({
             </Tr>
           ))}
         </Tbody>
-        {/* <TFooter /> */}
       </Table>
     );
   }
   return null;
 };
 
-ReportsReviewTable.propTypes = {
-  commentId: PropTypes.oneOfType(PropTypes.string, PropTypes.number).isRequired,
-  items: PropTypes.array.isRequired,
-  selectedItems: PropTypes.array.isRequired,
-  mutation: PropTypes.func.isRequired,
-  allowedActions: PropTypes.shape({
-    canAccessReports: PropTypes.bool,
-    canReviewReports: PropTypes.bool,
-  }),
-  onBlockButtonsStateChange: PropTypes.func.isRequired,
-  onSelectionChange: PropTypes.func.isRequired,
-  updateItems: PropTypes.func.isRequired,
-};
+
 
 export default ReportsReviewTable;

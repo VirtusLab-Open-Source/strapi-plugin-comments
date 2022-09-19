@@ -1,15 +1,13 @@
-// @ts-ignore
-import axios from "axios";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 // @ts-ignore
 import { auth } from "@strapi/helper-plugin";
-import { ToBeFixed } from "../../../types";
 
 const instance = axios.create({
   baseURL: process.env.STRAPI_ADMIN_BACKEND_URL,
 });
 
 instance.interceptors.request.use(
-  async (config: ToBeFixed) => {
+  async (config: AxiosRequestConfig) => {
     config.headers = {
       Authorization: `Bearer ${auth.getToken()}`,
       Accept: "application/json",
@@ -18,21 +16,21 @@ instance.interceptors.request.use(
 
     return config;
   },
-  (error: ToBeFixed) => {
+  (error: AxiosError) => {
     Promise.reject(error);
-  }
+  },
 );
 
 instance.interceptors.response.use(
-  (response: ToBeFixed) => response,
-  (error: ToBeFixed) => {
+  (response: AxiosResponse) => response,
+  (error: AxiosError) => {
     if (error.response?.status === 401) {
       auth.clearAppStorage();
       window.location.reload();
     }
 
     throw error;
-  }
+  },
 );
 
 export default instance;
