@@ -207,8 +207,120 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       .map((_) =>
         this.getCommonService().mergeRelatedEntityTo(_, relatedEntities),
       );
+    
 
     const pageCount = Math.floor(total / pageSize);
+
+    return {
+      result,
+      pagination: {
+        page: page,
+        pageSize: pageSize,
+        pageCount: total % pageSize === 0 ? pageCount : pageCount + 1,
+        total,
+      },
+    };
+  },
+
+  //Find all reports
+  async findReports(
+    this: IServiceAdmin,
+    query: AdminFindAllProps,
+  ): Promise<AdminPaginatedResponse<Comment>> {
+    const {
+      _q,
+      filters,
+      orderBy,
+      page = 1,
+      pageSize = 10,
+    }: AdminFindAllQueryParamsParsed = parseParams<AdminFindAllQueryParamsParsed>(
+      query,
+    );
+
+    const defaultWhere = {
+      resolved: { $notNull: true },
+    };
+
+    const defaultAuthorUserPopulate = this.getDefaultAuthorPopulate();
+
+    let params: StrapiDBQueryArgs<CommentModelKeys> = {
+      where: !isEmpty(filters)
+        ? {
+            ...defaultWhere,
+            ...filters,
+          }
+        : { ...defaultWhere },
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+      orderBy: orderBy || [{ resolved: "asc" }, { createdAt: "desc" }],
+    };
+    if (_q) {
+      params = {
+        ...params,
+        where: {
+          ...params.where,
+          content: {
+            $contains: _q,
+          },
+        },
+      };
+    }
+
+    const entities: Comment<CommentAuthor>[] = await strapi.db
+      .query<Comment>(getModelUid("comment-report"))
+      .findMany({
+        ...params,
+        populate: ["related"],
+      });
+
+    const total: number = await strapi.db
+      .query<Comment>(getModelUid("comment-report"))
+      .count({
+        where: params.where,
+      });
+
+    const reportedCommentsIds: Id[] = entities.map(
+      (report) => report.related.id,
+    );
+
+    const commentsInThreads: Comment[] = await strapi.db
+      .query<Comment>(getModelUid("comment"))
+      .findMany({
+        where: {
+          threadOf: reportedCommentsIds,
+        },
+        populate: ["threadOf"],
+        limit: Number.MAX_SAFE_INTEGER,
+      });
+
+    const commentWithThreadIds: Id[] = [
+      ...new Set(
+        commentsInThreads.map(({ threadOf }) => {
+          assertComment(threadOf);
+          return threadOf.id;
+        }),
+      ),
+    ];
+
+    const result = entities.map((_) => {
+      const isCommentWithThread = commentWithThreadIds.includes(_.related.id);
+
+      return filterOurResolvedReports(
+        this.getCommonService().sanitizeCommentEntity(
+          {
+            ..._,
+            related: this.getCommonService().sanitizeCommentEntity({
+              ..._.related,
+              gotThread: isCommentWithThread,
+            }),
+          },
+          defaultAuthorUserPopulate?.populate,
+        ),
+      );
+    });
+
+    const pageCount = Math.floor(total / pageSize);
+
     return {
       result,
       pagination: {

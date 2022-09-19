@@ -7,6 +7,4 @@ export function assertComment(value: any): asserts value is Comment {
   }
 }
 export type Effect<T> = (value: T) => void
-export type VoidEffect = Effect<void>export type Effect<T> = (value: T) => void
-
 export type VoidEffect = Effect<void>
