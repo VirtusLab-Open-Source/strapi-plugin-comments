@@ -66,6 +66,14 @@ const routes: StrapiRoute[] = [
     },
   },
   {
+    method: "DELETE",
+    path: "/moderate/single/:id/delete",
+    handler: "admin.deleteComment",
+    config: {
+      policies: [],
+    },
+  },
+  {
     method: "PATCH",
     path: "/moderate/single/:id/report/:reportId/resolve",
     handler: "admin.resolveAbuseReport",
@@ -106,6 +114,14 @@ const routes: StrapiRoute[] = [
     },
   },
   {
+    method: "PUT",
+    path: "/moderate/single/:id/update",
+    handler: "admin.updateComment",
+    config: {
+      policies: [],
+    },
+  },
+  {
     method: "PATCH",
     path: "/moderate/thread/:id/block",
     handler: "admin.blockCommentThread",
@@ -117,6 +133,14 @@ const routes: StrapiRoute[] = [
     method: "PATCH",
     path: "/moderate/thread/:id/unblock",
     handler: "admin.unblockCommentThread",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "POST",
+    path: "/moderate/thread/:id/postComment",
+    handler: "admin.postComment",
     config: {
       policies: [],
     },

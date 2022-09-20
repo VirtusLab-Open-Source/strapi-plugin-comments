@@ -6,3 +6,5 @@ export function assertComment(value: any): asserts value is Comment {
     throw new Error("Provided value is not Comment type");
   }
 }
+export type Effect<T> = (value: T) => void
+export type VoidEffect = Effect<void>

@@ -128,6 +128,30 @@ const controllers: IControllerAdmin = {
     }
   },
 
+  async deleteComment(
+    ctx: StrapiRequestContext<never>,
+  ): ThrowablePromisedResponse<Comment> {
+    const { params = {} } = ctx;
+    const { id } = parseParams(params);
+    try {
+      return await this.getService<IServiceAdmin>().blockComment(id, false);
+    } catch (e) {
+      throw throwError(ctx, e);
+    }
+  },
+
+  async deleteComment(
+    ctx: StrapiRequestContext<never>
+  ): ThrowablePromisedResponse<Comment> {
+    const { params = {} } = ctx;
+    const { id } = parseParams(params);
+    try {
+      return await this.getService<IServiceAdmin>().deleteComment(id);
+    } catch (e) {
+      throw throwError(ctx, e);
+    }
+  },
+
   async blockCommentThread(
     ctx: StrapiRequestContext<never>,
   ): ThrowablePromisedResponse<Comment> {
@@ -234,6 +258,43 @@ const controllers: IControllerAdmin = {
     try {
       return await this.getService<IServiceAdmin>().resolveMultipleAbuseReports(
         body,
+      );
+    } catch (e) {
+      throw throwError(ctx, e);
+    }
+  },
+
+  async postComment(
+    ctx: StrapiRequestContext<never>
+  ): ThrowablePromisedResponse<Comment> {
+    
+    const { params = {}, request } = ctx;
+    const { body }:ToBeFixed = request;
+    const { id:threadId } = parseParams(params);
+
+    try {
+      return await this.getService<IServiceAdmin>().postComment(
+        threadId,
+        body.content,
+        body.author
+      );
+    } catch (e) {
+      throw throwError(ctx, e);
+    }
+  },  
+
+  async updateComment(
+    ctx: StrapiRequestContext<never>
+  ): ThrowablePromisedResponse<Comment> {
+    
+    const { params = {}, request } = ctx;
+    const { body }: ToBeFixed = request;
+    const { id } = parseParams(params);
+    
+    try {
+      return await this.getService<IServiceAdmin>().updateComment(
+        id,
+        body.content,
       );
     } catch (e) {
       throw throwError(ctx, e);

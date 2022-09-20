@@ -40,6 +40,7 @@ import Nav from "../../components/Nav";
 import DetailsEntity from "./components/DetailsEntity";
 import DiscussionThread from "../../components/DiscussionThread";
 import makeAppView from "../App/reducer/selectors";
+import ModeratorResponse from "../../components/ModeratorResponse/index";
 
 const Details = ({ config }) => {
   useFocusWhenNavigate();
@@ -129,16 +130,23 @@ const Details = ({ config }) => {
               <ContentLayout>
                 <TwoColsLayout
                   startCol={
-                    <DiscussionThread
-                      level={level}
-                      selected={selected}
-                      isReloading={isLoading}
-                      allowedActions={{
-                        canModerate,
-                        canAccessReports,
-                        canReviewReports,
-                      }}
-                    />
+                    <>
+                      <DiscussionThread
+                        level={level}
+                        selected={selected}
+                        isReloading={isLoading}
+                        allowedActions={{
+                          canModerate,
+                          canAccessReports,
+                          canReviewReports,
+                        }}
+                      />
+                      {selected?.threadOf && (
+                        <ModeratorResponse
+                          rootThread={{ ...selected.threadOf }}
+                        />
+                      )}
+                    </>
                   }
                   endCol={
                     <DetailsEntity

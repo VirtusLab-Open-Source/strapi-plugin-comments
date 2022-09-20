@@ -52,7 +52,7 @@ const DiscussionThread = ({
           </Link>
         )}
       </Flex>
-      <Flex as="ul" direction="column" alignItems="flex-start">
+      <Flex as="ul" direction="column" alignItems="flex-start" marginBottom={4}>
         {rootThread && (
           <DiscussionThreadItem
             {...rootThread}

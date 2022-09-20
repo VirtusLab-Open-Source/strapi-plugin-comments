@@ -3,6 +3,7 @@ import { isEmpty } from "lodash";
 
 import { getApiURL, axiosInstance, handleAPIError } from "../../utils";
 import { Id } from "strapi-typed";
+import { CommentDetails, CommentUpdateDetails } from "../../../../types/api"
 import { ToBeFixed } from "../../../../types";
 
 export const fetchDetailsData = async (
@@ -54,6 +55,10 @@ export const rejectItem = (id: Id) => {
   return axiosInstance.patch(getApiURL(`moderate/single/${id}/reject`));
 };
 
+export const deleteItem = (id: Id) => {
+  return axiosInstance.delete(getApiURL(`moderate/single/${id}/delete`));
+};
+
 export const blockItemThread = (id: Id) => {
   return axiosInstance.patch(getApiURL(`moderate/thread/${id}/block`));
 };
@@ -92,3 +97,22 @@ export const resolveAllAbuseReportsForThread = (commentId: Id) =>
   axiosInstance.put(
     getApiURL(`moderate/all/${commentId}/report/resolve-thread`),
   );
+
+  export const postComment = ({threadId, body, author} : CommentDetails):Promise<Response> => {
+  return axiosInstance.post(
+    getApiURL(`moderate/thread/${threadId}/postComment`),
+    {
+      content: body,
+      author: author
+    },
+  )
+}
+
+export const updateComment = ({id, body} : CommentUpdateDetails):Promise<Response> => {
+  return axiosInstance.put(
+    getApiURL(`moderate/single/${id}/update`),
+    {
+      content: body,
+    },
+  )
+}

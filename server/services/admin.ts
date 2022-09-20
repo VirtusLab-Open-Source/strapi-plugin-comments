@@ -4,6 +4,7 @@ import {
   StrapiDBQueryArgs,
   PropType,
   StrapiDBBulkActionResponse,
+  StrapiAdminUser,
 } from 'strapi-typed';
 import {
   AdminFindAllProps,
@@ -21,6 +22,7 @@ import {
   PluginConfigKeys,
   RelatedEntity,
   SettingsCommentsPluginConfig,
+  ToBeFixed,
 } from "../../types";
 
 import { getPluginService, parseParams } from "./../utils/functions";
@@ -205,8 +207,120 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       .map((_) =>
         this.getCommonService().mergeRelatedEntityTo(_, relatedEntities),
       );
+    
 
     const pageCount = Math.floor(total / pageSize);
+
+    return {
+      result,
+      pagination: {
+        page: page,
+        pageSize: pageSize,
+        pageCount: total % pageSize === 0 ? pageCount : pageCount + 1,
+        total,
+      },
+    };
+  },
+
+  //Find all reports
+  async findReports(
+    this: IServiceAdmin,
+    query: AdminFindAllProps,
+  ): Promise<AdminPaginatedResponse<Comment>> {
+    const {
+      _q,
+      filters,
+      orderBy,
+      page = 1,
+      pageSize = 10,
+    }: AdminFindAllQueryParamsParsed = parseParams<AdminFindAllQueryParamsParsed>(
+      query,
+    );
+
+    const defaultWhere = {
+      resolved: { $notNull: true },
+    };
+
+    const defaultAuthorUserPopulate = this.getDefaultAuthorPopulate();
+
+    let params: StrapiDBQueryArgs<CommentModelKeys> = {
+      where: !isEmpty(filters)
+        ? {
+            ...defaultWhere,
+            ...filters,
+          }
+        : { ...defaultWhere },
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+      orderBy: orderBy || [{ resolved: "asc" }, { createdAt: "desc" }],
+    };
+    if (_q) {
+      params = {
+        ...params,
+        where: {
+          ...params.where,
+          content: {
+            $contains: _q,
+          },
+        },
+      };
+    }
+
+    const entities: Comment<CommentAuthor>[] = await strapi.db
+      .query<Comment>(getModelUid("comment-report"))
+      .findMany({
+        ...params,
+        populate: ["related"],
+      });
+
+    const total: number = await strapi.db
+      .query<Comment>(getModelUid("comment-report"))
+      .count({
+        where: params.where,
+      });
+
+    const reportedCommentsIds: Id[] = entities.map(
+      (report) => report.related.id,
+    );
+
+    const commentsInThreads: Comment[] = await strapi.db
+      .query<Comment>(getModelUid("comment"))
+      .findMany({
+        where: {
+          threadOf: reportedCommentsIds,
+        },
+        populate: ["threadOf"],
+        limit: Number.MAX_SAFE_INTEGER,
+      });
+
+    const commentWithThreadIds: Id[] = [
+      ...new Set(
+        commentsInThreads.map(({ threadOf }) => {
+          assertComment(threadOf);
+          return threadOf.id;
+        }),
+      ),
+    ];
+
+    const result = entities.map((_) => {
+      const isCommentWithThread = commentWithThreadIds.includes(_.related.id);
+
+      return filterOurResolvedReports(
+        this.getCommonService().sanitizeCommentEntity(
+          {
+            ..._,
+            related: this.getCommonService().sanitizeCommentEntity({
+              ..._.related,
+              gotThread: isCommentWithThread,
+            }),
+          },
+          defaultAuthorUserPopulate?.populate,
+        ),
+      );
+    });
+
+    const pageCount = Math.floor(total / pageSize);
+
     return {
       result,
       pagination: {
@@ -444,6 +558,23 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     return this.getCommonService().sanitizeCommentEntity(changedEntity);
   },
 
+  // Delete a comment
+  async deleteComment(
+    this: IServiceAdmin,
+    id: Id,
+  ): Promise<Comment> {
+
+    const changedEntity = await strapi.db
+      .query<Comment>(getModelUid("comment"))
+      .update({
+        where: { id },
+        data: {
+          removed: true,
+        },
+      });
+    return this.getCommonService().sanitizeCommentEntity(changedEntity);
+  },
+
   // Block / Unblock a comment thread
   async blockCommentThread(
     this: IServiceAdmin,
@@ -663,6 +794,53 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       400,
       "At least one of selected reports got invalid comment entity relation. Try again.",
     );
+  },
+
+  //Post moderator comment
+  async postComment(
+    this: IServiceAdmin,
+    threadId: Id,
+    body: ToBeFixed,
+    author: StrapiAdminUser
+  ):Promise<Comment> {
+    const entity = await strapi.db
+      .query<Comment>(getModelUid("comment"))
+      .findOne({
+        where: {
+          id: threadId,
+        },
+      });
+
+    return await strapi.db
+      .query<Comment>(getModelUid("comment"))
+      .create({
+        data: {
+          approvalStatus: "APPROVED",
+          authorId: author.id,
+          authorName: author.username,
+          authorEmail: author.email,
+          content: body,
+          threadOf: threadId,
+          related: entity.related
+        },
+      });
+  },
+
+  //Update moderator comment
+  async updateComment(
+    this: IServiceAdmin,
+    id: Id,
+    body: ToBeFixed,
+  ):Promise<Comment> {
+    const updateComment = await strapi.db
+      .query<Comment>(getModelUid("comment"))
+      .update({
+        where: { id },
+        data: {
+          content: body
+        }
+      });
+    return this.getCommonService().sanitizeCommentEntity(updateComment);
   },
 
   // Recognize Strapi User fields possible to populate

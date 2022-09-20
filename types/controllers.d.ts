@@ -91,6 +91,7 @@ export interface IControllerAdmin {
   ): ThrowablePromisedResponse<AdminSinglePageResponse>;
   blockComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
   unblockComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
+  deleteComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
   blockCommentThread(
     ctx: StrapiRequestContext,
   ): ThrowablePromisedResponse<Comment>;
@@ -114,6 +115,8 @@ export interface IControllerAdmin {
   ): ThrowablePromisedResponse<StrapiDBBulkActionResponse>;
   approveComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
   rejectComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
+  postComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
+  updateComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>
 }
 
 export interface IControllerClient {

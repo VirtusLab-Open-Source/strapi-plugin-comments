@@ -14,7 +14,7 @@ import { useHistory } from "react-router-dom";
 import { isNil, isEmpty, noop } from "lodash";
 import { Flex } from "@strapi/design-system/Flex";
 import { IconButton } from "@strapi/design-system/IconButton";
-import { useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
+import { useNotification, useOverlayBlocker, auth } from "@strapi/helper-plugin";
 import {
   getMessage,
   getUrl,
@@ -30,6 +30,7 @@ import {
   unblockItem,
   unblockItemThread,
   resolveAllAbuseReportsForThread,
+  deleteItem
 } from "../../pages/utils/api";
 import { pluginId } from "../../pluginId";
 import { lock, unlock, eye } from "../icons";
@@ -38,6 +39,8 @@ import StatusBadge from "../StatusBadge";
 import { IconButtonGroupStyled } from "../IconButton/styles";
 import { ActionButton } from "../ActionButton/styles";
 import DiscussionThreadItemReviewAction from "../DiscussionThreadItemReviewAction";
+import { StrapiAdminUser } from "strapi-typed";
+import ModeratorResponseModal from "../ModeratorResponseModal/ModeratorResponseModal";
 
 const DiscussionThreadItemActions = ({
   allowedActions: { canModerate, canAccessReports, canReviewReports },
@@ -47,6 +50,7 @@ const DiscussionThreadItemActions = ({
     id,
     blocked,
     removed,
+    content,
     blockedThread,
     gotThread,
     threadFirstItemId,
@@ -54,13 +58,22 @@ const DiscussionThreadItemActions = ({
     preview,
     reports = [],
     approvalStatus,
+    author
   } = item;
+
+  const user: StrapiAdminUser = auth.get('userInfo')
 
   const [blockConfirmationVisible, setBlockConfirmationVisible] =
     useState(false);
   const [blockThreadConfirmationVisible, setBlockThreadConfirmationVisible] =
     useState(false);
-
+  const [blockButtonsDisabled, setBlockButtonsDisabled] =
+    useState(blockedThread);
+  const [startThreadVisible, setStartThreadVisible] =
+    useState(false);
+  
+  const [updateCommentVisible, setUpdateCommentVisible] = 
+    useState(false);
 
   const { push } = useHistory();
   const toggleNotification = useNotification();
@@ -102,6 +115,8 @@ const DiscussionThreadItemActions = ({
 
   const unblockItemThreadMutation = useMutation(unblockItemThread, mutationConfig("page.details.actions.thread.unblock.confirmation.success"));
 
+  const deleteItemMutation = useMutation(deleteItem, mutationConfig("page.details.actions.comment.delete.confirmation.success"));
+
   const gotApprovalFlow = !isNil(approvalStatus);
   const needsApproval = gotApprovalFlow && approvalStatus === "PENDING";
   const isBlocked = blocked || blockedThread;
@@ -113,6 +128,7 @@ const DiscussionThreadItemActions = ({
   const hasActiveThread =
     gotThread && !(removed || preview || pinned || blockedThread);
   const isStatusBadgeVisible = isBlocked || reviewFlowEnabled;
+  const isAdminAuthor = String(user.id) === author.id
 
   const renderStatus = (props) => {
     const status = resolveCommentStatus({ ...props, reviewFlowEnabled });
@@ -170,6 +186,13 @@ const DiscussionThreadItemActions = ({
     }
   };
 
+  const handleDeleteClick = () => {
+    if (canModerate) {
+      lockApp();
+      deleteItemMutation.mutate(id);
+    }
+  };
+
   const handleBlockThreadClick = () => setBlockThreadConfirmationVisible(true);
 
   const handleBlockThreadConfirm = () => {
@@ -181,6 +204,15 @@ const DiscussionThreadItemActions = ({
   const handleBlockThreadCancel = () => {
     setBlockThreadConfirmationVisible(false);
   };
+
+  const toggleStartThreadVisibility = () => {
+    setStartThreadVisible(!startThreadVisible);
+  }
+
+  const toggleUpdateCommentVisibility = () => {
+    setUpdateCommentVisible(!updateCommentVisible);
+  }
+
   const handleUnblockThreadClick = () => {
     if (canModerate) {
       lockApp();
@@ -222,7 +254,10 @@ const DiscussionThreadItemActions = ({
             loading={blockItemThreadMutation.isLoading}
             variant="danger"
           >
-            {getMessage("page.details.actions.thread.block", "Block thread")}
+            {getMessage(
+              "page.details.actions.thread.block", 
+              "Block thread"
+            )}
           </ActionButton>
         )}
         {blockedThread && (gotThread || pinned) && (
@@ -269,6 +304,26 @@ const DiscussionThreadItemActions = ({
                 queryToInvalidate="get-details-data"
               />
             )}
+            {!blockedThread && !blocked && isAdminAuthor && (
+              <IconButton
+                onClick={handleDeleteClick}
+                loading={deleteItemMutation.isLoading}
+                icon={<Trash/>}
+                label={getMessage(
+                  "page.details.actions.comment.delete",
+                  "Delete comment"
+                )}
+              />
+            )}
+            {isAdminAuthor && !isBlocked && ( 
+              <IconButton
+                onClick={toggleUpdateCommentVisibility}
+                icon={<Pencil />}
+                label={getMessage(
+                  "page.details.actions.thread.modal.update.comment"
+                )}
+              />
+            )}
             <DiscussionThreadItemReviewAction
               item={item}
               queryToInvalidate="get-details-data"
@@ -298,7 +353,38 @@ const DiscussionThreadItemActions = ({
             />
           </IconButtonGroupStyled>
         )}
+        <IconButtonGroupStyled>
+           {!hasActiveThread && !pinned && (!blockedThread && !blocked) &&  (
+            <IconButton
+              onClick={toggleStartThreadVisibility}
+              icon={<Plus />}
+              label={getMessage(
+                "page.details.actions.thread.modal.start.thread"
+              )}
+            />
+           )}
+        </IconButtonGroupStyled>
       </DiscussionThreadItemActionsWrapper>
+      {startThreadVisible && 
+        <ModeratorResponseModal
+          content=""
+          id={id}
+          title={getMessage(
+            "page.details.actions.thread.modal.start.thread"
+          )}
+          onClose={toggleStartThreadVisibility}
+        />
+      }
+      {updateCommentVisible && 
+        <ModeratorResponseModal
+          content={content}
+          id={id}
+          title={getMessage(
+            "page.details.actions.thread.modal.update.comment"
+          )}
+          onClose={toggleUpdateCommentVisibility}
+        />
+      }
       {!blocked && (
         <ConfirmationDialog
           isVisible={blockConfirmationVisible}
