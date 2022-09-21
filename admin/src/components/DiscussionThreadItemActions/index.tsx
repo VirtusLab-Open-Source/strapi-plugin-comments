@@ -14,6 +14,7 @@ import { useHistory } from "react-router-dom";
 import { isNil, isEmpty, noop } from "lodash";
 import { Flex } from "@strapi/design-system/Flex";
 import { IconButton } from "@strapi/design-system/IconButton";
+import { trash, pencil, plus } from "../../components/icons";
 import { useNotification, useOverlayBlocker, auth } from "@strapi/helper-plugin";
 import {
   getMessage,
@@ -24,6 +25,7 @@ import {
 } from "../../utils";
 import { DiscussionThreadItemActionsWrapper } from "./styles";
 import ConfirmationDialog from "../ConfirmationDialog";
+
 import {
   blockItem,
   blockItemThread,
@@ -308,7 +310,7 @@ const DiscussionThreadItemActions = ({
               <IconButton
                 onClick={handleDeleteClick}
                 loading={deleteItemMutation.isLoading}
-                icon={<Trash/>}
+                icon={trash}
                 label={getMessage(
                   "page.details.actions.comment.delete",
                   "Delete comment"
@@ -318,7 +320,7 @@ const DiscussionThreadItemActions = ({
             {isAdminAuthor && !isBlocked && ( 
               <IconButton
                 onClick={toggleUpdateCommentVisibility}
-                icon={<Pencil />}
+                icon={pencil}
                 label={getMessage(
                   "page.details.actions.thread.modal.update.comment"
                 )}
@@ -357,7 +359,7 @@ const DiscussionThreadItemActions = ({
            {!hasActiveThread && !pinned && (!blockedThread && !blocked) &&  (
             <IconButton
               onClick={toggleStartThreadVisibility}
-              icon={<Plus />}
+              icon={plus}
               label={getMessage(
                 "page.details.actions.thread.modal.start.thread"
               )}

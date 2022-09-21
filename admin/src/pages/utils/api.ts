@@ -98,7 +98,7 @@ export const resolveAllAbuseReportsForThread = (commentId: Id) =>
     getApiURL(`moderate/all/${commentId}/report/resolve-thread`),
   );
 
-  export const postComment = ({threadId, body, author} : CommentDetails):Promise<Response> => {
+  export const postComment = ({threadId, body, author} : CommentDetails) => {
   return axiosInstance.post(
     getApiURL(`moderate/thread/${threadId}/postComment`),
     {
@@ -108,7 +108,7 @@ export const resolveAllAbuseReportsForThread = (commentId: Id) =>
   )
 }
 
-export const updateComment = ({id, body} : CommentUpdateDetails):Promise<Response> => {
+export const updateComment = ({id, body} : CommentUpdateDetails) => {
   return axiosInstance.put(
     getApiURL(`moderate/single/${id}/update`),
     {

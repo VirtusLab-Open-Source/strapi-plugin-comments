@@ -10,6 +10,7 @@ import {
   IServiceAdmin,
   SettingsCommentsPluginConfig,
   ThrowablePromisedResponse,
+  ToBeFixed,
   ViewCommentsPluginConfig,
 } from "../../types";
 
@@ -117,18 +118,6 @@ const controllers: IControllerAdmin = {
   },
 
   async unblockComment(
-    ctx: StrapiRequestContext<never>,
-  ): ThrowablePromisedResponse<Comment> {
-    const { params = {} } = ctx;
-    const { id } = parseParams(params);
-    try {
-      return await this.getService<IServiceAdmin>().blockComment(id, false);
-    } catch (e) {
-      throw throwError(ctx, e);
-    }
-  },
-
-  async deleteComment(
     ctx: StrapiRequestContext<never>,
   ): ThrowablePromisedResponse<Comment> {
     const { params = {} } = ctx;

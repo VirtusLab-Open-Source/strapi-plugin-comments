@@ -27,6 +27,7 @@ import { auth, useNotification, useOverlayBlocker } from "@strapi/helper-plugin"
 import { StrapiAdminUser, Id } from "strapi-typed";
 import { pluginId } from "../../pluginId";
 import { ToBeFixed } from "../../../../types";
+import { AxiosResponse } from "axios";
 
 type ModeratorResponseProps = {
   rootThread: Comment;
@@ -59,7 +60,7 @@ const ModeratorResponse: React.FC<ModeratorResponseProps> = ({
   const user: StrapiAdminUser = auth.get("userInfo");
 
   useEffect(() => {
-    setIsFieldEmpty(!commentField)
+    setIsFieldEmpty(!commentField);
   }, [commentField]);
 
   const toggleNotification = useNotification();
@@ -82,17 +83,21 @@ const ModeratorResponse: React.FC<ModeratorResponseProps> = ({
     handleAPIError(err, toggleNotification);
   };
 
-  const unblockItemThreadMutation = useMutation<Response, Error, Id, unknown>(
-    unblockItemThread
-  );
+  const unblockItemThreadMutation = useMutation<
+    AxiosResponse<any, any>,
+    Error,
+    Id,
+    unknown
+  >(unblockItemThread);
 
-  const postCommentMutation = useMutation<Response, Error, postCommentRequest>(
-    postComment,
-    {
-      onSuccess: onSuccess("page.details.actions.comment.post.confirmation"),
-      onError,
-    }
-  );
+  const postCommentMutation = useMutation<
+    AxiosResponse<any, any>,
+    Error,
+    postCommentRequest
+  >(postComment, {
+    onSuccess: onSuccess("page.details.actions.comment.post.confirmation"),
+    onError,
+  });
 
   const handleSave = async (): Promise<void> => {
     lockApp();
