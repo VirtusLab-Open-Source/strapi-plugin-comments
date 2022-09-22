@@ -63,7 +63,7 @@ export const blockItemThread = (id: Id) => {
   return axiosInstance.patch(getApiURL(`moderate/thread/${id}/block`));
 };
 
-export const unblockItemThread = (id: Id) => {
+export const unblockItemThread = (id: Id): Promise<Response> => {
   return axiosInstance.patch(getApiURL(`moderate/thread/${id}/unblock`));
 };
 
