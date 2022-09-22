@@ -17,6 +17,9 @@ import {
   Information,
   Play,
   Refresh,
+  Trash,
+  Pencil,
+  Plus
 } from "@strapi/icons";
 import ReviewIcon from './review';
 import LockIcon from './lock';
@@ -42,3 +45,6 @@ export const review = <ReviewIcon />;
 export const lock = <LockIcon />;
 export const unlock = <UnlockIcon />;
 export const comments = <CommentsIcon />;
+export const trash = <Trash />;
+export const pencil = <Pencil />;
+export const plus = <Plus />;

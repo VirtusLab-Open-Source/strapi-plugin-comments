@@ -18,6 +18,9 @@ import {
   refresh,
   review,
   unlock,
+  trash,
+  pencil,
+  plus
 } from "./strapiIcons";
 
 export {
@@ -40,4 +43,7 @@ export {
   refresh,
   review,
   unlock,
+  trash,
+  pencil,
+  plus
 };

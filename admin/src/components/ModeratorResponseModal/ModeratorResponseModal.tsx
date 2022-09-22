@@ -26,6 +26,7 @@ import { auth, useNotification, useOverlayBlocker } from "@strapi/helper-plugin"
 import { StrapiAdminUser, Id } from "strapi-typed";
 import { pluginId } from "../../pluginId";
 import { ToBeFixed } from "../../../../types";
+import { AxiosResponse } from "axios";
 
 type ModeratorResponseModalProps = {
   content: string;
@@ -88,16 +89,17 @@ const ModeratorResponseModal: React.FC<ModeratorResponseModalProps> = ({
     handleAPIError(err, toggleNotification);
   };
 
-  const postCommentMutation = useMutation<Response, Error, postCommentRequest>(
-    postComment,
-    {
-      onSuccess: onSuccess("page.details.actions.comment.post.confirmation"),
-      onError,
-    }
-  );
+  const postCommentMutation = useMutation<
+    AxiosResponse<any, any>,
+    Error,
+    postCommentRequest
+  >(postComment, {
+    onSuccess: onSuccess("page.details.actions.comment.post.confirmation"),
+    onError,
+  });
 
   const updateCommentMutation = useMutation<
-    Response,
+    AxiosResponse<any, any>,
     Error,
     updateCommentRequest
   >(updateComment, {

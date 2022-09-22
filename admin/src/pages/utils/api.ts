@@ -63,7 +63,7 @@ export const blockItemThread = (id: Id) => {
   return axiosInstance.patch(getApiURL(`moderate/thread/${id}/block`));
 };
 
-export const unblockItemThread = (id: Id): Promise<Response> => {
+export const unblockItemThread = (id: Id) => {
   return axiosInstance.patch(getApiURL(`moderate/thread/${id}/unblock`));
 };
 
@@ -98,7 +98,7 @@ export const resolveAllAbuseReportsForThread = (commentId: Id) =>
     getApiURL(`moderate/all/${commentId}/report/resolve-thread`),
   );
 
-  export const postComment = ({threadId, body, author} : CommentDetails):Promise<Response> => {
+  export const postComment = ({threadId, body, author} : CommentDetails) => {
   return axiosInstance.post(
     getApiURL(`moderate/thread/${threadId}/postComment`),
     {
@@ -108,7 +108,7 @@ export const resolveAllAbuseReportsForThread = (commentId: Id) =>
   )
 }
 
-export const updateComment = ({id, body} : CommentUpdateDetails):Promise<Response> => {
+export const updateComment = ({id, body} : CommentUpdateDetails) => {
   return axiosInstance.put(
     getApiURL(`moderate/single/${id}/update`),
     {
