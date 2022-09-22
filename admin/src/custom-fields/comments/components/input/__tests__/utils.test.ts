@@ -54,21 +54,15 @@ describe("Custom fields", () => {
         expect(() => fromInput(null)).toThrow();
       });
       it("should prepare input for consumption", () => {
-        expect(
-          fromInput(
-            `{ "commentsNumber": 35, "filterBy": "DATE_CREATED", "filterByValue": "${new Date(
-              2022,
-              7,
-              7
-            )}" }`
-          )
-        ).toMatchInlineSnapshot(`
-          Object {
-            "commentsNumber": 35,
-            "filterBy": "DATE_CREATED",
-            "filterByValue": 2022-08-06T22:00:00.000Z,
-          }
-        `);
+        const state = fromInput(
+          `{ "commentsNumber": 35, "filterBy": "DATE_CREATED", "filterByValue": "${new Date(
+            2022,
+            7,
+            7
+          )}" }`
+        );
+
+        expect(state.filterByValue).toBeInstanceOf(Date);
       });
     });
     describe("toOutput()", () => {
