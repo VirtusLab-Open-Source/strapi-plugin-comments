@@ -34,7 +34,11 @@ jobs:
       - run:
           name: Test
           command: |
-            yarn test:unit
+            yarn test:unit:ci
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: ./reports/
+      - store_test_results:
+          path: ./reports/
       - codecov/upload:
           flags: unittest
           file:
