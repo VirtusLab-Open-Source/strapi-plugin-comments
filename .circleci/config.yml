@@ -8,6 +8,7 @@ jobs:
     docker:
       - image: cimg/node:14.19.3
     working_directory: ~/repo
+    resource_class: large
     steps:
       - checkout
       - run:
@@ -34,7 +35,9 @@ jobs:
       - run:
           name: Test
           command: |
-            yarn test:unit
+            yarn test:unit:ci
+      - store_test_results:
+          path: ./coverage/clover.xml
       - codecov/upload:
           flags: unittest
           file:

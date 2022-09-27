@@ -18,6 +18,7 @@
     "clean": "rm -rf build",
     "develop": "nodemon --exec \"yarn build:dev\"",
     "test:unit": "jest --verbose --coverage",
+    "test:unit:ci": "CI=true jest --ci --verbose --coverage",
     "lint": "prettier --check .",
     "format": "prettier --write ."
   },
