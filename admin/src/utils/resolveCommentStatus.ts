@@ -1,6 +1,13 @@
 import { isNil } from "lodash";
-import { ToBeFixed } from "../../../types";
 import { COMMENT_STATUS } from "./constants";
+
+type Config = {
+  removed?: boolean;
+  blocked?: boolean;
+  blockedThread?: boolean;
+  approvalStatus?: string;
+  reviewFlowEnabled?: boolean;
+};
 
 const resolveCommentStatus = ({
   removed,
@@ -8,7 +15,7 @@ const resolveCommentStatus = ({
   blockedThread,
   approvalStatus,
   reviewFlowEnabled,
-}: ToBeFixed) => {
+}: Config) => {
   const gotApprovalFlow = !isNil(approvalStatus);
 
   if (removed) {

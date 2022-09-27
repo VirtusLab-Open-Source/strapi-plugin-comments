@@ -34,9 +34,9 @@ export default class PluginError extends Error implements IPluginError {
   toJSON() {
     if (this.payload) {
       return {
+        ...this.payload,
         name: this.name,
         message: this.message,
-        ...(this.payload || {}),
       };
     }
     return this;

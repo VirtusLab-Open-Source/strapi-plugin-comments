@@ -11,3 +11,6 @@ export {default as resolveCommentStatusColor} from './resolveCommentStatusColor'
 export {default as resolveReportStatus} from './resolveReportStatus';
 export {default as resolveReportStatusColor} from './resolveReportStatusColor';
 export {default as parseRegExp} from './parseRegExp';
+export { APPROVAL_STATUS } from './constants'
+export { UIError, ValidationError } from './errors'
+export { assertString } from './functions'

@@ -42,8 +42,9 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
    - [Plugin file](#in-v202-and-older--default-configuration-state-for-v203-and-newer)
 5. [🕸️ Public API - REST](#%EF%B8%8F-public-rest-api-specification)
 6. [🕸️ Public API - GraphQL](#%EF%B8%8F-public-graphql-specification)
-7. [🤝 Contributing](#-contributing)
-8. [👨‍💻 Community support](#-community-support)
+7. [⚗️ Custom fields](#-custom-fields)
+8. [🤝 Contributing](#-contributing)
+9. [👨‍💻 Community support](#-community-support)
 
 ## ✨ Features
 
@@ -827,6 +828,14 @@ _Available reason enums:_ `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See
 ## 🧩 Examples
 
 Live example of plugin usage can be found in the [VirtusLab Strapi Examples](https://github.com/VirtusLab/strapi-examples/tree/master/strapi-v4-plugin-comments) repository.
+
+## ⚗️ Custom fields
+
+**THIS IS AN UNSTABLE FEATURE**
+
+For developers who upgrades their Strapi instance custom field from Comments plugin is available. Custom field can be picked from content types' edit page or added in definition file.
+
+Read more about this feature in [Strapi's docs](https://docs-next.strapi.io/user-docs/latest/plugins/introduction-to-plugins.html#custom-fields).
 
 ## 🤝 Contributing
 
