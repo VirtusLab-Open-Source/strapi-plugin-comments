@@ -4,15 +4,18 @@
  *
  */
 
+// TODO
 // @ts-nocheck
 
-import React from "react";
-import PropTypes from "prop-types";
 import { Box } from "@strapi/design-system/Box";
 import { Flex } from "@strapi/design-system/Flex";
 import { Typography } from "@strapi/design-system/Typography";
-import DiscussionThreadItemFooter from "../DiscussionThreadItemFooter";
+import PropTypes from "prop-types";
+import React from "react";
+
 import DiscussionThreadItemActions from "../DiscussionThreadItemActions";
+import DiscussionThreadItemFooter from "../DiscussionThreadItemFooter";
+
 import {
   DiscussionThreadItemContainer,
   DiscussionThreadFullsize,
@@ -20,7 +23,16 @@ import {
 } from "./styles";
 
 const DiscussionThreadItem = (props) => {
-  const { as = "li", isSelected, content, root, preview, pinned } = props;
+  const {
+    as = "li",
+    authorAvatar,
+    authorName,
+    content,
+    isSelected,
+    pinned,
+    preview,
+    root,
+  } = props;
 
   return (
     <DiscussionThreadFullsize as={as} marginBottom={preview ? 4 : 0}>
@@ -59,13 +71,14 @@ const DiscussionThreadItem = (props) => {
   );
 };
 
-DiscussionThreadItem.propTypes = {
-  content: PropTypes.string.isRequired,
-  allowedActions: PropTypes.shape({
-    canModerate: PropTypes.bool,
-    canAccessReports: PropTypes.bool,
-    canReviewReports: PropTypes.bool,
-  }),
-};
+// Typescript to fix!!!
+// DiscussionThreadItem.propTypes = {
+//   content: PropTypes.string.isRequired,
+//   allowedActions: PropTypes.shape({
+//     canModerate: PropTypes.bool,
+//     canAccessReports: PropTypes.bool,
+//     canReviewReports: PropTypes.bool,
+//   }),
+// };
 
 export default DiscussionThreadItem;

@@ -70,40 +70,53 @@ export type CreateCommentReportPayload = {
 export interface IControllerAdmin {
   getService<T extends CommentsPluginServices>(name?: string): T;
   config(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext,
   ): ThrowablePromisedResponse<ViewCommentsPluginConfig>;
   settingsConfig(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext,
   ): ThrowablePromisedResponse<SettingsCommentsPluginConfig>;
   settingsUpdateConfig(
-    ctx: StrapiRequestContext<SettingsCommentsPluginConfig>
+    ctx: StrapiRequestContext<SettingsCommentsPluginConfig>,
   ): ThrowablePromisedResponse<SettingsCommentsPluginConfig>;
   settingsRestoreConfig(
-    ctx: StrapiRequestContext<SettingsCommentsPluginConfig>
+    ctx: StrapiRequestContext<SettingsCommentsPluginConfig>,
   ): ThrowablePromisedResponse<SettingsCommentsPluginConfig>;
   settingsRestart(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext,
   ): ThrowablePromisedResponse<unknown>;
   findAll(ctx: StrapiRequestContext): Promise<AdminPaginatedResponse<Comment>>;
+  findReports(ctx: StrapiRequestContext): Promise<ToBeFixed>;
   findOne(
-    ctx: StrapiRequestContext<never, AdminFindOneAndThreadProps>
+    ctx: StrapiRequestContext<never, AdminFindOneAndThreadProps>,
   ): ThrowablePromisedResponse<AdminSinglePageResponse>;
   blockComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
   unblockComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
+  deleteComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
   blockCommentThread(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext,
   ): ThrowablePromisedResponse<Comment>;
   unblockCommentThread(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext,
   ): ThrowablePromisedResponse<Comment>;
   resolveAbuseReport(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext,
   ): ThrowablePromisedResponse<CommentReport>;
+  resolveCommentMultipleAbuseReports(
+    ctx: StrapiRequestContext,
+  ): ThrowablePromisedResponse<StrapiDBBulkActionResponse>;
+  resolveAllAbuseReportsForComment(
+    ctx: StrapiRequestContext<never>,
+  ): ThrowablePromisedResponse<StrapiDBBulkActionResponse>;
+  resolveAllAbuseReportsForThread(
+    ctx: StrapiRequestContext<never>,
+  ): ThrowablePromisedResponse<StrapiDBBulkActionResponse>;
   resolveMultipleAbuseReports(
-    ctx: StrapiRequestContext
+    ctx: StrapiRequestContext<never>,
   ): ThrowablePromisedResponse<StrapiDBBulkActionResponse>;
   approveComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
   rejectComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
+  postComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
+  updateComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>
 }
 
 export interface IControllerClient {

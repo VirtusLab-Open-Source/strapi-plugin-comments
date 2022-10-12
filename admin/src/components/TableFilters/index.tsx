@@ -1,10 +1,11 @@
+// TODO
 // @ts-nocheck
 
 import React, { useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { Button } from "@strapi/design-system/Button";
 import { Box } from "@strapi/design-system/Box";
-import { Filter } from "@strapi/icons";
+import { filter } from "../icons";
 import {
   FilterListURLQuery,
   FilterPopoverURLQuery,
@@ -25,7 +26,7 @@ const TableFilters = ({ displayedFilters }) => {
         <Button
           variant="tertiary"
           ref={buttonRef}
-          startIcon={<Filter />}
+          startIcon={filter}
           onClick={handleToggle}
           size="S"
         >

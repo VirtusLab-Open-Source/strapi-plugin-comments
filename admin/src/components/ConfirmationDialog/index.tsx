@@ -4,6 +4,7 @@
  *
  */
 
+// TODO
 // @ts-nocheck
 
 import React from "react";
@@ -13,7 +14,7 @@ import { Dialog, DialogBody, DialogFooter } from "@strapi/design-system/Dialog";
 import { Flex } from "@strapi/design-system/Flex";
 import { Stack } from "@strapi/design-system/Stack";
 import { Typography } from "@strapi/design-system/Typography";
-import { ExclamationMarkCircle, Check } from "@strapi/icons";
+import { exclamationMarkCircle, check } from "../icons";
 import { getMessage } from "../../utils";
 
 const ConfirmationDialog = ({
@@ -35,7 +36,7 @@ const ConfirmationDialog = ({
     }
     isOpen={isVisible}
   >
-    <DialogBody icon={<ExclamationMarkCircle />}>
+    <DialogBody icon={exclamationMarkCircle}>
       <Stack size={2}>
         <Flex justifyContent="center">
           <Typography id="dialog-confirm-description">
@@ -59,7 +60,7 @@ const ConfirmationDialog = ({
         <Button
           onClick={onConfirm}
           variant="danger-light"
-          startIcon={iconConfirm || <Check />}
+          startIcon={iconConfirm || check}
           disabled={isActionAsync}
         >
           {labelConfirm ||

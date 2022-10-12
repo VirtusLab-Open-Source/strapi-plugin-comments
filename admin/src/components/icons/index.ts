@@ -1,6 +1,49 @@
-import CommentsIcon from "./comments";
-import ReviewIcon from "./review";
-import LockIcon from "./lock";
-import UnlockIcon from "./unlock";
+import {
+  apps,
+  arrowLeft,
+  arrowRight,
+  arrowUp,
+  carretDown,
+  check,
+  comments,
+  cross,
+  emptyPictures,
+  exclamationMarkCircle,
+  eye,
+  filter,
+  illo,
+  information,
+  lock,
+  play,
+  refresh,
+  review,
+  unlock,
+  trash,
+  pencil,
+  plus
+} from "./strapiIcons";
 
-export { CommentsIcon, ReviewIcon, LockIcon, UnlockIcon };
+export {
+  apps,
+  arrowLeft,
+  arrowRight,
+  arrowUp,
+  carretDown,
+  check,
+  comments,
+  cross,
+  emptyPictures,
+  exclamationMarkCircle,
+  eye,
+  filter,
+  illo,
+  information,
+  lock,
+  play,
+  refresh,
+  review,
+  unlock,
+  trash,
+  pencil,
+  plus
+};

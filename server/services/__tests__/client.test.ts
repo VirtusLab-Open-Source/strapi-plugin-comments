@@ -1,4 +1,4 @@
-import { StrapiUser } from "strapi-typed";
+import { Id, StrapiUser } from "strapi-typed";
 import { IServiceClient } from "../../../types";
 import { Comment } from "../../../types/contentTypes";
 import { setupStrapi, resetStrapi } from "../../../__mocks__/initSetup";
@@ -59,7 +59,7 @@ describe("Test Comments service - Client", () => {
     },
   ];
   const relatedEntity = { id: 1, title: "Test", uid: collection };
-  const adminUser = { id: 1, username: "Admin", email: "admin@example.com" }
+  const adminUser = { id: 1, username: "Admin", email: "admin@example.com" };
 
   const errorThrown = (e: unknown, message: string, status: number = 400) => {
     expect(e).toBeInstanceOf(PluginError);
@@ -833,7 +833,7 @@ describe("Test Comments service - Client", () => {
             await getPluginService<IServiceClient>("client").markAsRemoved(
               1,
               "api::not-enabled.relation:1",
-              undefined,
+              undefined as unknown as Id,
               undefined
             );
           } catch (e) {
@@ -964,7 +964,7 @@ describe("Test Comments service - Client", () => {
 
           const result = await getPluginService<IServiceClient>(
             "client"
-          ).markAsRemoved(1, related, undefined, user);
+          ).markAsRemoved(1, related, undefined as unknown as Id, user);
 
           expect(result).toHaveProperty(["id"], 4);
           expect(result).toHaveProperty(["related"], related);
@@ -1078,7 +1078,7 @@ describe("Test Comments service - Client", () => {
                     default:
                       return resolve([related]);
                   }
-              }),  
+                }),
               create: async (args: any) =>
                 new Promise((resolve) => {
                   return resolve({
@@ -1089,13 +1089,12 @@ describe("Test Comments service - Client", () => {
             }));
 
           const spyPluginEmail = jest
-            .spyOn(global.strapi.plugins.email.services.email, 'send')
+            .spyOn(global.strapi.plugins.email.services.email, "send")
             // @ts-ignore
             .mockImplementation((args: any) => ({
-                status: 200,
-                params: args,
-              })  
-            );
+              status: 200,
+              params: args,
+            }));
 
           const result = await getPluginService<IServiceClient>(
             "client"
@@ -1107,9 +1106,18 @@ describe("Test Comments service - Client", () => {
           expect(result).toHaveProperty(["reason"], payload.reason);
 
           expect(spyPluginEmail).toHaveBeenCalledTimes(1);
-          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(["from"], adminUser.email);
-          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(["to", 0], adminUser.email);
-          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(["subject"], "New abuse report on comment");
+          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(
+            ["from"],
+            adminUser.email
+          );
+          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(
+            ["to", 0],
+            adminUser.email
+          );
+          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(
+            ["subject"],
+            "New abuse report on comment"
+          );
 
           spyQuery.mockRestore();
           spyPluginEmail.mockRestore();
@@ -1119,24 +1127,26 @@ describe("Test Comments service - Client", () => {
 
     describe("Inform about response", () => {
       const clientSettings = {
-        url: 'http://testsite.com',
-        contactEmail: 'contact@example.com',
+        url: "http://testsite.com",
+        contactEmail: "contact@example.com",
       };
 
       beforeEach(() =>
-        setupStrapi({ enabledCollections: [collection], client: { ...clientSettings } }, true, {
-          "plugins::comments": db,
-          "api::collection": [
-            relatedEntity,
-            { id: 2, title: "Test 2", uid: collection },
-          ],
-        })
+        setupStrapi(
+          { enabledCollections: [collection], client: { ...clientSettings } },
+          true,
+          {
+            "plugins::comments": db,
+            "api::collection": [
+              relatedEntity,
+              { id: 2, title: "Test 2", uid: collection },
+            ],
+          }
+        )
       );
 
       describe("Successful path", () => {
-
         test("Should sent e-mail with proper content to comment author", async () => {
-
           const spyQuery = jest
             .spyOn(global.strapi.db, "query")
             // @ts-ignore
@@ -1162,29 +1172,43 @@ describe("Test Comments service - Client", () => {
                     default:
                       return resolve([related]);
                   }
-              }),  
+                }),
             }));
 
           const spyPluginEmail = jest
-            .spyOn(global.strapi.plugins.email.services.email, 'send')
+            .spyOn(global.strapi.plugins.email.services.email, "send")
             // @ts-ignore
             .mockImplementation((args: any) => ({
-                status: 200,
-                params: args,
-              })  
-            );
+              status: 200,
+              params: args,
+            }));
 
           const result = await getPluginService<IServiceClient>(
             "client"
           ).sendResponseNotification(db[1]);
 
           expect(spyPluginEmail).toHaveBeenCalledTimes(1);
-          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(["from"], clientSettings.contactEmail);
-          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(["to", 0], db[0].authorEmail);
-          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(["subject"], "You've got a new response to your comment");
-          expect(spyPluginEmail.mock.results[0].value.params.text).toContain(db[0].authorName);
-          expect(spyPluginEmail.mock.results[0].value.params.text).toContain(db[1].authorName);
-          expect(spyPluginEmail.mock.results[0].value.params.text).toContain(clientSettings.url);
+          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(
+            ["from"],
+            clientSettings.contactEmail
+          );
+          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(
+            ["to", 0],
+            db[0].authorEmail
+          );
+          expect(spyPluginEmail.mock.results[0].value.params).toHaveProperty(
+            ["subject"],
+            "You've got a new response to your comment"
+          );
+          expect(spyPluginEmail.mock.results[0].value.params.text).toContain(
+            db[0].authorName
+          );
+          expect(spyPluginEmail.mock.results[0].value.params.text).toContain(
+            db[1].authorName
+          );
+          expect(spyPluginEmail.mock.results[0].value.params.text).toContain(
+            clientSettings.url
+          );
 
           spyQuery.mockRestore();
           spyPluginEmail.mockRestore();

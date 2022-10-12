@@ -19,6 +19,14 @@ const routes: StrapiRoute[] = [
   },
   {
     method: "GET",
+    path: "/moderate/reports",
+    handler: "admin.findReports",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "GET",
     path: "/moderate/single/:id",
     handler: "admin.findOne",
     config: {
@@ -58,6 +66,14 @@ const routes: StrapiRoute[] = [
     },
   },
   {
+    method: "DELETE",
+    path: "/moderate/single/:id/delete",
+    handler: "admin.deleteComment",
+    config: {
+      policies: [],
+    },
+  },
+  {
     method: "PATCH",
     path: "/moderate/single/:id/report/:reportId/resolve",
     handler: "admin.resolveAbuseReport",
@@ -68,7 +84,39 @@ const routes: StrapiRoute[] = [
   {
     method: "PUT",
     path: "/moderate/single/:id/report/resolve",
+    handler: "admin.resolveCommentMultipleAbuseReports",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "PUT",
+    path: "/moderate/all/:id/report/resolve",
+    handler: "admin.resolveAllAbuseReportsForComment",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "PUT",
+    path: "/moderate/all/:id/report/resolve-thread",
+    handler: "admin.resolveAllAbuseReportsForThread",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "PUT",
+    path: "/moderate/multiple/report/resolve",
     handler: "admin.resolveMultipleAbuseReports",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "PUT",
+    path: "/moderate/single/:id/update",
+    handler: "admin.updateComment",
     config: {
       policies: [],
     },
@@ -85,6 +133,14 @@ const routes: StrapiRoute[] = [
     method: "PATCH",
     path: "/moderate/thread/:id/unblock",
     handler: "admin.unblockCommentThread",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "POST",
+    path: "/moderate/thread/:id/postComment",
+    handler: "admin.postComment",
     config: {
       policies: [],
     },

@@ -4,6 +4,7 @@
  *
  */
 
+// TODO
 // @ts-nocheck
 import React, { memo, useRef, useMemo, useState } from "react";
 import { connect } from "react-redux";
@@ -21,7 +22,7 @@ import { Box } from "@strapi/design-system/Box";
 import { Link } from "@strapi/design-system/Link";
 import { Loader } from "@strapi/design-system/Loader";
 import { useNotifyAT } from "@strapi/design-system/LiveRegions";
-import { ArrowLeft } from "@strapi/icons";
+import { arrowLeft } from "../../components/icons";
 
 import { isEmpty } from "lodash";
 import {
@@ -39,6 +40,7 @@ import Nav from "../../components/Nav";
 import DetailsEntity from "./components/DetailsEntity";
 import DiscussionThread from "../../components/DiscussionThread";
 import makeAppView from "../App/reducer/selectors";
+import ModeratorResponse from "../../components/ModeratorResponse/index";
 
 const Details = ({ config }) => {
   useFocusWhenNavigate();
@@ -117,9 +119,9 @@ const Details = ({ config }) => {
             <>
               <HeaderLayout
                 navigationAction={
-                  <Link startIcon={<ArrowLeft />} to={getUrl(`discover`)}>
-                    {getMessage("HeaderLayout.link.go-back", "Back", false)}
-                  </Link>
+                    <Link startIcon={arrowLeft} to={getUrl(`discover`)}>
+                      {getMessage("HeaderLayout.link.go-back", "Back", false)}
+                    </Link>
                 }
                 title={getMessage("page.details.header")}
                 subtitle={getMessage("page.details.header.description")}
@@ -128,16 +130,23 @@ const Details = ({ config }) => {
               <ContentLayout>
                 <TwoColsLayout
                   startCol={
-                    <DiscussionThread
-                      level={level}
-                      selected={selected}
-                      isReloading={isLoading}
-                      allowedActions={{
-                        canModerate,
-                        canAccessReports,
-                        canReviewReports,
-                      }}
-                    />
+                    <>
+                      <DiscussionThread
+                        level={level}
+                        selected={selected}
+                        isReloading={isLoading}
+                        allowedActions={{
+                          canModerate,
+                          canAccessReports,
+                          canReviewReports,
+                        }}
+                      />
+                      {selected?.threadOf && (
+                        <ModeratorResponse
+                          rootThread={{ ...selected.threadOf }}
+                        />
+                      )}
+                    </>
                   }
                   endCol={
                     <DetailsEntity

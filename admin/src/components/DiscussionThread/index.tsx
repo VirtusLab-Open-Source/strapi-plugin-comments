@@ -4,6 +4,7 @@
  *
  */
 
+// TODO
 // @ts-nocheck
 
 import React from "react";
@@ -13,7 +14,7 @@ import { Box } from "@strapi/design-system/Box";
 import { Flex } from "@strapi/design-system/Flex";
 import { Link } from "@strapi/design-system/Link";
 import { Typography } from "@strapi/design-system/Typography";
-import { ArrowUp } from "@strapi/icons";
+import { arrowUp } from "../icons";
 import DiscussionThreadItem from "../DiscussionThreadItem";
 import { getMessage, getUrl } from "../../utils";
 import LoadingIndicatorOverlay from "../LoadingIndicatorOverlay";
@@ -45,13 +46,13 @@ const DiscussionThread = ({
         {rootThread && (
           <Link
             to={getUrl(`discover/${rootThread.id}`)}
-            startIcon={<ArrowUp />}
+            startIcon={arrowUp}
           >
             {getMessage("page.details.panel.discussion.nav.back")}
           </Link>
         )}
       </Flex>
-      <Flex as="ul" direction="column" alignItems="flex-start">
+      <Flex as="ul" direction="column" alignItems="flex-start" marginBottom={4}>
         {rootThread && (
           <DiscussionThreadItem
             {...rootThread}

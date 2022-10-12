@@ -1,5 +1,6 @@
 // @ts-ignore
 import { prefixPluginTranslations } from "@strapi/helper-plugin";
+import { StrapiAdminInstance } from "strapi-typed";
 import * as pluginPkg from "../../package.json";
 import { pluginId } from "./pluginId";
 import Initializer from "./components/Initializer";
@@ -7,13 +8,14 @@ import PluginIcon from "./components/PluginIcon";
 import pluginPermissions from "./permissions";
 import reducers from "./reducers";
 import { ToBeFixed } from "../../types";
+import { registerCustomFields } from "./custom-fields";
 
 const { name, displayName } = pluginPkg.strapi;
 
 export default {
-  register(app: ToBeFixed) {
+  register(app: StrapiAdminInstance) {
     app.addMenuLink({
-      to: `/plugins/${pluginId}/discover`,
+      to: `/plugins/${pluginId}`,
       badgeContent: 1,
       icon: PluginIcon,
       intlLabel: {
@@ -22,7 +24,7 @@ export default {
       },
       Component: async () => {
         const component = await import(
-          /* webpackChunkName: "[request]" */ "./pages/App"
+          /* webpackChunkName: "[request]" */ './pages/App'
         );
 
         return component;
@@ -65,6 +67,8 @@ export default {
       isReady: false,
       name,
     });
+
+    registerCustomFields(app);
   },
 
   // bootstrap(app: ToBeFixed) {

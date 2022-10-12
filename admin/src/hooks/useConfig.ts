@@ -1,5 +1,5 @@
+// TODO
 // @ts-nocheck
-
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import {
   fetchConfig,
@@ -7,7 +7,7 @@ import {
   restoreConfig,
   updateConfig,
 } from "../pages/Settings/utils/api";
-import pluginId from "../pluginId";
+import { pluginId } from "../pluginId";
 
 const useConfig = (toggleNotification) => {
   const queryClient = useQueryClient();
@@ -25,7 +25,7 @@ const useConfig = (toggleNotification) => {
   const handleSuccess = (
     type,
     callback = () => {},
-    invalidateQueries = true
+    invalidateQueries = true,
   ) => {
     if (invalidateQueries) {
       queryClient.invalidateQueries("get-config");
