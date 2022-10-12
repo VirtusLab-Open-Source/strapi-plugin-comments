@@ -50,6 +50,7 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 
 - **Comments Public REST + GraphQL API:** Elegant, entirely customizable and a fully extensible admin panel.
 - **Strapi &amp; generic users:** Support for built-in &amp; also generic non-Strapi users that might be the comments authors.
+- **Strapi Custom Fields support:** Improve an experience of your Content Types by using [dedicated set of custom fields](https://docs-next.strapi.io/user-docs/latest/plugins/introduction-to-plugins.html#custom-fields) for each of them and automate client side processing of Comments.
 - **Any Content Type relation:** Comments can be linked to any of your Content Types by default. Simply, you're controlling it.
 - **Moderation Panel:** Search & Filter through the bucket with your auditory comments. Manage them by blocking single ones or full threads. All in combined list &amp; hierarchical tree view of threads.
 - **Automated Bad Words filtering:** By default end users are not allowed to post abusing comments where bad words have been used.
@@ -830,8 +831,6 @@ _Available reason enums:_ `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See
 Live example of plugin usage can be found in the [VirtusLab Strapi Examples](https://github.com/VirtusLab/strapi-examples/tree/master/strapi-v4-plugin-comments) repository.
 
 ## ⚗️ Custom fields
-
-**THIS IS AN UNSTABLE FEATURE**
 
 For developers who upgrades their Strapi instance custom field from Comments plugin is available. Custom field can be picked from content types' edit page or added in definition file.
 

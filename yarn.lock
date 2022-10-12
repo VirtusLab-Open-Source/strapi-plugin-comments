@@ -528,6 +528,25 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.3.0.tgz#ea89004119dc42db2e1dba0f97d553f7372f6fcb"
   integrity sha512-AHPmaAx+RYfZz0eYu6Gviiagpmiyw98ySSlQvCUhVGDRtDFe4DBS0x1bSjdF3gqUDYOczB+yYvBTtEylYSdRhg==
 
+"@floating-ui/core@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@floating-ui/core/-/core-1.0.1.tgz#00e64d74e911602c8533957af0cce5af6b2e93c8"
+  integrity sha512-bO37brCPfteXQfFY0DyNDGB3+IMe4j150KFQcgJ5aBP295p9nBGeHEs/p0czrRbtlHq4Px/yoPXO/+dOCcF4uA==
+
+"@floating-ui/dom@^1.0.0":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-1.0.2.tgz#c5184c52c6f50abd11052d71204f4be2d9245237"
+  integrity sha512-5X9WSvZ8/fjy3gDu8yx9HAA4KG1lazUN2P4/VnaXLxTO9Dz53HI1oYoh1OlhqFNlHgGDiwFX5WhFCc2ljbW3yA==
+  dependencies:
+    "@floating-ui/core" "^1.0.1"
+
+"@floating-ui/react-dom@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@floating-ui/react-dom/-/react-dom-1.0.0.tgz#e0975966694433f1f0abffeee5d8e6bb69b7d16e"
+  integrity sha512-uiOalFKPG937UCLm42RxjESTWUVpbbatvlphQAU6bsv+ence6IoVG8JOUZcy8eW81NkU+Idiwvx10WFLmR4MIg==
+  dependencies:
+    "@floating-ui/dom" "^1.0.0"
+
 "@formatjs/ecma402-abstract@1.11.4":
   version "1.11.4"
   resolved "https://registry.yarnpkg.com/@formatjs/ecma402-abstract/-/ecma402-abstract-1.11.4.tgz#b962dfc4ae84361f9f08fbce411b4e4340930eda"
@@ -780,6 +799,13 @@
   integrity sha512-pjJIWH0XOVnYGXCqej8g/u/tsfV4LvLlj0eATKQu5zwnxd/TiTHq7Cg313qUPTFFHZ3PP5wJ15chYVtLDwaymg==
   dependencies:
     tslib "^2.4.0"
+
+"@internationalized/number@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@internationalized/number/-/number-3.1.1.tgz#160584316741de4381689ab759001603ee17b595"
+  integrity sha512-dBxCQKIxvsZvW2IBt3KsqrCfaw2nV6o6a8xsloJn/hjW0ayeyhKuiiMtTwW3/WGNPP7ZRyDbtuiUEjMwif1ENQ==
+  dependencies:
+    "@babel/runtime" "^7.6.2"
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
@@ -1109,16 +1135,27 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@strapi/helper-plugin@^4.3.8":
-  version "4.3.8"
-  resolved "https://registry.yarnpkg.com/@strapi/helper-plugin/-/helper-plugin-4.3.8.tgz#e9053e3fa00e43aaeadbbb8e06eee7aead92ed41"
-  integrity sha512-qEv1YnDwDMe8nNH9m6drUcnfGLPmt7TiLaD+sg2fcwNwILO3Imis7l4vy/qKraOmj4iWiB+j160+J5oiiN3a3w==
+"@strapi/design-system@1.2.5":
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/@strapi/design-system/-/design-system-1.2.5.tgz#af067aa6daa5db20d1a5f799e7b02fdf0e954dc6"
+  integrity sha512-7vF1UXzDPS0HxPS10OxaUpTapGIyaea+wj3L1bVxjRf4ZGsblGSIayX0kIeBlv9OoP056LW75ViRJzGjRsaTxw==
+  dependencies:
+    "@floating-ui/react-dom" "^1.0.0"
+    "@internationalized/number" "^3.1.1"
+    compute-scroll-into-view "^1.0.17"
+    prop-types "^15.7.2"
+
+"@strapi/helper-plugin@^4.4.3":
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/@strapi/helper-plugin/-/helper-plugin-4.4.3.tgz#42097f091e59bef997952026df873538d60d00ae"
+  integrity sha512-2VoAoyCAXjlo7Mop1iKe/mhqg1U/Ivu0VucnOz7N6m5J1lPAbZ+ALlFHIinmKd0Y311SQQzaBowoq4W6+IAo8w==
   dependencies:
     "@fortawesome/fontawesome-free" "^5.15.2"
     "@fortawesome/fontawesome-svg-core" "6.1.2"
     "@fortawesome/free-brands-svg-icons" "^5.15.2"
     "@fortawesome/free-solid-svg-icons" "^5.15.3"
     "@fortawesome/react-fontawesome" "^0.2.0"
+    "@strapi/design-system" "1.2.5"
     axios "0.27.2"
     date-fns "2.29.2"
     formik "^2.2.6"
@@ -1159,10 +1196,43 @@
     pluralize "^8.0.0"
     subscriptions-transport-ws "0.9.19"
 
+"@strapi/plugin-graphql@^4.4.3":
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.4.3.tgz#7954e18fa5d7dfa34374cf75d43ad6ea9f38e86c"
+  integrity sha512-KeuKQre2DOsAf8z4feV8D3VBKLW024CD9IPE9NvnkP+rAQEkFN6FkZHZY0gHY+EUssDrYZPDr9IYavu5wFZPgA==
+  dependencies:
+    "@graphql-tools/schema" "8.1.2"
+    "@graphql-tools/utils" "^8.10.0"
+    "@strapi/utils" "4.4.3"
+    apollo-server-core "3.1.2"
+    apollo-server-koa "3.10.0"
+    glob "^7.1.7"
+    graphql "^15.5.1"
+    graphql-depth-limit "^1.1.0"
+    graphql-playground-middleware-koa "^1.6.21"
+    graphql-scalars "1.17.0"
+    graphql-upload "^13.0.0"
+    koa-compose "^4.1.0"
+    lodash "4.17.21"
+    nexus "1.2.0"
+    pluralize "^8.0.0"
+    subscriptions-transport-ws "0.9.19"
+
 "@strapi/utils@4.3.8", "@strapi/utils@^4.3.8":
   version "4.3.8"
   resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.3.8.tgz#10212a2deba66be85aabc3214f9ed5eb945cfed5"
   integrity sha512-Ckgd3B+gOLRXyuAt2hFiXQQ7nay5UtsqAcy8On25gvsidz+5LK70k+afXG9A02Hg6pNeNU3goU/Ah3gpRho7fg==
+  dependencies:
+    "@sindresorhus/slugify" "1.1.0"
+    date-fns "2.29.2"
+    http-errors "1.8.1"
+    lodash "4.17.21"
+    yup "0.32.9"
+
+"@strapi/utils@4.4.3", "@strapi/utils@^4.4.3":
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.4.3.tgz#6947eda897a936d31b3879fabe1163e13f8c1d04"
+  integrity sha512-EsyNrC4F95KC+tRNN+IBQrOVJIoKmbNxE2El6FBeO1TeKpppYFI4AWzAbj/txcaIOlhvlAY7J9zTRGms72GgHA==
   dependencies:
     "@sindresorhus/slugify" "1.1.0"
     date-fns "2.29.2"
@@ -2113,6 +2183,11 @@ commander@^2.20.3:
   version "2.20.3"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
   integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
+
+compute-scroll-into-view@^1.0.17:
+  version "1.0.17"
+  resolved "https://registry.yarnpkg.com/compute-scroll-into-view/-/compute-scroll-into-view-1.0.17.tgz#6a88f18acd9d42e9cf4baa6bec7e0522607ab7ab"
+  integrity sha512-j4dx+Fb0URmzbwwMUrhqWM2BEWHdFGx+qZ9qqASHRPqvTYdqvWnHg0H1hIbcyLnvgnoNAVMlwkepyqM3DaIFUg==
 
 concat-map@0.0.1:
   version "0.0.1"
