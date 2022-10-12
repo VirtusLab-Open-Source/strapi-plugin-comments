@@ -18,7 +18,7 @@
     "clean": "rm -rf build",
     "develop": "nodemon --exec \"yarn build:dev\"",
     "test:unit": "jest --verbose --coverage",
-    "test:unit:ci": "CI=true jest --ci --verbose --coverage",
+    "test:unit:ci": "CI=true jest --ci --runInBand --verbose --coverage",
     "lint": "prettier --check .",
     "format": "prettier --write ."
   },
@@ -43,6 +43,7 @@
     "husky": "7.0.4",
     "jest": "^27.5.1",
     "jest-cli": "^27.5.1",
+    "jest-junit": "^14.0.1",
     "jest-styled-components": "^7.0.8",
     "koa": "2.13.3",
     "nodemon": "^2.0.15",

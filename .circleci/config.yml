@@ -36,8 +36,10 @@ jobs:
           name: Test
           command: |
             yarn test:unit:ci
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: ./reports/
       - store_test_results:
-          path: ./coverage/clover.xml
+          path: ./reports/
       - codecov/upload:
           flags: unittest
           file:

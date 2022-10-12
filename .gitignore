@@ -103,6 +103,7 @@ package-lock.json
 
 testApp
 coverage
+junit.xml
 
 ############################
 # Strapi
