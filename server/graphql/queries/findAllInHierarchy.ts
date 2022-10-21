@@ -20,12 +20,16 @@ export = ({ strapi, nexus }: StrapiGraphQLContext) => {
   const { nonNull, list, stringArg } = nexus;
   const { service: getService } = strapi.plugin("graphql");
   const { args } = getService("internals");
+  const {
+    naming: { getFiltersInputTypeName },
+  } = getService("utils");
 
   return {
     type: nonNull(list("CommentNested")),
     args: {
       relation: nonNull(stringArg()),
       sort: args.SortArg,
+      filters: getFiltersInputTypeName(contentType),
     },
     // @ts-ignore
     async resolve(obj: Object, args: findAllInHierarchyProps) {
