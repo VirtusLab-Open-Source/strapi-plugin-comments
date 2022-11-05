@@ -700,18 +700,19 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
           id: threadId,
         },
       });
-
+      console.log(author);
     return await strapi.db
       .query<Comment>(getModelUid("comment"))
       .create({
         data: {
           approvalStatus: "APPROVED",
           authorId: author.id,
-          authorName: author.username,
+          authorName: author.lastname ? `${author.firstname} ${author.lastname}` : author.username || author.firstname,
           authorEmail: author.email,
           content: body,
           threadOf: threadId,
-          related: entity.related
+          related: entity.related,
+          isAdminComment: true
         },
       });
   },
