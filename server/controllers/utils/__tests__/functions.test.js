@@ -8,13 +8,13 @@ describe("Test Comments controller functions utils", () => {
   describe("Errors serialization", () => {
     test("Should throw error PluginError", () => {
       try {
-        throw new PluginError(400, "Error message", {
+        throw new PluginError.default(400, "Error message", {
           content: {
             param: "Parameter value",
           },
         });
       } catch (e) {
-        expect(e).toBeInstanceOf(PluginError);
+        expect(e).toBeInstanceOf(PluginError.default);
         expect(e).toHaveProperty("status", 400);
         expect(e).toHaveProperty("name", "Strapi:Plugin:Comments");
         expect(e).toHaveProperty("message", "Error message");
