@@ -3,7 +3,7 @@ import { defaults as tsjPreset } from "ts-jest/presets";
 
 const config: Config.InitialOptions = {
   name: "Unit test",
-  testMatch: ["**/__tests__/?(*.)+(spec|test).ts"],
+  testMatch: ["**/__tests__/?(*.)+(spec|test).(t|j)s"],
   transform: {
     ...tsjPreset.transform,
   },

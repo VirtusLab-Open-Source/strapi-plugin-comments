@@ -20,14 +20,14 @@ describe("Test Comments controller parsers utils", () => {
     const fields = ["content"];
 
     test("Should contain default property 'populate'", () => {
-      expect(flatInput()).toHaveProperty(
+      expect(flatInput({ query: {} })).toHaveProperty(
         ["populate", "threadOf", "populate", "authorUser"],
         true
       );
     });
 
     test("Should assign relation to 'query'", () => {
-      expect(flatInput({ relation })).toHaveProperty(
+      expect(flatInput({ relation, query: {} })).toHaveProperty(
         ["query", "related"],
         relation
       );
@@ -158,6 +158,70 @@ describe("Test Comments controller parsers utils", () => {
         ["pagination", "pageSize"],
         pagination.pageSize
       );
+    });
+
+    test("Should assign filtering by comments status", () => {
+      const filterByValue = "APPROVED";
+      const result = flatInput({
+        relation,
+        query: {
+          ...query,
+          filterBy: "APPROVAL_STATUS",
+          filterByValue,
+        },
+        sort,
+        fields,
+      });
+
+      expect(result).toHaveProperty(["query", "approvalStatus"], filterByValue);
+      expect(() => {
+        flatInput({
+          relation,
+          query: {
+            filterBy: "APPROVAL_STATUS",
+          },
+          sort,
+          fields,
+        });
+      }).toThrow();
+    });
+
+    test("Should assign filtering by creation date", () => {
+      const filterByValue = new Date().toUTCString();
+      const result = flatInput({
+        relation,
+        query: {
+          ...query,
+          filterBy: "DATE_CREATED",
+          filterByValue,
+        },
+        sort,
+        fields,
+      });
+
+      expect(result).toHaveProperty(["query", "createdAt", "$between", 0]);
+      expect(result).toHaveProperty(["query", "createdAt", "$between", 1]);
+      expect(() => {
+        flatInput({
+          relation,
+          query: {
+            filterBy: "DATE_CREATED",
+          },
+          sort,
+          fields,
+        });
+      }).toThrow();
+      expect(() => {
+        flatInput({
+          relation,
+          query: {
+            filterByValue: "X",
+            filterBy: "DATE_CREATED",
+          },
+          sort,
+          fields,
+        });
+      }).toThrow();
     });
   });
 });
