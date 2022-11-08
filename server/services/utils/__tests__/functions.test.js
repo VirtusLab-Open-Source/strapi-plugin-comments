@@ -27,7 +27,7 @@ describe("Test service functions utils", () => {
       try {
         resolveUserContextError({ id: 1 });
       } catch (e) {
-        expect(e).toBeInstanceOf(PluginError);
+        expect(e).toBeInstanceOf(PluginError.default);
         expect(e).toHaveProperty("status", 401);
       }
     });
@@ -36,7 +36,7 @@ describe("Test service functions utils", () => {
       try {
         resolveUserContextError();
       } catch (e) {
-        expect(e).toBeInstanceOf(PluginError);
+        expect(e).toBeInstanceOf(PluginError.default);
         expect(e).toHaveProperty("status", 403);
       }
     });

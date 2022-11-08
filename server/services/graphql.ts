@@ -3,8 +3,10 @@ import { IServiceGraphQL, ToBeFixed } from "../../types";
 
 import { has, propEq, isNil, isDate, isObject } from "lodash/fp";
 import { inputObjectType } from "nexus";
+import { assertNotEmpty } from "../utils/functions";
 
 const virtualScalarAttributes = ["id"];
+const customFields = ["filterBy", "filterByValue"];
 
 export = ({ strapi }: StrapiContext): IServiceGraphQL => {
   const { service: getService } = strapi.plugin("graphql");
@@ -65,6 +67,9 @@ export = ({ strapi }: StrapiContext): IServiceGraphQL => {
         for (const operator of rootLevelOperators()) {
           operator.add(t, filtersTypeName);
         }
+
+        t.field("filterBy", { type: "String" });
+        t.field("filterByValue", { type: "String" });
       },
     });
   };
@@ -132,7 +137,7 @@ export = ({ strapi }: StrapiContext): IServiceGraphQL => {
   };
 
   const graphQLFiltersToStrapiQuery = (
-    filters: ToBeFixed,
+    queryFilters: ToBeFixed,
     contentType: ToBeFixed = {}
   ): Array<ToBeFixed> | ToBeFixed => {
     const { isStrapiScalar, isMedia, isRelation } =
@@ -142,18 +147,23 @@ export = ({ strapi }: StrapiContext): IServiceGraphQL => {
     const ROOT_LEVEL_OPERATORS = [operators.and, operators.or, operators.not];
 
     // Handle unwanted scenario where there is no filters defined
-    if (isNil(filters)) {
+    if (isNil(queryFilters)) {
       return {};
     }
 
     // If filters is a collection, then apply the transformation to every item of the list
-    if (Array.isArray(filters)) {
-      return filters.map((filtersItem) =>
-        graphQLFiltersToStrapiQuery(filtersItem, contentType)
-      );
+    if (Array.isArray(queryFilters)) {
+      return queryFilters.reduce((acc, filtersItem) => {
+        if (!customFields.includes(filtersItem)) {
+          acc.push(graphQLFiltersToStrapiQuery(filtersItem, contentType));
+        }
+
+        return acc;
+      });
     }
 
     const resultMap: ToBeFixed = {};
+    const { filterBy, filterByValue, ...filters } = queryFilters;
     const { attributes } = contentType;
 
     const isAttribute = (attributeName: string): boolean => {
@@ -206,6 +216,30 @@ export = ({ strapi }: StrapiContext): IServiceGraphQL => {
           );
         }
       }
+    }
+
+    if (filterBy === "DATE_CREATED") {
+      const date = new Date(filterByValue);
+
+      if (!filterByValue || Number.isNaN(+date)) {
+        throw new Error('Invalid date specified in "filterByValue"');
+      }
+
+      const start = date.setHours(0, 0, 0, 0);
+      const end = date.setHours(23, 59, 59, 999);
+
+      resultMap.createdAt = {
+        $between: [start, end],
+      };
+    }
+
+    if (filterBy === "APPROVAL_STATUS") {
+      assertNotEmpty(
+        filterByValue,
+        new Error('Empty "filterByValue" parameter')
+      );
+
+      resultMap.approvalStatus = filterByValue;
     }
 
     return resultMap;
