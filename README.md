@@ -127,14 +127,14 @@ Complete installation requirements are exact same as for Strapi itself and can b
 
 **Minimum environment requirements**
 
-- Node.js `>=14.x.x`
+- Node.js `>=14.19.1 <=18.x.x`
 - NPM `>=7.x.x`
 
 In our minimum support we're following [official Node.js releases timelines](https://nodejs.org/en/about/releases/).
 
 **Supported Strapi versions**:
 
-- Strapi v4.4.3 (recently tested)
+- Strapi v4.4.7 (recently tested)
 - Strapi v4.x
 
 > This plugin is designed for **Strapi v4** and is not working with v3.x. To get version for **Strapi v3** install version [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3).
