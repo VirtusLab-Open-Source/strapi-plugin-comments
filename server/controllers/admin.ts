@@ -13,6 +13,7 @@ import {
   ToBeFixed,
   ViewCommentsPluginConfig,
 } from "../../types";
+//import { commentsCustomField } from "../register/custom-fields/comments";
 
 import { assertNotEmpty, getPluginService } from "./../utils/functions";
 import { parseParams, throwError } from "./utils/functions";

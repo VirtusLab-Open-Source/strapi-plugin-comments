@@ -238,6 +238,14 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
         related: relation,
       });
 
+
+      if (reportAgainstEntity.isAdminComment) {
+        throw new PluginError(
+          430,
+          `You're not allowed to take an action on that entity. This in a admin comment.`
+          );
+      }
+
       if (reportAgainstEntity) {
         const entity = await strapi.db
           .query<CommentReport>(getModelUid("comment-report"))
