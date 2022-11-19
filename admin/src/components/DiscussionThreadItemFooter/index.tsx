@@ -33,7 +33,7 @@ const DiscussionThreadItemFooter = ({
   });
 
   const { name, avatar } = author || {};
-  console.log(author);
+
   return (
     <DiscussionThreadItemFooterStyled as={Box} paddingTop={2} direction="row">
       <DiscussionThreadItemFooterMeta size={3} horizontal>

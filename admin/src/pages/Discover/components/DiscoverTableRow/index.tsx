@@ -78,7 +78,9 @@ const DiscoverTableRow = ({
   if (reviewFlowEnabled || needsApproval) {
     actionItemsCount = 2;
   }
-  console.log(item);
+
+  const {author, isAdminComment} = item;
+
   return (
     <Tr key={item.id}>
       <Td>
@@ -88,7 +90,7 @@ const DiscoverTableRow = ({
       </Td>
       <Td>
         <Stack size={2} horizontal>
-          {item.author && (<UserAvatar avatar={item?.author?.avatar} name={item?.author?.name} isAdminComment={item.isAdminComment}/>)}
+          {item.author && (<UserAvatar avatar={author.avatar} name={author.name} isAdminComment={isAdminComment}/>)}
           <Typography textColor="neutral800" variant="pi">
             {item?.author?.name || getMessage('compontents.author.unknown')}
           </Typography>

@@ -33,6 +33,7 @@ import {
   getModelUid,
   getRelatedGroups,
   filterOurResolvedReports,
+  getAuthorName,
 } from "./utils/functions";
 import { APPROVAL_STATUS, REGEX } from "./../utils/constants";
 
@@ -700,14 +701,14 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
           id: threadId,
         },
       });
-    
+
     return await strapi.db
       .query<Comment>(getModelUid("comment"))
       .create({
         data: {
           approvalStatus: "APPROVED",
           authorId: author.id,
-          authorName: author.lastname ? `${author.firstname} ${author.lastname}` : author.username || author.firstname,
+          authorName: getAuthorName(author),
           authorEmail: author.email,
           content: body,
           threadOf: threadId,

@@ -238,7 +238,6 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
         related: relation,
       });
 
-
       if (reportAgainstEntity.isAdminComment) {
         throw new PluginError(
           403,
@@ -405,7 +404,6 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
       status
     );
   },
-
 
   async sendResponseNotification(
     this: IServiceClient,
