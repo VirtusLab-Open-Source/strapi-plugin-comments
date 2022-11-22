@@ -22,7 +22,7 @@ interface IProps {
     isAdminComment?: boolean;
 };
 
-const UserAvatar = ({ avatar, name, isAdminComment = false }) => {
+const UserAvatar: React.FC<IProps> = ({ avatar, name, isAdminComment = false }) => {
   if (avatar) {
     let image = avatar;
     if (isObject(avatar)) {
