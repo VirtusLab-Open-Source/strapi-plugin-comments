@@ -275,7 +275,6 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
         `You're not allowed to take an action on that entity. Make sure that comment exist or you've authenticated your request properly.`
       );
     } catch (e) {
-      console.log(e);
       throw e;
       }
   },

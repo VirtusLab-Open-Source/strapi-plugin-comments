@@ -14,8 +14,15 @@ import { Avatar, Initials } from "@strapi/design-system/Avatar";
 import { renderInitials } from "../../utils";
 import { IntlContext } from "react-intl";
 import AdminAvatar from "../AdminAvatar";
+import { ToBeFixed } from "../../../../types";
 
-const UserAvatar = ({ avatar, name, isAdminComment }) => {
+interface IProps {
+    avatar: string | ToBeFixed; 
+    name: string;
+    isAdminComment?: boolean;
+};
+
+const UserAvatar = ({ avatar, name, isAdminComment = false }) => {
   if (avatar) {
     let image = avatar;
     if (isObject(avatar)) {
@@ -29,11 +36,6 @@ const UserAvatar = ({ avatar, name, isAdminComment }) => {
     isAdminComment ? <AdminAvatar>{name && (<Initials>{renderInitials(name)}</Initials>)}</AdminAvatar>
     : name && (<Initials>{renderInitials(name)}</Initials>)
   ) 
-};
-
-UserAvatar.propTypes = {
-  avatar: PropTypes.oneOfType(PropTypes.string, PropTypes.object).isRequired,
-  name: PropTypes.string,
 };
 
 export default UserAvatar;

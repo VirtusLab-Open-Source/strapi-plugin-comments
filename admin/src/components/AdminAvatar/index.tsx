@@ -4,9 +4,8 @@ import { AdminAvatarWrapper, AdminShield } from "./styles";
 import {Shield} from "@strapi/icons";
 // @ts-ignore
 import {Icon} from "@strapi/design-system/Icon";
-import { ToBeFixed } from "../../../../types";
 
-const AdminAvatar = ({ children }: ToBeFixed ) => {
+const AdminAvatar: React.FC<React.PropsWithChildren<{}>>  = ({ children } ) => {
     return ( 
         <AdminAvatarWrapper>
             <AdminShield>
