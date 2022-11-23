@@ -209,7 +209,6 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
         this.getCommonService().mergeRelatedEntityTo(_, relatedEntities),
       );
 
-
     const pageCount = Math.floor(total / pageSize);
 
     return {

@@ -79,37 +79,45 @@ const DiscoverTableRow = ({
     actionItemsCount = 2;
   }
 
-  const {author, isAdminComment} = item;
+  const {
+    author,
+    isAdminComment,
+    id,
+    content,
+    threadOf,
+    related,
+    createdAt,
+    updatedAt } = item;
 
   return (
-    <Tr key={item.id}>
+    <Tr key={id}>
       <Td>
         <Typography textColor="neutral800" fontWeight="bold">
-          #{item.id}
+          #{id}
         </Typography>
       </Td>
       <Td>
         <Stack size={2} horizontal>
-          {item.author && (<UserAvatar avatar={author.avatar} name={author.name} isAdminComment={isAdminComment}/>)}
+          {author && (<UserAvatar avatar={author.avatar} name={author.name} isAdminComment={isAdminComment}/>)}
           <Typography textColor="neutral800" variant="pi">
-            {item?.author?.name || getMessage('compontents.author.unknown')}
+            {author?.name || getMessage('compontents.author.unknown')}
           </Typography>
         </Stack>
       </Td>
       <Td style={{ maxWidth: "30vw" }}>
         <Typography textColor="neutral800" ellipsis>
-          {item.content}
+          {content}
         </Typography>
       </Td>
       <Td>
-        {item.threadOf?.id ? (
-          <Link to={renderDetailsUrl(item.threadOf)}>
+        {threadOf?.id ? (
+          <Link to={renderDetailsUrl(threadOf)}>
             {getMessage(
               {
                 id: "page.discover.table.cell.thread",
-                props: { id: item.threadOf.id },
+                props: { id: threadOf.id },
               },
-              "#" + item.threadOf.id
+              "#" + threadOf.id
             )}
           </Link>
         ) : (
@@ -117,9 +125,9 @@ const DiscoverTableRow = ({
         )}
       </Td>
       <Td style={{ maxWidth: "15vw" }}>
-        {item.related ? (
-          <TableLink to={renderEntryUrl(item.related)}>
-            {renderEntryTitle(item.related, config)}
+        {related ? (
+          <TableLink to={renderEntryUrl(related)}>
+            {renderEntryTitle(related, config)}
           </TableLink>
         ) : (
           "-"
@@ -127,7 +135,7 @@ const DiscoverTableRow = ({
       </Td>
       <Td>
         <Typography textColor="neutral800">
-          {formatDate(item.updatedAt || item.createdAt, {
+          {formatDate(updatedAt || createdAt, {
             dateStyle: "long",
             timeStyle: "short",
           })}
@@ -143,7 +151,7 @@ const DiscoverTableRow = ({
           >
             {canModerate && needsApproval && (
               <DiscussionThreadItemApprovalFlowActions
-                id={item.id}
+                id={id}
                 allowedActions={{ canModerate }}
               />
             )}
