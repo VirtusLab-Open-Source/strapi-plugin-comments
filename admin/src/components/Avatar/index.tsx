@@ -12,21 +12,30 @@ import PropTypes from "prop-types";
 import { isObject } from "lodash";
 import { Avatar, Initials } from "@strapi/design-system/Avatar";
 import { renderInitials } from "../../utils";
+import { IntlContext } from "react-intl";
+import AdminAvatar from "../AdminAvatar";
+import { ToBeFixed } from "../../../../types";
 
-const UserAvatar = ({ avatar, name }) => {
+interface IProps {
+    avatar: string | ToBeFixed; 
+    name: string;
+    isAdminComment?: boolean;
+};
+
+const UserAvatar: React.FC<IProps> = ({ avatar, name, isAdminComment = false }) => {
   if (avatar) {
     let image = avatar;
     if (isObject(avatar)) {
       image = avatar?.formats?.thumbnail.url || avatar.url;
     }
-    return image && (<Avatar src={image} alt={name} />);
-  }
-  return name && (<Initials>{renderInitials(name)}</Initials>);
-};
-
-UserAvatar.propTypes = {
-  avatar: PropTypes.oneOfType(PropTypes.string, PropTypes.object).isRequired,
-  name: PropTypes.string,
+      return(
+        isAdminComment ? <AdminAvatar>{image && (<Avatar src={image} alt={name} />)}</AdminAvatar>
+        : image && (<Avatar src={image} alt={name} />))
+      }
+  return(
+    isAdminComment ? <AdminAvatar>{name && (<Initials>{renderInitials(name)}</Initials>)}</AdminAvatar>
+    : name && (<Initials>{renderInitials(name)}</Initials>)
+  ) 
 };
 
 export default UserAvatar;

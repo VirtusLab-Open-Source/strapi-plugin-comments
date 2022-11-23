@@ -1008,7 +1008,7 @@ describe("Test Comments service - Client", () => {
           }
         });
 
-        test("Should fail with 403 because of try to add report against not existing comment", async () => {
+        test("Should fail with 404 because of try to add report against not existing comment", async () => {
           const spy = jest
             .spyOn(global.strapi.db, "query")
             // @ts-ignore
@@ -1037,8 +1037,8 @@ describe("Test Comments service - Client", () => {
           } catch (e) {
             errorThrown(
               e,
-              "You're not allowed to take an action on that entity. Make sure that comment exist or you've authenticated your request properly.",
-              403
+              "Comment does not exist. Check your payload please.",
+              404
             );
           }
 

@@ -32,7 +32,9 @@
     "@types/axios": "^0.14.0",
     "@types/react-intl": "^3.0.0",
     "@types/react-query": "^1.2.9",
-    "bad-words": "^3.0.4"
+    "@types/styled-components": "^5.1.26",
+    "bad-words": "^3.0.4",
+    "styled-components": "^5.3.6"
   },
   "devDependencies": {
     "@strapi/helper-plugin": "^4.4.7",

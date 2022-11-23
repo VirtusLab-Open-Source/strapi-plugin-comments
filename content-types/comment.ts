@@ -64,6 +64,10 @@ export default {
       type: "string",
       configurable: false,
     },
+    isAdminComment: {
+      type: "boolean",
+      configurable: false,
+    },
     removed: {
       type: "boolean",
       configurable: false,

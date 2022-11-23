@@ -238,6 +238,13 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
         related: relation,
       });
 
+      if (reportAgainstEntity.isAdminComment) {
+        throw new PluginError(
+          403,
+          `You're not allowed to take an action on that entity. This in a admin comment.`
+          );
+      }
+
       if (reportAgainstEntity) {
         const entity = await strapi.db
           .query<CommentReport>(getModelUid("comment-report"))
@@ -268,11 +275,8 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
         `You're not allowed to take an action on that entity. Make sure that comment exist or you've authenticated your request properly.`
       );
     } catch (e) {
-      throw new PluginError(
-        403,
-        `You're not allowed to take an action on that entity. Make sure that comment exist or you've authenticated your request properly.`
-      );
-    }
+      throw e;
+      }
   },
 
   async markAsRemoved(
@@ -399,7 +403,6 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
       status
     );
   },
-
 
   async sendResponseNotification(
     this: IServiceClient,
