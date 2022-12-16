@@ -18,7 +18,7 @@ import {
   useNotification,
 } from '@strapi/helper-plugin';
 
-import ComingSoonPage from '../ComingSoonPage';
+//import ComingSoonPage from '../ComingSoonPage'; 
 import getUrl from '../../utils/getUrl';
 import Discover from '../Discover';
 import Details from '../Details';
@@ -26,6 +26,8 @@ import Reports from '../Reports';
 import {fetchConfig} from './utils/api';
 import {setConfig} from './reducer/actions';
 import makeAppView from './reducer/selectors';
+import DashboardPage from '../DashboardPage';
+import ComingSoonPage from "../ComingSoonPage";
 
 const App = ({setConfig}) => {
   const toggleNotification = useNotification();
@@ -49,7 +51,7 @@ const App = ({setConfig}) => {
     <div>
       <Switch>
         <Route path={getUrl('discover/:id')} component={Details} />
-        <Route path={getUrl('dashboard')} component={ComingSoonPage} />
+        <Route path={getUrl('dashboard')} component={DashboardPage} />
         <Route path={getUrl('discover')} component={Discover} />
         <Route path={getUrl('settings')} component={ComingSoonPage} />
         <Route path={getUrl('reports')} component={Reports} />

@@ -39,6 +39,9 @@ const Nav = ({ visible = false, hasNewComments, hasNewReports }) => {
           {getMessage("nav.item.updates")}
         </SubNavLink> */}
         <SubNavSection label={getMessage('nav.header.moderation')}>
+          <SubNavLink to={getUrl('dashboard')} icon={apps}>
+            {getMessage('nav.item.dashboard')}
+          </SubNavLink>
           <SubNavLink to={getUrl('discover')} icon={apps}>
             {getMessage('nav.item.discover')}
           </SubNavLink>

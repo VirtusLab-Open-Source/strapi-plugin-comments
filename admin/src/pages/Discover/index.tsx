@@ -95,6 +95,8 @@ const Discover = ({config}) => {
     },
   );
 
+  console.log(result);
+
   const handleClickDisplay = (id) => {
     push(getUrl(`discover/${id}`));
   };
