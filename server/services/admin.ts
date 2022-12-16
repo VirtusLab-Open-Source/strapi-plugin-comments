@@ -177,19 +177,26 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       };
     }
 
+    const basePopulate = {
+      threadOf: true,
+      reports: {
+        where: {
+          resolved: false,
+        },
+      },
+    }
+    const populate = defaultAuthorUserPopulate
+      ? {
+        ...basePopulate,
+        authorUser: defaultAuthorUserPopulate,
+      }
+      : basePopulate;
+
     const entities = await strapi.db
       .query<Comment>(getModelUid("comment"))
       .findMany({
         ...params,
-        populate: {
-          authorUser: defaultAuthorUserPopulate,
-          threadOf: true,
-          reports: {
-            where: {
-              resolved: false,
-            },
-          },
-        },
+        populate,
       });
     const total = await strapi.db.query<Comment>(getModelUid("comment")).count({
       where: params.where,
@@ -354,18 +361,31 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       },
     };
 
-    const defaultPopulate = {
+    const basePopulate = { 
       populate: {
-        authorUser: defaultAuthorUserPopulate,
         threadOf: {
           populate: {
-            authorUser: defaultAuthorUserPopulate,
             ...reportsPopulation,
           },
         },
         ...reportsPopulation,
       },
     };
+
+    const defaultPopulate = defaultAuthorUserPopulate 
+      ? {
+        populate: {
+          ...basePopulate.populate,
+          authorUser: defaultAuthorUserPopulate,
+          threadOf: {
+            populate: {
+              ...basePopulate.populate.threadOf.populate,
+              authorUser: defaultAuthorUserPopulate,
+            },
+          },
+        },
+      }
+      : basePopulate;
 
     const entity = await strapi.db
       .query<Comment>(getModelUid("comment"))
@@ -743,11 +763,13 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     const relationTypes = Object.keys(attributes)?.filter((key: string) =>
       allowedTypes.includes(attributes[key]?.type),
     );
+
     if (relationTypes.includes("avatar")) {
       return {
         populate: { avatar: true },
       };
     }
+
     return undefined;
   },
 });
