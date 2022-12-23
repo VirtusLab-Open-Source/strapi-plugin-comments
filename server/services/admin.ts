@@ -33,6 +33,7 @@ import {
   getModelUid,
   getRelatedGroups,
   filterOurResolvedReports,
+  getAuthorName,
 } from "./utils/functions";
 import { APPROVAL_STATUS, REGEX } from "./../utils/constants";
 
@@ -156,9 +157,9 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     let params: StrapiDBQueryArgs<CommentModelKeys> = {
       where: !isEmpty(filters)
         ? {
-            ...defaultWhere,
-            ...filters,
-          }
+          ...defaultWhere,
+          ...filters,
+        }
         : { ...defaultWhere },
       offset: (page - 1) * pageSize,
       limit: pageSize,
@@ -176,19 +177,26 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       };
     }
 
+    const basePopulate = {
+      threadOf: true,
+      reports: {
+        where: {
+          resolved: false,
+        },
+      },
+    }
+    const populate = defaultAuthorUserPopulate
+      ? {
+        ...basePopulate,
+        authorUser: defaultAuthorUserPopulate,
+      }
+      : basePopulate;
+
     const entities = await strapi.db
       .query<Comment>(getModelUid("comment"))
       .findMany({
         ...params,
-        populate: {
-          authorUser: defaultAuthorUserPopulate,
-          threadOf: true,
-          reports: {
-            where: {
-              resolved: false,
-            },
-          },
-        },
+        populate,
       });
     const total = await strapi.db.query<Comment>(getModelUid("comment")).count({
       where: params.where,
@@ -207,7 +215,6 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       .map((_) =>
         this.getCommonService().mergeRelatedEntityTo(_, relatedEntities),
       );
-    
 
     const pageCount = Math.floor(total / pageSize);
 
@@ -246,9 +253,9 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     let params: StrapiDBQueryArgs<CommentModelKeys> = {
       where: !isEmpty(filters)
         ? {
-            ...defaultWhere,
-            ...filters,
-          }
+          ...defaultWhere,
+          ...filters,
+        }
         : { ...defaultWhere },
       offset: (page - 1) * pageSize,
       limit: pageSize,
@@ -342,8 +349,8 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
 
     const defaultWhere = !removed
       ? {
-          $or: [{ removed: false }, { removed: { $notNull: false } }],
-        }
+        $or: [{ removed: false }, { removed: { $notNull: false } }],
+      }
       : {};
 
     const reportsPopulation = {
@@ -354,18 +361,31 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       },
     };
 
-    const defaultPopulate = {
+    const basePopulate = { 
       populate: {
-        authorUser: defaultAuthorUserPopulate,
         threadOf: {
           populate: {
-            authorUser: defaultAuthorUserPopulate,
             ...reportsPopulation,
           },
         },
         ...reportsPopulation,
       },
     };
+
+    const defaultPopulate = defaultAuthorUserPopulate 
+      ? {
+        populate: {
+          ...basePopulate.populate,
+          authorUser: defaultAuthorUserPopulate,
+          threadOf: {
+            populate: {
+              ...basePopulate.populate.threadOf.populate,
+              authorUser: defaultAuthorUserPopulate,
+            },
+          },
+        },
+      }
+      : basePopulate;
 
     const entity = await strapi.db
       .query<Comment>(getModelUid("comment"))
@@ -692,7 +712,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     threadId: Id,
     body: ToBeFixed,
     author: StrapiAdminUser
-  ):Promise<Comment> {
+  ): Promise<Comment> {
     const entity = await strapi.db
       .query<Comment>(getModelUid("comment"))
       .findOne({
@@ -707,11 +727,12 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
         data: {
           approvalStatus: "APPROVED",
           authorId: author.id,
-          authorName: author.username,
+          authorName: getAuthorName(author),
           authorEmail: author.email,
           content: body,
           threadOf: threadId,
-          related: entity.related
+          related: entity.related,
+          isAdminComment: true,
         },
       });
   },
@@ -721,7 +742,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     this: IServiceAdmin,
     id: Id,
     body: ToBeFixed,
-  ):Promise<Comment> {
+  ): Promise<Comment> {
     const updateComment = await strapi.db
       .query<Comment>(getModelUid("comment"))
       .update({
@@ -742,11 +763,13 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     const relationTypes = Object.keys(attributes)?.filter((key: string) =>
       allowedTypes.includes(attributes[key]?.type),
     );
+
     if (relationTypes.includes("avatar")) {
       return {
         populate: { avatar: true },
       };
     }
+
     return undefined;
   },
 });

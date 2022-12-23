@@ -1,6 +1,5 @@
-import { Id, IStrapi, StrapiUser } from "strapi-typed";
+import { Id, IStrapi, StrapiAdmin, StrapiUser } from "strapi-typed";
 import { Comment, CommentAuthor, ToBeFixed } from "../../../types";
-
 import PluginError from "./../../utils/error";
 import { REGEX } from "./../../utils/constants";
 import { first, get, isObject, isArray, isEmpty, isString } from "lodash";
@@ -147,4 +146,14 @@ export const resolveUserContextError = (user: StrapiUser): PluginError => {
   } else {
     throw new PluginError(403, "Not authorized");
   }
+};
+
+export const getAuthorName = (author: StrapiAdmin) =>{
+  
+  const {lastname, username, firstname} = author;
+
+  if(lastname)
+    return `${firstname} ${lastname}`
+  else
+    return username || firstname 
 };

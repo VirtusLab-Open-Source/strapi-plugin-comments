@@ -17,6 +17,7 @@ export type Comment<TAuthor = CommentAuthor> = {
   approvalStatus?: CommentApprovalStatus | null;
   firstThreadItemId?: Id;
   threadFirstItemId?: Id;
+  isAdminComment?: boolean;
 } & CommentAuthorPartial;
 
 export type CommentModelKeys = OnlyStrings<keyof Comment>;

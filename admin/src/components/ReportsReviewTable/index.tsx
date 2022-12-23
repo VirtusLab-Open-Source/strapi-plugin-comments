@@ -213,7 +213,7 @@ const ReportsReviewTable = ({
                   value={isItemSelected(entry.id)}
                   disabled={entry.resolved}
                   onValueChange={(value) =>
-                    handleItemSelectionChange(entry.id, value)
+                  handleItemSelectionChange(entry.id, value)
                   }
                 />
               </Td>

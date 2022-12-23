@@ -7,13 +7,22 @@ import {
   assertString,
 } from "../../../../utils";
 import { CommentsFieldValue, PopulateField } from "./types";
+import { DEFAULTS } from "./consts";
 
 export const asString = () => "";
 
 export const fromInput = (value: unknown) => {
   assertString(value);
 
-  const state = JSON.parse(value);
+  let state = JSON.parse(value);
+
+  if (!state) {
+    console.group("[Comments]");
+    console.warn("Empty state provided from the back-end");
+    console.groupEnd();
+
+    state = DEFAULTS
+  }
 
   assertCorrectState(state);
 
