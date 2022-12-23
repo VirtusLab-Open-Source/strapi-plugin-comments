@@ -39,12 +39,7 @@ import {
 } from "./utils";
 import { getMessage } from "../../../../utils";
 import { useIntl } from "react-intl";
-
-const DEFAULTS: CommentsFieldValue = {
-  commentsNumber: 30,
-  populate: [],
-  renderType: "FLAT",
-};
+import { DEFAULTS } from "./consts";
 
 export const CustomFieldInput: React.FC<CustomFieldInputProps> = ({
   attribute,
