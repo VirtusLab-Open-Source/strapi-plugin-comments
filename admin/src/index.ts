@@ -1,5 +1,6 @@
 // @ts-ignore
 import { prefixPluginTranslations } from "@strapi/helper-plugin";
+import { get } from 'lodash';
 import { StrapiAdminInstance } from "strapi-typed";
 import * as pluginPkg from "../../package.json";
 import { pluginId } from "./pluginId";
@@ -7,8 +8,8 @@ import Initializer from "./components/Initializer";
 import PluginIcon from "./components/PluginIcon";
 import pluginPermissions from "./permissions";
 import reducers from "./reducers";
-import { ToBeFixed } from "../../types";
 import { registerCustomFields } from "./custom-fields";
+import trads, { TranslationKey, Translations } from "./translations";
 
 const { name, displayName } = pluginPkg.strapi;
 
@@ -78,25 +79,12 @@ export default {
   //   // });
   // },
 
-  async registerTrads({ locales }: ToBeFixed) {
-    const importedTrads = await Promise.all(
-      locales.map((locale: ToBeFixed) => {
-        return import(`./translations/${locale}.json`)
-          .then(({ default: data }) => {
-            return {
-              data: prefixPluginTranslations(data, pluginId),
-              locale,
-            };
-          })
-          .catch(() => {
-            return {
-              data: {},
-              locale,
-            };
-          });
-      })
-    );
-
-    return Promise.resolve(importedTrads);
+  registerTrads({ locales }: { locales: Array<TranslationKey>}) {
+    return locales.map((locale: string) => {
+      return {
+        data: prefixPluginTranslations(get<Translations, TranslationKey>(trads, locale as TranslationKey), pluginId, {}),
+        locale,
+      };
+    });
   },
 };
