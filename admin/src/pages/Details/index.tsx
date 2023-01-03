@@ -81,12 +81,12 @@ const Details = ({ config }) => {
     parseRegExp(config.regex.uid).flags
   );
 
-  const {
+  const {     
     isLoading: isLoadingForData,
     data,
     isFetching,
   } = useQuery(
-    ["get-details-data", id, filters, canAccess],
+    ["details-get-data", id, filters, canAccess],
     () => fetchDetailsData(id, filters, toggleNotification),
     {
       initialData: {},
