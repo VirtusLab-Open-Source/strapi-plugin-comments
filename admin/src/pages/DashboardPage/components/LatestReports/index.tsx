@@ -1,11 +1,5 @@
-/*
- *
- * Report
- *
- */
 
-// TODO
-// @ts-nocheck
+//@ts-nocheck
 
 import {
   ActionLayout,
@@ -24,6 +18,7 @@ import {
   useRBAC,
   useTracking,
 } from "@strapi/helper-plugin";
+import { PanelLayout, StyledHeader } from "../../styles";
 import React, {
   memo,
   useCallback,
@@ -34,31 +29,28 @@ import React, {
 } from "react";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@strapi/design-system/Table";
 import { bindActionCreators, compose } from "redux";
-import { getMessage, handleAPIError } from "../../utils";
+import { getMessage, handleAPIError } from "../../../../utils";
 import { isArray, isEmpty } from "lodash";
-import { resolveMultipleReports, resolveReport } from "../utils/api";
+import { resolveMultipleReports, resolveReport } from "../../../utils/api";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import { BaseCheckbox } from "@strapi/design-system/BaseCheckbox";
 import { Box } from "@strapi/design-system/Box";
 import { Button } from "@strapi/design-system/Button";
 import { Flex } from "@strapi/design-system/Flex";
-import Nav from "../../components/Nav";
-import NoAcccessPage from "../NoAccessPage";
-import ReportsTableRow from "./components/ReportsTableRow";
-import TableFilters from "../../components/TableFilters";
-import TablePagination from "../../components/TablePagination";
+import NoAcccessPage from "../../../NoAccessPage";
+import ReportsTableRow from "../../../Reports/components/ReportsTableRow";
 import { Typography } from "@strapi/design-system/Typography";
 import { VisuallyHidden } from "@strapi/design-system/VisuallyHidden";
 import { check } from "../../components/icons";
 import { connect } from "react-redux";
-import { fetchReportsData } from "./utils/api";
+import { fetchReportsData } from "../../../Reports/utils/api";
 import filtersSchema from "./utils/filtersSchema";
-import getUrl from "../../utils/getUrl";
+import getUrl from "../../../../utils/getUrl";
 import isEqual from "react-fast-compare";
-import makeAppView from "../App/reducer/selectors";
-import { pluginId } from "../../pluginId";
-import pluginPermissions from "../../permissions";
+import makeAppView from "../../../App/reducer/selectors";
+import { pluginId } from "../../../../pluginId";
+import pluginPermissions from "../../../../permissions";
 import { useHistory } from "react-router-dom";
 import { useNotifyAT } from "@strapi/design-system/LiveRegions";
 
@@ -74,7 +66,7 @@ const tableHeaders = [
 
 const COL_COUNT = 8;
 
-const Reports = ({ config }) => {
+const LatestReports = ({ config }) => {
   const [storedReports, setStoredReports] = useState([]);
   const [selectedReports, setSelectedReports] = useState([]);
 
@@ -110,22 +102,18 @@ const Reports = ({ config }) => {
     },
   } = useRBAC(viewPermissions);
 
- 
-
   const {
     isLoading: isLoadingForData,
     data: { result, pagination = {} },
     isFetching,
   } = useQuery(
-    ["get-data", queryParams, canAccess],
+    ["get-reports-data", queryParams, canAccess],
     () => fetchReportsData(queryParams, toggleNotification),
     {
       initialData: {},
     },
   );
-
- 
-    console.log(result)
+  console.log({isLoadingForData, result, pagination, isFetching} )
 
   useEffect(() => {
     setStoredReports(result);
@@ -136,7 +124,7 @@ const Reports = ({ config }) => {
   };
 
   const onSuccess = () => async () => {
-    await queryClient.invalidateQueries("get-data");
+    await queryClient.invalidateQueries("get-reports-data");
     unlockApp();
   };
 
@@ -222,50 +210,19 @@ const Reports = ({ config }) => {
 
   const emptyContent = _q ? "search" : "comments";
 
+
+
   return canAccess ? (
-    <Box background="neutral100">
       <Layout>
         {isLoading || isLoadingForPermissions ? (
           <LoadingIndicatorPage />
         ) : (
-          <Layout sideNav={<Nav visible />}>
-            <>
-              <HeaderLayout
-                title={getMessage("page.reports.header")}
-                subtitle={`${total} ${getMessage(
-                  "page.discover.header.count",
-                )}`}
-                as="h2"
-              />
-              <ActionLayout
-                startActions={
-                  <>
-                    <SearchURLQuery
-                      label={getMessage("search.label", "Search", false)}
-                    />
-                    <TableFilters displayedFilters={filtersSchema} />
-                    {hasAnySelectedReports && (
-                      <Button
-                        variant="success"
-                        onClick={handleClickResolveSelected}
-                        startIcon={check}>
-                        {getMessage(
-                          {
-                            id: `page.details.panel.discussion.warnings.reports.dialog.actions.resolve.selected`,
-                            props: {
-                              count: selectedReports.length,
-                            },
-                          },
-                          "Resolve selected",
-                        )}
-                      </Button>
-                    )}
-                  </>
-                }
-              />
-              <ContentLayout>
+          <>
+            <PanelLayout>
+                <StyledHeader>
+                <Typography variant='beta'>Latest Reports</Typography>
+                </StyledHeader>
                 {!isEmpty(result) ? (
-                  <>
                     <Table colCount={COL_COUNT} rowCount={result.length}>
                       <Thead>
                         <Tr>
@@ -290,7 +247,7 @@ const Reports = ({ config }) => {
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {result.map((entry) => {
+                        {result.slice(0,5).map((entry) => {
                           return (
                             <ReportsTableRow
                               key={`comment-${entry.id}`}
@@ -318,29 +275,16 @@ const Reports = ({ config }) => {
                         })}
                       </Tbody>
                     </Table>
-                    <TablePagination
-                      pagination={{ pageCount: pagination?.pageCount || 1 }}
-                    />
-                  </>
+                    
                 ) : (
                   <EmptyStateLayout content={emptyLayout[emptyContent]} />
                 )}
-              </ContentLayout>
-            </>
-          </Layout>
+              </PanelLayout>
+          </>
         )}
       </Layout>
-    </Box>
   ) :
     <NoAcccessPage />;
 
 };
-const mapStateToProps = makeAppView();
-
-export const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({}, dispatch);
-}
-const withConnect = connect(mapStateToProps, mapDispatchToProps);
-
-export default compose(withConnect)(memo(Reports, isEqual));
-
+export default LatestReports;

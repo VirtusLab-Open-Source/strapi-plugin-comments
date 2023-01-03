@@ -1,29 +1,125 @@
-//@ts-nocheck
+// @ts-nocheck
 
-import React from 'react';
+import React, {memo, useRef, useMemo} from 'react';
+import {connect} from 'react-redux';
+import {bindActionCreators, compose} from 'redux';
+import isEqual from 'react-fast-compare';
+import {useQuery} from 'react-query';
+import {useHistory} from 'react-router-dom';
+import {isEmpty} from 'lodash';
+import {Box} from '@strapi/design-system/Box';
 import {
-    Layout,
-    HeaderLayout,
-    ActionLayout,
-    ContentLayout,
+  Layout,
+  HeaderLayout,
+  ActionLayout,
+  ContentLayout,
 } from '@strapi/design-system/Layout';
+import { styledLayout } from './styles';
 import {Table, Thead, Tbody, Tr, Th, Td} from '@strapi/design-system/Table';
 import {Typography} from '@strapi/design-system/Typography';
 import {VisuallyHidden} from '@strapi/design-system/VisuallyHidden';
+import {useNotifyAT} from '@strapi/design-system/LiveRegions';
+import {Grid} from '@strapi/design-system/Grid';
+
+import {
+  EmptyStateLayout,
+  SearchURLQuery,
+  LoadingIndicatorPage,
+  useTracking,
+  useNotification,
+  useRBAC,
+  useFocusWhenNavigate,
+  useQueryParams,
+} from '@strapi/helper-plugin';
+import getMessage from '../../../../utils/getMessage';
+import { fetchData } from '../../../Discover/utils/api';
+import pluginPermissions from '../../../../permissions';
+
+import getUrl from '../../../../utils/getUrl';
+import makeAppView from '../../../App/reducer/selectors';
 import DiscoverTableRow from '../../../Discover/components/DiscoverTableRow';
-import { getMessage } from '../../../../utils';
+import NoAcccessPage from '../../../NoAccessPage';
+import { PanelLayout, StyledHeader } from '../../styles';
 
 const COL_COUNT = 8;
 
-const LatestComments = ({ data, handleClick, allowedActions, config }) => {
+const LatestComments = ({ config }) => {
+  useFocusWhenNavigate();
 
-    return ( 
+  const {push} = useHistory();
+  const {notifyStatus} = useNotifyAT();
+  const {trackUsage} = useTracking();
+  const trackUsageRef = useRef(trackUsage);
+  const toggleNotification = useNotification();
+  const [{query: queryParams}] = useQueryParams();
+  const _q = queryParams?._q || '';
+
+  const viewPermissions = useMemo(
+    () => ({
+      access: pluginPermissions.access,
+      moderate: pluginPermissions.moderate,
+      accessReports: pluginPermissions.reports,
+      reviewReports: pluginPermissions.reportsReview,
+    }),
+    [],
+  );
+
+  const {
+    isLoading: isLoadingForPermissions,
+    allowedActions: {
+      canAccess,
+      canModerate,
+      canAccessReports,
+      canReviewReports,
+    },
+  } = useRBAC(viewPermissions);
+
+  const {
+    isLoading: isLoadingForData,
+    data: {result, pagination = {}},
+    isFetching,
+  } = useQuery(
+    ['get-comments-data', queryParams, canAccess],
+    () => fetchData(queryParams, toggleNotification),
+    {
+      initialData: {},
+    },
+  );
+
+  const handleClickDisplay = (id) => {
+    push(getUrl(`discover/${id}`));
+  };
+
+  const isLoading = isLoadingForData || isFetching;
+  const {total} = pagination;
+
+  const emptyLayout = {
+    comments: {
+      id: getMessage('page.discover.table.empty'),
+      defaultMessage: "You don't have any comments yet.",
+    },
+    search: {
+      id: getMessage('page.discover.table.empty.search'),
+      defaultMessage: 'No comments match the search.',
+    },
+  };
+
+  const emptyContent = _q ? 'search' : 'comments';
+
+
+
+  return canAccess ? (
         <Layout>
-            <HeaderLayout
-                  title="Latest Comments"
-                  as="h3"
-                />
-                      <Table colCount={COL_COUNT} rowCount={data.length}>
+          {isLoading || isLoadingForPermissions ? (
+            <LoadingIndicatorPage />
+          ) : (
+            <>
+              <PanelLayout>
+                <StyledHeader>
+                <Typography variant='beta' fontSize='30px'>Latest Comments</Typography>
+                </StyledHeader>
+                  {!isEmpty(result) ? (
+                      <Table colCount={COL_COUNT} rowCount={result.length}>
                         <Thead>
                           <Tr>
                             <Th>
@@ -81,20 +177,31 @@ const LatestComments = ({ data, handleClick, allowedActions, config }) => {
                           </Tr>
                         </Thead>
                         <Tbody>
-                          {
-                          data.slice(0,5).map((entry) => (
+                          {result.slice(0, 5).map((entry) => (
                             <DiscoverTableRow
                               key={`comment-${entry.id}`}
                               config={config}
                               item={entry}
-                              allowedActions={allowedActions}
-                              onClick={handleClick}
+                              allowedActions={{
+                                canModerate,
+                                canAccessReports,
+                                canReviewReports,
+                              }}
+                              onClick={() => handleClickDisplay(entry.id)}
                             />
                           ))}
                         </Tbody>
-                      </Table>           
+                      </Table>
+                  ) : (
+                    <EmptyStateLayout content={emptyLayout[emptyContent]} />
+                  )}
+                </PanelLayout>
+            </>
+          )}
         </Layout>
-     );
-}
+  ) :
+    <NoAcccessPage />
+
+};
  
 export default LatestComments;
