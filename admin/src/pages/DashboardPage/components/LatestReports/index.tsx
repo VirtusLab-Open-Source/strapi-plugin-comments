@@ -66,7 +66,7 @@ const tableHeaders = [
 
 const COL_COUNT = 8;
 
-const LatestReports = ({ config }) => {
+const LatestReports = ({ config, result, isLoadingForData, isFetching, pagination, allowedActions, isLoadingForPermissions, header, emptyLayout }) => {
   const [storedReports, setStoredReports] = useState([]);
   const [selectedReports, setSelectedReports] = useState([]);
 
@@ -81,39 +81,8 @@ const LatestReports = ({ config }) => {
   const _q = queryParams?._q || "";
   const queryClient = useQueryClient();
   const { lockApp, unlockApp } = useOverlayBlocker();
-
-  const viewPermissions = useMemo(
-    () => ({
-      access: pluginPermissions.access,
-      moderate: pluginPermissions.moderate,
-      accessReports: pluginPermissions.reports,
-      reviewReports: pluginPermissions.reportsReview,
-    }),
-    [],
-  );
-
-  const {
-    isLoading: isLoadingForPermissions,
-    allowedActions: {
-      canAccess,
-      canModerate,
-      canAccessReports,
-      canReviewReports,
-    },
-  } = useRBAC(viewPermissions);
-
-  const {
-    isLoading: isLoadingForData,
-    data: { result, pagination = {} },
-    isFetching,
-  } = useQuery(
-    ["get-reports-data", queryParams, canAccess],
-    () => fetchReportsData(queryParams, toggleNotification),
-    {
-      initialData: {},
-    },
-  );
-  console.log({isLoadingForData, result, pagination, isFetching} )
+  
+  const { canAccess, canModerate, canAccessReports, canReviewReports} = allowedActions; 
 
   useEffect(() => {
     setStoredReports(result);
@@ -197,17 +166,6 @@ const LatestReports = ({ config }) => {
   const isLoading = isLoadingForData || isFetching;
   const { total } = pagination;
 
-  const emptyLayout = {
-    comments: {
-      id: getMessage("page.reports.table.empty"),
-      defaultMessage: "You don't have any reports yet.",
-    },
-    search: {
-      id: getMessage("page.reports.table.empty.search"),
-      defaultMessage: "No reports match the search.",
-    },
-  };
-
   const emptyContent = _q ? "search" : "comments";
 
 
@@ -220,7 +178,7 @@ const LatestReports = ({ config }) => {
           <>
             <PanelLayout>
                 <StyledHeader>
-                <Typography variant='beta'>Latest Reports</Typography>
+                <Typography variant='beta'>{header}</Typography>
                 </StyledHeader>
                 {!isEmpty(result) ? (
                     <Table colCount={COL_COUNT} rowCount={result.length}>
