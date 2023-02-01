@@ -21,6 +21,7 @@ import { getMessage } from "../../utils";
 
 const DiscussionThreadItemFooter = ({
   author,
+  isAdminComment,
   children,
   createdAt,
   updatedAt,
@@ -37,7 +38,7 @@ const DiscussionThreadItemFooter = ({
   return (
     <DiscussionThreadItemFooterStyled as={Box} paddingTop={2} direction="row">
       <DiscussionThreadItemFooterMeta size={3} horizontal>
-        {avatar && <UserAvatar avatar={avatar} name={name} />}
+        { author && <UserAvatar avatar={avatar} name={name} isAdminComment={isAdminComment} /> }
         <Typography variant="pi" fontWeight="bold" textColor="neutral800">
           {name || getMessage("compontents.author.unknown")}
         </Typography>

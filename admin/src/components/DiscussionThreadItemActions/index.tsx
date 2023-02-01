@@ -60,7 +60,8 @@ const DiscussionThreadItemActions = ({
     preview,
     reports = [],
     approvalStatus,
-    author
+    author,
+    isAdminComment,
   } = item;
 
   const user: StrapiAdminUser = auth.get('userInfo')
@@ -119,8 +120,10 @@ const DiscussionThreadItemActions = ({
 
   const deleteItemMutation = useMutation(deleteItem, mutationConfig("page.details.actions.comment.delete.confirmation.success"));
 
+  const isAdminAuthor = String(user?.id) === author?.id;
+
   const gotApprovalFlow = !isNil(approvalStatus);
-  const needsApproval = gotApprovalFlow && approvalStatus === "PENDING";
+  const needsApproval = !isAdminComment && gotApprovalFlow && approvalStatus === "PENDING";
   const isBlocked = blocked || blockedThread;
   const isRejected = gotApprovalFlow && approvalStatus === "REJECTED";
   const openReports = reports?.filter((_) => !_.resolved);
@@ -130,7 +133,6 @@ const DiscussionThreadItemActions = ({
   const hasActiveThread =
     gotThread && !(removed || preview || pinned || blockedThread);
   const isStatusBadgeVisible = isBlocked || reviewFlowEnabled;
-  const isAdminAuthor = String(user.id) === author.id
 
   const renderStatus = (props) => {
     const status = resolveCommentStatus({ ...props, reviewFlowEnabled });
@@ -277,33 +279,44 @@ const DiscussionThreadItemActions = ({
         )}
         {anyGroupButtonsVisible && (
           <IconButtonGroupStyled isSingle withMargin>
-            {!blockedThread && !(blocked || needsApproval) && (
-              <IconButton
-                onClick={handleBlockClick}
-                loading={blockItemMutation.isLoading}
-                icon={lock}
-                label={getMessage(
-                  "page.details.actions.comment.block",
-                  "Block"
-                )}
-              />
-            )}
-            {!blockedThread && blocked && (
-              <IconButton
-                onClick={handleUnblockClick}
-                loading={unblockItemMutation.isLoading}
-                icon={unlock}
-                label={getMessage(
-                  "page.details.actions.comment.unblock",
-                  "Unblock"
-                )}
-              />
-            )}
+            { !isAdminComment && (<>
+              {!blockedThread && !(blocked || needsApproval) && (
+                <IconButton
+                  onClick={handleBlockClick}
+                  loading={blockItemMutation.isLoading}
+                  icon={lock}
+                  label={getMessage(
+                    "page.details.actions.comment.block",
+                    "Block"
+                  )}
+                />
+              )}
+              {!blockedThread && blocked && (
+                <IconButton
+                  onClick={handleUnblockClick}
+                  loading={unblockItemMutation.isLoading}
+                  icon={unlock}
+                  label={getMessage(
+                    "page.details.actions.comment.unblock",
+                    "Unblock"
+                  )}
+                />
+              )}
+            </>)}
             {needsApproval && (
               <DiscussionThreadItemApprovalFlowActions
                 id={id}
                 allowedActions={{ canModerate }}
                 queryToInvalidate="get-details-data"
+              />
+            )}
+            {isAdminAuthor && !isBlocked && ( 
+              <IconButton
+                onClick={toggleUpdateCommentVisibility}
+                icon={pencil}
+                label={getMessage(
+                  "page.details.actions.thread.modal.update.comment"
+                )}
               />
             )}
             {!blockedThread && !blocked && isAdminAuthor && (
@@ -314,15 +327,6 @@ const DiscussionThreadItemActions = ({
                 label={getMessage(
                   "page.details.actions.comment.delete",
                   "Delete comment"
-                )}
-              />
-            )}
-            {isAdminAuthor && !isBlocked && ( 
-              <IconButton
-                onClick={toggleUpdateCommentVisibility}
-                icon={pencil}
-                label={getMessage(
-                  "page.details.actions.thread.modal.update.comment"
                 )}
               />
             )}
@@ -355,17 +359,17 @@ const DiscussionThreadItemActions = ({
             />
           </IconButtonGroupStyled>
         )}
-        <IconButtonGroupStyled>
-           {!hasActiveThread && !pinned && (!blockedThread && !blocked) &&  (
-            <IconButton
-              onClick={toggleStartThreadVisibility}
-              icon={plus}
-              label={getMessage(
-                "page.details.actions.thread.modal.start.thread"
-              )}
-            />
-           )}
-        </IconButtonGroupStyled>
+        {!hasActiveThread && !pinned && (!blockedThread && !blocked) &&  (
+          <IconButtonGroupStyled isSingle withMargin>
+              <IconButton
+                onClick={toggleStartThreadVisibility}
+                icon={plus}
+                label={getMessage(
+                  "page.details.actions.thread.modal.start.thread"
+                )}
+              />
+          </IconButtonGroupStyled>
+        )}
       </DiscussionThreadItemActionsWrapper>
       {startThreadVisible && 
         <ModeratorResponseModal

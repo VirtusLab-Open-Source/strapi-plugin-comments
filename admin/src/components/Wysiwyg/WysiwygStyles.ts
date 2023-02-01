@@ -30,7 +30,7 @@ export const CustomLinkIconButton = styled(CustomIconButton)`
 `;
 
 export const MainButtons = styled(IconButtonGroup)`
-  margin-left: ${({ theme }:ThemeInterface) => theme.spaces[4]};
+  
 `;
 
 export const MoreButton = styled(IconButton)`
