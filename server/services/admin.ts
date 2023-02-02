@@ -86,9 +86,12 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
     const entryLabel = getConfigProp<"entryLabel">("entryLabel");
     const approvalFlow = getConfigProp<"approvalFlow">("approvalFlow");
     const reportReasons = getConfigProp<"reportReasons">("reportReasons");
+    const blockedAuthorProps = getConfigProp<"blockedAuthorProps">("blockedAuthorProps");
+
     const result = {
       entryLabel,
       approvalFlow,
+      blockedAuthorProps,
       reportReasons,
       ...additionalConfiguration,
     };

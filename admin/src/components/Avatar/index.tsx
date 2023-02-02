@@ -18,8 +18,6 @@ import { ToBeFixed } from "../../../../types";
 
 interface IProps {
   avatar: string | ToBeFixed;
-  avatar: string | ToBeFixed;
-  avatar: string | ToBeFixed;
   name: string;
   isAdminComment?: boolean;
 }

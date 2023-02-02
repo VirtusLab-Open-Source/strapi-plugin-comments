@@ -176,6 +176,7 @@ const Settings = () => {
     ) || [];
   const clientUrl = configData?.client?.url;
   const clientEmail = configData?.client?.contactEmail;
+  const blockedAuthorProps = configData?.blockedAuthorProps ?? [];
 
   const changeApprovalFlowFor = (
     uid: ToBeFixed,
@@ -261,6 +262,7 @@ const Settings = () => {
           clientEmail,
           clientUrl,
           gqlAuthEnabled,
+          blockedAuthorProps,
         }}
         enableReinitialize={true}
         onSubmit={handleUpdateConfiguration}
@@ -489,7 +491,7 @@ const Settings = () => {
                       {getMessage("page.settings.section.additional")}
                     </Typography>
                     <Grid gap={4}>
-                      <GridItem col={6} xs={12}>
+                      <GridItem col={4} xs={12}>
                         <ToggleInput
                           name="badWords"
                           label={getMessage(
@@ -505,8 +507,23 @@ const Settings = () => {
                           disabled={restartRequired}
                         />
                       </GridItem>
+                      <GridItem col={4} xs={12}>
+                        <TextInput
+                          type="text"
+                          name="blockedAuthorProps"
+                          label={getMessage(
+                            "page.settings.form.author.blockedProps.label"
+                          )}
+                          hint={getMessage("page.settings.form.author.blockedProps.hint")}
+                          value={values.blockedAuthorProps.join(", ")}
+                          onChange={({ target: { value } }: ToBeFixed) =>
+                            setFieldValue("blockedAuthorProps", value.split(', ').map(_ => _.trim()), false)
+                          }
+                          disabled={restartRequired}
+                        />
+                      </GridItem>
                       {isGQLPluginEnabled && (
-                        <GridItem col={6} xs={12}>
+                        <GridItem col={4} xs={12}>
                           <ToggleInput
                             name="gqlAuthEnabled"
                             label={getMessage(
