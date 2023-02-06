@@ -40,7 +40,8 @@ import Nav from "../../components/Nav";
 import DetailsEntity from "./components/DetailsEntity";
 import DiscussionThread from "../../components/DiscussionThread";
 import makeAppView from "../App/reducer/selectors";
-import ModeratorResponse from "../../components/ModeratorResponse/index";
+import ModeratorResponse from "../../components/ModeratorResponse";
+import Nav from '../../components/Nav';
 
 const Details = ({ config }) => {
   useFocusWhenNavigate();
@@ -112,7 +113,7 @@ const Details = ({ config }) => {
   if (canAccess) {
     return (
       <Box background="neutral100">
-        <Layout>
+        <Layout sideNav={<Nav visible />}>
           {(isLoading || isLoadingForPermissions) && isEmpty(data) ? (
             <LoadingIndicatorPage />
           ) : (

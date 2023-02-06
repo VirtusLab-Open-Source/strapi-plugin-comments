@@ -11,7 +11,7 @@ import { Box } from "@strapi/design-system/Box";
 import { Flex } from "@strapi/design-system/Flex";
 import { Typography } from "@strapi/design-system/Typography";
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useMemo } from "react";
 
 import DiscussionThreadItemActions from "../DiscussionThreadItemActions";
 import DiscussionThreadItemFooter from "../DiscussionThreadItemFooter";
@@ -20,7 +20,11 @@ import {
   DiscussionThreadItemContainer,
   DiscussionThreadFullsize,
   DiscussionThreadItemContent,
+  DiscussionThreadItemContentTypographyRenderer,
 } from "./styles";
+
+import sanitizeHtml from './../PreviewWysiwyg/utils/satinizeHtml';
+import md from "./../PreviewWysiwyg/utils/mdRenderer";
 
 const DiscussionThreadItem = (props) => {
   const {
@@ -33,6 +37,8 @@ const DiscussionThreadItem = (props) => {
     preview,
     root,
   } = props;
+
+  const sanitizedContent = useMemo(() => sanitizeHtml(md.render(content || '')), [content]);
 
   return (
     <DiscussionThreadFullsize as={as} marginBottom={preview ? 4 : 0}>
@@ -54,7 +60,7 @@ const DiscussionThreadItem = (props) => {
         >
           <Box as={Flex} grow={1} alignItems="center" marginTop="6px">
             <Typography variant="omega" textColor="neutral800">
-              {content}
+              <DiscussionThreadItemContentTypographyRenderer dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
             </Typography>
           </Box>
           {!preview && (

@@ -8,7 +8,7 @@
 import sanitizeHtml from 'sanitize-html';
 
 // Options for the lib can be found here https://www.npmjs.com/package/sanitize-html
-const options = {
+const defaultOptions = {
   ...sanitizeHtml.defaults,
   allowedTags: false,
   allowedAttributes: {
@@ -18,6 +18,6 @@ const options = {
   },
 };
 
-const clean = dirty => sanitizeHtml(dirty, options);
+const clean = (dirty, options = defaultOptions) => sanitizeHtml(dirty, options);
 
 export default clean;
