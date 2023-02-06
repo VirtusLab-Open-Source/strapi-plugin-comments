@@ -158,6 +158,8 @@
   "page.settings.notification.restart.success": "Application has been restarted successfully",
   "page.settings.notification.restart.error": "Failed to restart your application. Try to do it manually.",
   "page.settings.loading": "Fetching configuration...",
+  "page.settings.form.author.blockedProps.label": "Blocked author details",
+  "page.settings.form.author.blockedProps.hint": "Specified properties will be filtered out from author's details (comma-separated)",
   "compontents.confirmation.dialog.header": "Confirmation",
   "compontents.confirmation.dialog.description": "Do you really want to perform this action?",
   "compontents.confirmation.dialog.button.confirm": "Yes, I do",

@@ -75,6 +75,9 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
     >(CONFIG_PARAMS.APPROVAL_FLOW, []);
     const isApprovalFlowEnabled =
       approvalFlow.includes(uid) || relatedEntity.requireCommentsApproval;
+    const doNotPopulateAuthor: Array<string> = await this.getCommonService().getConfig<
+      Array<string>
+    >(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
 
     let linkToThread;
     try {
@@ -155,7 +158,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
       const sanitizedEntity = this.getCommonService().sanitizeCommentEntity({
         ...entity,
         threadOf: linkToThread,
-      });
+      }, doNotPopulateAuthor);
 
       try {
         await this.sendResponseNotification(sanitizedEntity);
@@ -202,6 +205,9 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
 
     if (isEqualEntity(existingEntity, data, user) && content) {
       if (await this.getCommonService().checkBadWords(content)) {
+        const blockedAuthorProps: Array<string> = await this.getCommonService().getConfig<
+          Array<string>
+        >(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
         const entity = await strapi.db
           .query<Comment>(getModelUid("comment"))
           .update({
@@ -209,7 +215,7 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
             data: { content },
             populate: { threadOf: true, authorUser: true },
           });
-        return this.getCommonService().sanitizeCommentEntity(entity);
+        return this.getCommonService().sanitizeCommentEntity(entity, blockedAuthorProps);
       }
     }
     throw new PluginError(
@@ -327,8 +333,11 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
           });
 
         await this.markAsRemovedNested(id, true);
+        const doNotPopulateAuthor: Array<string> = await this.getCommonService().getConfig<
+          Array<string>
+        >(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
 
-        return this.getCommonService().sanitizeCommentEntity(removedEntity);
+        return this.getCommonService().sanitizeCommentEntity(removedEntity, doNotPopulateAuthor);
       } else {
         throw new PluginError(
           404,

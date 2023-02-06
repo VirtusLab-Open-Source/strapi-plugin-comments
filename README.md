@@ -176,6 +176,7 @@ module.exports = ({ env }) => ({
         "*": ["Title", "title", "Name", "name", "Subject", "subject"],
         "api::page.page": ["MyField"],
       },
+      blockedAuthorProps: ["name", "email"],
       reportReasons: {
         MY_CUSTOM_REASON: "MY_CUSTOM_REASON",
       },
@@ -197,6 +198,7 @@ module.exports = ({ env }) => ({
 - `entryLabel` - ordered list of property names per Content Type to generate related entity label. Keys must be in format like `'api::<collection name>.<content type name>'`. Default formatting set as `*`.
 - `reportReasons` - set of enums you would like to use for issuing abuse reports. Provided by default `'BAD_LANGUAGE'`, `'DISCRIMINATION'` and `'OTHER'`.
 - `gql` - specific configuration for GraphQL. See [Additional GQL Configuration](#additional-gql-configuration)
+- `blockedAuthorProps` - list of author's entity properties removed from a response for client side
 
 ## Additional GQL Configuration
 

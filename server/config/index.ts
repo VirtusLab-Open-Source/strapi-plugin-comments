@@ -13,6 +13,7 @@ const config: StrapiConfig = {
       DISCRIMINATION: "DISCRIMINATION",
       OTHER: "OTHER",
     },
+    blockedAuthorProps: [],
   },
 };
 
