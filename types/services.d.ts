@@ -98,7 +98,8 @@ export interface IServiceCommon {
   ): Promise<boolean>;
   sanitizeCommentEntity(
     entity: Comment,
-    populate?: PopulateClause<OnlyStrings<keyof StrapiUser>>
+    blockedAuthorProps: string[],
+    populate?: PopulateClause<OnlyStrings<keyof StrapiUser>>,
   ): Comment;
   isValidUserContext(user?: any): boolean;
   parseRelationString(

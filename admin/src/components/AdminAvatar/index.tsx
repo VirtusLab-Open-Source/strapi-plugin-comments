@@ -8,10 +8,10 @@ import {Icon} from "@strapi/design-system/Icon";
 const AdminAvatar: React.FC<React.PropsWithChildren<{}>>  = ({ children } ) => {
     return ( 
         <AdminAvatarWrapper>
+            {children}
             <AdminShield>
                 <Icon as={Shield} color="neutral800"/>
             </AdminShield>
-            {children}
         </AdminAvatarWrapper>
      );
 }

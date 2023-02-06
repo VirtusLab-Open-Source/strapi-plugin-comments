@@ -7,6 +7,7 @@
 //@ts-nocheck
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { isString } from 'lodash';
 import CodeMirror from 'codemirror';
 import 'codemirror/addon/display/placeholder';
 import PreviewWysiwyg from '../PreviewWysiwyg';
@@ -63,7 +64,7 @@ const Editor: React.FC<EditorProps>= ({
   }, [editorRef, textareaRef, name, placeholder]);
 
   useEffect(() => {
-    if (value && !editorRef.current.state.focused) {
+    if (isString(value) && !editorRef.current.state.focused) {
       editorRef.current.setValue(value);
     }
   }, [editorRef, value]);

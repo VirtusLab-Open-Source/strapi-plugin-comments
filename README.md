@@ -134,7 +134,7 @@ In our minimum support we're following [official Node.js releases timelines](htt
 
 **Supported Strapi versions**:
 
-- Strapi v4.5.5 (recently tested)
+- Strapi v4.6.0 (recently tested)
 - Strapi v4.x
 
 > This plugin is designed for **Strapi v4** and is not working with v3.x. To get version for **Strapi v3** install version [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3).
@@ -176,6 +176,7 @@ module.exports = ({ env }) => ({
         "*": ["Title", "title", "Name", "name", "Subject", "subject"],
         "api::page.page": ["MyField"],
       },
+      blockedAuthorProps: ["name", "email"],
       reportReasons: {
         MY_CUSTOM_REASON: "MY_CUSTOM_REASON",
       },
@@ -197,6 +198,7 @@ module.exports = ({ env }) => ({
 - `entryLabel` - ordered list of property names per Content Type to generate related entity label. Keys must be in format like `'api::<collection name>.<content type name>'`. Default formatting set as `*`.
 - `reportReasons` - set of enums you would like to use for issuing abuse reports. Provided by default `'BAD_LANGUAGE'`, `'DISCRIMINATION'` and `'OTHER'`.
 - `gql` - specific configuration for GraphQL. See [Additional GQL Configuration](#additional-gql-configuration)
+- `blockedAuthorProps` - list of author's entity properties removed from a response for client side
 
 ## Additional GQL Configuration
 

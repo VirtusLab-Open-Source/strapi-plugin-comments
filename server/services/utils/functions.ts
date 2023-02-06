@@ -95,7 +95,8 @@ export const convertContentTypeNameToSlug = (str: string): string => {
 
 export const buildAuthorModel = (
   item: Comment,
-  fieldsToPopulate: Array<string> = []
+  blockedAuthorProps: Array<string>,
+  fieldsToPopulate: Array<string> = [],
 ): Comment => {
   const {
     authorUser,
@@ -106,6 +107,7 @@ export const buildAuthorModel = (
     ...rest
   } = item;
   let author: CommentAuthor = {} as CommentAuthor;
+
   if (authorUser) {
     author = fieldsToPopulate.reduce(
       (prev, curr) => ({
@@ -130,9 +132,15 @@ export const buildAuthorModel = (
       avatar: authorAvatar,
     };
   }
+
+  author = isEmpty(author) ? author : Object.fromEntries(
+    Object.entries(author)
+      .filter(([name]) => !blockedAuthorProps.includes(name))
+  ) as CommentAuthor;
+
   return {
     ...rest,
-    author: isEmpty(author) ? undefined : author,
+    author,
   };
 };
 

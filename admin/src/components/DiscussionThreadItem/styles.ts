@@ -14,3 +14,17 @@ export const DiscussionThreadItemContent = styled(DiscussionThreadFullsize)`
 export const DiscussionThreadItemContainer = styled(DiscussionThreadFullsize)`
   align-items: flex-start;
 `;
+
+export const DiscussionThreadItemContentTypographyRenderer = styled.div`
+  strong {
+    font-weight: bold;
+  }
+
+  i, em {
+    font-style: italic;
+  }
+
+  u {
+    font-style: underline;
+  }
+`
