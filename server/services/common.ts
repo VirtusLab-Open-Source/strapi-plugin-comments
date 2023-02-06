@@ -105,6 +105,9 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       authorUser: true,
       ...(isObject(populate) ? populate : {}),
     };
+    const doNotPopulateAuthor: Array<string> = await this.getConfig<
+      Array<string>
+    >(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
 
     let queryExtension: StrapiDBQueryArgs<CommentModelKeys> = {};
 
@@ -251,9 +254,10 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
 
       let authorUserPopulate = {};
       if (isObject(populateClause?.authorUser)) {
-        authorUserPopulate = 'populate' in populateClause.authorUser ? 
-          populateClause.authorUser.populate as StringMap<unknown> : 
-          populateClause.authorUser;
+        authorUserPopulate =
+          "populate" in populateClause.authorUser
+            ? (populateClause.authorUser.populate as StringMap<unknown>)
+            : populateClause.authorUser;
       }
 
       return this.sanitizeCommentEntity(
@@ -263,6 +267,7 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
           gotThread: (threadedItem?.itemsInTread || 0) > 0,
           threadFirstItemId: threadedItem?.firstThreadItemId,
         },
+        doNotPopulateAuthor,
         authorUserPopulate
       );
     });
@@ -320,7 +325,10 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
         "Comment does not exist. Check your payload please."
       );
     }
-    return filterOurResolvedReports(this.sanitizeCommentEntity(entity));
+    const doNotPopulateAuthor: Array<string> = await this.getConfig<
+      Array<string>
+    >(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
+    return filterOurResolvedReports(this.sanitizeCommentEntity(entity, doNotPopulateAuthor));
   },
 
   // Find all related entiries
@@ -412,7 +420,8 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
 
   sanitizeCommentEntity(
     entity: Comment,
-    populate?: PopulateClause<OnlyStrings<keyof StrapiUser>>
+    blockedAuthorProps: string[],
+    populate?: PopulateClause<OnlyStrings<keyof StrapiUser>>,
   ): Comment {
     const fieldsToPopulate = isArray(populate)
       ? populate
@@ -423,10 +432,11 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
         {
           ...entity,
           threadOf: isObject(entity.threadOf)
-            ? buildAuthorModel(entity.threadOf, fieldsToPopulate)
+            ? buildAuthorModel(entity.threadOf, blockedAuthorProps, fieldsToPopulate)
             : entity.threadOf,
         },
-        fieldsToPopulate
+        blockedAuthorProps,
+        fieldsToPopulate,
       ),
     };
   },

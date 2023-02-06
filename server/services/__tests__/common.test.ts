@@ -138,7 +138,7 @@ describe("Test Comments service - Common", () => {
     test("Should return exact the same value", () => {
       const input = { ...sample };
       const output =
-        getPluginService<IServiceCommon>("common").sanitizeCommentEntity(input);
+        getPluginService<IServiceCommon>("common").sanitizeCommentEntity(input, []);
       expect(output).toHaveProperty("id", input.id);
       expect(output).toHaveProperty("content", input.content);
       expect(output).toHaveProperty("blocked", input.blocked);
@@ -151,7 +151,7 @@ describe("Test Comments service - Common", () => {
         ...authorGenericSample,
       };
       const output =
-        getPluginService<IServiceCommon>("common").sanitizeCommentEntity(input);
+        getPluginService<IServiceCommon>("common").sanitizeCommentEntity(input, []);
 
       expect(output).toHaveProperty("author");
       expect(output).toHaveProperty("author.id", input.authorId);
@@ -172,7 +172,7 @@ describe("Test Comments service - Common", () => {
         authorUser: authorSample,
       };
       const output =
-        getPluginService<IServiceCommon>("common").sanitizeCommentEntity(input);
+        getPluginService<IServiceCommon>("common").sanitizeCommentEntity(input, []);
 
       expect(output).toHaveProperty("author");
       expect(output).toHaveProperty("author.id", input.authorUser.id);
@@ -186,6 +186,24 @@ describe("Test Comments service - Common", () => {
 
       expect(output).not.toHaveProperty("author.password");
     });
+
+    test("Should filter out author properties", () => {
+      const input = {
+        ...sample,
+        authorUser: authorSample,
+      };
+      const output =
+        getPluginService<IServiceCommon>("common").sanitizeCommentEntity(input, ["email"]);
+
+      expect(output).toHaveProperty("author");
+      expect(output).toHaveProperty("author.id", outputAuthorSample.id);
+      expect(output).toHaveProperty("author.name", outputAuthorSample.name);
+      expect(output).not.toHaveProperty("author.email");
+
+      expect(output).not.toHaveProperty("authorUser");
+
+      expect(output).not.toHaveProperty("author.password");
+    })
   });
 
   describe("Bad Words filtering", () => {
@@ -453,10 +471,10 @@ describe("Test Comments service - Common", () => {
         expect(result).toHaveProperty("data");
         expect(result).not.toHaveProperty("meta");
         expect(result.data.length).toBe(4);
-        expect(Object.keys(filterOutUndefined(result.data[0]))).toHaveLength(6);
-        expect(Object.keys(filterOutUndefined(result.data[1]))).toHaveLength(6);
-        expect(Object.keys(filterOutUndefined(result.data[2]))).toHaveLength(6);
-        expect(Object.keys(filterOutUndefined(result.data[3]))).toHaveLength(6);
+        expect(Object.keys(filterOutUndefined(result.data[0]))).toHaveLength(7);
+        expect(Object.keys(filterOutUndefined(result.data[1]))).toHaveLength(7);
+        expect(Object.keys(filterOutUndefined(result.data[2]))).toHaveLength(7);
+        expect(Object.keys(filterOutUndefined(result.data[3]))).toHaveLength(7);
       });
 
       test("Should return structure with populated avatar field", async () => {

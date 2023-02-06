@@ -6,6 +6,7 @@ export const CONFIG_PARAMS: ConfigParamKeys = {
   ENTRY_LABEL: "entryLabel",
   MODERATOR_ROLES: "moderatorRoles",
   BAD_WORDS: "badWords",
+  AUTHOR_BLOCKED_PROPS: "blockedAuthorProps",
 };
 
 export const APPROVAL_STATUS = {
