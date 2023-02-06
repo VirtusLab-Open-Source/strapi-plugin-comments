@@ -247,6 +247,11 @@ const DiscussionThreadItemActions = ({
     );
   }
 
+  const isBlockEnabled = !blockedThread && !(blocked || needsApproval);
+  const isUnblockEnabled = !blockedThread && blocked;
+  const isRemovable = !blockedThread && !blocked && isAdminAuthor;
+  const isThreadStartEnabled = !hasActiveThread && !pinned && (!blockedThread && !blocked);
+
   return (
     <>
       <DiscussionThreadItemActionsWrapper as={Flex} direction="row">
@@ -279,8 +284,8 @@ const DiscussionThreadItemActions = ({
         )}
         {anyGroupButtonsVisible && (
           <IconButtonGroupStyled isSingle withMargin>
-            { !isAdminComment && (<>
-              {!blockedThread && !(blocked || needsApproval) && (
+            {!isAdminComment && (<>
+              {isBlockEnabled && (
                 <IconButton
                   onClick={handleBlockClick}
                   loading={blockItemMutation.isLoading}
@@ -291,7 +296,7 @@ const DiscussionThreadItemActions = ({
                   )}
                 />
               )}
-              {!blockedThread && blocked && (
+              {isUnblockEnabled && (
                 <IconButton
                   onClick={handleUnblockClick}
                   loading={unblockItemMutation.isLoading}
@@ -319,7 +324,7 @@ const DiscussionThreadItemActions = ({
                 )}
               />
             )}
-            {!blockedThread && !blocked && isAdminAuthor && (
+            {isRemovable && (
               <IconButton
                 onClick={handleDeleteClick}
                 loading={deleteItemMutation.isLoading}
@@ -359,7 +364,7 @@ const DiscussionThreadItemActions = ({
             />
           </IconButtonGroupStyled>
         )}
-        {!hasActiveThread && !pinned && (!blockedThread && !blocked) &&  (
+        {isThreadStartEnabled && (
           <IconButtonGroupStyled isSingle withMargin>
               <IconButton
                 onClick={toggleStartThreadVisibility}
