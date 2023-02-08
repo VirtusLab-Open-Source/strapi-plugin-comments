@@ -5,7 +5,7 @@ import React, { useRef, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 // @ts-ignore
 import { Formik } from "formik";
-import { capitalize, first, orderBy, isEmpty, isEqual, isNil, debounce } from "lodash";
+import { capitalize, first, orderBy, isEmpty, isEqual, isNil } from "lodash";
 // @ts-ignore
 import {
   CheckPermissions,
