@@ -96,6 +96,7 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       sort,
       pagination,
       fields,
+      isAdmin = false,
     }: FindAllFlatProps<Comment>,
     relatedEntity: RelatedEntity | null = null
   ): Promise<StrapiPaginatedResponse<Comment>> {
@@ -105,9 +106,11 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       authorUser: true,
       ...(isObject(populate) ? populate : {}),
     };
-    const doNotPopulateAuthor: Array<string> = await this.getConfig<
-      Array<string>
-    >(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
+    const doNotPopulateAuthor: Array<string> = isAdmin 
+      ? [] 
+      : await this.getConfig<
+        Array<string>
+      >(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
 
     let queryExtension: StrapiDBQueryArgs<CommentModelKeys> = {};
 
@@ -292,11 +295,12 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       fields,
       startingFromId = null,
       dropBlockedThreads = false,
+      isAdmin = false,
     }: FindAllInHierarchyProps,
     relatedEntity?: RelatedEntity | null | boolean
   ): Promise<Array<Comment>> {
     const entities = await this.findAllFlat(
-      { query, populate, sort, fields },
+      { query, populate, sort, fields, isAdmin },
       relatedEntity
     );
     return buildNestedStructure(

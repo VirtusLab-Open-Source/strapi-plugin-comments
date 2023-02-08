@@ -42,6 +42,7 @@ export type FindAllFlatProps<T, TFields = keyof T> = {
   sort?: StringMap<unknown>;
   fields?: StrapiRequestQueryFieldsClause<OnlyStrings<TFields>>;
   pagination?: StrapiPagination;
+  isAdmin?: boolean
 };
 
 export type FindAllInHierarchyProps = Omit<FindAllFlatProps, "pagination"> & {
