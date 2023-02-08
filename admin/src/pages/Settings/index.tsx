@@ -5,7 +5,7 @@ import React, { useRef, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 // @ts-ignore
 import { Formik } from "formik";
-import { capitalize, first, orderBy, isEmpty, isEqual, isNil } from "lodash";
+import { capitalize, first, orderBy, isEmpty, isEqual, isNil, debounce } from "lodash";
 // @ts-ignore
 import {
   CheckPermissions,
@@ -112,9 +112,11 @@ const Settings = () => {
     entryLabel,
     clientUrl,
     clientEmail,
+    blockedAuthorProps,
     ...rest
   }: ToBeFixed) => ({
     ...rest,
+    blockedAuthorProps: blockedAuthorProps.split(",").map(x => x.trim()).filter(x => x),
     enabledCollections,
     approvalFlow: approvalFlow.filter((_) => enabledCollections.includes(_)),
     entryLabel: {
@@ -262,7 +264,7 @@ const Settings = () => {
           clientEmail,
           clientUrl,
           gqlAuthEnabled,
-          blockedAuthorProps,
+          blockedAuthorProps: blockedAuthorProps.join(", "),
         }}
         enableReinitialize={true}
         onSubmit={handleUpdateConfiguration}
@@ -515,9 +517,9 @@ const Settings = () => {
                             "page.settings.form.author.blockedProps.label"
                           )}
                           hint={getMessage("page.settings.form.author.blockedProps.hint")}
-                          value={values.blockedAuthorProps.join(", ")}
+                          value={values.blockedAuthorProps}
                           onChange={({ target: { value } }: ToBeFixed) =>
-                            setFieldValue("blockedAuthorProps", value.split(', ').map(_ => _.trim()), false)
+                            setFieldValue("blockedAuthorProps", value, false)
                           }
                           disabled={restartRequired}
                         />
