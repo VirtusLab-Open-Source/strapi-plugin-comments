@@ -22,7 +22,7 @@ describe("PluginError", () => {
           random: "value",
         }).toJSON()
       ).toMatchInlineSnapshot(`
-        Object {
+        {
           "item": "comment",
           "message": "Not found",
           "name": "Strapi:Plugin:Comments",

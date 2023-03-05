@@ -12,13 +12,13 @@ jest.mock("react-intl", () => ({
 describe("getMessage()", () => {
   it("should handle simple string", () => {
     expect(getMessage("message.key")).toMatchInlineSnapshot(`
-      Object {
+      {
         "defaultMessage": "",
         "id": "comments.message.key",
       }
     `);
     expect(getMessage("message.key", "message.default")).toMatchInlineSnapshot(`
-      Object {
+      {
         "defaultMessage": "message.default",
         "id": "comments.message.key",
       }
@@ -33,7 +33,7 @@ describe("getMessage()", () => {
         "message.default"
       )
     ).toMatchInlineSnapshot(`
-      Object {
+      {
         "defaultMessage": "message.default",
         "id": "comments.message.key",
       }
@@ -49,7 +49,7 @@ describe("getMessage()", () => {
         false
       )
     ).toMatchInlineSnapshot(`
-      Object {
+      {
         "defaultMessage": "message.key.default",
         "id": "app.components.message.key",
       }
