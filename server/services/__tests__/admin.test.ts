@@ -168,7 +168,7 @@ describe("Test Comments service - Admin", () => {
               ["entryLabel", "api::blog-post.blog-post", 0],
               "alternative_subject",
             );
-            expect(result).toHaveProperty("isGQLPluginEnabled", undefined);
+            expect(result).not.toHaveProperty("isGQLPluginEnabled");
             expectRegex(result);
             expect(result).not.toHaveProperty("moderatorRoles");
           });
@@ -835,7 +835,7 @@ describe("Test Comments service - Admin", () => {
           }));
         const result = await getPluginService<IServiceAdmin>(
           "admin",
-        ).resolveMultipleAbuseReports([reportEntity.id], db[0].id);
+        ).resolveMultipleAbuseReports([reportEntity.id]);
         expect(result).toHaveProperty([0, "id"], reportEntity.id);
         expect(result).toHaveProperty([0, "resolved"], true);
         expect(result).toHaveProperty([0, "reason"], "OTHER");

@@ -23,7 +23,7 @@ describe("Test plugin functions utils", () => {
           name: "NAME",
         })
       ).toMatchInlineSnapshot(`
-        Object {
+        {
           "id": 1,
           "name": "NAME",
         }
