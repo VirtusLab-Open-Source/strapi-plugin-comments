@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosRequestHeaders, InternalAxiosRequestConfig, AxiosResponse } from "axios";
 // @ts-ignore
 import { auth } from "@strapi/helper-plugin";
 
@@ -7,12 +7,12 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use(
-  async (config: AxiosRequestConfig) => {
+  async (config: InternalAxiosRequestConfig) => {
     config.headers = {
       Authorization: `Bearer ${auth.getToken()}`,
       Accept: "application/json",
       "Content-Type": "application/json",
-    };
+    } as AxiosRequestHeaders;
 
     return config;
   },
