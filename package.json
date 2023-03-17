@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "2.2.8",
+  "version": "2.2.9",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
@@ -27,18 +27,19 @@
     "url": "https://github.com/VirtusLab-Open-Source/strapi-plugin-comments"
   },
   "dependencies": {
-    "@strapi/plugin-graphql": "^4.7.1",
-    "@strapi/utils": "^4.7.1",
+    "@strapi/plugin-graphql": "^4.8.2",
+    "@strapi/utils": "^4.8.2",
     "@types/axios": "^0.14.0",
     "@types/react-intl": "^3.0.0",
     "@types/react-query": "^1.2.9",
     "@types/styled-components": "^5.1.26",
     "bad-words": "^3.0.4",
     "styled-components": "^5.3.8",
-    "match-sorter": "^4.0.2"
+    "match-sorter": "^4.0.2",
+    "codemirror5": "npm:codemirror@^5.65.11"
   },
   "devDependencies": {
-    "@strapi/helper-plugin": "^4.7.1",
+    "@strapi/helper-plugin": "^4.8.2",
     "@types/bad-words": "^3.0.1",
     "@types/jest": "^29.4.0",
     "codecov": "^3.7.2",

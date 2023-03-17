@@ -7,6 +7,7 @@ import {
   check,
   comments,
   cross,
+  discuss,
   emptyPictures,
   exclamationMarkCircle,
   eye,
@@ -14,13 +15,14 @@ import {
   illo,
   information,
   lock,
+  pencil,
   play,
+  plus,
   refresh,
   review,
-  unlock,
+  thumbDown,
   trash,
-  pencil,
-  plus
+  unlock
 } from "./strapiIcons";
 
 export {
@@ -32,6 +34,7 @@ export {
   check,
   comments,
   cross,
+  discuss,
   emptyPictures,
   exclamationMarkCircle,
   eye,
@@ -39,11 +42,12 @@ export {
   illo,
   information,
   lock,
+  pencil,
   play,
+  plus,
   refresh,
   review,
-  unlock,
+  thumbDown,
   trash,
-  pencil,
-  plus
+  unlock
 };
