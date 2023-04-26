@@ -263,10 +263,14 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
             : populateClause.authorUser;
       }
 
+      const primitiveThreadOf = isString(parsedThreadOf) || isNumber(parsedThreadOf) ?
+        parsedThreadOf :
+        null;
+
       return this.sanitizeCommentEntity(
         {
           ..._,
-          threadOf: parsedThreadOf || _.threadOf || null,
+          threadOf: primitiveThreadOf || _.threadOf,
           gotThread: (threadedItem?.itemsInTread || 0) > 0,
           threadFirstItemId: threadedItem?.firstThreadItemId,
         },
