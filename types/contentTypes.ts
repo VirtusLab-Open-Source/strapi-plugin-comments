@@ -1,4 +1,4 @@
-import { OnlyStrings, StrapiUser, StringMap } from "strapi-typed";
+import { OnlyStrings, StrapiAdminUser, StrapiUser, StringMap } from "strapi-typed";
 
 export type Id = number | string;
 
@@ -18,6 +18,7 @@ export type Comment<TAuthor = CommentAuthor> = {
   firstThreadItemId?: Id;
   threadFirstItemId?: Id;
   isAdminComment?: boolean;
+  displayedBy?: Array<StrapiAdminUser>;
 } & CommentAuthorPartial;
 
 export type CommentModelKeys = OnlyStrings<keyof Comment>;

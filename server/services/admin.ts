@@ -712,7 +712,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
           content: body,
           threadOf: threadId,
           related: entity.related,
-          isAdminComment: true,
+          isAdminComment: true
         },
       });
   },
@@ -732,6 +732,22 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
         }
       });
     return this.getCommonService().sanitizeCommentEntity(updateComment);
+  },
+
+  async displayComment(
+    this: IServiceAdmin,
+    id: Id,
+    body: ToBeFixed,
+  ): Promise<Comment> {
+    const displayComment = await strapi.db
+      .query<Comment>(getModelUid("comment"))
+      .update({
+        where: { id },
+        data: {
+          displayedBy: body
+        }
+      });
+    return this.getCommonService().sanitizeCommentEntity(displayComment);
   },
 
   // Recognize Strapi User fields possible to populate

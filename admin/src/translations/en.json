@@ -8,6 +8,7 @@
   "nav.item.updates": "Updates",
   "nav.item.discover": "Discover",
   "nav.item.reports": "Reports",
+  "nav.item.dashboard": "Dashboard",
   "nav.item.settings": "Settings",
   "page.auth.noAccess": "No access",
   "page.auth.not.allowed": "Oops! It seems like You do not have access to this page...",
