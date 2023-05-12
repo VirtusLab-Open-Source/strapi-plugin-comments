@@ -93,5 +93,11 @@ export default {
       target: "plugin::comments.comment",
       configurable: false,
     },
+    displayedBy: {
+      type: "relation",
+      relation: "manyToMany",
+      target: "plugin::users-permissions.user",
+      configurable: false,
+    },
   },
 };

@@ -116,7 +116,8 @@ export interface IControllerAdmin {
   approveComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
   rejectComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
   postComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
-  updateComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>
+  updateComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>;
+  displayComment(ctx: StrapiRequestContext): ThrowablePromisedResponse<Comment>
 }
 
 export interface IControllerClient {
