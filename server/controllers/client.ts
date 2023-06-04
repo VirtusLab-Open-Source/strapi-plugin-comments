@@ -21,6 +21,7 @@ import {
 import { parseParams, throwError } from "./utils/functions";
 import { flatInput } from "./utils/parsers";
 import PluginError from "../utils/error";
+import { AUTHOR_TYPE } from "../utils/constants";
 
 const controllers: IControllerClient = {
   getService(name = "client") {
@@ -80,6 +81,38 @@ const controllers: IControllerClient = {
           }),
           dropBlockedThreads: true,
         }
+      );
+    } catch (e: ToBeFixed) {
+      throw throwError(ctx, e);
+    }
+  },
+
+  async findAllPerAuthor(
+    this: IControllerClient,
+    ctx: StrapiRequestContext<never, ToBeFixed>
+  ): ThrowablePromisedResponse<StrapiPaginatedResponse<Comment>> {
+    const { params = {}, query, sort, pagination } = ctx;
+    const { id, type } = parseParams<{ id: Id, type: string }>(params);
+
+    const {
+      sort: querySort,
+      pagination: queryPagination,
+      fields,
+      ...filterQuery
+    } = query || {};
+
+    try {
+      assertParamsPresent<{ id: Id }>(params, ["id"]);
+
+      return this.getService<IServiceCommon>("common").findAllPerAuthor(
+        flatInput({
+          query: filterQuery,
+          sort: sort || querySort,
+          pagination: pagination || queryPagination,
+          fields,
+        }),
+        id,
+        ![AUTHOR_TYPE.GENERIC.toLowerCase(), AUTHOR_TYPE.GENERIC].includes(type)
       );
     } catch (e: ToBeFixed) {
       throw throwError(ctx, e);

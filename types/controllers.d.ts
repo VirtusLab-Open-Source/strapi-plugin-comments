@@ -38,9 +38,9 @@ import {
 } from "./services";
 
 export type FlatInput<TKeys extends string> = {
-  relation: Id;
   query: ToBeFixed;
   sort: ToBeFixed;
+  relation?: Id;
   pagination?: ToBeFixed;
   fields?: StrapiRequestQueryFieldsClause<TKeys>;
 };
@@ -127,6 +127,9 @@ export interface IControllerClient {
   findAllInHierarchy(
     ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<Array<Comment>>;
+  findAllPerAuthor(
+    ctx: StrapiRequestContext<never>
+  ): ThrowablePromisedResponse<StrapiPaginatedResponse<Comment>>;
   post(
     ctx: StrapiRequestContext<CreateCommentPayload>
   ): ThrowablePromisedResponse<Comment>;
