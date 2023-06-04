@@ -15,6 +15,11 @@ export const APPROVAL_STATUS = {
   REJECTED: "REJECTED",
 };
 
+export const AUTHOR_TYPE = {
+  GENERIC: 'GENERIC',
+  STRAPI: 'STRAPI',
+};
+
 export const REGEX: RegExpCollection = {
   uid: /^(?<type>[a-z0-9-]+)\:{2}(?<api>[a-z0-9-]+)\.{1}(?<contentType>[a-z0-9-]+)$/i,
   relatedUid:

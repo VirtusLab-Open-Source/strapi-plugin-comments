@@ -8,15 +8,12 @@ import {
   isEmpty,
   first,
   parseInt,
-  set,
   get,
-  uniq,
 } from "lodash";
 import {
   Id,
   StrapiContext,
   StrapiStore,
-  StrapiPagination,
   StrapiResponseMeta,
   StrapiPaginatedResponse,
   StrapiDBQueryArgs,
@@ -36,7 +33,7 @@ import {
   CommentModelKeys,
   SettingsCommentsPluginConfig,
 } from "../../types";
-import { REGEX, CONFIG_PARAMS } from "../utils/constants";
+import { CONFIG_PARAMS } from "../utils/constants";
 import PluginError from "./../utils/error";
 import {
   getModelUid,
@@ -46,6 +43,11 @@ import {
   buildAuthorModel,
   buildConfigQueryProp,
 } from "./utils/functions";
+import { 
+  parseFieldsQuery,
+  parsePaginationsQuery,
+  parseSortQuery
+} from "./utils/parsers";
 
 /**
  * Comments Plugin - common services
@@ -112,69 +114,9 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
         Array<string>
       >(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
 
-    let queryExtension: StrapiDBQueryArgs<CommentModelKeys> = {};
-
-    if (sort && (isString(sort) || isArray(sort))) {
-      queryExtension = {
-        ...queryExtension,
-        orderBy: (isString(sort) ? [sort] : sort)
-          .map((_) => (REGEX.sorting.test(_) ? _ : `${_}:asc`))
-          .reduce((prev, curr) => {
-            const [type = "asc", ...parts] = curr.split(":").reverse();
-            return { ...set(prev, parts.reverse().join("."), type) };
-          }, {}),
-      };
-    }
-
-    if (!isNil(fields)) {
-      queryExtension = {
-        ...queryExtension,
-        select: isArray(fields) ? uniq([...fields, ...defaultSelect]) : fields,
-      };
-    }
-
-    let meta: StrapiResponseMeta = {} as StrapiResponseMeta;
-    if (pagination && isObject(pagination)) {
-      const parsedpagination: StrapiPagination = Object.keys(pagination).reduce(
-        (prev: StrapiPagination, curr: string) => ({
-          ...prev,
-          [curr]: parseInt(get(pagination, curr)),
-        }),
-        {}
-      );
-      const {
-        page = 1,
-        pageSize = PAGE_SIZE,
-        start = 0,
-        limit = PAGE_SIZE,
-      } = parsedpagination;
-      const paginationByPage =
-        !isNil(parsedpagination?.page) || !isNil(parsedpagination?.pageSize);
-
-      queryExtension = {
-        ...queryExtension,
-        offset: paginationByPage ? (page - 1) * pageSize : start,
-        limit: paginationByPage ? pageSize : limit,
-      };
-
-      const metapagination = paginationByPage
-        ? {
-            pagination: {
-              page,
-              pageSize,
-            },
-          }
-        : {
-            pagination: {
-              start,
-              limit,
-            },
-          };
-
-      meta = {
-        ...metapagination,
-      };
-    }
+    const sortQuery = parseSortQuery(sort);
+    const fieldsQuery = parseFieldsQuery(fields, sortQuery, defaultSelect);
+    let [meta, queryExtension = {}]: [StrapiResponseMeta, StrapiDBQueryArgs<CommentModelKeys>] = parsePaginationsQuery(pagination, fieldsQuery, { PAGE_SIZE });
 
     const entries = await strapi.db
       .query<Comment>(getModelUid("comment"))
@@ -336,8 +278,51 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
     return filterOurResolvedReports(this.sanitizeCommentEntity(entity, doNotPopulateAuthor));
   },
 
-  // Find all related entiries
+  // Find all for author
+  async findAllPerAuthor(
+    this: IServiceCommon,
+    {
+      query = {},
+      populate = {},
+      pagination,
+      sort,
+      fields,
+      isAdmin = false,
+    }: FindAllFlatProps<Comment>,
+    authorId: Id,
+    isStrapiAuthor: boolean = false,
+  ): Promise<StrapiPaginatedResponse<Comment>> {
+    if (isNil(authorId)) {
+      return {
+        data: [],
+      };
+    }
 
+    const { related, ...restQuery } = query;
+
+    const authorQuery = isStrapiAuthor ? {
+      authorUser: {
+        id: authorId
+      },
+    } : {
+      authorId,
+    };
+
+    const response = await this.findAllFlat({ 
+      query: {
+        ...restQuery,
+        ...authorQuery,
+      },
+      pagination, populate, sort, fields, isAdmin 
+    });
+
+    return {
+      ...response,
+      data: response.data.map(({ author, ...rest }: Comment): Comment => rest),
+    };
+  },
+
+  // Find all related entiries
   async findRelatedEntitiesFor(
     entities: Array<Comment> = []
   ): Promise<Array<RelatedEntity>> {
