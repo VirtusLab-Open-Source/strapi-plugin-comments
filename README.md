@@ -134,7 +134,7 @@ In our minimum support we're following [official Node.js releases timelines](htt
 
 **Supported Strapi versions**:
 
-- Strapi v4.9.2 (recently tested)
+- Strapi v4.10.5 (recently tested)
 - Strapi v4.x
 
 > This plugin is designed for **Strapi v4** and is not working with v3.x. To get version for **Strapi v3** install version [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3).
@@ -361,6 +361,50 @@ Return a flat structure of comments for specified instance of Content Type like 
 - [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
 - [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#pagination)
 
+### Get Comments (by Author)
+
+_GraphQL equivalent: [Public GraphQL API -> Get Comments (by Author)](#get-comments-by-author-1)_
+
+`GET <host>/api/comments/author/<id>/<?type>`
+
+Return a flat structure of comments by specified Author for example `Author` with `ID: 1`
+
+**Example URL**: `https://localhost:1337/api/comments/author/1` - get comments by `ID:1` of Strapi User
+**Example URL**: `https://localhost:1337/api/comments/author/1/generic` - get comments by `ID:1` of Generic User
+
+**Example response body**
+
+```json
+{
+  "data": [
+    {
+      // -- Comment Model fields ---
+    },
+    {
+      // -- Comment Model fields ---
+    }
+    // ...
+  ],
+  "meta": {
+    "pagination": {
+      // payload based on Strapi REST Pagination specification
+    }
+  }
+}
+```
+
+**Possible response codes**
+
+- `200` - Successful. Response with list of comments (can be empty)
+- `400` - Bad Request. Requested list for not valid / not existing Content Type
+
+#### Strapi REST API properties support:
+
+- [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/filtering-locale-publication.html#filtering)
+- [field selection](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/populating-fields.html#field-selection)
+- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
+- [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#pagination)
+
 ### Post a Comment
 
 _GraphQL equivalent: [Public GraphQL API -> Post a Comments](#post-a-comment-1)_
@@ -534,57 +578,6 @@ _REST API equivalent: [Public REST API -> Get Comments](#get-comments)_
 
 ```graphql
 query {
-  findAllFlat(
-    relation: "api::page.page:1"
-    filters: { content: { contains: "Test" } }
-  ) {
-    id
-    content
-    blocked
-    threadOf {
-      id
-    }
-    author {
-      id
-      name
-    }
-  }
-}
-```
-
-**Example response**
-
-```json
-{
-  "data": {
-    "findAllFlat": [
-      {
-        "id": 3,
-        "content": "Test",
-        "blocked": false,
-        "threadOf": null,
-        "author": {
-          "id": "123456",
-          "name": "Joe Doe"
-        }
-      },
-      // ...
-    ]
-  }
-```
-
-#### Strapi GraphQL API properties support:
-
-- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#sorting)
-
-### Get Comments (flat structure)
-
-_REST API equivalent: [Public REST API -> Get Comments (flat structure)](#get-comments-flat-structure)_
-
-**Example request**
-
-```graphql
-query {
   findAllInHierarchy(relation: "api::page.page:1") {
     id
     content
@@ -631,6 +624,106 @@ query {
     ]
   }
 }
+```
+
+#### Strapi GraphQL API properties support:
+
+- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#sorting)
+
+### Get Comments (flat structure)
+
+_REST API equivalent: [Public REST API -> Get Comments (flat structure)](#get-comments-flat-structure)_
+
+**Example request**
+
+```graphql
+query {
+  findAllFlat(
+    relation: "api::page.page:1"
+    filters: { content: { contains: "Test" } }
+  ) {
+    id
+    content
+    blocked
+    threadOf {
+      id
+    }
+    author {
+      id
+      name
+    }
+  }
+}
+```
+
+**Example response**
+
+```json
+{
+  "data": {
+    "findAllFlat": [
+      {
+        "id": 3,
+        "content": "Test",
+        "blocked": false,
+        "threadOf": null,
+        "author": {
+          "id": "123456",
+          "name": "Joe Doe"
+        }
+      },
+      // ...
+    ]
+  }
+```
+
+#### Strapi GraphQL API properties support:
+
+- [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#filters)
+- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#sorting)
+- [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#pagination)
+
+### Get Comments (by Author)
+
+_REST API equivalent: [Public REST API -> Get Comments (by Author)](#get-comments-by-author)_
+
+**Example request**
+
+```graphql
+query {
+  findAllPerAuthor(authorId: 1, authorType: STRAPI) { // authorType might be one of [GENERIC, STRAPI]
+    data {
+      id
+      content
+      blocked
+      threadOf {
+        id
+      }
+    }
+  }
+}
+
+```
+
+**Example response**
+
+```json
+{
+  "data": {
+    "findAllPerAuthor": {
+      "data": [
+        {
+          "id": 4,
+          "content": "Hackaton test comment",
+          "blocked": false,
+          "threadOf": {
+            "id": 1
+          }
+        }
+      // ...
+      ]
+    }
+  }
 ```
 
 #### Strapi GraphQL API properties support:
