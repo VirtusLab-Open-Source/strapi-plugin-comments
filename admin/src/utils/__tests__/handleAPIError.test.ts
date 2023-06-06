@@ -17,8 +17,8 @@ describe("handleAPIError()", () => {
     expect(() => handleAPIError(err, notify, "message")).toThrowError(err);
     expect(notify).toHaveBeenCalled();
     expect(notify.mock.calls[0]).toMatchInlineSnapshot(`
-      Array [
-        Object {
+      [
+        {
           "message": "comments.message",
           "type": "warning",
         },

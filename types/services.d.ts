@@ -87,6 +87,11 @@ export interface IServiceCommon {
     relatedEntity?: RelatedEntity | null | boolean
   ): Promise<Array<Comment>>;
   findOne(criteria: WhereClause): Promise<Comment>;
+  findAllPerAuthor(
+    props: FindAllFlatProps<Comment>,
+    authorId: Id,
+    isStrapiAuthor?: boolean
+  ): Promise<StrapiPaginatedResponse<Comment>>;
   findRelatedEntitiesFor(entities: Array<Comment>): Promise<RelatedEntity[]>;
   mergeRelatedEntityTo(
     entity: ToBeFixed,
@@ -154,6 +159,7 @@ export interface IServiceAdmin {
     | undefined;
   postComment(threadId: Id, body: string, author: StrapiAdminUser): Promise<Comment>;
   updateComment(id: Id, body: string): Promise<Comment>;
+  displayComment(id: Id, body: StrapiAdminUser): Promise<Comment>;
 }
 
 export interface IServiceClient {

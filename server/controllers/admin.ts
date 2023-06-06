@@ -1,4 +1,4 @@
-import { Id, StrapiDBBulkActionResponse, StrapiRequestContext } from "strapi-typed";
+import { Id, StrapiAdminUser, StrapiDBBulkActionResponse, StrapiRequestContext } from "strapi-typed";
 import {
   AdminFindAllProps,
   AdminFindOneAndThreadProps,
@@ -283,6 +283,24 @@ const controllers: IControllerAdmin = {
       return await this.getService<IServiceAdmin>().updateComment(
         id,
         body.content,
+      );
+    } catch (e) {
+      throw throwError(ctx, e);
+    }
+  },
+
+  async displayComment(
+    ctx: StrapiRequestContext<never>
+  ): ThrowablePromisedResponse<Comment> {
+    
+    const { params = {}, request } = ctx;
+    const { body }: StrapiAdminUser = request;
+    const { id } = parseParams(params);
+    
+    try {
+      return await this.getService<IServiceAdmin>().displayComment(
+        id,
+        body.displayedBy,
       );
     } catch (e) {
       throw throwError(ctx, e);

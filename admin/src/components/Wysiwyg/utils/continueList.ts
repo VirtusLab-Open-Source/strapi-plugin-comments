@@ -6,7 +6,7 @@
 
 // @ts-nocheck
 
-import CodeMirror from 'codemirror';
+import CodeMirror from 'codemirror5';
 
 // Disabling eslint on purpose
 /* eslint-disable */

@@ -9,6 +9,7 @@ import {
   CarretDown,
   Check,
   Cross,
+  Discuss,
   EmptyPictures,
   ExclamationMarkCircle,
   Eye,
@@ -18,6 +19,7 @@ import {
   Play,
   Refresh,
   Trash,
+  ThumbDown,
   Pencil,
   Plus,
   Shield
@@ -34,6 +36,7 @@ export const arrowUp = <ArrowUp />;
 export const carretDown = <CarretDown />;
 export const check = <Check />;
 export const cross = <Cross />;
+export const discuss = <Discuss />;
 export const emptyPictures = <EmptyPictures width="10rem" />;
 export const exclamationMarkCircle = <ExclamationMarkCircle />;
 export const eye = <Eye />;
@@ -50,4 +53,5 @@ export const trash = <Trash />;
 export const pencil = <Pencil />;
 export const plus = <Plus />;
 export const shield = <Shield />;
+export const thumbDown = <ThumbDown />;
 

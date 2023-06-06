@@ -1,10 +1,3 @@
-/*
- *
- * Discover
- *
- */
-
-// TODO
 // @ts-nocheck
 
 import React, {memo, useRef, useMemo} from 'react';
@@ -21,6 +14,7 @@ import {
   ActionLayout,
   ContentLayout,
 } from '@strapi/design-system/Layout';
+import { styledLayout } from './styles';
 import {Table, Thead, Tbody, Tr, Th, Td} from '@strapi/design-system/Table';
 import {Typography} from '@strapi/design-system/Typography';
 import {VisuallyHidden} from '@strapi/design-system/VisuallyHidden';
@@ -37,22 +31,19 @@ import {
   useFocusWhenNavigate,
   useQueryParams,
 } from '@strapi/helper-plugin';
-import getMessage from '../../utils/getMessage';
-import {fetchData} from './utils/api';
-import pluginPermissions from '../../permissions';
+import getMessage from '../../../../utils/getMessage';
+import { fetchData } from '../../../Discover/utils/api';
+import pluginPermissions from '../../../../permissions';
 
-import getUrl from '../../utils/getUrl';
-import Nav from '../../components/Nav';
-import TablePagination from '../../components/TablePagination';
-import filtersSchema from './utils/filtersSchema';
-import TableFilters from '../../components/TableFilters';
-import makeAppView from '../App/reducer/selectors';
-import DiscoverTableRow from './components/DiscoverTableRow';
-import NoAcccessPage from '../NoAccessPage';
+import getUrl from '../../../../utils/getUrl';
+import makeAppView from '../../../App/reducer/selectors';
+import DiscoverTableRow from '../../../Discover/components/DiscoverTableRow';
+import NoAcccessPage from '../../../NoAccessPage';
+import { PanelLayout, StyledHeader } from '../../styles';
 
 const COL_COUNT = 8;
 
-const Discover = ({config}) => {
+const LatestComments = ({ config }) => {
   useFocusWhenNavigate();
 
   const {push} = useHistory();
@@ -88,14 +79,12 @@ const Discover = ({config}) => {
     data: {result, pagination = {}},
     isFetching,
   } = useQuery(
-    ['get-data', queryParams, canAccess],
+    ['get-comments-data', queryParams, canAccess],
     () => fetchData(queryParams, toggleNotification),
     {
       initialData: {},
     },
   );
-
-  console.log(result);
 
   const handleClickDisplay = (id) => {
     push(getUrl(`discover/${id}`));
@@ -120,33 +109,16 @@ const Discover = ({config}) => {
 
 
   return canAccess ? (
-      <Box background="neutral100">
         <Layout>
           {isLoading || isLoadingForPermissions ? (
             <LoadingIndicatorPage />
           ) : (
-            <Layout sideNav={<Nav visible />}>
-              <>
-                <HeaderLayout
-                  title={getMessage("page.discover.header")}
-                  subtitle={`${total} ${getMessage(
-                    "page.discover.header.count",
-                  )}`}
-                  as="h2"
-                />
-                <ActionLayout
-                  startActions={
-                    <>
-                      <SearchURLQuery
-                        label={getMessage("search.label", "Search", false)}
-                      />
-                      <TableFilters displayedFilters={filtersSchema} />
-                    </>
-                  }
-                />
-                <ContentLayout>
+            <>
+              <PanelLayout>
+                <StyledHeader>
+                <Typography variant='beta' fontSize='30px'>Latest Comments</Typography>
+                </StyledHeader>
                   {!isEmpty(result) ? (
-                    <>
                       <Table colCount={COL_COUNT} rowCount={result.length}>
                         <Thead>
                           <Tr>
@@ -205,7 +177,7 @@ const Discover = ({config}) => {
                           </Tr>
                         </Thead>
                         <Tbody>
-                          {result.map((entry) => (
+                          {result.slice(0, 5).map((entry) => (
                             <DiscoverTableRow
                               key={`comment-${entry.id}`}
                               config={config}
@@ -220,29 +192,16 @@ const Discover = ({config}) => {
                           ))}
                         </Tbody>
                       </Table>
-                      <TablePagination
-                        pagination={{ pageCount: pagination?.pageCount || 1 }}
-                      />
-                    </>
                   ) : (
                     <EmptyStateLayout content={emptyLayout[emptyContent]} />
                   )}
-                </ContentLayout>
-              </>
-            </Layout>
+                </PanelLayout>
+            </>
           )}
         </Layout>
-      </Box>
   ) :
     <NoAcccessPage />
 
 };
-
-const mapStateToProps = makeAppView();
-
-export function mapDispatchToProps(dispatch) {
-  return bindActionCreators({}, dispatch);
-}
-const withConnect = connect(mapStateToProps, mapDispatchToProps);
-
-export default compose(withConnect)(memo(Discover, isEqual));
+ 
+export default LatestComments;

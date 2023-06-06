@@ -14,7 +14,7 @@ describe("registerCustomFields()", () => {
     expect(strapi.customFields.register).toHaveBeenCalled();
     expect((strapi.customFields.register as jest.Mock).mock.calls[0][0])
       .toMatchInlineSnapshot(`
-      Object {
+      {
         "name": "comments",
         "plugin": "comments",
         "type": "json",

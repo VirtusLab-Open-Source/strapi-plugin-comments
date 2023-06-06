@@ -2,11 +2,13 @@ import { INexusType, StrapiGraphQLContext } from "../../../types";
 
 import findAllFlat from "./findAllFlat";
 import findAllInHierarchy from "./findAllInHierarchy";
+import findAllPerAuthor from "./findAllPerAuthor";
 
 export = (context: StrapiGraphQLContext) => {
   const queries = {
     findAllFlat,
     findAllInHierarchy,
+    findAllPerAuthor,
   };
 
   return context.nexus.extendType({

@@ -74,7 +74,7 @@ describe("Custom fields", () => {
         };
 
         expect(toOutput(state)).toMatchInlineSnapshot(
-          `"{\\"commentsNumber\\":1,\\"populate\\":[],\\"sortByDate\\":\\"ASC\\"}"`
+          `"{"commentsNumber":1,"populate":[],"sortByDate":"ASC"}"`
         );
       });
     });
@@ -197,34 +197,34 @@ describe("Custom fields", () => {
       it("should handle state slice", () => {
         expect(handleStateSliceChange("commentsNumber", setter)(1))
           .toMatchInlineSnapshot(`
-          Object {
+          {
             "commentsNumber": 1,
           }
         `);
         expect(handleStateSliceChange("filterBy", setter)("FOO"))
           .toMatchInlineSnapshot(`
-          Object {
+          {
             "commentsNumber": 99,
             "filterBy": "FOO",
           }
         `);
         expect(handleStateSliceChange("filterByValue", setter)("VALUE"))
           .toMatchInlineSnapshot(`
-          Object {
+          {
             "commentsNumber": 99,
             "filterByValue": "VALUE",
           }
         `);
         expect(handleStateSliceChange("renderType", setter)("TREE"))
           .toMatchInlineSnapshot(`
-          Object {
+          {
             "commentsNumber": 99,
             "renderType": "TREE",
           }
         `);
         expect(handleStateSliceChange("sortByDate", setter)("ASC"))
           .toMatchInlineSnapshot(`
-          Object {
+          {
             "commentsNumber": 99,
             "sortByDate": "ASC",
           }
@@ -235,18 +235,18 @@ describe("Custom fields", () => {
       it("should handle populate change", () => {
         expect(handlePopulateChange("author", createSetter(state))())
           .toMatchInlineSnapshot(`
-          Object {
+          {
             "commentsNumber": 99,
-            "populate": Array [
+            "populate": [
               "author",
             ],
           }
         `);
         expect(handlePopulateChange("avatar", createSetter(state))())
           .toMatchInlineSnapshot(`
-          Object {
+          {
             "commentsNumber": 99,
-            "populate": Array [
+            "populate": [
               "avatar",
             ],
           }
@@ -260,9 +260,9 @@ describe("Custom fields", () => {
             })
           )()
         ).toMatchInlineSnapshot(`
-          Object {
+          {
             "commentsNumber": 99,
-            "populate": Array [
+            "populate": [
               "author",
             ],
           }
@@ -276,9 +276,9 @@ describe("Custom fields", () => {
             })
           )()
         ).toMatchInlineSnapshot(`
-          Object {
+          {
             "commentsNumber": 99,
-            "populate": Array [],
+            "populate": [],
           }
         `);
         expect(
@@ -290,9 +290,9 @@ describe("Custom fields", () => {
             })
           )()
         ).toMatchInlineSnapshot(`
-          Object {
+          {
             "commentsNumber": 99,
-            "populate": Array [
+            "populate": [
               "avatar",
               "author",
             ],
@@ -307,9 +307,9 @@ describe("Custom fields", () => {
             })
           )()
         ).toMatchInlineSnapshot(`
-          Object {
+          {
             "commentsNumber": 99,
-            "populate": Array [
+            "populate": [
               "avatar",
             ],
           }
@@ -323,9 +323,9 @@ describe("Custom fields", () => {
             })
           )()
         ).toMatchInlineSnapshot(`
-          Object {
+          {
             "commentsNumber": 99,
-            "populate": Array [
+            "populate": [
               "author",
               "avatar",
             ],
@@ -340,9 +340,9 @@ describe("Custom fields", () => {
             })
           )()
         ).toMatchInlineSnapshot(`
-          Object {
+          {
             "commentsNumber": 99,
-            "populate": Array [],
+            "populate": [],
           }
         `);
       });
@@ -351,12 +351,12 @@ describe("Custom fields", () => {
       it("should render options", () => {
         expect(getRenderTypeOptions(({ id }) => `translated.${id}`))
           .toMatchInlineSnapshot(`
-          Array [
-            Object {
+          [
+            {
               "label": "translated.customField.comments.input.renderType.option.tree.label",
               "value": "TREE",
             },
-            Object {
+            {
               "label": "translated.customField.comments.input.renderType.option.flat.label",
               "value": "FLAT",
             },
@@ -368,16 +368,16 @@ describe("Custom fields", () => {
       it("should render options", () => {
         expect(getSortByDateOptions(({ id }) => `translated.${id}`))
           .toMatchInlineSnapshot(`
-          Array [
-            Object {
+          [
+            {
               "label": "",
               "value": undefined,
             },
-            Object {
+            {
               "label": "translated.customField.comments.input.sortByDate.option.asc.label",
               "value": "ASC",
             },
-            Object {
+            {
               "label": "translated.customField.comments.input.sortByDate.option.desc.label",
               "value": "DESC",
             },
@@ -389,16 +389,16 @@ describe("Custom fields", () => {
       it("should render options", () => {
         expect(getFilterByOptions(({ id }) => `translated.${id}`))
           .toMatchInlineSnapshot(`
-          Array [
-            Object {
+          [
+            {
               "label": "",
               "value": undefined,
             },
-            Object {
+            {
               "label": "translated.customField.comments.input.filterBy.option.dateCreated.label",
               "value": "DATE_CREATED",
             },
-            Object {
+            {
               "label": "translated.customField.comments.input.filterBy.option.approvalStatus.label",
               "value": "APPROVAL_STATUS",
             },
@@ -410,20 +410,20 @@ describe("Custom fields", () => {
       it("should render options", () => {
         expect(getApprovalStatusOptions(({ id }) => `translated.${id}`))
           .toMatchInlineSnapshot(`
-          Array [
-            Object {
+          [
+            {
               "label": "",
               "value": undefined,
             },
-            Object {
+            {
               "label": "translated.customField.comments.input.filterBy.option.approvalStatus.option.approved.label",
               "value": "APPROVED",
             },
-            Object {
+            {
               "label": "translated.customField.comments.input.filterBy.option.approvalStatus.option.pending.label",
               "value": "PENDING",
             },
-            Object {
+            {
               "label": "translated.customField.comments.input.filterBy.option.approvalStatus.option.rejected.label",
               "value": "REJECTED",
             },

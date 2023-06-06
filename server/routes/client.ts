@@ -90,6 +90,36 @@ const routes: StrapiRoute[] = [
       },
     },
   },
+  {
+    method: "GET",
+    path: "/author/:id",
+    handler: "client.findAllPerAuthor",
+    config: {
+      policies: [],
+      description:
+        "Find all comments created by Strapi user",
+      tag: {
+        plugin: "comments",
+        name: "Comments",
+        actionType: "find",
+      },
+    },
+  },
+  {
+    method: "GET",
+    path: "/author/:id/:type",
+    handler: "client.findAllPerAuthor",
+    config: {
+      policies: [],
+      description:
+        "Find all comments created by specified type of user",
+      tag: {
+        plugin: "comments",
+        name: "Comments",
+        actionType: "find",
+      },
+    },
+  },
 ];
 
 export default routes;

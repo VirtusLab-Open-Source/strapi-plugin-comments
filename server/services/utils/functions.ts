@@ -156,7 +156,7 @@ export const resolveUserContextError = (user: StrapiUser): PluginError => {
   }
 };
 
-export const getAuthorName = (author: StrapiAdmin) =>{
+export const getAuthorName = (author: StrapiAdmin) => {
   
   const {lastname, username, firstname} = author;
 
