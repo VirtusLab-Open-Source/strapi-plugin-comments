@@ -453,7 +453,7 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       Array<string>
     >(CONFIG_PARAMS.ENABLED_COLLECTIONS, []);
 
-    if (!isEnabledCollection) {
+    if (enabledCollections.length > 0 && !isEnabledCollection) {
       throw new PluginError(
         403,
         `Action not allowed for collection '${uid}'. Use one of: ${enabledCollections.join(
