@@ -312,6 +312,7 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
         populate: {
           reports: true,
           authorUser: true,
+          displayedBy: true,
         },
       });
     if (!entity) {

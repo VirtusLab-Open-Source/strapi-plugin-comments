@@ -364,6 +364,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
           },
         },
         ...reportsPopulation,
+        displayedBy: true
       },
     };
 
