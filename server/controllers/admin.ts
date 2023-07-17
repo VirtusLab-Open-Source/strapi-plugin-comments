@@ -276,7 +276,7 @@ const controllers: IControllerAdmin = {
   ): ThrowablePromisedResponse<Comment> {
     
     const { params = {}, request } = ctx;
-    const { body }: ToBeFixed = request;
+    const { body }: StrapiAdminUser = request;
     const { id } = parseParams(params);
     
     try {
@@ -289,23 +289,6 @@ const controllers: IControllerAdmin = {
     }
   },
 
-  async displayComment(
-    ctx: StrapiRequestContext<never>
-  ): ThrowablePromisedResponse<Comment> {
-    
-    const { params = {}, request } = ctx;
-    const { body }: StrapiAdminUser = request;
-    const { id } = parseParams(params);
-    
-    try {
-      return await this.getService<IServiceAdmin>().displayComment(
-        id,
-        body.displayedBy,
-      );
-    } catch (e) {
-      throw throwError(ctx, e);
-    }
-  },
 
   async approveComment(
     ctx: StrapiRequestContext<never>,
@@ -324,6 +307,25 @@ const controllers: IControllerAdmin = {
     const { id } = parseParams(ctx.params || {});
     try {
       return await this.getService<IServiceAdmin>().rejectComment(id);
+    } catch (e) {
+      throw throwError(ctx, e);
+    }
+  },
+
+
+  async displayComment(
+    ctx: StrapiRequestContext<never>
+  ): ThrowablePromisedResponse<Comment> {
+    
+    const { params = {}, request } = ctx;
+    const { body }:ToBeFixed = request;
+    const { id } = parseParams(params);
+    
+    try {
+      return await this.getService<IServiceAdmin>().displayComment(
+        id,
+        body
+      );
     } catch (e) {
       throw throwError(ctx, e);
     }

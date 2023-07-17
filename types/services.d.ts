@@ -152,7 +152,7 @@ export interface IServiceAdmin {
     | undefined;
   postComment(threadId: Id, body: string, author: StrapiAdminUser): Promise<Comment>;
   updateComment(id: Id, body: string): Promise<Comment>;
-  displayComment(id: Id, body: StrapiAdminUser): Promise<Comment>;
+  displayComment(id: Id, body: Id): Promise<Comment>;
 }
 
 export interface IServiceClient {

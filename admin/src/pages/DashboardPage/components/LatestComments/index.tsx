@@ -104,9 +104,13 @@ const LatestComments = ({ config }) => {
     },
   };
 
+  console.log(result)
+
   const emptyContent = _q ? 'search' : 'comments';
 
+  const unreadedComments = result ? result.filter(entity => entity.displayedBy.length === 0).length : null;
 
+  const subtitle = <Typography variant='omega' fontSize='20px'>You have {unreadedComments} unreaded comments</Typography>;
 
   return canAccess ? (
         <Layout>
@@ -117,6 +121,8 @@ const LatestComments = ({ config }) => {
               <PanelLayout>
                 <StyledHeader>
                 <Typography variant='beta' fontSize='30px'>Latest Comments</Typography>
+                <br/>
+                {subtitle}
                 </StyledHeader>
                   {!isEmpty(result) ? (
                       <Table colCount={COL_COUNT} rowCount={result.length}>

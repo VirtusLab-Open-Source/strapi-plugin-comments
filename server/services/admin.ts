@@ -33,7 +33,7 @@ import {
   getModelUid,
   getRelatedGroups,
   filterOurResolvedReports,
-  getAuthorName,
+  getAuthorName
 } from "./utils/functions";
 import { APPROVAL_STATUS, REGEX } from "./../utils/constants";
 
@@ -189,6 +189,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
               resolved: false,
             },
           },
+          displayedBy: true,
         },
       });
     const total = await strapi.db.query<Comment>(getModelUid("comment")).count({
@@ -738,17 +739,67 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   async displayComment(
     this: IServiceAdmin,
     id: Id,
-    body: ToBeFixed,
+    body: string,
   ): Promise<Comment> {
+
+    const defaultAuthorUserPopulate = this.getDefaultAuthorPopulate();
+
+    const reportsPopulation = {
+      reports: {
+        where: {
+          resolved: false,
+        },
+      },
+    };
+
+    const defaultPopulate = {
+      populate: {
+        authorUser: defaultAuthorUserPopulate,
+        threadOf: {
+          populate: {
+            authorUser: defaultAuthorUserPopulate,
+            ...reportsPopulation,
+          },
+        },
+        ...reportsPopulation,
+        displayedBy: true
+      },
+    };
+
+    const entity = await strapi.db
+      .query<Comment>(getModelUid("comment"))
+      .findOne({
+        where: { id },
+        ...defaultPopulate,
+      });
+
+    if (!entity) {
+      throw new PluginError(404, "Not found");
+    }
+
+    const user: StrapiAdminUser = await strapi.plugins['users-permissions'].services.user.fetch({ id: body });
+
+    if (!user) {
+      throw new PluginError(404, "Not found");
+    }
+
+    const isUserExistingInRelation = entity.displayedBy?.findIndex( user => user.id === body);
+    
+    if ( isUserExistingInRelation !== -1) {
+      throw new PluginError(403, "User is already existing in this relation field");
+    }
+
+    const updatedDisplayedBy = entity.displayedBy?.push(user);
+
     const displayComment = await strapi.db
       .query<Comment>(getModelUid("comment"))
       .update({
         where: { id },
-        data: {
-          displayedBy: body
-        }
+        data: { displayedBy: updatedDisplayedBy}
+  
       });
-    return this.getCommonService().sanitizeCommentEntity(displayComment);
+
+      return this.getCommonService().sanitizeCommentEntity(displayComment);
   },
 
   // Recognize Strapi User fields possible to populate
