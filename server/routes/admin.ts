@@ -123,7 +123,7 @@ const routes: StrapiRoute[] = [
   },
   {
     method: "PUT",
-    path: "/moderate/single/:id/display",
+    path: "/moderate/single/:id/user/:userId/display",
     handler: "admin.displayComment",
     config: {
       policies: [],

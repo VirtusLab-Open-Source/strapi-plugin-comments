@@ -317,14 +317,13 @@ const controllers: IControllerAdmin = {
     ctx: StrapiRequestContext<never>
   ): ThrowablePromisedResponse<Comment> {
     
-    const { params = {}, request } = ctx;
-    const { body }:ToBeFixed = request;
-    const { id } = parseParams(params);
+    const { params = {} } = ctx;
+    const { id: id, userId} = parseParams(params);
     
     try {
       return await this.getService<IServiceAdmin>().displayComment(
         id,
-        body
+        userId
       );
     } catch (e) {
       throw throwError(ctx, e);

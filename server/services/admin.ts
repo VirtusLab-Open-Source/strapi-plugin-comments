@@ -739,7 +739,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   async displayComment(
     this: IServiceAdmin,
     id: Id,
-    body: string,
+    userId: Id,
   ): Promise<Comment> {
 
     const defaultAuthorUserPopulate = this.getDefaultAuthorPopulate();
@@ -762,7 +762,12 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
           },
         },
         ...reportsPopulation,
-        displayedBy: true
+        displayedBy: {
+          populate: {
+            id: true,
+            username: true
+          }
+        }
       },
     };
 
@@ -777,13 +782,19 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       throw new PluginError(404, "Not found");
     }
 
-    const user: StrapiAdminUser = await strapi.plugins['users-permissions'].services.user.fetch({ id: body });
+    const user = await strapi.db
+      .query<StrapiAdminUser>("admin::user")
+      .findOne({
+        where: { id: userId },
+      }); 
+
+      console.log(user)
 
     if (!user) {
       throw new PluginError(404, "Not found");
     }
 
-    const isUserExistingInRelation = entity.displayedBy?.findIndex( user => user.id === body);
+    const isUserExistingInRelation = entity.displayedBy?.findIndex( user => user.id === userId);
     
     if ( isUserExistingInRelation !== -1) {
       throw new PluginError(403, "User is already existing in this relation field");
