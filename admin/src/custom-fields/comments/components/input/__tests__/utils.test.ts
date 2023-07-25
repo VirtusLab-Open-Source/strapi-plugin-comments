@@ -370,10 +370,6 @@ describe("Custom fields", () => {
           .toMatchInlineSnapshot(`
           [
             {
-              "label": "",
-              "value": undefined,
-            },
-            {
               "label": "translated.customField.comments.input.sortByDate.option.asc.label",
               "value": "ASC",
             },
@@ -391,10 +387,6 @@ describe("Custom fields", () => {
           .toMatchInlineSnapshot(`
           [
             {
-              "label": "",
-              "value": undefined,
-            },
-            {
               "label": "translated.customField.comments.input.filterBy.option.dateCreated.label",
               "value": "DATE_CREATED",
             },
@@ -411,10 +403,6 @@ describe("Custom fields", () => {
         expect(getApprovalStatusOptions(({ id }) => `translated.${id}`))
           .toMatchInlineSnapshot(`
           [
-            {
-              "label": "",
-              "value": undefined,
-            },
             {
               "label": "translated.customField.comments.input.filterBy.option.approvalStatus.option.approved.label",
               "value": "APPROVED",

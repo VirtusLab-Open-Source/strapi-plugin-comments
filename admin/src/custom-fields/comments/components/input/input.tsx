@@ -154,7 +154,7 @@ export const CustomFieldInput: React.FC<CustomFieldInputProps> = ({
                 onChange={onRenderTypeChange}
               >
                 {getRenderTypeOptions(getMessage).map(({ value, label }) => (
-                  <Option key={value} value={value}>
+                  <Option key={`renderTypeOptions-${value}`} value={value}>
                     {label}
                   </Option>
                 ))}
@@ -170,9 +170,10 @@ export const CustomFieldInput: React.FC<CustomFieldInputProps> = ({
                 )}
                 value={currentState.sortByDate}
                 onChange={onSortByDateChange}
+                onClear={() => onSortByDateChange(undefined)}
               >
                 {getSortByDateOptions(getMessage).map(({ value, label }) => (
-                  <Option key={value} value={value}>
+                  <Option key={`sortByDataOptions-${value}`} value={value}>
                     {label}
                   </Option>
                 ))}
@@ -190,9 +191,10 @@ export const CustomFieldInput: React.FC<CustomFieldInputProps> = ({
                 )}
                 value={currentState.filterBy}
                 onChange={onFilterByChange}
+                onClear={() => onFilterByChange(undefined)}
               >
                 {getFilterByOptions(getMessage).map(({ value, label }) => (
-                  <Option key={value} value={value}>
+                  <Option key={`filterByOptions-${value}`} value={value}>
                     {label}
                   </Option>
                 ))}
@@ -208,10 +210,11 @@ export const CustomFieldInput: React.FC<CustomFieldInputProps> = ({
                     name={`${name}.filterBy.approvalStatus`}
                     value={currentState.filterByValue}
                     onChange={onFilterByValueChange}
+                    onClear={() => onFilterByValueChange(undefined)}
                   >
                     {getApprovalStatusOptions(getMessage).map(
                       ({ value, label }) => (
-                        <Option key={value} value={value}>
+                        <Option key={`approvalStatusOptions-${value}`} value={value}>
                           {label}
                         </Option>
                       )
@@ -227,6 +230,7 @@ export const CustomFieldInput: React.FC<CustomFieldInputProps> = ({
                     disabled={disabled}
                     name={`${name}.filterBy.dateCreated`}
                     onChange={onFilterByValueChange}
+                    onClear={() => onFilterByValueChange(undefined)}
                     selectedDate={currentState.filterByValue}
                     selectedDateLabel={asString}
                   />
