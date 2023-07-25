@@ -51,9 +51,12 @@ export = ({ strapi }: StrapiContext): IServiceClient => ({
       relation
     );
 
+    const enabledCollections: Array<string> = await this.getCommonService().getConfig<
+      Array<string>
+    >(CONFIG_PARAMS.ENABLED_COLLECTIONS, []);
     const isEnabledCollection =
       await this.getCommonService().isEnabledCollection(uid);
-    if (!isEnabledCollection) {
+    if (enabledCollections.length > 0 && !isEnabledCollection) {
       throw new PluginError(
         400,
         `Field "related" refer to not enabled collection. Please amend the plugin settings and try again`
