@@ -776,6 +776,6 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       };
     }
 
-    return undefined;
+    return true;
   },
 });

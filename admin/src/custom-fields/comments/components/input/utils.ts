@@ -83,7 +83,7 @@ export const handlePopulateChange =
     });
   };
 
-export const getRenderTypeOptions = (translate: typeof getMessage) => [
+export const getRenderTypeOptions = (translate: typeof getMessage) => ([
   {
     value: "TREE",
     label: translate({
@@ -98,13 +98,9 @@ export const getRenderTypeOptions = (translate: typeof getMessage) => [
       defaultMessage: "Flat list",
     }),
   },
-];
+]);
 
-export const getSortByDateOptions = (translate: typeof getMessage) => [
-  {
-    value: undefined,
-    label: "",
-  },
+export const getSortByDateOptions = (translate: typeof getMessage) => ([
   {
     value: "ASC",
     label: translate({
@@ -119,13 +115,9 @@ export const getSortByDateOptions = (translate: typeof getMessage) => [
       defaultMessage: "Descending",
     }),
   },
-];
+]);
 
-export const getFilterByOptions = (translate: typeof getMessage) => [
-  {
-    value: undefined,
-    label: "",
-  },
+export const getFilterByOptions = (translate: typeof getMessage) => ([
   {
     value: "DATE_CREATED",
     label: translate({
@@ -140,13 +132,9 @@ export const getFilterByOptions = (translate: typeof getMessage) => [
       defaultMessage: "Approval Status",
     }),
   },
-];
+]);
 
-export const getApprovalStatusOptions = (translate: typeof getMessage) => [
-  {
-    value: undefined,
-    label: "",
-  },
+export const getApprovalStatusOptions = (translate: typeof getMessage) => ([
   {
     value: APPROVAL_STATUS.APPROVED,
     label: translate({
@@ -168,7 +156,7 @@ export const getApprovalStatusOptions = (translate: typeof getMessage) => [
       defaultMessage: "Rejected",
     }),
   },
-];
+]);
 
 const stringFields = [
   "renderType",
