@@ -5,8 +5,9 @@ import tr from "./tr.json";
 import ptBr from "./pt-BR.json";
 import ru from "./ru.json";
 import zhHans from "./zh-Hans.json";
+import pl from "./pl.json";
 
-export type TranslationKey = "en" | "fr" | "pt-BR" | "tr" | "ru" | "zh-Hans";
+export type TranslationKey = "en" | "fr" | "pt-BR" | "tr" | "ru" | "zh-Hans" | "pl";
 export type Translations = {
   [key in TranslationKey]: KeyValueSet<string>
 };
@@ -18,6 +19,7 @@ const trads: Translations = {
   tr,
   ru,  
   "zh-Hans": zhHans,
+  pl
 };
 
 export default trads;
