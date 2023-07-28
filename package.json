@@ -33,14 +33,13 @@
     "@types/react-intl": "^3.0.0",
     "@types/react-query": "^1.2.9",
     "@types/styled-components": "^5.1.26",
-    "bad-words": "^3.0.4",
+    "no-profanity": "^1.4.2",
     "styled-components": "^5.3.8",
     "match-sorter": "^4.0.2",
     "codemirror5": "npm:codemirror@^5.65.11"
   },
   "devDependencies": {
     "@strapi/helper-plugin": "^4.11.7",
-    "@types/bad-words": "^3.0.1",
     "@types/jest": "^29.4.0",
     "codecov": "^3.7.2",
     "copyfiles": "^2.4.1",

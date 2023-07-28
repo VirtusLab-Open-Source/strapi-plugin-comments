@@ -1,4 +1,5 @@
-import BadWordsFilter from "bad-words";
+import {replaceProfanities, isProfane} from "no-profanity";
+
 import {
   isArray,
   isNumber,
@@ -473,17 +474,14 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       true
     );
     if (config) {
-      const filter = new BadWordsFilter(
-        isObject(config) ? (config as ToBeFixed) : undefined
-      );
-      if (content && filter.isProfane(content)) {
+      if (content && isProfane({testString: content, options: config})) {
         throw new PluginError(
           400,
           "Bad language used! Please polite your comment...",
           {
             content: {
               original: content,
-              filtered: content && filter.clean(content),
+              filtered: content && replaceProfanities({testString: content, options: config}),
             },
           }
         );
