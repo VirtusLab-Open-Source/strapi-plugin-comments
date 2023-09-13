@@ -110,6 +110,7 @@
   "page.details.actions.comment.approve.confirmation.success": "Comment has been approved",
   "page.details.actions.comment.reject.confirmation.success": "Comment has been rejected",
   "page.details.filters.label": "View",
+  "page.details.displayedBy.label": "Displayed By",
   "page.details.filters.removed.visibility": "Show removed comments",
   "page.coming.soon": "Wait for what is coming soon...",
   "page.settings": "Settings",

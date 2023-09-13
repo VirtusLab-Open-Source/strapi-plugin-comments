@@ -32,7 +32,7 @@ import {
   useQueryParams,
 } from '@strapi/helper-plugin';
 import getMessage from '../../../../utils/getMessage';
-import { fetchData } from '../../../Discover/utils/api';
+import { fetchData, displayComment } from '../../../Discover/utils/api';
 import pluginPermissions from '../../../../permissions';
 
 import getUrl from '../../../../utils/getUrl';
@@ -88,6 +88,7 @@ const LatestComments = ({ config }) => {
 
   const handleClickDisplay = (id) => {
     push(getUrl(`discover/${id}`));
+    displayComment(id);
   };
 
   const isLoading = isLoadingForData || isFetching;
@@ -103,8 +104,6 @@ const LatestComments = ({ config }) => {
       defaultMessage: 'No comments match the search.',
     },
   };
-
-  console.log(result)
 
   const emptyContent = _q ? 'search' : 'comments';
 

@@ -16,9 +16,11 @@ import { Stack } from "@strapi/design-system/Stack";
 import { Typography } from "@strapi/design-system/Typography";
 import { getMessage } from "../../../../utils";
 import DetailsFilters from "../DetailsFilters";
+import  UserAvatar  from "../../../../components/Avatar";
 
 const DetailsEntity = ({
   data = {},
+  selected = {},
   schema = {},
   config = {},
   filters,
@@ -48,6 +50,16 @@ const DetailsEntity = ({
 
   const entityIsRenderable =
     data && !isEmpty(data) && (!isEmpty(itemKeys) || data[entityLabelKey]);
+
+  const displayedBy = selected.displayedBy;
+
+  const showDisplayedBy = displayedBy ? displayedBy.map( admin => (
+    <Stack size={1} horizontal paddingBottom={4}>
+      <UserAvatar avatar={admin.avatar} name={`${admin.firstname} ${admin.lastname}`} isAdminComment={true} />
+      <Typography textColor="neutral800" variant="pi">{`${admin.firstname} ${admin.lastname}`}</Typography>
+    </Stack>
+  )) : null
+
 
   return (
     <Box padding={4}>
@@ -83,7 +95,7 @@ const DetailsEntity = ({
           </Stack>
         </Box>
       )}
-      <Box>
+      <Box marginBottom={4}>
         <Typography variant="sigma" textColor="neutral600" id="view-filters">
           {getMessage("page.details.filters.label", "View")}
         </Typography>
@@ -92,6 +104,17 @@ const DetailsEntity = ({
         </Box>
         <DetailsFilters data={filters} onChange={onFiltersChange} />
       </Box>
+      {displayedBy && (
+      <Box>
+        <Typography variant="sigma" textColor="neutral600" id="displayed-by">
+          {getMessage("page.details.displayedBy.label", "Displayed By")}
+        </Typography>
+        <Box paddingTop={2} paddingBottom={4}>
+          <Divider />
+        </Box>
+          {showDisplayedBy}
+      </Box>
+      )}
     </Box>
   );
 };

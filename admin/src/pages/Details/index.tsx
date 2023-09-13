@@ -152,6 +152,7 @@ const Details = ({ config }) => {
                   endCol={
                     <DetailsEntity
                       data={entity}
+                      selected={selected}
                       schema={contentTypeData?.schema}
                       config={config}
                       filters={filters}

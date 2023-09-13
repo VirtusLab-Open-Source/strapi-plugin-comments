@@ -15,11 +15,10 @@ export const AdminShield = styled(Box)`
     align-items: middle;
 
     position: absolute;
-    right: -35%;
-    top: -35%;
+    right: -20%;
+    top: -20%;
 
     border-radius: 50%;
-    border: 2px #ffffff solid;
 
-    background: #ffffff;
+    background: transparent;
 `;
