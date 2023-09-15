@@ -637,6 +637,13 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/core/-/core-1.3.1.tgz#4d795b649cc3b1cbb760d191c80dcb4353c9a366"
   integrity sha512-Bu+AMaXNjrpjh41znzHqaz3r2Nr8hHuHZT6V2LBKMhyMl0FgKA62PNYbqnfgmzOhoWZj70Zecisbo4H1rotP5g==
 
+"@floating-ui/core@^1.4.2":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@floating-ui/core/-/core-1.5.0.tgz#5c05c60d5ae2d05101c3021c1a2a350ddc027f8c"
+  integrity sha512-kK1h4m36DQ0UHGj5Ah4db7R0rHemTqqO0QLvUqi1/mUUp3LuAWbWxdxSIf/XsnH9VS6rRVPLJCncjRzUvyCLXg==
+  dependencies:
+    "@floating-ui/utils" "^0.1.3"
+
 "@floating-ui/dom@^1.0.1":
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-1.2.3.tgz#8dc6fbf799fbb5c29f705b54bdd51f3ab0ee03a2"
@@ -651,12 +658,32 @@
   dependencies:
     "@floating-ui/core" "^1.3.1"
 
-"@floating-ui/react-dom@^2.0.0", "@floating-ui/react-dom@^2.0.1":
+"@floating-ui/dom@^1.5.1":
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-1.5.3.tgz#54e50efcb432c06c23cd33de2b575102005436fa"
+  integrity sha512-ClAbQnEqJAKCJOEbbLo5IUlZHkNszqhuxS4fHAVxRPXPya6Ysf2G8KypnYcOTpx6I8xcgF9bbHb6g/2KpbV8qA==
+  dependencies:
+    "@floating-ui/core" "^1.4.2"
+    "@floating-ui/utils" "^0.1.3"
+
+"@floating-ui/react-dom@^2.0.0":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@floating-ui/react-dom/-/react-dom-2.0.1.tgz#7972a4fc488a8c746cded3cfe603b6057c308a91"
   integrity sha512-rZtAmSht4Lry6gdhAJDrCp/6rKN7++JnL1/Anbr/DdeyYXQPxvg/ivrbYvJulbRf4vL8b212suwMM2lxbv+RQA==
   dependencies:
     "@floating-ui/dom" "^1.3.0"
+
+"@floating-ui/react-dom@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@floating-ui/react-dom/-/react-dom-2.0.2.tgz#fab244d64db08e6bed7be4b5fcce65315ef44d20"
+  integrity sha512-5qhlDvjaLmAst/rKb3VdlCinwTF4EYMiVxuuc/HVUjs46W0zgtbMmAZ1UTsDrRTxRmUEzl92mOtWbeeXL26lSQ==
+  dependencies:
+    "@floating-ui/dom" "^1.5.1"
+
+"@floating-ui/utils@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.1.3.tgz#6ee493102b45d796d69f1f472d4bf64e5244500a"
+  integrity sha512-uvnFKtPgzLnpzzTRfhDlvXX0kLYi9lDRQbcDmT8iXl71Rx+uwSuaUIQl3DNC7w5OweAQ7XQMDObML+KaYDQfng==
 
 "@formatjs/ecma402-abstract@1.14.3":
   version "1.14.3"
@@ -918,10 +945,10 @@
   resolved "https://registry.yarnpkg.com/@graphql-typed-document-node/core/-/core-3.1.2.tgz#6fc464307cbe3c8ca5064549b806360d84457b04"
   integrity sha512-9anpBMM9mEgZN4wr2v8wHJI2/u5TnnggewRN6OlvXTTnuVyoY19X6rOv9XTqKRw6dcGKwZsBi8n0kDE2I5i4VA==
 
-"@internationalized/date@^3.3.0":
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/@internationalized/date/-/date-3.3.0.tgz#90386d4b4e707f28507d1a1b3cc0e162ad5ee038"
-  integrity sha512-qfRd7jCIgUjabI8RxeAsxhLDRS1u8eUPX96GB5uBp1Tpm6YY6dVveE7YwsTEV6L4QOp5LKFirFHHGsL/XQwJIA==
+"@internationalized/date@^3.4.0":
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/@internationalized/date/-/date-3.5.0.tgz#67f1dd62355f05140cc80e324842e9bfb4553abe"
+  integrity sha512-nw0Q+oRkizBWMioseI8+2TeUPEyopJVz5YxoYVzR0W1v+2YytiYah7s/ot35F149q/xAg4F1gT/6eTd+tsUpFQ==
   dependencies:
     "@swc/helpers" "^0.5.0"
 
@@ -1579,29 +1606,29 @@
   dependencies:
     "@sinonjs/commons" "^2.0.0"
 
-"@strapi/design-system@1.9.0":
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/@strapi/design-system/-/design-system-1.9.0.tgz#fbccd17f74cba0262c4aabbfdd8d1e8325f64e79"
-  integrity sha512-JDeoJigur0lNJFkQN9XuM9BuGXHa+LIqSqT6cefH1a6x4zMxW2LGSsM7sewZfaAolKmwVgHWBI3ON9ViOLcT6Q==
+"@strapi/design-system@1.10.1":
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/@strapi/design-system/-/design-system-1.10.1.tgz#f96ced6d871f0a52f43b0d1e6d4f5bdab8989e8e"
+  integrity sha512-fVrqDlcLlnvdMeay6IdamcmPwZtDs/qiAWuf2wl5zEPrZacDekNhX/IUZZj3HBmdkwZlpYg78SPbEeY5bsYl3g==
   dependencies:
     "@codemirror/lang-json" "^6.0.1"
-    "@floating-ui/react-dom" "^2.0.1"
-    "@internationalized/date" "^3.3.0"
+    "@floating-ui/react-dom" "^2.0.2"
+    "@internationalized/date" "^3.4.0"
     "@internationalized/number" "^3.2.1"
     "@radix-ui/react-dismissable-layer" "^1.0.4"
     "@radix-ui/react-dropdown-menu" "^2.0.5"
     "@radix-ui/react-focus-scope" "1.0.3"
-    "@strapi/ui-primitives" "^1.9.0"
-    "@uiw/react-codemirror" "^4.21.9"
+    "@strapi/ui-primitives" "^1.10.1"
+    "@uiw/react-codemirror" "^4.21.13"
     aria-hidden "^1.2.3"
     compute-scroll-into-view "^3.0.3"
     prop-types "^15.8.1"
     react-remove-scroll "^2.5.6"
 
-"@strapi/helper-plugin@4.13.1", "@strapi/helper-plugin@^4.13.1":
-  version "4.13.1"
-  resolved "https://registry.yarnpkg.com/@strapi/helper-plugin/-/helper-plugin-4.13.1.tgz#1cf16db74f70f802a1a5f3c58301b92b066fb13d"
-  integrity sha512-qUxUuVfeeXSmTEKykqEq36Y56iwg0WfZRK1xREuiLiLWguah7LpN1WEieZbItsMK8C/S6g4QNn9j78bx5vOvrg==
+"@strapi/helper-plugin@4.13.6", "@strapi/helper-plugin@^4.13.6":
+  version "4.13.6"
+  resolved "https://registry.yarnpkg.com/@strapi/helper-plugin/-/helper-plugin-4.13.6.tgz#38d6e0a4f0c829cfbf9d9b80739bcdfb9740ad13"
+  integrity sha512-UZaGuzU0K8A3J9UuW+u3yuOdLP3racg2pBu6VSLpUL+pcUZb3WLLEWtHqVTlXmF7yq9naemg9Z2lezZAmNaQDQ==
   dependencies:
     axios "1.5.0"
     date-fns "2.30.0"
@@ -1615,23 +1642,23 @@
     react-query "3.39.3"
     react-select "5.7.0"
 
-"@strapi/icons@1.9.0":
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/@strapi/icons/-/icons-1.9.0.tgz#a3d12f965e8a42082cc83149af8fb0a5e610dfe8"
-  integrity sha512-w+4PGz/8mdzW+kDS8vJX/5fAZ7NBaWPDdhuLE4rqWQZuUDSsetVjgX5RQlulw/f3R52JKJmp5+p2shT84kyMbw==
+"@strapi/icons@1.10.1":
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/@strapi/icons/-/icons-1.10.1.tgz#d0805fbe630f77e86e71740f64e30b88981ff718"
+  integrity sha512-nipvxjSlaFgrXkcJXPDCDP/QrMUyYW6gSIMpr+ZhWE34GiLY0D/FBu3GFbuRzXWp3YwFdnL09OlW0L04KDjIUg==
 
-"@strapi/plugin-graphql@^4.13.1":
-  version "4.13.1"
-  resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.13.1.tgz#a3c8ce14f6161a65c595e77b206f00f5c68ff0b8"
-  integrity sha512-w0ysCxrTgpos3drBACskVUFLezo/Me0J8Vedifg5M+f96UJdNvv6BN2rm9KGD2Uy4noreByPJbWiwQkmRwSnvw==
+"@strapi/plugin-graphql@^4.13.6":
+  version "4.13.6"
+  resolved "https://registry.yarnpkg.com/@strapi/plugin-graphql/-/plugin-graphql-4.13.6.tgz#b1f2019495d1c72b1375c199679a94f47edb9c9e"
+  integrity sha512-8kbQP6kOITpQRYghsSR8n4brCS1Xe0SjXOPs6w3wsYyiRhx+1wQR+JpGR5CfMSa2ITIXjmvWidSMGeRI+Pik7w==
   dependencies:
     "@graphql-tools/schema" "8.5.1"
     "@graphql-tools/utils" "^8.13.1"
-    "@strapi/design-system" "1.9.0"
-    "@strapi/helper-plugin" "4.13.1"
-    "@strapi/icons" "1.9.0"
-    "@strapi/utils" "4.13.1"
-    apollo-server-core "3.12.0"
+    "@strapi/design-system" "1.10.1"
+    "@strapi/helper-plugin" "4.13.6"
+    "@strapi/icons" "1.10.1"
+    "@strapi/utils" "4.13.6"
+    apollo-server-core "3.12.1"
     apollo-server-koa "3.10.0"
     glob "7.2.3"
     graphql "^15.5.1"
@@ -1666,10 +1693,10 @@
     pluralize "^8.0.0"
     subscriptions-transport-ws "0.9.19"
 
-"@strapi/ui-primitives@^1.9.0":
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/@strapi/ui-primitives/-/ui-primitives-1.9.0.tgz#c6727c31145bbea86a4430c3682c2236b8443799"
-  integrity sha512-pjtGALNbWry/rIu50pKpa9K2unoly4FrHwyK1/nbp8OvyMK16E/usPMSndUazQMYv4sjrVczHljNi9Kg5IwQlA==
+"@strapi/ui-primitives@^1.10.1":
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/@strapi/ui-primitives/-/ui-primitives-1.10.1.tgz#5a843350e2d7d1370f65ea2c04e835c6d1bfa872"
+  integrity sha512-tbNsKnz/JTT5F+Eu7W8qwA9ipHpF2a3YCViIuEU6GxDwvwJkMEI2rTcyxswxRRY1fcVxkWMnPsTFi4kczk0D1Q==
   dependencies:
     "@radix-ui/number" "^1.0.1"
     "@radix-ui/primitive" "^1.0.1"
@@ -1693,10 +1720,10 @@
     aria-hidden "^1.2.3"
     react-remove-scroll "^2.5.6"
 
-"@strapi/utils@4.13.1", "@strapi/utils@^4.13.1":
-  version "4.13.1"
-  resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.13.1.tgz#03f9fee871481af4abb55733aeb21f61a3c64cec"
-  integrity sha512-IW0ac0aeJbE6wptzW/7yZ4KPwRaqshHtNPCOrWAnG0L1Is/UkpwVUBUSmWq12m1utJF+nIenwgHH8jbKYolhFw==
+"@strapi/utils@4.13.6", "@strapi/utils@^4.13.6":
+  version "4.13.6"
+  resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-4.13.6.tgz#3526979e640d10dc853e277bf628abfdee9a5fcc"
+  integrity sha512-9IlkOe+mmZUh1WzQW+oWhEgRYuq2DHDWe1JzaNoCivVssFZh9PUr8GT6JYCk9LrNwGP2uX9o42K03NQi1NZ05A==
   dependencies:
     "@sindresorhus/slugify" "1.1.0"
     date-fns "2.30.0"
@@ -2061,10 +2088,10 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@uiw/codemirror-extensions-basic-setup@4.21.12":
-  version "4.21.12"
-  resolved "https://registry.yarnpkg.com/@uiw/codemirror-extensions-basic-setup/-/codemirror-extensions-basic-setup-4.21.12.tgz#95d1f86727093a841eac3b9dfea640aa792ff98b"
-  integrity sha512-LNAr5ZmKjo9KpnoVhnAiXkRsI+l9JrIrUPc3+GjpbTi8k9QjEcs8y3MFvhA2le7bbf6q1gHh2UbLmn6le0cGjQ==
+"@uiw/codemirror-extensions-basic-setup@4.21.13":
+  version "4.21.13"
+  resolved "https://registry.yarnpkg.com/@uiw/codemirror-extensions-basic-setup/-/codemirror-extensions-basic-setup-4.21.13.tgz#d7bcebf1906157bafde2d097dd6b63bcc772f54c"
+  integrity sha512-5ObHaBqPV00xBVleDFehzPfOQvek5dPM7YLdPHJUE9bumeSflIWJb55n0Zg/w1rsuU0Lt/Q6WJUh4X6VGR1FVw==
   dependencies:
     "@codemirror/autocomplete" "^6.0.0"
     "@codemirror/commands" "^6.0.0"
@@ -2074,16 +2101,16 @@
     "@codemirror/state" "^6.0.0"
     "@codemirror/view" "^6.0.0"
 
-"@uiw/react-codemirror@^4.21.9":
-  version "4.21.12"
-  resolved "https://registry.yarnpkg.com/@uiw/react-codemirror/-/react-codemirror-4.21.12.tgz#5161afbcef00b6a739c737541170108e1649c2dc"
-  integrity sha512-dgPhw2QLcXMe004UU8b8P0Y6Zu+AKoGXbioLF2dY2/wLeMWSXCCbKo/BKJGj/skoO/lBJ4X+b+14OGuZ5Uyeaw==
+"@uiw/react-codemirror@^4.21.13":
+  version "4.21.13"
+  resolved "https://registry.yarnpkg.com/@uiw/react-codemirror/-/react-codemirror-4.21.13.tgz#b6e44cbccef70c1ff13bc905b46edc5bc3363dcc"
+  integrity sha512-kNX8jLeoDrF2CDa5lsey0MXjBXN3JP00z6AQTTP58mHvlE7Rf03QJSs7bNwwco+3kpwREifFJjnwRe+Y3Gmwtw==
   dependencies:
     "@babel/runtime" "^7.18.6"
     "@codemirror/commands" "^6.1.0"
     "@codemirror/state" "^6.1.1"
     "@codemirror/theme-one-dark" "^6.0.0"
-    "@uiw/codemirror-extensions-basic-setup" "4.21.12"
+    "@uiw/codemirror-extensions-basic-setup" "4.21.13"
     codemirror "^6.0.0"
 
 abbrev@1:
@@ -2207,7 +2234,36 @@ apollo-server-core@3.11.1:
     uuid "^9.0.0"
     whatwg-mimetype "^3.0.0"
 
-apollo-server-core@3.12.0, apollo-server-core@^3.10.0:
+apollo-server-core@3.12.1:
+  version "3.12.1"
+  resolved "https://registry.yarnpkg.com/apollo-server-core/-/apollo-server-core-3.12.1.tgz#ba255c37345db29c48a2e0c064c519a8d62eb5af"
+  integrity sha512-9SF5WAkkV0FZQ2HVUWI9Jada1U0jg7e8NCN9EklbtvaCeUlOLyXyM+KCWuZ7+dqHxjshbtcwylPHutt3uzoNkw==
+  dependencies:
+    "@apollo/utils.keyvaluecache" "^1.0.1"
+    "@apollo/utils.logger" "^1.0.0"
+    "@apollo/utils.usagereporting" "^1.0.0"
+    "@apollographql/apollo-tools" "^0.5.3"
+    "@apollographql/graphql-playground-html" "1.6.29"
+    "@graphql-tools/mock" "^8.1.2"
+    "@graphql-tools/schema" "^8.0.0"
+    "@josephg/resolvable" "^1.0.0"
+    apollo-datasource "^3.3.2"
+    apollo-reporting-protobuf "^3.4.0"
+    apollo-server-env "^4.2.1"
+    apollo-server-errors "^3.3.1"
+    apollo-server-plugin-base "^3.7.2"
+    apollo-server-types "^3.8.0"
+    async-retry "^1.2.1"
+    fast-json-stable-stringify "^2.1.0"
+    graphql-tag "^2.11.0"
+    loglevel "^1.6.8"
+    lru-cache "^6.0.0"
+    node-abort-controller "^3.0.1"
+    sha.js "^2.4.11"
+    uuid "^9.0.0"
+    whatwg-mimetype "^3.0.0"
+
+apollo-server-core@^3.10.0:
   version "3.12.0"
   resolved "https://registry.yarnpkg.com/apollo-server-core/-/apollo-server-core-3.12.0.tgz#8aa2a7329ce6fe1823290c45168c749db01548df"
   integrity sha512-hq7iH6Cgldgmnjs9FVSZeKWRpi0/ZR+iJ1arzeD2VXGxxgk1mAm/cz1Tx0TYgegZI+FvvrRl0UhKEx7sLnIxIg==
