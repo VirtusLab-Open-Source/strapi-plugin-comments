@@ -794,8 +794,6 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
         where: { id: userId },
       }); 
 
-      console.log(user)
-
     if (!user) {
       throw new PluginError(404, "Not found");
     }
@@ -806,7 +804,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
       throw new PluginError(403, "User is already existing in this relation field");
     }
 
-    const updatedDisplayedBy = entity.displayedBy?.push(user);
+    const updatedDisplayedBy = [...(entity?.displayedBy || []).map(_ => _.id), user.id];
 
     const displayComment = await strapi.db
       .query<Comment>(getModelUid("comment"))
@@ -816,7 +814,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
   
       });
 
-      return this.getCommonService().sanitizeCommentEntity(displayComment);
+      return this.getCommonService().sanitizeCommentEntity(displayComment, []);
   },
 
   // Recognize Strapi User fields possible to populate

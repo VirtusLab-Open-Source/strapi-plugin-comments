@@ -38,7 +38,7 @@ import {
   useQueryParams,
 } from '@strapi/helper-plugin';
 import getMessage from '../../utils/getMessage';
-import {fetchData} from './utils/api';
+import {fetchData, displayComment} from './utils/api';
 import pluginPermissions from '../../permissions';
 
 import getUrl from '../../utils/getUrl';
@@ -99,6 +99,7 @@ const Discover = ({config}) => {
 
   const handleClickDisplay = (id) => {
     push(getUrl(`discover/${id}`));
+    displayComment(id);
   };
 
   const isLoading = isLoadingForData || isFetching;

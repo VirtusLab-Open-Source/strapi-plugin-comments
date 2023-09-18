@@ -95,8 +95,8 @@ export default {
     },
     displayedBy: {
       type: "relation",
-      relation: "manyToMany",
-      target: "plugin::users-permissions.user",
+      relation: "oneToMany",
+      target: "admin::user",
       configurable: false
     }
   }
