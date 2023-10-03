@@ -73,9 +73,11 @@ export default {
   },
 
   registerTrads({ locales = [] }: { locales: Array<TranslationKey>}) {
-    return locales.map((locale: string) => {
+    return locales
+    .filter((locale: string) => Object.keys(trads).includes(locale))
+    .map((locale: string) => {
       return {
-        data: prefixPluginTranslations(get<Translations, TranslationKey>(trads, locale as TranslationKey), pluginId, {}),
+        data: prefixPluginTranslations(get<Translations, TranslationKey>(trads, locale as TranslationKey, trads.en), pluginId, {}),
         locale,
       };
     });
