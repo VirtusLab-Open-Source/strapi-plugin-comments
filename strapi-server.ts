@@ -1,4 +1,4 @@
-import { PropType } from "strapi-typed";
+import { PropType, StrapiContext } from "strapi-typed";
 import { CommentsPluginConfig } from "./types";
 
 import { isArray, isEmpty, isString } from "lodash";
@@ -73,5 +73,30 @@ export = () => ({
         );
       }
     },
+  },
+  register( {strapi}: StrapiContext ) {
+    if (strapi.plugin('documentation')) {
+      const override = {
+        // Only run this override for version 1.0.0
+        info: { version: '1.0.0' },
+        paths: {
+          '/moderate/all': {
+            get: {
+              responses: { 200: { description: "Get all comments" }}
+            }
+          }
+        }
+      }
+
+      strapi
+        .plugin('documentation')
+        .service('override')
+        .registerOverride(override, {
+          // Specify the origin in case the user does not want this plugin documented
+          pluginOrigin: 'comments',
+          // The override provides everything don't generate anything
+          excludeFromGeneration: ['comments'],
+        });
+    }
   },
 });
