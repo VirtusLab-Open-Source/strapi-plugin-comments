@@ -6,6 +6,8 @@ import { isArray, isEmpty, isString } from "lodash";
 import { REGEX, CONFIG_PARAMS } from "./server/utils/constants";
 import server from "./server";
 import contentTypes from "./content-types";
+import { adminPaths } from "./server/documentation/admin";
+import { clientPaths } from "./server/documentation/client";
 
 export = () => ({
   ...server,
@@ -75,17 +77,15 @@ export = () => ({
     },
   },
   register( {strapi}: StrapiContext ) {
+    const paths = {
+      ...adminPaths,
+      ...clientPaths
+    }
     if (strapi.plugin('documentation')) {
       const override = {
         // Only run this override for version 1.0.0
         info: { version: '1.0.0' },
-        paths: {
-          '/moderate/all': {
-            get: {
-              responses: { 200: { description: "Get all comments" }}
-            }
-          }
-        }
+        paths: paths
       }
 
       strapi
