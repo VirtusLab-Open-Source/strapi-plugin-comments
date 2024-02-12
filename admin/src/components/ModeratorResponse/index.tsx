@@ -141,14 +141,11 @@ const ModeratorResponse: React.FC<ModeratorResponseProps> = ({
           </Typography>
         </Box>
         <Box paddingTop={2} paddingBottom={4}>
-          <GenericInput
+          <Wysiwyg
             name=""
             type="wysiwyg"
             value={commentField}
             onChange={handleCommentChange}
-            customInputs={{
-              wysiwyg: Wysiwyg,
-            } as any}
             intlLabel={intlLabel}
           />
         </Box>
