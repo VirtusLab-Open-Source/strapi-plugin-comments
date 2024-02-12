@@ -27,19 +27,29 @@
     "url": "https://github.com/VirtusLab-Open-Source/strapi-plugin-comments"
   },
   "dependencies": {
-    "@strapi/plugin-graphql": "^4.13.6",
-    "@strapi/utils": "^4.13.6",
+    "@strapi/design-system": "1.14.1",
+    "@strapi/plugin-graphql": "^4.20.0",
+    "@strapi/utils": "^4.20.0",
+    "@strapi/types": "4.20.0",
+    "no-profanity": "^1.4.2",
+    "styled-components": "^5.3.8",
+    "match-sorter": "^4.0.2",
+    "react-query": "3.39.3",
+    "codemirror5": "npm:codemirror@^5.65.11"
+  },
+  "devDependencies": {
+    "@strapi/helper-plugin": "^4.20.0",
+    "@strapi/strapi": "4.20.0",
     "@types/axios": "^0.14.0",
     "@types/react-intl": "^3.0.0",
     "@types/react-query": "^1.2.9",
     "@types/styled-components": "^5.1.26",
-    "no-profanity": "^1.4.2",
-    "styled-components": "^5.3.8",
-    "match-sorter": "^4.0.2",
-    "codemirror5": "npm:codemirror@^5.65.11"
-  },
-  "devDependencies": {
-    "@strapi/helper-plugin": "^4.13.6",
+    "@types/codemirror5": "npm:@types/codemirror@^5.60.15",
+    "@types/markdown-it": "13.0.7",
+    "@types/markdown-it-container": "2.0.9",
+    "@types/markdown-it-emoji": "2.0.4",
+    "@types/markdown-it-footnote": "3.0.3",
+    "@types/sanitize-html": "2.9.5",
     "@types/jest": "^29.4.0",
     "codecov": "^3.7.2",
     "copyfiles": "^2.4.1",
@@ -67,7 +77,7 @@
     "rimraf": "^4.3.0",
     "react-intl": "^6.4.1",
     "sanitize-html": "2.11.0",
-    "strapi-typed": "^1.0.15",
+    "strapi-typed": "^1.0.18",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.3"

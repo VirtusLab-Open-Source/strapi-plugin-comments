@@ -4,6 +4,8 @@
  *
  */
 
+// @ts-nocheck
+
 import React, { useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { postComment, updateComment } from "../../pages/utils/api";
@@ -20,9 +22,9 @@ import { Button } from "@strapi/design-system/Button";
 //@ts-ignore
 import { Divider } from "@strapi/design-system/Divider";
 import { handleAPIError, getMessage } from "../../utils";
-import Wysiwyg from "../Wysiwyg";
+import { Wysiwyg } from "../Wysiwyg/Field";
 // @ts-ignore
-import { auth, useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
+import { GenericInput, auth, useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
 import { StrapiAdminUser, Id } from "strapi-typed";
 import { pluginId } from "../../pluginId";
 import { ToBeFixed } from "../../../../types";
@@ -82,7 +84,7 @@ const ModeratorResponseModal: React.FC<ModeratorResponseModalProps> = ({
         message: `${pluginId}.${message}`,
       });
       stateAction(false);
-      unlockApp();
+      unlockApp && unlockApp();
     };
 
   const onError = (err: ToBeFixed) => {
@@ -108,7 +110,7 @@ const ModeratorResponseModal: React.FC<ModeratorResponseModalProps> = ({
   });
 
   const handlePostComment = async (): Promise<void> => {
-    lockApp();
+    lockApp && lockApp();
     await postCommentMutation.mutate({
       threadId: id,
       body: commentField,
@@ -117,7 +119,7 @@ const ModeratorResponseModal: React.FC<ModeratorResponseModalProps> = ({
   };
 
   const handleUpdateComment = async (): Promise<void> => {
-    lockApp();
+    lockApp && lockApp();
     await updateCommentMutation.mutate({
       id,
       body: commentField,
@@ -138,11 +140,14 @@ const ModeratorResponseModal: React.FC<ModeratorResponseModalProps> = ({
         </Typography>
       </ModalHeader>
       <ModalBody>
-        <Wysiwyg
+        <GenericInput
           name=""
           value={commentField}
           onChange={handleCommentChange}
           intlLabel={intlLabel}
+          customInputs={{
+            wysiwyg: Wysiwyg
+          } as any}
         />
       </ModalBody>
       <ModalFooter

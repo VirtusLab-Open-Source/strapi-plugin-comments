@@ -1,30 +1,21 @@
-/*
- *
- * Details
- *
- */
+import * as React from 'react';
 
-import React from 'react';
+// @ts-ignore
+import { BaseButtonProps, Box, Flex, Typography } from '@strapi/design-system';
+import { Expand } from '@strapi/icons';
 import { useIntl } from 'react-intl';
-//@ts-ignore
-import { Box } from '@strapi/design-system/Box';
-//@ts-ignore
-import { Flex } from '@strapi/design-system/Flex';
-//@ts-ignore
-import { Typography } from '@strapi/design-system/Typography';
-//@ts-ignore
-import Expand from '@strapi/icons/Expand';
+
 import { ExpandButton } from './WysiwygStyles';
 
-type WysiwyhFooterProps = {
-  onToggleExpand: () => void
+interface WysiwygFooterProps {
+  onToggleExpand: BaseButtonProps['onClick'];
 }
 
-const WysiwygFooter: React.FC<WysiwyhFooterProps> = ({ onToggleExpand }) => {
+const WysiwygFooter = ({ onToggleExpand }: WysiwygFooterProps) => {
   const { formatMessage } = useIntl();
 
   return (
-    <Box padding={2} background="neutral100" hasRadius>
+    <Box padding={2} background="neutral100" borderRadius={`0 0 ${4 / 16}rem ${4 / 16}rem`}>
       <Flex justifyContent="flex-end" alignItems="flex-end">
         <ExpandButton id="expand" onClick={onToggleExpand}>
           <Typography>
@@ -40,4 +31,5 @@ const WysiwygFooter: React.FC<WysiwyhFooterProps> = ({ onToggleExpand }) => {
   );
 };
 
-export default WysiwygFooter;
+export { WysiwygFooter };
+export type { WysiwygFooterProps };

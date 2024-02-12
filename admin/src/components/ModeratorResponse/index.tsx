@@ -4,6 +4,8 @@
  *
  */
 
+// @ts-nocheck
+
 import React, { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { unblockItemThread } from "../../pages/utils/api";
@@ -20,10 +22,10 @@ import { Button } from "@strapi/design-system/Button";
 //@ts-ignore
 import { Divider } from "@strapi/design-system/Divider";
 import { getMessage, handleAPIError } from "../../utils";
-import Wysiwyg from "../Wysiwyg";
+import { Wysiwyg } from "../Wysiwyg/Field";
 import { Comment } from "../../../../types/contentTypes";
 // @ts-ignore
-import { auth, useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
+import { GenericInput, auth, useNotification, useOverlayBlocker } from "@strapi/helper-plugin";
 import { StrapiAdminUser, Id } from "strapi-typed";
 import { pluginId } from "../../pluginId";
 import { ToBeFixed } from "../../../../types";
@@ -53,7 +55,7 @@ const ModeratorResponse: React.FC<ModeratorResponseProps> = ({
   const [commentField, setCommentField] = useState("");
   const [isFieldEmpty, setIsFieldEmpty] = useState(true);
 
-  const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCommentChange = (e: any) => {
     setCommentField(e.target.value);
   };
 
@@ -77,7 +79,7 @@ const ModeratorResponse: React.FC<ModeratorResponseProps> = ({
       });
       stateAction(false);
       setCommentField('');
-      unlockApp();
+      unlockApp && unlockApp();
     };
 
   const onError = (err: ToBeFixed) => {
@@ -101,7 +103,7 @@ const ModeratorResponse: React.FC<ModeratorResponseProps> = ({
   });
 
   const handleSave = async (): Promise<void> => {
-    lockApp();
+    lockApp && lockApp();
     await postCommentMutation.mutate({
       threadId,
       body: commentField,
@@ -110,7 +112,7 @@ const ModeratorResponse: React.FC<ModeratorResponseProps> = ({
   };
 
   const handleReopen = async (): Promise<void> => {
-    lockApp();
+    lockApp && lockApp();
     await unblockItemThreadMutation.mutate(threadId);
     await postCommentMutation.mutate({
       threadId,
@@ -139,10 +141,14 @@ const ModeratorResponse: React.FC<ModeratorResponseProps> = ({
           </Typography>
         </Box>
         <Box paddingTop={2} paddingBottom={4}>
-          <Wysiwyg
+          <GenericInput
             name=""
+            type="wysiwyg"
             value={commentField}
             onChange={handleCommentChange}
+            customInputs={{
+              wysiwyg: Wysiwyg,
+            } as any}
             intlLabel={intlLabel}
           />
         </Box>

@@ -1,11 +1,8 @@
-/*
- *
- * WYSIWYG utils
- *
- */
+import { MutableRefObject } from 'react';
 
-// @ts-nocheck
-export const replaceText = (markdownName, textToChange) => {
+import CodeMirror from 'codemirror5';
+
+export const replaceText = (markdownName: string, textToChange: string) => {
   let editedText;
 
   switch (markdownName) {
@@ -37,10 +34,10 @@ export const replaceText = (markdownName, textToChange) => {
   return editedText;
 };
 
-export const insertText = markdownName => {
+export const insertText = (markdownName: string) => {
   let editedText;
   // object to calculate text that will be selected after insert of markdown
-  let selection = { start: markdownName.length, end: 0 };
+  const selection = { start: markdownName.length, end: 0 };
 
   switch (markdownName) {
     case 'Strikethrough':
@@ -82,7 +79,7 @@ export const insertText = markdownName => {
   return { editedText, selection };
 };
 
-export const insertListOrTitle = markdown => {
+export const insertListOrTitle = (markdown: string) => {
   let textToInsert;
 
   switch (markdown) {
@@ -119,7 +116,10 @@ export const insertListOrTitle = markdown => {
 
 // EDITOR ACTIONS FUNCTIONS
 
-export const markdownHandler = (editor, markdownType) => {
+export const markdownHandler = (
+  editor: MutableRefObject<CodeMirror.EditorFromTextArea>,
+  markdownType: string
+) => {
   const textToEdit = editor.current.getSelection();
   let textToInsert;
 
@@ -139,16 +139,19 @@ export const markdownHandler = (editor, markdownType) => {
   }
 };
 
-export const listHandler = (editor, listType) => {
+export const listHandler = (
+  editor: MutableRefObject<CodeMirror.EditorFromTextArea>,
+  listType: string
+) => {
   const doc = editor.current.getDoc();
   const insertion = listType === 'BulletList' ? '- ' : '1. ';
 
   if (doc.somethingSelected()) {
     const selections = doc.listSelections();
-    let remove = null;
+    let remove: boolean | null = null;
 
-    editor.current.operation(function() {
-      selections.forEach(function(selection) {
+    editor.current.operation(function () {
+      selections.forEach(function (selection) {
         const pos = [selection.head.line, selection.anchor.line].sort();
 
         // Remove if the first text starts with it
@@ -170,7 +173,7 @@ export const listHandler = (editor, listType) => {
       });
     });
   } else {
-    let { line: currentLine } = doc.getCursor();
+    const { line: currentLine } = doc.getCursor();
     const listToInsert = insertListOrTitle(listType);
     const lineContent = editor.current.getLine(currentLine);
 
@@ -185,8 +188,11 @@ export const listHandler = (editor, listType) => {
   editor.current.focus();
 };
 
-export const titleHandler = (editor, titleType) => {
-  let { line: currentLine } = editor.current.getCursor();
+export const titleHandler = (
+  editor: MutableRefObject<CodeMirror.EditorFromTextArea>,
+  titleType: string
+) => {
+  const { line: currentLine } = editor.current.getCursor();
   const titleToInsert = insertListOrTitle(titleType);
   const lineContent = editor.current.getLine(currentLine);
 
@@ -207,8 +213,12 @@ export const titleHandler = (editor, titleType) => {
   }, 0);
 };
 
-export const insertFile = (editor, files) => {
-  let { line, ch } = editor.current.getCursor();
+export const insertFile = (
+  editor: MutableRefObject<CodeMirror.EditorFromTextArea>,
+  files: any[]
+) => {
+  let { line } = editor.current.getCursor();
+  const { ch } = editor.current.getCursor();
 
   files.forEach((file, i) => {
     let contentLength = editor.current.getLine(line).length;
@@ -235,7 +245,13 @@ export const insertFile = (editor, files) => {
 
 // NEXT FUNCTIONS FOR QUOTE OR CODE MARKDOWN
 
-const insertWithTextToEdit = (editor, markdownType, line, contentLength, textToEdit) => {
+const insertWithTextToEdit = (
+  editor: MutableRefObject<CodeMirror.EditorFromTextArea>,
+  markdownType: string,
+  line: number,
+  contentLength: number,
+  textToEdit: string
+) => {
   const textToInsert = replaceText(markdownType, textToEdit);
 
   // remove content after current line
@@ -254,7 +270,7 @@ const insertWithTextToEdit = (editor, markdownType, line, contentLength, textToE
   editor.current.replaceSelection(textToInsert);
 
   if (markdownType === 'Code') {
-    let { line: newLine } = editor.current.getCursor();
+    const { line: newLine } = editor.current.getCursor();
     editor.current.setCursor({ line: newLine - 1, ch: textToEdit.length });
   }
 
@@ -268,7 +284,12 @@ const insertWithTextToEdit = (editor, markdownType, line, contentLength, textToE
   editor.current.focus();
 };
 
-const insertWithoutTextToEdit = (editor, markdownType, line, contentLength) => {
+const insertWithoutTextToEdit = (
+  editor: MutableRefObject<CodeMirror.EditorFromTextArea>,
+  markdownType: string,
+  line: number,
+  contentLength: number
+) => {
   const textToInsert = insertText(markdownType);
 
   // remove content after current line
@@ -292,9 +313,9 @@ const insertWithoutTextToEdit = (editor, markdownType, line, contentLength) => {
   } else {
     line += 1;
 
-    let { ch } = editor.current.getCursor();
-    let endSelection = ch - textToInsert.selection.end;
-    let startSelection = ch - textToInsert.selection.end - textToInsert.selection.start;
+    const { ch } = editor.current.getCursor();
+    const endSelection = ch - textToInsert.selection.end;
+    const startSelection = ch - textToInsert.selection.end - textToInsert.selection.start;
     editor.current.setSelection({ line, ch: startSelection }, { line, ch: endSelection });
   }
 
@@ -307,10 +328,13 @@ const insertWithoutTextToEdit = (editor, markdownType, line, contentLength) => {
   editor.current.focus();
 };
 
-export const quoteAndCodeHandler = (editor, markdownType) => {
+export const quoteAndCodeHandler = (
+  editor: MutableRefObject<CodeMirror.EditorFromTextArea>,
+  markdownType: string
+) => {
   const textToEdit = editor.current.getSelection();
-  let { line } = editor.current.getCursor();
-  let contentLength = editor.current.getLine(line).length;
+  const { line } = editor.current.getCursor();
+  const contentLength = editor.current.getLine(line).length;
 
   if (textToEdit) {
     insertWithTextToEdit(editor, markdownType, line, contentLength, textToEdit);
