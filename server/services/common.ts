@@ -474,14 +474,14 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       true
     );
     if (config) {
-      if (content && isProfane({testString: content, options: config})) {
+      if (content && isProfane({testString: content})) {
         throw new PluginError(
           400,
           "Bad language used! Please polite your comment...",
           {
             content: {
               original: content,
-              filtered: content && replaceProfanities({testString: content, options: config}),
+              filtered: content && replaceProfanities({testString: content}),
             },
           }
         );

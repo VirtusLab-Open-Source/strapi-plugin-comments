@@ -1,11 +1,3 @@
-/*
- *
- * ContinueList
- *
- */
-
-// @ts-nocheck
-
 import CodeMirror from 'codemirror5';
 
 // Disabling eslint on purpose
@@ -15,16 +7,17 @@ var listRE = /^(\s*)(>[> ]*|[*+-] \[[x ]\]\s|[*+-]\s|(\d+)([.)]))(\s*)/,
   emptyListRE = /^(\s*)(>[> ]*|[*+-] \[[x ]\]|[*+-]|(\d+)[.)])(\s*)$/,
   unorderedListRE = /[*+-]\s/;
 
-/* 
+/*
   functions coming from CodeMirror addons continuelist.js
-  ===> https://github.com/codemirror/CodeMirror/blob/master/addon/edit/continuelist.js 
+  ===> https://github.com/codemirror/CodeMirror/blob/master/addon/edit/continuelist.js
 
   we imported it because the way the addon ask to use markdown mode
   since we have our own markdown preview system we couldn't use it directly
   only thing we changed is removing the part that enabled addon only with markdown mode
 */
 
-function newlineAndIndentContinueMarkdownList(cm) {
+function newlineAndIndentContinueMarkdownList(cm: CodeMirror.Editor) {
+  // @ts-expect-error - cm does not recognize disableInput.
   if (cm.getOption('disableInput')) return CodeMirror.Pass;
   var ranges = cm.listSelections(),
     replacements = [];
@@ -72,12 +65,12 @@ function newlineAndIndentContinueMarkdownList(cm) {
   cm.replaceSelections(replacements);
 }
 
-function incrementRemainingMarkdownListNumbers(cm, pos) {
+function incrementRemainingMarkdownListNumbers(cm: CodeMirror.Editor, pos: CodeMirror.Position) {
   var startLine = pos.line,
     lookAhead = 0,
     skipCount = 0;
   var startItem = listRE.exec(cm.getLine(startLine)),
-    startIndent = startItem[1];
+    startIndent = startItem![1];
 
   do {
     lookAhead += 1;
@@ -87,7 +80,7 @@ function incrementRemainingMarkdownListNumbers(cm, pos) {
 
     if (nextItem) {
       var nextIndent = nextItem[1];
-      var newNumber = parseInt(startItem[3], 10) + lookAhead - skipCount;
+      var newNumber = parseInt(startItem![3], 10) + lookAhead - skipCount;
       var nextNumber = parseInt(nextItem[3], 10),
         itemNumber = nextNumber;
 
@@ -116,4 +109,4 @@ function incrementRemainingMarkdownListNumbers(cm, pos) {
   } while (nextItem);
 }
 
-export default newlineAndIndentContinueMarkdownList;
+export { newlineAndIndentContinueMarkdownList };

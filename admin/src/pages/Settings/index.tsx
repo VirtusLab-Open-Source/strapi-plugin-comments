@@ -56,18 +56,15 @@ const Settings = () => {
   const toggleNotification = useNotification();
   const { lockApp, unlockApp } = useOverlayBlocker();
 
-  const viewPermissions = useMemo(
-    () => ({
-      access: pluginPermissions.settings.read,
-      change: pluginPermissions.settings.change,
-    }),
-    []
-  );
-
   const {
     isLoading: isLoadingForPermissions,
-    allowedActions: { canAccess, canChange },
-  } = useRBAC(viewPermissions);
+    allowedActions
+  } = useRBAC(pluginPermissions);
+
+  const { 
+    canSettings: canAccess, 
+    canSettingsChange: canChange 
+  } = allowedActions;
 
   const [restoreConfigmationVisible, setRestoreConfigmationVisible] =
     useState(false);

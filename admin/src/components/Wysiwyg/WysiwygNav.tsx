@@ -1,64 +1,57 @@
-/*
- *
- * WYSIWYG Nav
- *
- */
-import React, { useRef, useState } from 'react';
-import { useIntl } from 'react-intl';
-//@ts-ignore
-import { FocusTrap } from '@strapi/design-system/FocusTrap';
-//@ts-ignore
-import { Box } from '@strapi/design-system/Box';
-//@ts-ignore
-import { Button } from '@strapi/design-system/Button';
-//@ts-ignore
-import { IconButtonGroup } from '@strapi/design-system/IconButton';
-//@ts-ignore
-import { Option, Select } from '@strapi/design-system/Select';
-//@ts-ignore
-import { Popover } from '@strapi/design-system/Popover';
-//@ts-ignore
-import { Flex } from '@strapi/design-system/Flex';
-//@ts-ignore
-import Bold from '@strapi/icons/Bold';
-//@ts-ignore
-import Italic from '@strapi/icons/Italic';
-//@ts-ignore
-import Underline from '@strapi/icons/Underline';
-//@ts-ignore
-import StrikeThrough from '@strapi/icons/StrikeThrough';
-//@ts-ignore
-import BulletList from '@strapi/icons/BulletList';
-//@ts-ignore
-import NumberList from '@strapi/icons/NumberList';
-//@ts-ignore
-import Code from '@strapi/icons/Code';
-//@ts-ignore
-import Image from '@strapi/icons/Picture';
-//@ts-ignore
-import Link from '@strapi/icons/Link';
-//@ts-ignore
-import Quote from '@strapi/icons/Quote';
-//@ts-ignore
-import More from '@strapi/icons/More';
+import * as React from 'react';
+
 import {
-  MainButtons,
+  Button,
+  Flex,
+  IconButtonGroup,
+  SingleSelectOption,
+  Popover,
+  SingleSelect,
+  // @ts-ignore
+} from '@strapi/design-system';
+import {
+  Bold,
+  BulletList,
+  Code,
+  Italic,
+  Link,
+  More,
+  NumberList,
+  Picture as Image,
+  Quote,
+  StrikeThrough,
+  Underline,
+} from '@strapi/icons';
+import { EditorFromTextArea } from 'codemirror5';
+import { useIntl } from 'react-intl';
+import styled from 'styled-components';
+
+import {
   CustomIconButton,
-  IconButtonGroupMargin,
   CustomLinkIconButton,
+  IconButtonGroupMargin,
+  MainButtons,
+  MoreButton,
 } from './WysiwygStyles';
 
-type WysiwygNavProps = {
-  disabled?: boolean,
-  editorRef: any,
-  isExpandMode: boolean,
-  isPreviewMode: boolean,
-  onActionClick: (value:string,currentEditorRef:string,togglePopover?:any ) => void,
-  onToggleMediaLib: () => void,
-  onTogglePreviewMode: undefined | (() => void)
+interface WysiwygNavProps {
+  disabled?: boolean;
+  editorRef: React.MutableRefObject<EditorFromTextArea>;
+  isExpandMode?: boolean;
+  isPreviewMode?: boolean;
+  onActionClick: (
+    action: string,
+    editorRef: React.MutableRefObject<EditorFromTextArea>,
+    callback?: () => void
+  ) => void;
+  onToggleMediaLib: () => void;
+  onTogglePreviewMode?: () => void;
 }
 
-const WysiwygNav: React.FC<WysiwygNavProps> = ({
+/**
+ * TODO: refactor this mess.
+ */
+const WysiwygNav = ({
   disabled,
   editorRef,
   isExpandMode,
@@ -66,157 +59,191 @@ const WysiwygNav: React.FC<WysiwygNavProps> = ({
   onActionClick,
   onToggleMediaLib,
   onTogglePreviewMode,
-}) => {
-  const [visiblePopover, setVisiblePopover] = useState<boolean>(false);
+}: WysiwygNavProps) => {
+  const [visiblePopover, setVisiblePopover] = React.useState(false);
   const { formatMessage } = useIntl();
-  const buttonMoreRef = useRef();
+  const selectPlaceholder = formatMessage({
+    id: 'components.Wysiwyg.selectOptions.title',
+    defaultMessage: 'Add a title',
+  });
+  const buttonMoreRef = React.useRef<HTMLButtonElement>(null!);
 
   const handleTogglePopover = () => {
-    setVisiblePopover(prev => !prev);
+    setVisiblePopover((prev) => !prev);
   };
 
   if (disabled || isPreviewMode) {
     return (
-      <Box padding={2} background="neutral100">
-        <Flex justifyContent="space-between">
-          <Flex>
-            <MainButtons>
-              <CustomIconButton disabled id="Bold" label="Bold" name="Bold" icon={<Bold />} />
-              <CustomIconButton
-                disabled
-                id="Italic"
-                label="Italic"
-                name="Italic"
-                icon={<Italic />}
-              />
-              <CustomIconButton
-                disabled
-                id="Underline"
-                label="Underline"
-                name="Underline"
-                icon={<Underline />}
-              />
-            </MainButtons>
-          </Flex>
+      <Flex
+        padding={2}
+        background="neutral100"
+        justifyContent="space-between"
+        borderRadius={`${4 / 16}rem ${4 / 16}rem 0 0`}
+      >
+        <StyledFlex>
+          <SingleSelect disabled placeholder={selectPlaceholder} size="S" label={selectPlaceholder}>
+            <SingleSelectOption value="h1">h1</SingleSelectOption>
+            <SingleSelectOption value="h2">h2</SingleSelectOption>
+            <SingleSelectOption value="h3">h3</SingleSelectOption>
+            <SingleSelectOption value="h4">h4</SingleSelectOption>
+            <SingleSelectOption value="h5">h5</SingleSelectOption>
+            <SingleSelectOption value="h6">h6</SingleSelectOption>
+          </SingleSelect>
 
-          {!isExpandMode && (
-            <Button onClick={onTogglePreviewMode} variant="tertiary" id="preview">
-              {formatMessage({
-                id: 'components.Wysiwyg.ToggleMode.markdown-mode',
-                defaultMessage: 'Markdown mode',
-              })}
-            </Button>
-          )}
-        </Flex>
-      </Box>
-    );
-  }
-
-  return (
-    <Box padding={2} background="neutral100">
-      <Flex justifyContent="space-between">
-        <Flex>
           <MainButtons>
-            <CustomIconButton
-              onClick={() => onActionClick('Bold', editorRef)}
-              id="Bold"
-              label="Bold"
-              name="Bold"
-              icon={<Bold />}
-            />
-            <CustomIconButton
-              onClick={() => onActionClick('Italic', editorRef)}
-              id="Italic"
-              label="Italic"
-              name="Italic"
-              icon={<Italic />}
-            />
-            <CustomIconButton
-              onClick={() => onActionClick('Underline', editorRef)}
-              id="Underline"
-              label="Underline"
-              name="Underline"
-              icon={<Underline />}
-            />
+            <CustomIconButton disabled label="Bold" name="Bold" icon={<Bold />} />
+            <CustomIconButton disabled label="Italic" name="Italic" icon={<Italic />} />
+            <CustomIconButton disabled label="Underline" name="Underline" icon={<Underline />} />
           </MainButtons>
-          {visiblePopover && (
-            <Popover centered source={buttonMoreRef} spacing={4} id="popover">
-              <FocusTrap onEscape={handleTogglePopover} restoreFocus={false}>
-                <Flex>
-                  <IconButtonGroupMargin>
-                    <CustomIconButton
-                      onClick={() => onActionClick('Strikethrough', editorRef, handleTogglePopover)}
-                      id="Strikethrough"
-                      label="Strikethrough"
-                      name="Strikethrough"
-                      icon={<StrikeThrough />}
-                    />
-                    <CustomIconButton
-                      onClick={() => onActionClick('BulletList', editorRef, handleTogglePopover)}
-                      id="BulletList"
-                      label="BulletList"
-                      name="BulletList"
-                      icon={<BulletList />}
-                    />
-                    <CustomIconButton
-                      onClick={() => onActionClick('NumberList', editorRef, handleTogglePopover)}
-                      id="NumberList"
-                      label="NumberList"
-                      name="NumberList"
-                      icon={<NumberList />}
-                    />
-                  </IconButtonGroupMargin>
-                  <IconButtonGroup>
-                    <CustomIconButton
-                      onClick={() => onActionClick('Code', editorRef, handleTogglePopover)}
-                      id="Code"
-                      label="Code"
-                      name="Code"
-                      icon={<Code />}
-                    />
-                    <CustomIconButton
-                      onClick={() => {
-                        handleTogglePopover();
-                        onToggleMediaLib();
-                      }}
-                      id="Image"
-                      label="Image"
-                      name="Image"
-                      icon={<Image />}
-                    />
-                    <CustomLinkIconButton
-                      onClick={() => onActionClick('Link', editorRef, handleTogglePopover)}
-                      id="Link"
-                      label="Link"
-                      name="Link"
-                      // eslint-disable-next-line jsx-a11y/anchor-is-valid
-                      icon={<Link />}
-                    />
-                    <CustomIconButton
-                      onClick={() => onActionClick('Quote', editorRef, handleTogglePopover)}
-                      id="Quote"
-                      label="Quote"
-                      name="Quote"
-                      icon={<Quote />}
-                    />
-                  </IconButtonGroup>
-                </Flex>
-              </FocusTrap>
-            </Popover>
-          )}
-        </Flex>
 
-        {onTogglePreviewMode && (
-          <Button onClick={onTogglePreviewMode} variant="tertiary" id="preview">
+          <MoreButton disabled label="More" icon={<More />} />
+        </StyledFlex>
+
+        {!isExpandMode && (
+          <Button onClick={onTogglePreviewMode} variant="tertiary">
             {formatMessage({
-              id: 'components.Wysiwyg.ToggleMode.preview-mode',
-              defaultMessage: 'Preview mode',
+              id: 'components.Wysiwyg.ToggleMode.markdown-mode',
+              defaultMessage: 'Markdown mode',
             })}
           </Button>
         )}
       </Flex>
-    </Box>
+    );
+  }
+
+  return (
+    <Flex
+      padding={2}
+      background="neutral100"
+      justifyContent="space-between"
+      borderRadius={`${4 / 16}rem ${4 / 16}rem 0 0`}
+    >
+      <StyledFlex>
+        <SingleSelect
+          placeholder={selectPlaceholder}
+          label={selectPlaceholder}
+          size="S"
+          // @ts-expect-error – DS v2 will only allow strings.
+          onChange={(value) => onActionClick(value, editorRef)}
+        >
+          <SingleSelectOption value="h1">h1</SingleSelectOption>
+          <SingleSelectOption value="h2">h2</SingleSelectOption>
+          <SingleSelectOption value="h3">h3</SingleSelectOption>
+          <SingleSelectOption value="h4">h4</SingleSelectOption>
+          <SingleSelectOption value="h5">h5</SingleSelectOption>
+          <SingleSelectOption value="h6">h6</SingleSelectOption>
+        </SingleSelect>
+
+        <MainButtons>
+          <CustomIconButton
+            onClick={() => onActionClick('Bold', editorRef)}
+            label="Bold"
+            name="Bold"
+            icon={<Bold />}
+          />
+          <CustomIconButton
+            onClick={() => onActionClick('Italic', editorRef)}
+            label="Italic"
+            name="Italic"
+            icon={<Italic />}
+          />
+          <CustomIconButton
+            onClick={() => onActionClick('Underline', editorRef)}
+            label="Underline"
+            name="Underline"
+            icon={<Underline />}
+          />
+        </MainButtons>
+
+        <MoreButton
+          ref={buttonMoreRef}
+          onClick={handleTogglePopover}
+          label="More"
+          icon={<More />}
+        />
+        {visiblePopover && (
+          <Popover onDismiss={handleTogglePopover} centered source={buttonMoreRef} spacing={4}>
+            <Flex>
+              <IconButtonGroupMargin>
+                <CustomIconButton
+                  onClick={() => onActionClick('Strikethrough', editorRef, handleTogglePopover)}
+                  label="Strikethrough"
+                  name="Strikethrough"
+                  icon={<StrikeThrough />}
+                />
+                <CustomIconButton
+                  onClick={() => onActionClick('BulletList', editorRef, handleTogglePopover)}
+                  label="BulletList"
+                  name="BulletList"
+                  icon={<BulletList />}
+                />
+                <CustomIconButton
+                  onClick={() => onActionClick('NumberList', editorRef, handleTogglePopover)}
+                  label="NumberList"
+                  name="NumberList"
+                  icon={<NumberList />}
+                />
+              </IconButtonGroupMargin>
+              <IconButtonGroup>
+                <CustomIconButton
+                  onClick={() => onActionClick('Code', editorRef, handleTogglePopover)}
+                  label="Code"
+                  name="Code"
+                  icon={<Code />}
+                />
+                <CustomIconButton
+                  onClick={() => {
+                    handleTogglePopover();
+                    onToggleMediaLib();
+                  }}
+                  label="Image"
+                  name="Image"
+                  icon={<Image />}
+                />
+                <CustomLinkIconButton
+                  onClick={() => onActionClick('Link', editorRef, handleTogglePopover)}
+                  label="Link"
+                  name="Link"
+                  // eslint-disable-next-line jsx-a11y/anchor-is-valid
+                  icon={<Link />}
+                />
+                <CustomIconButton
+                  onClick={() => onActionClick('Quote', editorRef, handleTogglePopover)}
+                  label="Quote"
+                  name="Quote"
+                  icon={<Quote />}
+                />
+              </IconButtonGroup>
+            </Flex>
+          </Popover>
+        )}
+      </StyledFlex>
+
+      {onTogglePreviewMode && (
+        <Button onClick={onTogglePreviewMode} variant="tertiary">
+          {formatMessage({
+            id: 'components.Wysiwyg.ToggleMode.preview-mode',
+            defaultMessage: 'Preview mode',
+          })}
+        </Button>
+      )}
+    </Flex>
   );
 };
 
-export default WysiwygNav;
+export { WysiwygNav };
+export type { WysiwygNavProps };
+
+const StyledFlex = styled(Flex)`
+  /* Hide the label, every input needs a label. */
+  label {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+  }
+`;

@@ -6,7 +6,6 @@ export default {
     { action: permissions.render(permissions.reports.read), subject: null },
     // { action: 'plugin::comments.discover.read', subject: null },
     { action: permissions.render(permissions.settings.read), subject: null },
-    { action: permissions.render(permissions.settings.read), subject: null },
   ],
   // discover: [{ action: 'plugin::comments.discover.read', subject: null }],
   moderate: [

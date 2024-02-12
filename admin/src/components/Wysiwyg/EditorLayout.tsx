@@ -1,77 +1,32 @@
-//@ts-nocheck
-import React, { useEffect } from 'react';
-//@ts-ignore
-import styled, {ThemeInterface} from 'styled-components';
-//@ts-ignore
-import { Flex } from '@strapi/design-system/Flex';
-//@ts-ignore
-import { Box } from '@strapi/design-system/Box';
-//@ts-ignore
-import { FocusTrap } from '@strapi/design-system/FocusTrap';
-//@ts-ignore
-import { Portal } from '@strapi/design-system/Portal';
-//@ts-ignore
-import { BaseButton } from '@strapi/design-system/BaseButton';
-//@ts-ignore
-import { Typography } from '@strapi/design-system/Typography';
-//@ts-ignore
-import { pxToRem } from '@strapi/helper-plugin';
-//@ts-ignore
-import Collapse from '@strapi/icons/Collapse';
+import * as React from 'react';
+
+// @ts-ignore
+import { BaseButton, Box, Flex, FocusTrap, Portal, Typography } from '@strapi/design-system';
+import { pxToRem, useLockScroll } from '@strapi/helper-plugin';
+import { Collapse } from '@strapi/icons';
 import { useIntl } from 'react-intl';
-import PreviewWysiwyg from '../PreviewWysiwyg';
+import styled from 'styled-components';
 
-const setOpacity = (hex:number, alpha:number) =>
-  `${hex}${Math.floor(alpha * 255)
-    .toString(16)
-    .padStart(2, 0)}`;
+import { PreviewWysiwyg } from './PreviewWysiwyg';
 
-const ExpandWrapper = styled(Flex)`
-  background: ${({ theme }:ThemeInterface) => setOpacity(theme.colors.neutral800, 0.2)};
-`;
-
-const BoxWithBorder = styled(Box)`
-  border-right: 1px solid ${({ theme }:ThemeInterface) => theme.colors.neutral200};
-`;
-
-export const ExpandButton = styled(BaseButton)`
-  background-color: transparent;
-  border: none;
-  align-items: center;
-
-  svg {
-    margin-left: ${({ theme }:ThemeInterface) => `${theme.spaces[2]}`};
-    path {
-      fill: ${({ theme }:ThemeInterface) => theme.colors.neutral700};
-      width: ${12 / 16}rem;
-      height: ${12 / 16}rem;
-    }
-  }
-`;
-
-type EditorLayoutProps = {
-  children: React.ReactNode,
-  error: string | undefined,
-  isExpandMode: boolean,
-  previewContent: string,
-  onCollapse: ()=>void,
+interface EditorLayoutProps {
+  children: React.ReactNode;
+  isExpandMode: boolean;
+  error?: string;
+  previewContent?: string;
+  onCollapse: () => void;
 }
 
-export const EditorLayout: React.FC<EditorLayoutProps> = ({ children, isExpandMode, error, previewContent, onCollapse }) => {
+const EditorLayout = ({
+  children,
+  isExpandMode,
+  error,
+  previewContent = '',
+  onCollapse,
+}: EditorLayoutProps) => {
   const { formatMessage } = useIntl();
-  useEffect(() => {
-    const body = document.body;
 
-    if (isExpandMode) {
-      body.classList.add('lock-body-scroll');
-    }
-
-    return () => {
-      if (isExpandMode) {
-        body.classList.remove('lock-body-scroll');
-      }
-    };
-  }, [isExpandMode]);
+  useLockScroll({ lockScroll: isExpandMode });
 
   if (isExpandMode) {
     return (
@@ -88,22 +43,27 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({ children, isExpandMo
             onClick={onCollapse}
           >
             <Box
-              id="wysiwyg-expand"
               background="neutral0"
               hasRadius
               shadow="popupShadow"
               overflow="hidden"
-              width="70%"
-              height="70%"
-              onClick={(e:Event) => e.stopPropagation()}
+              width="90%"
+              height="90%"
+              onClick={(e: any) => e.stopPropagation()}
             >
               <Flex height="100%" alignItems="flex-start">
                 <BoxWithBorder flex="1" height="100%">
                   {children}
                 </BoxWithBorder>
-                <Box flex="1" height="100%">
-                  <Flex height={pxToRem(48)} background="neutral100" justifyContent="flex-end">
-                    <ExpandButton id="collapse" onClick={onCollapse}>
+                <Flex alignItems="start" direction="column" flex={1} height="100%" width="100%">
+                  <Flex
+                    height={pxToRem(48)}
+                    background="neutral100"
+                    justifyContent="flex-end"
+                    shrink={0}
+                    width="100%"
+                  >
+                    <ExpandButton onClick={onCollapse}>
                       <Typography>
                         {formatMessage({
                           id: 'components.Wysiwyg.collapse',
@@ -114,10 +74,10 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({ children, isExpandMo
                     </ExpandButton>
                   </Flex>
 
-                  <Box position="relative" height="100%">
+                  <Box position="relative" height="100%" width="100%">
                     <PreviewWysiwyg data={previewContent} />
                   </Box>
-                </Box>
+                </Flex>
               </Flex>
             </Box>
           </ExpandWrapper>
@@ -137,3 +97,33 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({ children, isExpandMo
     </Box>
   );
 };
+
+const ExpandWrapper = styled(Flex)`
+  background: ${({ theme }) =>
+    `${theme.colors.neutral800}${Math.floor(0.2 * 255)
+      .toString(16)
+      .padStart(2, '0')}`};
+`;
+
+const BoxWithBorder = styled(Box)`
+  border-right: 1px solid ${({ theme }) => theme.colors.neutral200};
+`;
+
+const ExpandButton = styled(BaseButton)`
+  background-color: transparent;
+  border: none;
+  align-items: center;
+
+  svg {
+    margin-left: ${({ theme }) => `${theme.spaces[2]}`};
+
+    path {
+      fill: ${({ theme }) => theme.colors.neutral700};
+      width: ${12 / 16}rem;
+      height: ${12 / 16}rem;
+    }
+  }
+`;
+
+export { EditorLayout, ExpandButton };
+export type { EditorLayoutProps };
