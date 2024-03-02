@@ -28,6 +28,7 @@ import {
 import { Comment, CommentReport, RelatedEntity } from "./contentTypes";
 
 import PluginError from "../server/utils/error";
+import { ContentType, LifeCycleEvent, LifeCycleHookName } from "../server/utils/types";
 
 export type AdminPaginatedResponse<T> = {
   result: Array<T>;
@@ -113,6 +114,8 @@ export interface IServiceCommon {
   ): Promise<[uid: string, relatedId: string | number]>;
   checkBadWords(content: string): Promise<boolean | string | PluginError>;
   isEnabledCollection(uid: string): Promise<boolean>;
+  registerLifecycleHook(input: { hookName: LifeCycleHookName, callback: Effect<LifeCycleEvent>, contentTypeName: ContentType }): void;
+  runLifecycleHook(input: { hookName: LifeCycleHookName, event: LifeCycleEvent, contentTypeName: ContentType }): Promise<void>;
 }
 
 export interface IServiceAdmin {
