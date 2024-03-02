@@ -1,7 +1,7 @@
-import { IServiceCommon } from "../../../types";
+import { IServiceCommon, ToBeFixed } from "../../../types";
 import { Comment } from "../../../types/contentTypes";
 import { setupStrapi, resetStrapi } from "../../../__mocks__/initSetup";
-import { CONFIG_PARAMS } from "../../utils/constants";
+import { CONFIG_PARAMS, LIFECYCLE_HOOKS } from "../../utils/constants";
 import PluginError from "../../utils/error";
 import { getPluginService } from "../../utils/functions";
 
@@ -806,6 +806,41 @@ describe("Test Comments service - Common", () => {
         expect(result).toHaveProperty([0, "title"], relatedEntity.title);
         expect(result).toHaveProperty([0, "uid"], relatedEntity.uid);
       });
+    });
+
+    describe("Lifecycle hooks", () => {
+      it.each(LIFECYCLE_HOOKS)(
+        "should trigger for %s hook listener",
+        async (hookName: ToBeFixed) => {
+          // Given
+          const commonService = getPluginService<IServiceCommon>("common");
+          const listenerA = jest.fn().mockResolvedValue("ABC");
+          const listenerB = jest.fn();
+          const event = {} as ToBeFixed;
+
+          commonService.registerLifecycleHook({
+            callback: listenerA,
+            contentTypeName: "comment",
+            hookName,
+          });
+          commonService.registerLifecycleHook({
+            callback: listenerB,
+            contentTypeName: "comment",
+            hookName,
+          });
+
+          // When
+          await commonService.runLifecycleHook({
+            contentTypeName: "comment",
+            event,
+            hookName,
+          });
+
+          // Then
+          expect(listenerA).toHaveBeenCalledTimes(1);
+          expect(listenerB).toHaveBeenCalledTimes(1);
+        }
+      );
     });
   });
 });

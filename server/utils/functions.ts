@@ -2,8 +2,13 @@ import {
   StrapiQueryParams,
   StrapiQueryParamsParsed,
   IStrapi,
+  StrapiContext,
 } from "strapi-typed";
 import PluginError from "./error";
+import { ContentType, LifeCycleEvent, LifeCycleHookName } from "./types";
+import { Effect } from "../../types/utils";
+import { IServiceCommon, ToBeFixed } from "../../types";
+import { LIFECYCLE_HOOKS } from "./constants";
 
 declare var strapi: IStrapi;
 
@@ -53,3 +58,29 @@ export const assertNotEmpty: <T>(
     customError ?? new PluginError(400, "Non-empty value expected, empty given")
   );
 };
+
+export const buildHookListener =
+  (contentTypeName: ContentType, { strapi }: StrapiContext) =>
+  (hookName: LifeCycleHookName): [LifeCycleHookName, Effect<LifeCycleEvent>] =>
+    [
+      hookName,
+      async (event) => {
+        const commonService: IServiceCommon = strapi
+          .plugin("comments")
+          .service("common");
+
+        await commonService.runLifecycleHook({
+          contentTypeName,
+          hookName,
+          event,
+        });
+      },
+    ];
+
+export const buildAllHookListeners = (
+  contentTypeName: ContentType,
+  context: StrapiContext,
+): Record<LifeCycleHookName, Effect<LifeCycleEvent>> =>
+  Object.fromEntries(
+    LIFECYCLE_HOOKS.map(buildHookListener(contentTypeName, context))
+  ) as ToBeFixed;

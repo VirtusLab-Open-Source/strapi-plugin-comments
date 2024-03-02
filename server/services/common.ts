@@ -49,12 +49,21 @@ import {
   parsePaginationsQuery,
   parseSortQuery
 } from "./utils/parsers";
+import { ContentType, LifeCycleHookName } from "../utils/types";
+import { Effect } from "../../types/utils";
 
 /**
  * Comments Plugin - common services
  */
 
 const PAGE_SIZE = 10;
+
+type LifecycleHookRecord = Partial<Record<LifeCycleHookName, Array<Effect<ToBeFixed>>>>;
+
+const lifecycleHookListeners: Record<ContentType, LifecycleHookRecord> = {
+  comment: {},
+  "comment-report": {}
+};
 
 export = ({ strapi }: StrapiContext): IServiceCommon => ({
   async getConfig<T>(
@@ -498,5 +507,21 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       SettingsCommentsPluginConfig["enabledCollections"]
     >("enabledCollections", []);
     return enabledCollections.includes(uid);
+  },
+
+  registerLifecycleHook({ callback, contentTypeName, hookName }) {
+    if (!lifecycleHookListeners[contentTypeName][hookName]) {
+      lifecycleHookListeners[contentTypeName][hookName] = [];
+    }
+
+    lifecycleHookListeners[contentTypeName][hookName]?.push(callback);
+  },
+
+  async runLifecycleHook({ contentTypeName, event, hookName }) {
+    const hookListeners = lifecycleHookListeners[contentTypeName][hookName] ?? [];
+
+    for (const listener of hookListeners) {
+      await listener(event);
+    }
   },
 });

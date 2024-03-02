@@ -931,6 +931,46 @@ For developers who upgrades their Strapi instance custom field from Comments plu
 
 Read more about this feature in [Strapi's docs](https://docs-next.strapi.io/user-docs/latest/plugins/introduction-to-plugins.html#custom-fields).
 
+## Model lifecycle hooks
+
+Comments plugin allows to register lifecycle hooks for `Comment` and `Comment report` content types.
+
+You can read more about lifecycle hooks [here](https://docs.strapi.io/dev-docs/backend-customization/models#lifecycle-hooks). (You can set a listener for all of the hooks).
+
+Lifecycle hooks can be register either in `register()` or `bootstrap()` methods of your server. You can register more than one listener for a specified lifecycle hook. For example: you want to do three things on report creation and do not want to handle all of these actions in one big function. You can split logic in as many listeners as you want.
+
+Listeners can by sync and `async`.
+
+>Be aware that lifecycle hooks registered in `register()` may be fired by plugin's bootstrapping. If you want listen to events triggered after server's startup use `bootstrap()`.
+
+Example:
+
+```ts
+  const commentsCommonService = strapi
+    .plugin("comments")
+    .service("common");
+
+  commentsCommonService.registerLifecycleHook({
+    callback: async ({ action, result }) => {
+      const saveResult = await logIntoSystem(action, result);
+
+      console.log(saveResult);
+    },
+    contentTypeName: "comment",
+    hookName: "afterCreate",
+  });
+
+  commentsCommonService.registerLifecycleHook({
+    callback: async ({ action, result }) => {
+      const saveResult = await logIntoSystem(action, result);
+
+      console.log(saveResult);
+    },
+    contentTypeName: "report",
+    hookName: "afterCreate",
+  });
+```
+
 ## 🤝 Contributing
 
 <div>
