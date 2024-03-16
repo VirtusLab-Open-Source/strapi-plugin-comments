@@ -43,6 +43,7 @@ export type FlatInput<TKeys extends string> = {
   relation?: Id;
   pagination?: ToBeFixed;
   fields?: StrapiRequestQueryFieldsClause<TKeys>;
+  omit?: Array<string>
 };
 
 export type ThrowableResponse<T> = T | PluginError | never;
