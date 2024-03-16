@@ -18,7 +18,7 @@
     "clean": "rm -rf build",
     "develop": "nodemon --exec \"yarn build:dev\"",
     "test:unit": "jest --verbose --coverage",
-    "test:watch": "jest --verbose --watch",
+    "test:unit:watch": "jest --verbose --watch",
     "test:unit:ci": "CI=true jest --ci --runInBand --verbose --coverage",
     "lint": "prettier --check .",
     "format": "prettier --write ."

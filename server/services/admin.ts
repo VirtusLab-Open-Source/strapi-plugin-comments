@@ -212,6 +212,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
           this.getCommonService().sanitizeCommentEntity(
             _,
             [],
+            [],
             defaultAuthorUserPopulate?.populate,
           ),
         ),
@@ -325,6 +326,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
               gotThread: isCommentWithThread,
             }, []),
           },
+          [],
           [],
           defaultAuthorUserPopulate?.populate,
         ),
@@ -445,6 +447,7 @@ export = ({ strapi }: StrapiContext): IServiceAdmin => ({
         ...entity,
         threadOf: entity.threadOf || null,
       },
+      [],
       [],
       defaultAuthorUserPopulate?.populate,
     );

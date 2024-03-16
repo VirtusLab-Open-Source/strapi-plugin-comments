@@ -39,6 +39,7 @@ const controllers: IControllerClient = {
       sort: querySort,
       pagination: queryPagination,
       fields,
+      omit = [],
       ...filterQuery
     } = query || {};
 
@@ -52,6 +53,7 @@ const controllers: IControllerClient = {
           sort: sort || querySort,
           pagination: pagination || queryPagination,
           fields,
+          omit,
         })
       );
     } catch (e: ToBeFixed) {
@@ -66,7 +68,7 @@ const controllers: IControllerClient = {
     const { params, query, sort } = ctx;
     const { relation } = parseParams<{ relation: string }>(params);
 
-    const { sort: querySort, fields, ...filterQuery } = query || {};
+    const { sort: querySort, fields, omit, ...filterQuery } = query || {};
 
     try {
       assertParamsPresent<{ relation: string }>(params, ["relation"]);
@@ -78,6 +80,7 @@ const controllers: IControllerClient = {
             query: filterQuery,
             sort: sort || querySort,
             fields,
+            omit,
           }),
           dropBlockedThreads: true,
         }
@@ -98,6 +101,7 @@ const controllers: IControllerClient = {
       sort: querySort,
       pagination: queryPagination,
       fields,
+      omit = [],
       ...filterQuery
     } = query || {};
 
@@ -110,6 +114,7 @@ const controllers: IControllerClient = {
           sort: sort || querySort,
           pagination: pagination || queryPagination,
           fields,
+          omit,
         }),
         id,
         ![AUTHOR_TYPE.GENERIC.toLowerCase(), AUTHOR_TYPE.GENERIC].includes(type)
