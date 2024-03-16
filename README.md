@@ -372,6 +372,12 @@ Return a flat structure of comments by specified Author for example `Author` wit
 **Example URL**: `https://localhost:1337/api/comments/author/1` - get comments by `ID:1` of Strapi User
 **Example URL**: `https://localhost:1337/api/comments/author/1/generic` - get comments by `ID:1` of Generic User
 
+#### Skipping fields
+
+To skip a field from the response you can use a query param called `omit`. It is a list of `Comment` entity fields you want to ignore. For example `?omit[]=author&omit[]=related`.
+
+**Remember!** `id` field is required so it will not be skipped.
+
 **Example response body**
 
 ```json

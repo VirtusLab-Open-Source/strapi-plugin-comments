@@ -10,6 +10,7 @@ import {
   first,
   parseInt,
   get,
+  omit as filterItem
 } from "lodash";
 import {
   Id,
@@ -55,6 +56,7 @@ import {
  */
 
 const PAGE_SIZE = 10;
+const REQUIRED_FIELDS = ["id"];
 
 export = ({ strapi }: StrapiContext): IServiceCommon => ({
   async getConfig<T>(
@@ -100,10 +102,12 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       pagination,
       fields,
       isAdmin = false,
+      omit: baseOmit = [],
     }: FindAllFlatProps<Comment>,
     relatedEntity: RelatedEntity | null = null
   ): Promise<StrapiPaginatedResponse<Comment>> {
-    const defaultSelect: Array<CommentModelKeys> = ["id", "related"];
+    const omit = baseOmit.filter((field) => !REQUIRED_FIELDS.includes(field));
+    const defaultSelect: Array<CommentModelKeys> = (["id", "related"] as const).filter((field) => !omit.includes(field));
 
     const populateClause: PopulateClause<CommentModelKeys> = {
       authorUser: true,
@@ -180,9 +184,11 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
     );
 
     const relatedEntities =
-      relatedEntity !== null
-        ? [relatedEntity]
-        : await this.findRelatedEntitiesFor([...entries]);
+      omit.includes("related")
+        ? []
+        : relatedEntity !== null
+          ? [relatedEntity]
+          : await this.findRelatedEntitiesFor([...entries]);
     const hasRelatedEntitiesToMap =
       relatedEntities.filter((_: RelatedEntity) => _).length > 0;
 
@@ -216,9 +222,10 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
           threadOf: primitiveThreadOf || _.threadOf,
           gotThread: (threadedItem?.itemsInTread || 0) > 0,
           threadFirstItemId: threadedItem?.firstThreadItemId,
-        },
+        } as ToBeFixed,
         doNotPopulateAuthor,
-        authorUserPopulate
+        omit,
+        authorUserPopulate,
       );
     });
 
@@ -243,11 +250,12 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
       startingFromId = null,
       dropBlockedThreads = false,
       isAdmin = false,
+      omit = [],
     }: FindAllInHierarchyProps,
     relatedEntity?: RelatedEntity | null | boolean
   ): Promise<Array<Comment>> {
     const entities = await this.findAllFlat(
-      { query, populate, sort, fields, isAdmin },
+      { query, populate, sort, fields, isAdmin, omit },
       relatedEntity
     );
     return buildNestedStructure(
@@ -415,13 +423,14 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
   sanitizeCommentEntity(
     entity: Comment,
     blockedAuthorProps: string[],
+    omit = [] as string[],
     populate?: PopulateClause<OnlyStrings<keyof StrapiUser>>,
   ): Comment {
     const fieldsToPopulate = isArray(populate)
       ? populate
       : Object.keys(populate || {});
 
-    return {
+    return filterItem({
       ...buildAuthorModel(
         {
           ...entity,
@@ -432,7 +441,7 @@ export = ({ strapi }: StrapiContext): IServiceCommon => ({
         blockedAuthorProps,
         fieldsToPopulate,
       ),
-    };
+    }, omit) as Comment;
   },
 
   isValidUserContext(user?: any): boolean {
