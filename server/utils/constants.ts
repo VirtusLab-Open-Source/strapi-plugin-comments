@@ -1,4 +1,5 @@
 import { ConfigParamKeys, RegExpCollection } from "../../types";
+import { LifeCycleHookName } from "./types";
 
 export const CONFIG_PARAMS: ConfigParamKeys = {
   ENABLED_COLLECTIONS: "enabledCollections",
@@ -27,3 +28,24 @@ export const REGEX: RegExpCollection = {
   email: /\S+@\S+\.\S+/,
   sorting: /^(?<path>[a-z0-9-_\:\.]+)\:+(asc|desc)$/i,
 };
+
+export const LIFECYCLE_HOOKS: ReadonlyArray<LifeCycleHookName> = [
+  "beforeCreate",
+  "beforeCreateMany",
+  "afterCreate",
+  "afterCreateMany",
+  "beforeUpdate",
+  "beforeUpdateMany",
+  "afterUpdate",
+  "afterUpdateMany",
+  "beforeDelete",
+  "beforeDeleteMany",
+  "afterDelete",
+  "afterDeleteMany",
+  "beforeCount",
+  "afterCount",
+  "beforeFindOne",
+  "afterFindOne",
+  "beforeFindMany",
+  "afterFindMany",
+] as const;
