@@ -76,7 +76,7 @@
     "react-dom": "^18.2.0",
     "rimraf": "^4.3.0",
     "react-intl": "^6.4.1",
-    "sanitize-html": "2.11.0",
+    "sanitize-html": "2.12.1",
     "strapi-typed": "^1.0.19",
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
