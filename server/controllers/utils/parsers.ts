@@ -6,7 +6,7 @@ import { assertNotEmpty } from "../../utils/functions";
 export const flatInput = <T, TKeys = keyof T>(
   payload: FlatInput<OnlyStrings<TKeys>>
 ) => {
-  const { relation, query, sort, pagination, fields } = payload;
+  const { relation, query, sort, pagination, fields, omit } = payload;
 
   const { populate = {}, filterBy, filterByValue, ...restQuery } = query;
   const filters = restQuery?.filters || restQuery;
@@ -81,5 +81,6 @@ export const flatInput = <T, TKeys = keyof T>(
     pagination,
     sort,
     fields,
+    omit,
   };
 };

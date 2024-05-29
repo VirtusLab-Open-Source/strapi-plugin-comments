@@ -43,7 +43,8 @@ export type FindAllFlatProps<T, TFields = keyof T> = {
   sort?: StringMap<unknown>;
   fields?: StrapiRequestQueryFieldsClause<OnlyStrings<TFields>>;
   pagination?: StrapiPagination;
-  isAdmin?: boolean
+  isAdmin?: boolean;
+  omit?: Array<string>;
 };
 
 export type FindAllInHierarchyProps = Omit<FindAllFlatProps, "pagination"> & {
@@ -106,6 +107,7 @@ export interface IServiceCommon {
   sanitizeCommentEntity(
     entity: Comment,
     blockedAuthorProps: string[],
+    omit?: string[],
     populate?: PopulateClause<OnlyStrings<keyof StrapiUser>>,
   ): Comment;
   isValidUserContext(user?: any): boolean;

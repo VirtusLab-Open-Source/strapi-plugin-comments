@@ -465,7 +465,7 @@ describe("Test Comments service - Common", () => {
         const result = await getPluginService<IServiceCommon>(
           "common"
         ).findAllFlat(
-          { query: { related }, fields: ["content"] },
+          { query: { related }, fields: ["content"], omit: [] },
           relatedEntity
         );
         expect(result).toHaveProperty("data");
@@ -654,7 +654,7 @@ describe("Test Comments service - Common", () => {
         test("Should return proper structure", async () => {
           const result = await getPluginService<IServiceCommon>(
             "common"
-          ).findAllPerAuthor({ }, authorId);
+          ).findAllPerAuthor({ query: {} }, authorId);
           expect(result).toHaveProperty("data");
           expect(result).not.toHaveProperty("meta");
           expect(result.data.length).toBe(3);
@@ -670,7 +670,7 @@ describe("Test Comments service - Common", () => {
           const result = await getPluginService<IServiceCommon>(
             "common"
           ).findAllPerAuthor(
-            { fields: ["content"] },
+            { fields: ["content"], query: {} },
             authorId
           );
           expect(result).toHaveProperty("data");
@@ -688,7 +688,7 @@ describe("Test Comments service - Common", () => {
           const result = await getPluginService<IServiceCommon>(
             "common"
           ).findAllPerAuthor(
-            { pagination: { page: 1, pageSize: 5 } },
+            { pagination: { page: 1, pageSize: 5 }, query: {} },
             authorId
           );
           expect(result).toHaveProperty("data");
@@ -741,7 +741,7 @@ describe("Test Comments service - Common", () => {
         test("Should return proper structure", async () => {
           const result = await getPluginService<IServiceCommon>(
             "common"
-          ).findAllPerAuthor({ }, authorId, true);
+          ).findAllPerAuthor({ query: {} }, authorId, true);
           expect(result).toHaveProperty("data");
           expect(result).not.toHaveProperty("meta");
           expect(result.data.length).toBe(1);
@@ -754,7 +754,7 @@ describe("Test Comments service - Common", () => {
           const result = await getPluginService<IServiceCommon>(
             "common"
           ).findAllPerAuthor(
-            { fields: ["content"] },
+            { fields: ["content"], query: {} },
             authorId,
             true
           );
@@ -769,7 +769,7 @@ describe("Test Comments service - Common", () => {
           const result = await getPluginService<IServiceCommon>(
             "common"
           ).findAllPerAuthor(
-            { pagination: { page: 1, pageSize: 5 } },
+            { pagination: { page: 1, pageSize: 5 }, query: {} },
             authorId,
             true
           );
@@ -841,6 +841,108 @@ describe("Test Comments service - Common", () => {
           expect(listenerB).toHaveBeenCalledTimes(1);
         }
       );
+    });
+  });
+
+  describe("Omit a field", () => {
+    const fields: Array<keyof Comment> = [
+      "approvalStatus",
+      "author",
+      "authorAvatar",
+      "authorEmail",
+      "authorId",
+      "authorName",
+      "authorUser",
+      "blocked",
+      "blockedThread",
+      "content",
+      "children",
+      "threadFirstItemId",
+      "threadOf",
+    ];
+    const requiredFields: Array<keyof Comment> = ["id"]
+
+    const collection = "api::collection.test";
+    const related = `${collection}:1`;
+    const db: Array<Comment> = [
+      {
+        id: 1,
+        content: "ABC",
+        threadOf: null,
+        related,
+        authorId: 1,
+        authorName: "Joe Doe",
+        authorEmail: "joe@example.com",
+      },
+      {
+        id: 2,
+        content: "DEF",
+        threadOf: 1,
+        related,
+        authorId: 1,
+        authorName: "Joe Doe",
+        authorEmail: "joe@example.com",
+        blockedThread: true,
+      },
+      {
+        id: 3,
+        content: "GHJ",
+        threadOf: null,
+        related,
+        authorId: 1,
+        authorName: "Joe Doe",
+        authorEmail: "joe@example.com",
+      },
+      {
+        id: 4,
+        content: "IKL",
+        threadOf: 2,
+        related,
+        authorUser: {
+          id: 1,
+          username: "Joe Doe",
+          email: "joe@example.com",
+          avatar: {
+            id: 1,
+            url: "http://example.com",
+          },
+          role: {
+            id: 1,
+            name: "my role"
+          }
+        },
+      },
+    ];
+    const relatedEntity = { id: 1, title: "Test", uid: collection };
+
+    beforeEach(() =>
+      setupStrapi({ enabledCollections: [collection] }, true, {
+        "plugins::comments": db,
+        "api::collection": [
+          relatedEntity,
+          { id: 2, title: "Test 2", uid: collection },
+        ],
+      })
+    );
+
+    it.each(fields)("should filter \"%s\"", async (field: string) => {
+      const { data } = await getPluginService<IServiceCommon>(
+        "common"
+      ).findAllFlat({ query: {}, omit: [field] }, undefined);
+
+      data.forEach(comment => {
+        expect(comment).not.toHaveProperty(field);
+      });
+    });
+
+    it.each(requiredFields)("should preserve \"%s\" field (required)", async (field: string) => {
+      const { data } = await getPluginService<IServiceCommon>(
+        "common"
+      ).findAllFlat({ query: {}, omit: [field] }, undefined);
+
+      data.forEach(comment => {
+        expect(comment).toHaveProperty(field);
+      });
     });
   });
 });
