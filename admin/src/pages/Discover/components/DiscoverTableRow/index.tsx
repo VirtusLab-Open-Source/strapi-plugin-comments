@@ -1,33 +1,33 @@
 // TODO;
 // @ts-nocheck
 
-import React, { useState, useMemo } from "react";
-import PropTypes from "prop-types";
-import { useIntl } from "react-intl";
-import { isNil, isEmpty } from "lodash";
 import { Flex } from "@strapi/design-system/Flex";
 import { IconButton } from "@strapi/design-system/IconButton";
 import { Link } from "@strapi/design-system/Link";
 import { Stack } from "@strapi/design-system/Stack";
-import { Tr, Td } from "@strapi/design-system/Table";
+import { Td, Tr } from "@strapi/design-system/Table";
 import { Typography } from "@strapi/design-system/Typography";
-import {
-  getMessage,
-  getUrl,
-  resolveCommentStatus,
-  resolveCommentStatusColor,
-} from "../../../../utils";
-import { eye } from "../../../../components/icons";
-import { TableLink } from "./styles";
-import renderEntryTitle from "../../../../utils/renderEntryTitle";
-import DiscussionThreadItemApprovalFlowActions from "../../../../components/DiscussionThreadItemApprovalFlowActions";
-import StatusBadge from "../../../../components/StatusBadge";
-import { IconButtonGroupStyled } from "../../../../components/IconButton/styles";
-import DiscussionThreadItemReviewAction from "../../../../components/DiscussionThreadItemReviewAction";
+import { isEmpty, isNil } from "lodash";
+import PropTypes from "prop-types";
+import React, { useMemo, useState } from "react";
+import { useIntl } from "react-intl";
 import UserAvatar from "../../../../components/Avatar";
+import DiscussionThreadItemApprovalFlowActions from "../../../../components/DiscussionThreadItemApprovalFlowActions";
+import DiscussionThreadItemReviewAction from "../../../../components/DiscussionThreadItemReviewAction";
+import { IconButtonGroupStyled } from "../../../../components/IconButton/styles";
+import { eye } from "../../../../components/icons";
+import StatusBadge from "../../../../components/StatusBadge";
+import {
+    getMessage,
+    getUrl,
+    resolveCommentStatus,
+    resolveCommentStatusColor,
+} from "../../../../utils";
+import renderEntryTitle from "../../../../utils/renderEntryTitle";
+import { TableLink } from "./styles";
 
-import sanitizeHtml from '../../../../components/PreviewWysiwyg/utils/satinizeHtml';
 import md from "../../../../components/PreviewWysiwyg/utils/mdRenderer";
+import sanitizeHtml from '../../../../components/PreviewWysiwyg/utils/satinizeHtml';
 
 const DiscoverTableRow = ({
   config,
@@ -70,7 +70,7 @@ const DiscoverTableRow = ({
   };
 
   const renderEntryUrl = (entry) =>
-    entry ? `/content-manager/collectionType/${entry.uid}/${entry.id}` : null;
+    entry ? `/content-manager/collection-types/${entry.uid}/${entry.id}` : null;
 
   const renderDetailsUrl = (entry) => getUrl(`discover/${entry.id}`);
 
