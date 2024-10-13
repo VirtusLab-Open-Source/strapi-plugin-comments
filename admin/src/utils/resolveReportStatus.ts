@@ -1,5 +1,5 @@
 import {isNil} from 'lodash';
-import {ToBeFixed} from '../../../types';
+import {ToBeFixed} from '../../../server/src/@types';
 import {REPORT_STATUS} from './constants';
 
 const resolveReportStatus = ({

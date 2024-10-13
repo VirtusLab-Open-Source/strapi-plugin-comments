@@ -1,4 +1,4 @@
-import permissions from "./../../permissions";
+import permissions from "../../server/src/permissions";
 
 export default {
   access: [

@@ -1,4 +1,4 @@
-import { ToBeFixed } from "../../../types";
+import { ToBeFixed } from "../../../server/src/@types";
 import { pluginId } from "../pluginId";
 
 const handleAPIError = (

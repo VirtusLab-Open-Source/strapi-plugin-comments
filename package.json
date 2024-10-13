@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "2.3.2",
+  "version": "2.3.1",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
@@ -8,6 +8,26 @@
     "description": "Powerful Strapi based comments moderation tool for you and your users",
     "kind": "plugin"
   },
+  "exports": {
+    "./package.json": "./package.json",
+    "./strapi-admin": {
+      "types": "./dist/admin/src/index.d.ts",
+      "source": "./admin/src/index.ts",
+      "import": "./dist/admin/index.mjs",
+      "require": "./dist/admin/index.js",
+      "default": "./dist/admin/index.js"
+    },
+    "./strapi-server": {
+      "types": "./dist/server/src/index.d.ts",
+      "source": "./server/src/index.ts",
+      "import": "./dist/server/index.mjs",
+      "require": "./dist/server/index.js",
+      "default": "./dist/server/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "prepare": "husky install",
     "publish:latest": "cd build && npm publish --tag latest",
@@ -21,74 +41,42 @@
     "test:unit:watch": "jest --verbose --watch",
     "test:unit:ci": "CI=true jest --ci --runInBand --verbose --coverage",
     "lint": "prettier --check .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "build:admin:watch": "tsc -p ./admin/tsconfig.json --watch",
+    "build:server:watch": "tsc -p ./server/tsconfig.json --watch",
+    "verify": "strapi-plugin verify",
+    "watch": "strapi-plugin watch",
+    "watch:link": "strapi-plugin watch:link"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/VirtusLab-Open-Source/strapi-plugin-comments"
   },
   "dependencies": {
-    "@strapi/design-system": "1.18.0",
-    "@strapi/plugin-graphql": "^4.25.11",
-    "@strapi/utils": "^4.25.11",
-    "@strapi/types": "4.25.11",
-    "no-profanity": "^1.4.2",
-    "styled-components": "^5.3.8",
-    "match-sorter": "^4.0.2",
-    "react-query": "3.39.3",
-    "codemirror5": "npm:codemirror@^5.65.11"
+    "@tanstack/react-query": "^5.40.0",
+    "codemirror5": "npm:codemirror@^5.65.11",
+    "match-sorter": "^6.3.4",
+    "no-profanity": "^1.5.1",
+    "strapi-typed": "^1.0.20",
+    "styled-components": "^6.1.13",
+    "typescript": "5.4.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@strapi/helper-plugin": "^4.25.11",
-    "@strapi/strapi": "4.25.11",
-    "@types/axios": "^0.14.0",
-    "@types/react-intl": "^3.0.0",
-    "@types/react-query": "^1.2.9",
-    "@types/styled-components": "^5.1.26",
-    "@types/codemirror5": "npm:@types/codemirror@^5.60.15",
-    "@types/markdown-it": "13.0.7",
-    "@types/markdown-it-container": "2.0.9",
-    "@types/markdown-it-emoji": "2.0.4",
-    "@types/markdown-it-footnote": "3.0.3",
-    "@types/sanitize-html": "2.9.5",
-    "@types/jest": "^29.4.0",
-    "codecov": "^3.7.2",
-    "copyfiles": "^2.4.1",
-    "highlight.js": "^10.4.1",
-    "husky": "7.0.4",
-    "jest": "^29.4.3",
-    "jest-cli": "^29.4.3",
-    "jest-junit": "^15.0.0",
-    "jest-styled-components": "^7.1.1",
-    "koa": "^2.14.1",
-    "markdown-it": "^12.3.2",
-    "markdown-it-abbr": "^1.0.4",
-    "markdown-it-container": "^3.0.0",
-    "markdown-it-deflist": "^2.1.0",
-    "markdown-it-emoji": "^2.0.0",
-    "markdown-it-footnote": "^3.0.3",
-    "markdown-it-ins": "^3.0.1",
-    "markdown-it-mark": "^3.0.1",
-    "markdown-it-sub": "^1.0.0",
-    "markdown-it-sup": "1.0.0",
-    "nodemon": "^2.0.21",
-    "prettier": "^2.8.4",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "rimraf": "^4.3.0",
-    "react-intl": "^6.4.1",
-    "sanitize-html": "2.12.1",
-    "strapi-typed": "^1.0.20",
-    "ts-jest": "^29.0.5",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
-  },
-  "peerDependencies": {
-    "@strapi/strapi": "^4.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "5.3.4",
-    "styled-components": "5.3.3"
+    "@sensinum/strapi-utils": "workspace:*",
+    "@strapi/plugin-cloud": "5.0.0",
+    "@strapi/plugin-users-permissions": "5.0.0",
+    "@strapi/sdk-plugin": "^5.2.6",
+    "@strapi/strapi": "patch:@strapi/strapi@npm%3A5.0.6#~/.yarn/patches/@strapi-strapi-npm-5.0.6-c7cea087a7.patch",
+    "@strapi/types": "^5.0.0",
+    "@types/koa": "^2.15.0",
+    "@types/react": "^18.3.8",
+    "@types/react-dom": "^18.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "nodemonConfig": {
     "ignore": [

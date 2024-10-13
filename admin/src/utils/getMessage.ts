@@ -1,6 +1,6 @@
 import { useIntl } from "react-intl";
 import { pluginId } from "../pluginId";
-import { ToBeFixed } from "../../../types";
+import { ToBeFixed } from "../../../server/src/@types";
 
 const getMessage = (
   input: ToBeFixed,

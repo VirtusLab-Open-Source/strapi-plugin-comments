@@ -1,5 +1,5 @@
 import { first } from "lodash";
-import { ToBeFixed } from "../../../types";
+import { ToBeFixed } from "../../../server/src/@types";
 
 const renderEntryTitle = (entry: ToBeFixed, config: ToBeFixed = {}) => {
   const { entryLabel } = config;
