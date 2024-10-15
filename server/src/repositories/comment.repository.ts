@@ -1,48 +1,17 @@
 import { FindOneParams, Params } from '@strapi/database/dist/entity-manager/types';
-import { isEmpty, once, set } from 'lodash';
-import { Comment, CoreStrapi, DBQuery, Where } from '../@types-v5';
-import { CommentQueryValidatorSchema } from '../validators';
-import { getDefaultAuthorPopulate, getModelUid, getOrderBy } from './utils';
+import { once } from 'lodash';
+import { Comment, CoreStrapi, Repository } from '../@types-v5';
+import { getModelUid } from './utils';
 
+type ResultFindPage = Awaited<ReturnType<Repository['findPage']>>;
 export const getCommentRepository = once((strapi: CoreStrapi) => {
 
   return {
-    admin: {
-      findAll: async (query: CommentQueryValidatorSchema) => {
-        const { _q, orderBy, page, pageSize, filters } = query;
-        const defaultWhere = {
-          $or: [{ removed: { $eq: false } }, { removed: { $eq: null } }],
-        };
-        const [operator, direction] = getOrderBy(orderBy);
-
-        const params: DBQuery = {
-          orderBy: orderBy ? { [operator]: direction } : undefined,
-          where: isEmpty(filters) ? defaultWhere : { ...defaultWhere, ...filters } as Where,
-          offset: (page - 1) * pageSize,
-          limit: pageSize,
-        };
-        if (_q) {
-          set(params, 'where.content.$contains', _q);
-        }
-        const populate = {
-          authorUser: getDefaultAuthorPopulate(strapi),
-          threadOf: true,
-          reports: {
-            where: {
-              resolved: false,
-            },
-          },
-        };
-
-        return strapi.query(getModelUid(strapi, 'comment')).findMany({
-          ...params,
-          count: true,
-          populate,
-        });
-      },
-    },
     findMany<T extends Comment = Comment>(params: Params): Promise<T[]> {
       return strapi.query(getModelUid(strapi, 'comment')).findMany(params);
+    },
+    findWithCount<T extends Comment = Comment>(params: Params): Promise<Omit<ResultFindPage, 'results'> & { results: T[] }> {
+      return strapi.query(getModelUid(strapi, 'comment')).findPage(params);
     },
     findOne<T extends Comment = Comment>(params: FindOneParams): Promise<T | null> {
       return strapi.query(getModelUid(strapi, 'comment')).findOne(params);

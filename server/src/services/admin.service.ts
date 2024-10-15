@@ -1,6 +1,7 @@
-import { Comment, Id, StrapiContext } from '../@types-v5';
+import { isEmpty, set } from 'lodash';
+import { Comment, DBQuery, Id, StrapiContext, Where } from '../@types-v5';
 import { APPROVAL_STATUS } from '../const';
-import { getCommentRepository, getDefaultAuthorPopulate, getReportCommentRepository } from '../repositories';
+import { getCommentRepository, getDefaultAuthorPopulate, getOrderBy, getReportCommentRepository } from '../repositories';
 import { getModelUid } from '../repositories/utils';
 import { getPluginService } from '../utils/getPluginService';
 import PluginError from '../utils/PluginError';
@@ -19,7 +20,79 @@ export default ({ strapi }: StrapiContext) => ({
 
   // Find all comments
   async findAll(query: CommentQueryValidatorSchema) {
-    return getCommentRepository(strapi).admin.findAll(query);
+    const { _q, orderBy, page, pageSize, filters } = query;
+    const defaultWhere = {
+      $or: [{ removed: { $eq: false } }, { removed: { $eq: null } }],
+    };
+    const [operator, direction] = getOrderBy(orderBy);
+
+    const params: DBQuery = {
+      orderBy: orderBy ? { [operator]: direction } : undefined,
+      where: isEmpty(filters) ? defaultWhere : { ...defaultWhere, ...filters } as Where,
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+    };
+    if (_q) {
+      set(params, 'where.content.$contains', _q);
+    }
+    const populate = {
+      authorUser: getDefaultAuthorPopulate(strapi),
+      threadOf: true,
+      reports: {
+        where: {
+          resolved: false,
+        },
+      },
+    };
+    console.log('params', params);
+    const { pagination, results } = await getCommentRepository(strapi).findWithCount({
+      ...params,
+      count: true,
+      populate,
+    });
+    return {
+      pagination,
+      result: results
+      .map((_) => this.getCommonService().sanitizeCommentEntity(_, [], []))
+      .map(_ => {
+        console.log('');
+        return {
+          ..._,
+          approvalStatus: 'APPROVED',
+          threadOf: {
+            id: 1,
+            content: 'Page content',
+            blocked: false,
+            blockedThread: false,
+            blockReason: '',
+            isAdminComment: false,
+            removed: false,
+            approvalStatus: 'APPROVED',
+            related: 'api::page.page',
+            createdAt: '',
+            updatedAt: '',
+            author: {
+              id: 1,
+              name: 'John Doe',
+              email: 'test@test.com',
+              avatar: null,
+            },
+          },
+          // TODO
+          related: {
+            id: 1,
+            documentId: 'dcyo9gr4bbtwjqm3zks2zl60',
+            title: 'Page title',
+            createdAt: '',
+            updatedAt: '',
+            publishedAt: '',
+            uid: 'api::page.page',
+          },
+        };
+      }),
+      // TODO
+      // .map(_ => this.getCommonService().mergeRelatedEntityTo(_, )),
+    };
   },
 
   async findReports(query: ReportQueryValidatorSchema) {
@@ -158,14 +231,14 @@ export default ({ strapi }: StrapiContext) => ({
     return this.getCommonService().sanitizeCommentEntity(updatedEntry, []);
   },
   async approveComment(id: Id) {
-    const entity = await getCommentRepository(strapi).update({ where: { id }, data: { approvalStatus: APPROVAL_STATUS.APPROVED }});
+    const entity = await getCommentRepository(strapi).update({ where: { id }, data: { approvalStatus: APPROVAL_STATUS.APPROVED } });
     if (!entity) {
       throw new PluginError(404, 'Not found');
     }
     return this.getCommonService().sanitizeCommentEntity(entity, []);
   },
   async rejectComment(id: Id) {
-    const entity = await getCommentRepository(strapi).update({ where: { id }, data: { approvalStatus: APPROVAL_STATUS.REJECTED }});
+    const entity = await getCommentRepository(strapi).update({ where: { id }, data: { approvalStatus: APPROVAL_STATUS.REJECTED } });
     if (!entity) {
       throw new PluginError(404, 'Not found');
     }

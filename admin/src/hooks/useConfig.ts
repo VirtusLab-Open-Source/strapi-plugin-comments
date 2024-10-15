@@ -1,15 +1,15 @@
-import { getFetchClient } from '@strapi/strapi/admin';
 import { useQuery } from '@tanstack/react-query';
-import { getApiClient } from '../api';
+import { Config } from '../api/schemas';
+import { useAPI } from './useAPI';
 
-export const useConfig = () => {
-  const fetch = getFetchClient();
-  const apiClient = getApiClient(fetch);
+export const useConfig = (setSettings: (settings: Config) => void) => {
+  const apiClient = useAPI();
   return useQuery({
-    queryKey: apiClient.readSettingsConfigIndex(),
-    queryFn() {
-      return apiClient.readSettingsConfig();
-    },
-    staleTime: 1000 * 60 * 5,
+    queryKey: apiClient.getConfigKey(),
+    queryFn: () => apiClient.getSettingsConfiguration()
+    .then(response => {
+      setSettings(response);
+      return response;
+    }),
   });
-}
+};

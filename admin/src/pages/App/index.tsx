@@ -1,56 +1,46 @@
-// import { usePluginTheme } from '@sensinum/strapi-utils';
+import { Layouts } from '@strapi/strapi/admin';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { SideNav } from '../../components/SideNav';
 import { useConfig } from '../../hooks/useConfig';
+import { useSettingsStore } from '../../store/settings.store';
+import { Details } from '../Details';
+import { Discover } from '../Discover';
+import { Reports } from '../Reports';
 
-const queryClient = new QueryClient();
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 const InnerApp = () => {
-  const data = useConfig();
-  console.log('data', data);
+  const setSettings = useSettingsStore(state => state.setSettings);
+  const { isLoading, data: config } = useConfig(setSettings);
+  if (isLoading || !config) {
+    return <div>Loading...</div>;
+  }
   return (
-    <div>Test</div>
+    <Layouts.Root sideNav={<SideNav />}>
+      <Routes>
+        <Route path="/discover" element={<Discover config={config} />} />
+        <Route path="/discover/:id" element={<Details />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="*" element={<Navigate to="discover" replace />} />
+      </Routes>
+    </Layouts.Root>
   );
 };
 
 const App = () => {
-
   return (
     <QueryClientProvider client={queryClient}>
       <InnerApp />
     </QueryClientProvider>
   );
-
-  //
-  // const {isLoading, isFetching} = useQuery(
-  //   'get-config',
-  //   () => fetchConfig(toggleNotification),
-  //   {
-  //     initialData: {},
-  //     onSuccess: (response) => {
-  //       setConfig(response);
-  //     },
-  //   },
-  // );
-  //
-  // if (isLoading || isFetching) {
-  //   return <LoadingIndicatorPage />;
-  // }
-  //
-  // return (
-  //   <div>
-  //     <Switch>
-  //       <Route path={getUrl('discover/:id')} component={Details} />
-  //       <Route path={getUrl('dashboard')} component={ComingSoonPage} />
-  //       <Route path={getUrl('discover')} component={Discover} />
-  //       <Route path={getUrl('settings')} component={ComingSoonPage} />
-  //       <Route path={getUrl('reports')} component={Reports} />
-  //       <Route
-  //         path={getUrl()}
-  //         exact
-  //         children={<Redirect to={getUrl('discover')} />}
-  //       />
-  //     </Switch>
-  //   </div>
-  // );
 };
 
 export default App;

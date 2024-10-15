@@ -1,11 +1,11 @@
 // TODO
 // @ts-nocheck
 
-import React from "react";
+import React, { FC } from 'react';
 
 const initSize = 16;
 
-const ReviewIcon = ({ width, height, size = 16 }) => (
+const ReviewIcon: FC<{ width?: number; height?: number, size?: number }> = ({ width, height, size = 16 }) => (
   <svg
     width={width || size}
     height={height || size}

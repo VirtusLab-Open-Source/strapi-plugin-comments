@@ -57,26 +57,29 @@
     "codemirror5": "npm:codemirror@^5.65.11",
     "match-sorter": "^6.3.4",
     "no-profanity": "^1.5.1",
-    "strapi-typed": "^1.0.20",
-    "styled-components": "^6.1.13",
-    "typescript": "5.4.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
-    "zod": "^3.23.8"
+    "strapi-typed": "^1.0.20",
+    "styled-components": "^6.1.13",
+    "typescript": "5.4.4",
+    "zod": "^3.23.8",
+    "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
     "@sensinum/strapi-utils": "workspace:*",
     "@strapi/plugin-cloud": "5.0.0",
     "@strapi/plugin-users-permissions": "5.0.0",
     "@strapi/sdk-plugin": "^5.2.6",
-    "@strapi/strapi": "patch:@strapi/strapi@npm%3A5.0.6#~/.yarn/patches/@strapi-strapi-npm-5.0.6-c7cea087a7.patch",
     "@strapi/types": "^5.0.0",
     "@types/koa": "^2.15.0",
     "@types/react": "^18.3.8",
     "@types/react-dom": "^18.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
+  },
+  "peerDependencies": {
+    "@strapi/strapi": "patch:@strapi/strapi@npm%3A5.0.6#~/.yarn/patches/@strapi-strapi-npm-5.0.6-c7cea087a7.patch"
   },
   "nodemonConfig": {
     "ignore": [

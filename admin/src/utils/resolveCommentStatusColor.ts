@@ -1,8 +1,8 @@
 import { ToBeFixed } from "../../../server/src/@types";
 import { COMMENT_STATUS } from "./constants";
 
-const resolveCommentStatusColor = (status: ToBeFixed) => {
-  if (Object.keys(COMMENT_STATUS).includes(status)) {
+const resolveCommentStatusColor = (status: typeof COMMENT_STATUS[keyof typeof COMMENT_STATUS]) => {
+  if (Object.values(COMMENT_STATUS).includes(status)) {
     switch (status) {
       case COMMENT_STATUS.REMOVED:
         return "secondary";

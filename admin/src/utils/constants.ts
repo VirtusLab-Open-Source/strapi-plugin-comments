@@ -2,14 +2,14 @@ export const APPROVAL_STATUS = {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
   REJECTED: 'REJECTED',
-};
+} as const;
 
 export const REPORT_STATUS = {
   ...APPROVAL_STATUS,
   BLOCKED: 'BLOCKED',
   OPEN: 'OPEN',
   RESOLVED: 'RESOLVED',
-};
+} as const;
 
 export enum REPORT_REASON {
   BAD_LANGUAGE = 'BAD_LANGUAGE',
@@ -24,4 +24,4 @@ export const COMMENT_STATUS = {
   REMOVED: 'REMOVED',
   TO_REVIEW: 'TO_REVIEW',
   UNKNOWN: 'UNKNOWN',
-};
+} as const;
