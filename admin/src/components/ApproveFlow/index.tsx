@@ -53,14 +53,12 @@ export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModer
     return (
       <>
         <IconButton
-          withTooltip={false}
           onClick={handleApproveClick}
           label="Approve"
         >
           <Check />
         </IconButton>
         <IconButton
-          withTooltip={false}
           label="Reject"
           onClick={handleRejectClick}
         >

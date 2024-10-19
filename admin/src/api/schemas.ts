@@ -38,8 +38,17 @@ const authorSchema = z.object({
   id: z.union([z.number(), z.string()]),
   name: z.string(),
   email: z.string(),
-  avatar: z.null(),
+  avatar: z.object({
+    url: z.string().nullable(),
+    formats: z.object({
+      thumbnail: z.object({
+        url: z.string(),
+      }).nullable(),
+    }),
+  }).nullable(),
 });
+
+export type Author = z.infer<typeof authorSchema>;
 const approvalStatusSchema = z.union([
   z.literal(COMMENT_STATUS.PENDING),
   z.literal(COMMENT_STATUS.APPROVED),

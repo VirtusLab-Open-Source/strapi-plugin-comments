@@ -67,7 +67,6 @@ export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports }) =
               allowedActions={{ canModerate: true, canAccessReports: true, canReviewReports: true }}
             />
             <IconButton
-              withTooltip={false}
               onClick={noop}
               label="View"
             >

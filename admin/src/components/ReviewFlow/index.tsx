@@ -6,6 +6,7 @@ import { FC, useState } from 'react';
 import { Comment } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
 import { AllowedActions } from '../../types';
+import { DiscussionThreadItem } from '../DiscussionThreadItem';
 import Lock from '../icons/lock';
 import ReviewIcon from '../icons/review';
 import { ReportReviewTable } from './ReportReviewTable';
@@ -90,7 +91,6 @@ export const ReviewFlow: FC<Props> = ({
       <Modal.Trigger>
         {canReviewReports && reports.length && (
           <IconButton
-            withTooltip={false}
             label="Review"
           >
             <ReviewIcon />
@@ -104,6 +104,13 @@ export const ReviewFlow: FC<Props> = ({
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <DiscussionThreadItem
+            as="div"
+            item={item}
+            root
+            preview
+            isSelected={true}
+          />
           <ReportReviewTable
             commentId={item.id}
             reports={reports}

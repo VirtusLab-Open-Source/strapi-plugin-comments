@@ -1,3 +1,4 @@
+import { DesignSystemProvider } from '@strapi/design-system';
 import { Layouts } from '@strapi/strapi/admin';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Navigate, Route, Routes } from 'react-router-dom';
@@ -38,7 +39,9 @@ const InnerApp = () => {
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <InnerApp />
+      <DesignSystemProvider>
+        <InnerApp />
+      </DesignSystemProvider>
     </QueryClientProvider>
   );
 };
