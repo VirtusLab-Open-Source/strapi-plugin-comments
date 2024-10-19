@@ -1,15 +1,22 @@
-import * as designSystem from '@strapi/design-system';
 import { Flex, IconButton, Link, Td, Tr } from '@strapi/design-system';
 import { Eye } from '@strapi/icons';
 import { isEmpty, isNil, noop } from 'lodash';
 import { FC } from 'react';
 import { Comment } from '../../api/schemas';
+import { useAPI } from '../../hooks/useAPI';
 import { ApproveFlow } from '../ApproveFlow';
+import { CommentStatusBadge } from '../CommentStatusBadge';
 import { IconButtonGroup } from '../IconButtonGroup';
 import { ReviewFlow } from '../ReviewFlow';
-import { Status } from '../Status';
 
-export const CommentRow: FC<{ item: Comment, canAccessReports: boolean; canModerate: boolean }> = ({ item, canModerate, canAccessReports }) => {
+type Props = {
+  readonly item: Comment;
+  readonly canAccessReports: boolean;
+  readonly canModerate: boolean;
+};
+export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports }) => {
+  const api = useAPI();
+
   const hasReports = !isEmpty(item.reports?.filter((_) => !_.resolved));
 
   const reviewFlowEnabled = canAccessReports && hasReports && !(item.blocked || item.blockedThread);
@@ -36,7 +43,7 @@ export const CommentRow: FC<{ item: Comment, canAccessReports: boolean; canModer
       </Td>
       <Td>{item.updatedAt}</Td>
       <Td>
-        <Status
+        <CommentStatusBadge
           item={item}
           canAccessReports={canAccessReports}
           hasReports={hasReports}
@@ -45,17 +52,19 @@ export const CommentRow: FC<{ item: Comment, canAccessReports: boolean; canModer
       <Td>
         <Flex direction="column" alignItems="flex-end">
           <IconButtonGroup isSingle={!(reviewFlowEnabled || (canModerate && needsApproval))}>
-            {(canModerate && needsApproval || true) && (
+            {canModerate && needsApproval && (
+              // TODO: permissions
               <ApproveFlow
                 id={item.id}
-                canModerate={canModerate}
+                canModerate={true}
               />
             )}
+            {/* TODO: permissions */}
             <ReviewFlow
               item={item}
-              queryToInvalidate="comments"
+              queryKey={api.getCommentsKey()}
               isAnyActionLoading={false}
-              allowedActions={{ canModerate, canAccessReports, canReviewReports: false }}
+              allowedActions={{ canModerate: true, canAccessReports: true, canReviewReports: true }}
             />
             <IconButton
               withTooltip={false}

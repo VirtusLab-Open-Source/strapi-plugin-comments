@@ -29,7 +29,7 @@ const adminRoutes: StrapiRoute<'admin'>[] = [
     },
   },
   {
-    method: 'PATCH',
+    method: 'PUT',
     path: '/moderate/single/:id/approve',
     handler: 'admin.approveComment',
     config: {
@@ -38,7 +38,7 @@ const adminRoutes: StrapiRoute<'admin'>[] = [
     },
   },
   {
-    method: 'PATCH',
+    method: 'PUT',
     path: '/moderate/single/:id/reject',
     handler: 'admin.rejectComment',
     config: {
@@ -47,7 +47,7 @@ const adminRoutes: StrapiRoute<'admin'>[] = [
     },
   },
   {
-    method: 'PATCH',
+    method: 'PUT',
     path: '/moderate/single/:id/block',
     handler: 'admin.blockComment',
     config: {
@@ -56,7 +56,7 @@ const adminRoutes: StrapiRoute<'admin'>[] = [
     },
   },
   {
-    method: 'PATCH',
+    method: 'PUT',
     path: '/moderate/single/:id/unblock',
     handler: 'admin.unblockComment',
     config: {
@@ -74,7 +74,7 @@ const adminRoutes: StrapiRoute<'admin'>[] = [
     },
   },
   {
-    method: 'PATCH',
+    method: 'PUT',
     path: '/moderate/single/:id/report/:reportId/resolve',
     handler: 'admin.resolveAbuseReport',
     config: {
@@ -128,7 +128,7 @@ const adminRoutes: StrapiRoute<'admin'>[] = [
     },
   },
   {
-    method: 'PATCH',
+    method: 'PUT',
     path: '/moderate/thread/:id/block',
     handler: 'admin.blockCommentThread',
     config: {
@@ -137,7 +137,7 @@ const adminRoutes: StrapiRoute<'admin'>[] = [
     },
   },
   {
-    method: 'PATCH',
+    method: 'PUT',
     path: '/moderate/thread/:id/unblock',
     handler: 'admin.unblockCommentThread',
     config: {

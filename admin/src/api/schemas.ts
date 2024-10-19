@@ -71,6 +71,20 @@ const paginationSchema = z.object({
   pageCount: z.number(),
   total: z.number(),
 });
+const reportSchema = z.object({
+  id: z.number(),
+  reason: z.union([
+    z.literal('BAD_LANGUAGE'),
+    z.literal('DISCRIMINATION'),
+    z.literal('OTHER'),
+  ]),
+  content: z.string(),
+  resolved: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string().nullable(),
+});
+
+export type Report = z.infer<typeof reportSchema>;
 const commentSchema = z.object({
   id: z.number(),
   documentId: z.string(),
@@ -85,18 +99,10 @@ const commentSchema = z.object({
   createdAt: z.string(),
   updatedAt: z.string(),
   threadOf: threadOfSchema.nullable(),
-  reports: z.array(z.object({
-    id: z.number(),
-    reason: z.union([
-      z.literal('BAD_LANGUAGE'),
-      z.literal('DISCRIMINATION'),
-      z.literal('OTHER'),
-    ]),
-    resolved: z.boolean(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-  })),
+  reports: z.array(reportSchema),
   author: authorSchema,
+  // TODO: refactor this to be a boolean
+  gotThread: z.boolean().nullable().default(false),
 });
 
 export type Comment = z.infer<typeof commentSchema>;

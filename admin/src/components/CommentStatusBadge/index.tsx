@@ -4,7 +4,7 @@ import { resolveCommentStatus, resolveCommentStatusColor } from '../../utils';
 import { StatusBadge } from '../StatusBadge';
 import { isEmpty, startCase } from 'lodash';
 
-export const Status: FC<{ item: Comment, canAccessReports: boolean; hasReports: boolean }> = ({ item, canAccessReports, hasReports }) => {
+export const CommentStatusBadge: FC<{ item: Comment, canAccessReports: boolean; hasReports: boolean }> = ({ item, canAccessReports, hasReports }) => {
   const reviewFlowEnabled = canAccessReports && hasReports && !(item.blocked || item.blockedThread);
   const status = resolveCommentStatus({ ...item, reviewFlowEnabled });
   const color = resolveCommentStatusColor(status);

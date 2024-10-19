@@ -34,7 +34,7 @@ const controllers = ({ strapi }: StrapiContext) => {
     },
 
     async blockComment(ctx: RequestContextWithId) {
-      const either = getIdValidator(ctx.params.id);
+      const either = getIdValidator(ctx.params);
       if (isRight(either)) {
         return adminService.changeBlockedComment(unwrapEither(either).id, true);
       }
@@ -42,7 +42,7 @@ const controllers = ({ strapi }: StrapiContext) => {
     },
 
     async unblockComment(ctx: RequestContextWithId) {
-      const either = getIdValidator(ctx.params.id);
+      const either = getIdValidator(ctx.params);
       if (isRight(either)) {
         return adminService.changeBlockedComment(unwrapEither(either).id, true);
       }
@@ -50,7 +50,7 @@ const controllers = ({ strapi }: StrapiContext) => {
     },
 
     async deleteComment(ctx: RequestContextWithId) {
-      const either = getIdValidator(ctx.params.id);
+      const either = getIdValidator(ctx.params);
       if (isRight(either)) {
         return adminService.deleteComment(unwrapEither(either).id);
       }
@@ -58,7 +58,7 @@ const controllers = ({ strapi }: StrapiContext) => {
     },
 
     async blockCommentThread(ctx: RequestContextWithId) {
-      const either = getIdValidator(ctx.params.id);
+      const either = getIdValidator(ctx.params);
       if (isRight(either)) {
         return adminService.blockCommentThread(unwrapEither(either).id, true);
       }
@@ -66,7 +66,7 @@ const controllers = ({ strapi }: StrapiContext) => {
     },
 
     async unblockCommentThread(ctx: RequestContextWithId) {
-      const either = getIdValidator(ctx.params.id);
+      const either = getIdValidator(ctx.params);
       if (isRight(either)) {
         return adminService.blockCommentThread(unwrapEither(either).id, false);
       }
@@ -82,10 +82,9 @@ const controllers = ({ strapi }: StrapiContext) => {
     },
 
     async resolveCommentMultipleAbuseReports(ctx: RequestContextWithId<Array<Id>>) {
-      const reportIds = ctx.request.body;
       const either = getResolveCommentMultipleAbuseReportsValidator({
+        ...ctx.request.body,
         id: ctx.params.id,
-        reportIds,
       });
       if (isRight(either)) {
         return adminService.resolveCommentMultipleAbuseReports(unwrapEither(either));
@@ -94,7 +93,7 @@ const controllers = ({ strapi }: StrapiContext) => {
     },
 
     async resolveAllAbuseReportsForComment(ctx: RequestContextWithId) {
-      const either = getIdValidator(ctx.params.id);
+      const either = getIdValidator(ctx.params);
       if (isRight(either)) {
         return adminService.resolveAllAbuseReportsForComment(unwrapEither(either).id);
       }
@@ -102,7 +101,7 @@ const controllers = ({ strapi }: StrapiContext) => {
     },
 
     async resolveAllAbuseReportsForThread(ctx: RequestContextWithId) {
-      const either = getIdValidator(ctx.params.id);
+      const either = getIdValidator(ctx.params);
       if (isRight(either)) {
         return adminService.resolveAllAbuseReportsForThread(unwrapEither(either).id);
       }
@@ -143,7 +142,7 @@ const controllers = ({ strapi }: StrapiContext) => {
     },
 
     async approveComment(ctx: RequestContext<unknown, IdValidatorSchema>) {
-      const either = getIdValidator(ctx.params.id);
+      const either = getIdValidator(ctx.params);
       if (isRight(either)) {
         return adminService.approveComment(unwrapEither(either).id);
       }
@@ -151,7 +150,7 @@ const controllers = ({ strapi }: StrapiContext) => {
     },
 
     async rejectComment(ctx: RequestContext<unknown, IdValidatorSchema>) {
-      const either = getIdValidator(ctx.params.id);
+      const either = getIdValidator(ctx.params);
       if (isRight(either)) {
         return adminService.rejectComment(unwrapEither(either).id);
       }

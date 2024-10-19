@@ -1,17 +1,24 @@
 // TODO
 // @ts-nocheck
 
-import React from "react";
+import React, { FC } from 'react';
 
 const initSize = 330;
 
-const LockIcon = ({ width, height, size = 16 }) => (
+type LockIconProps = {
+  width?: number;
+  height?: number;
+  size?: number;
+};
+
+const LockIcon: FC<LockIconProps> = ({ width, height, size = 16 }) => (
   <svg
     width={width || size}
     height={height || size}
     viewBox={`0 0 ${width || size} ${height || size}`}
     style={{ width: `${width || size}px`, height: `${height || size}px` }}
     xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
   >
     <g style={{ transform: `scale(${(width || size) / initSize})` }}>
       <path

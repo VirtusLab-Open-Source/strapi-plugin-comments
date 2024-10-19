@@ -8,13 +8,13 @@ import { pluginId } from '../../pluginId';
 import { AllowedActions } from '../../types';
 import { handleAPIError } from '../../utils';
 
-export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModerate'], queryToInvalidate?: string[] }> = ({ id, canModerate, queryToInvalidate }) => {
+export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModerate'] }> = ({ id, canModerate }) => {
   const { toggleNotification } = useNotification();
   const queryClient = useQueryClient();
   const apiClient = useAPI();
   const onSuccess = (message: string) => () => {
-    queryToInvalidate && queryClient.invalidateQueries({
-      queryKey: queryToInvalidate,
+    queryClient.invalidateQueries({
+      queryKey: apiClient.getCommentsKey(),
     });
     toggleNotification({
       type: 'success',
@@ -28,24 +28,24 @@ export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModer
 
   const approveItemMutation = useMutation({
     mutationKey: ['approveItem', id],
-    mutationFn: () => apiClient.approveComment(id),
+    mutationFn: apiClient.approveComment,
     onSuccess: onSuccess('success.approveItem'),
     onError,
   });
 
   const handleApproveClick = () => {
-    approveItemMutation.mutate();
+    approveItemMutation.mutate(id);
   };
 
   const rejectItemMutation = useMutation({
     mutationKey: ['rejectItem', id],
-    mutationFn: () => apiClient.rejectComment(id),
+    mutationFn: apiClient.rejectComment,
     onSuccess: onSuccess('success.rejectItem'),
     onError,
   });
 
   const handleRejectClick = () => {
-    rejectItemMutation.mutate();
+    rejectItemMutation.mutate(id);
   };
 
 

@@ -33,6 +33,7 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
     },
   } = useRBAC(viewPermissions);
 
+
   const {
     isLoading: isLoadingForData,
     data: { result, pagination },
@@ -65,11 +66,12 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
             </Thead>
             <Tbody>
               {result.map((comment) => (
+                // TODO: permissions
                 <CommentRow
                   key={comment.id}
                   item={comment}
-                  canModerate={canModerate}
-                  canAccessReports={canAccessReports}
+                  canModerate={true}
+                  canAccessReports={true}
                 />
               ))}
             </Tbody>
