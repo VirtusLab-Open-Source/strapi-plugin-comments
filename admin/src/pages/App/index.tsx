@@ -1,4 +1,4 @@
-import { DesignSystemProvider } from '@strapi/design-system';
+import { darkTheme, DesignSystemProvider, lightTheme } from '@strapi/design-system';
 import { Layouts } from '@strapi/strapi/admin';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Navigate, Route, Routes } from 'react-router-dom';
@@ -9,6 +9,8 @@ import { Details } from '../Details';
 import { Discover } from '../Discover';
 import { Reports } from '../Reports';
 
+console.log('!!darkTheme', !!darkTheme);
+console.log('!!lightTheme', !!lightTheme);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,7 +41,7 @@ const InnerApp = () => {
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <DesignSystemProvider>
+      <DesignSystemProvider theme={{theme: darkTheme, themeName: 'light'}}>
         <InnerApp />
       </DesignSystemProvider>
     </QueryClientProvider>

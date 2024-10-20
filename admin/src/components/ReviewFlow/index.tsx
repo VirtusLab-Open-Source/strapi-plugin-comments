@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { FC, useState } from 'react';
 import { Comment } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
+import { useCommentMutation } from '../../hooks/useCommentMutation';
 import { AllowedActions } from '../../types';
 import { DiscussionThreadItem } from '../DiscussionThreadItem';
 import Lock from '../icons/lock';
@@ -33,31 +34,18 @@ export const ReviewFlow: FC<Props> = ({
   const queryClient = useQueryClient();
   const hasAnySelectedItems = selectedItems.length > 0;
 
-  const blockItemMutation = useMutation({
-    mutationKey: ['blockItem', item.id],
-    mutationFn: api.blockComment,
-  });
-  const blockThreadMutation = useMutation({
-    mutationKey: ['blockThread', item.id],
-    mutationFn: api.blockThread,
-  });
-
-  const resolveMultipleReportsMutation = useMutation({
-    mutationKey: ['resolveMultipleReports', item.id],
-    mutationFn: api.resolveMultipleReports,
-    onSuccess: () => {
+  const {
+    blockItemMutation,
+    blockThreadMutation,
+    resolveAllAbuseReportsForCommentMutation,
+    resolveMultipleReportsMutation,
+    resolveAllAbuseReportsForThreadMutation
+  } = useCommentMutation(item.id, {
+    resolveMultipleReportsSuccess: () => {
       return queryClient.invalidateQueries({
         queryKey: api.getCommentsKey(),
       });
     },
-  });
-  const resolveAllAbuseReportsForCommentMutation = useMutation({
-    mutationKey: ['resolveAllAbuseReportsForComment', item.id],
-    mutationFn: api.resolveAllAbuseReportsForComment,
-  });
-  const resolveAllAbuseReportsForThreadMutation = useMutation({
-    mutationKey: ['resolveAllAbuseReportsForThread', item.id],
-    mutationFn: api.resolveAllAbuseReportsForThread,
   });
 
   const onBlockButtonsStateChange = (disabled: boolean) => setBlockButtonsDisabled(disabled);
@@ -89,7 +77,7 @@ export const ReviewFlow: FC<Props> = ({
   return (
     <Modal.Root open={isModalVisible} onOpenChange={onToggleModal}>
       <Modal.Trigger>
-        {canReviewReports && reports.length && (
+        {canReviewReports && reports?.length && (
           <IconButton
             label="Review"
           >
@@ -113,7 +101,7 @@ export const ReviewFlow: FC<Props> = ({
           />
           <ReportReviewTable
             commentId={item.id}
-            reports={reports}
+            reports={reports || []}
             selectedItems={selectedItems}
             allowedActions={{ canAccessReports, canReviewReports, canModerate }}
             onBlockButtonsStateChange={onBlockButtonsStateChange}

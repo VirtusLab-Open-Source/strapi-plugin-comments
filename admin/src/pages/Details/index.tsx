@@ -28,7 +28,7 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
   );
 
   const { data: { entity, level, selected }, isLoading: isLoadingForData, isFetching } = useQuery({
-    queryKey: api.getDetailsCommentKey(id!, canAccess, filters),
+    queryKey: api.getDetailsCommentKey(id!, filters),
     queryFn: () => api.getDetailsComment(id!, filters),
     initialData: {
       level: [],

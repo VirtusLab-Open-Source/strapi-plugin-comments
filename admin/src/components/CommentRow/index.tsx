@@ -46,9 +46,11 @@ export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports, can
         ) : '-'}
       </Td>
       <Td>
-        <Link href={`/admin/content-manager/collection-types/${item.related.uid}/${item.related.documentId}`}>
-          {item.related.title}
-        </Link>
+        {typeof item.related !== 'string' && (
+          <Link href={`/admin/content-manager/collection-types/${item.related.uid}/${item.related.documentId}`}>
+            {item.related.title}
+          </Link>
+        )}
       </Td>
       <Td>{item.updatedAt}</Td>
       <Td>

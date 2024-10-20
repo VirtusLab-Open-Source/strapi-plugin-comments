@@ -8,7 +8,7 @@ import { pluginId } from '../../pluginId';
 import { AllowedActions } from '../../types';
 import { handleAPIError } from '../../utils';
 
-export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModerate'] }> = ({ id, canModerate }) => {
+export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModerate'], queryKey?: string[] }> = ({ id, canModerate }) => {
   const { toggleNotification } = useNotification();
   const queryClient = useQueryClient();
   const apiClient = useAPI();

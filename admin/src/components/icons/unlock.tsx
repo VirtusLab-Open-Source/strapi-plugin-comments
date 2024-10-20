@@ -1,11 +1,17 @@
 // TODO
 // @ts-nocheck
 
-import React from "react";
+import React, { FC } from 'react';
 
 const initSize = 330;
 
-const UnlockIcon = ({ width, height, size = 16 }) => (
+type IconProps = {
+  width?: number;
+  height?: number;
+  size?: number;
+};
+
+const UnlockIcon: FC<IconProps>= ({ width, height, size = 16 }) => (
   <svg
     width={width || size}
     height={height || size}

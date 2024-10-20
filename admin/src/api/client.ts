@@ -37,6 +37,9 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
   blockThread(id: number) {
     return fetch.put(`/${URL_PREFIX}/moderate/thread/${id}/block`);
   },
+  unBlockThread(id: number) {
+    return fetch.put(`/${URL_PREFIX}/moderate/thread/${id}/unblock`);
+  },
   resolveReport({ id, reportId }: { id: number, reportId: number }) {
     return fetch.put(`/${URL_PREFIX}/moderate/single/${id}/report/${reportId}/resolve`);
   },
@@ -49,6 +52,9 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
   resolveAllAbuseReportsForThread(id: number) {
     return fetch.put(`/${URL_PREFIX}/moderate/thread/${id}/report/resolve-thread`);
   },
+  deleteItem(id: number) {
+    return fetch.del(`/${URL_PREFIX}/moderate/single/${id}/delete`);
+  },
   async getDetailsComment(id: number | string, filters: any) {
     const queryFilters = !isEmpty(filters) ? `?${stringify(filters, { encode: false })}` : '';
     const response = await fetch.get(`/${URL_PREFIX}/moderate/single/${id}${queryFilters}`);
@@ -57,8 +63,8 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
       throw error;
     });
   },
-  getDetailsCommentKey(id: number | string, canAccess: boolean, filters: any) {
-    return [URL_PREFIX, 'details', canAccess, id, JSON.stringify(filters)];
+  getDetailsCommentKey(id: number | string, filters?: any): string[] {
+    return [URL_PREFIX, 'details', id.toString(), filters ? JSON.stringify(filters) : undefined].filter(Boolean) as string[];
   },
   async getContentTypeData(uid: string) {
     const response = await fetch.get(`/content-type-builder/content-types/${uid}`);
@@ -66,5 +72,11 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
   },
   getAdditionalDataKey(uid: string, canAccess: boolean) {
     return [URL_PREFIX, 'moderate', 'content-type', canAccess, uid];
+  },
+  postComment({ id, content, author }: { id: number | string, content: string, author: string | number }) {
+    return fetch.post(`/${URL_PREFIX}/moderate/thread/${id}/postComment`, { content, author });
+  },
+  updateComment({ id, content }: { id: number | string, content: string }) {
+    return fetch.put(`/${URL_PREFIX}/moderate/single/${id}/update`, { content });
   },
 }));
