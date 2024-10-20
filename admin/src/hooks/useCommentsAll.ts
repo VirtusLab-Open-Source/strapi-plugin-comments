@@ -13,8 +13,11 @@ export const useCommentsAll = () => {
       result: res.result.map((item) => ({
         ...item,
         reports: orderBy(item.reports, ['resolved', 'createdAt'], ['desc', 'desc']),
-      })),
-    })),
+      }))
+    })).catch((error) => {
+      console.log('error', error);
+      throw error;
+    }),
     initialData: { result: [], pagination: { page: 0, pageSize: 0, pageCount: 0, total: 0 } },
   });
 };

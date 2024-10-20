@@ -1,11 +1,11 @@
 import { Table, Tbody, Th, Thead, Tr } from '@strapi/design-system';
-import { Layouts, Page, Pagination, SearchInput, useNotification, useQueryParams, useRBAC, useTracking } from '@strapi/strapi/admin';
-import { FC, useMemo } from 'react';
+import { Layouts, Page, Pagination, SearchInput, useNotification, useQueryParams, useTracking } from '@strapi/strapi/admin';
 import { noop } from 'lodash';
+import { FC } from 'react';
 import { Config } from '../../api/schemas';
 import { CommentRow } from '../../components/CommentRow';
 import { useCommentsAll } from '../../hooks/useCommentsAll';
-import pluginPermissions from '../../permissions';
+import { usePermissions } from '../../hooks/usePermissions';
 
 
 export const Discover: FC<{ config: Config }> = ({ config }) => {
@@ -14,24 +14,13 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
   const [{ query: queryParams }] = useQueryParams();
   const _q = (queryParams as any)?._q || '';
 
-  const viewPermissions = useMemo(
-    () => ({
-      access: pluginPermissions.access,
-      moderate: pluginPermissions.moderate,
-      accessReports: pluginPermissions.reports,
-      reviewReports: pluginPermissions.reportsReview,
-    }),
-    [],
-  );
   const {
-    isLoading: isLoadingForPermissions,
-    allowedActions: {
-      canAccess,
-      canModerate,
-      canAccessReports,
-      canReviewReports,
-    },
-  } = useRBAC(viewPermissions);
+    isLoadingForPermissions,
+    canAccess,
+    canModerate,
+    canAccessReports,
+    canReviewReports,
+  } = usePermissions();
 
 
   const {
@@ -66,12 +55,12 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
             </Thead>
             <Tbody>
               {result.map((comment) => (
-                // TODO: permissions
                 <CommentRow
                   key={comment.id}
                   item={comment}
-                  canModerate={true}
-                  canAccessReports={true}
+                  canModerate={canModerate}
+                  canAccessReports={canAccessReports}
+                  canReviewReports={canReviewReports}
                 />
               ))}
             </Tbody>

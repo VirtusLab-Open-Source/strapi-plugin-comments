@@ -11,7 +11,7 @@ type Props = Readonly<Pick<Author, 'avatar'> & {
 }>
 export const UserAvatar: FC<Props> = ({ avatar, isAdminComment, name }) => {
   if (avatar) {
-    const image = avatar.formats?.thumbnail?.url ?? avatar.url;
+    const image = 'formats' in avatar ? avatar.formats?.thumbnail?.url ?? avatar.url : avatar.url;
     if (isAdminComment) {
       return (
         <AdminAvatar>

@@ -45,7 +45,9 @@ const getFindQueryValidator = <T extends z.ZodRawShape>(filters: z.ZodObject<T>)
 };
 
 const entryFilters = getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true })
-.merge(getStringToNumberValidator({ threadOf: AVAILABLE_OPERATORS.single }));
+.merge(z.object({
+  threadOf: stringToNumberValidator.optional(),
+}));
 
 const commentValidator = getFindQueryValidator(entryFilters);
 

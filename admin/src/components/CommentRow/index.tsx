@@ -1,7 +1,8 @@
 import { Flex, IconButton, Link, Td, Tr } from '@strapi/design-system';
 import { Eye } from '@strapi/icons';
 import { isEmpty, isNil, noop } from 'lodash';
-import { FC } from 'react';
+import { FC, SyntheticEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Comment } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
 import { ApproveFlow } from '../ApproveFlow';
@@ -13,9 +14,11 @@ type Props = {
   readonly item: Comment;
   readonly canAccessReports: boolean;
   readonly canModerate: boolean;
+  readonly canReviewReports: boolean;
 };
-export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports }) => {
+export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports, canReviewReports }) => {
   const api = useAPI();
+  const navigate = useNavigate();
 
   const hasReports = !isEmpty(item.reports?.filter((_) => !_.resolved));
 
@@ -24,6 +27,12 @@ export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports }) =
 
   const needsApproval = gotApprovalFlow && item.approvalStatus === 'PENDING';
 
+  const onClickDetails = (id: number) => (evt: SyntheticEvent) => {
+    evt.preventDefault();
+    evt.stopPropagation();
+    navigate(id.toString());
+  }
+
   return (
     <Tr>
       <Td>{item.id}</Td>
@@ -31,7 +40,7 @@ export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports }) =
       <Td>{item.content}</Td>
       <Td>
         {item.threadOf ? (
-          <Link href={`discover/${item.threadOf.id}`}>
+          <Link href={`discover/${item.threadOf.id}`} onClick={onClickDetails(item.threadOf.id)}>
             {item.threadOf.content}
           </Link>
         ) : '-'}
@@ -53,21 +62,19 @@ export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports }) =
         <Flex direction="column" alignItems="flex-end">
           <IconButtonGroup isSingle={!(reviewFlowEnabled || (canModerate && needsApproval))}>
             {canModerate && needsApproval && (
-              // TODO: permissions
               <ApproveFlow
                 id={item.id}
-                canModerate={true}
+                canModerate={canModerate}
               />
             )}
-            {/* TODO: permissions */}
             <ReviewFlow
               item={item}
               queryKey={api.getCommentsKey()}
               isAnyActionLoading={false}
-              allowedActions={{ canModerate: true, canAccessReports: true, canReviewReports: true }}
+              allowedActions={{ canModerate, canAccessReports, canReviewReports }}
             />
             <IconButton
-              onClick={noop}
+              onClick={onClickDetails(item.id)}
               label="View"
             >
               <Eye />

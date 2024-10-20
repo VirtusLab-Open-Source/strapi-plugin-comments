@@ -113,7 +113,9 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
 
   // Find comments and create relations tree structure
-  async findAllInHierarchy(criteria: any, relatedEntity: any) {},
+  async findAllInHierarchy(criteria: any, relatedEntity: any) {
+    return []
+  },
 
   // Find single comment
   async findOne<T extends Comment = Comment>(criteria: Partial<Params['where']>) {

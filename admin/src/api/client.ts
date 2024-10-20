@@ -1,6 +1,7 @@
 import { getFetchClient } from '@strapi/strapi/admin';
-import { once } from 'lodash';
-import { commentsSchema, configSchema } from './schemas';
+import { isEmpty, once } from 'lodash';
+import { stringify } from 'qs';
+import { commentDetailsSchema, commentsSchema, configSchema, contentTypeSchema } from './schemas';
 
 const URL_PREFIX = 'comments';
 
@@ -12,11 +13,11 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
   },
   async getSettingsConfiguration() {
     const response = await fetch.get(`/${URL_PREFIX}/settings/config`);
-    return configSchema.parse(response.data);
+    return configSchema.parseAsync(response.data);
   },
   async getComments() {
     const response = await fetch.get(`/${URL_PREFIX}/moderate/all`);
-    return commentsSchema.parse(response.data);
+    return commentsSchema.parseAsync(response.data);
   },
   getCommentsKey() {
     return [URL_PREFIX, 'moderate', 'all'];
@@ -47,5 +48,23 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
   },
   resolveAllAbuseReportsForThread(id: number) {
     return fetch.put(`/${URL_PREFIX}/moderate/thread/${id}/report/resolve-thread`);
+  },
+  async getDetailsComment(id: number | string, filters: any) {
+    const queryFilters = !isEmpty(filters) ? `?${stringify(filters, { encode: false })}` : '';
+    const response = await fetch.get(`/${URL_PREFIX}/moderate/single/${id}${queryFilters}`);
+    return commentDetailsSchema.parseAsync(response.data).catch((error) => {
+      console.log('error', error);
+      throw error;
+    });
+  },
+  getDetailsCommentKey(id: number | string, canAccess: boolean, filters: any) {
+    return [URL_PREFIX, 'details', canAccess, id, JSON.stringify(filters)];
+  },
+  async getContentTypeData(uid: string) {
+    const response = await fetch.get(`/content-type-builder/content-types/${uid}`);
+    return contentTypeSchema.parseAsync(response.data).then((data) => data.data);
+  },
+  getAdditionalDataKey(uid: string, canAccess: boolean) {
+    return [URL_PREFIX, 'moderate', 'content-type', canAccess, uid];
   },
 }));
