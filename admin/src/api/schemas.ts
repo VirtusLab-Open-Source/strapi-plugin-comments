@@ -91,7 +91,7 @@ const baseCommentSchema = z.object({
   blockReason: z.string().nullable(),
   isAdminComment: z.boolean().nullable(),
   removed: z.boolean().nullable(),
-  approvalStatus: approvalStatusSchema,
+  approvalStatus: approvalStatusSchema.nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
   reports: z.array(reportSchema).nullable().optional(),
@@ -112,11 +112,16 @@ const paginationSchema = z.object({
 // const threadOfSchema = baseCommentSchema.omit({ related: true }).merge(z.object({ related: z.string(), threadOf: commentSchema.nullable().optional() }));
 
 export type Report = z.infer<typeof reportSchema>;
-const commentSchema: z.ZodType<Comment> = baseCommentSchema.extend({
-  related: relatedSchema,
-  documentId: z.string(),
-  threadOf: z.lazy(() => baseCommentSchema.merge(z.object({ related: z.string(), threadOf: commentSchema.nullable().optional(), documentId: z.string().optional() })).nullable()),
-});
+
+function getCommentSchema() {
+  return baseCommentSchema.extend({
+    related: relatedSchema,
+    documentId: z.string(),
+    threadOf: z.lazy(() => baseCommentSchema.merge(z.object({ related: z.string(), threadOf: commentSchema.nullable().optional(), documentId: z.string().optional() }))),
+  });
+}
+
+const commentSchema: z.ZodType<Comment> = getCommentSchema();
 
 export type Comment = BaseComment & {
   threadOf?: Comment | null
@@ -134,7 +139,7 @@ export const commentsSchema = z.object({
 export const commentDetailsSchema = z.object({
   entity: relatedSchema,
   selected: baseCommentSchema.merge(z.object({ related: z.string(), threadOf: commentSchema.nullable().optional() })).nullable(),
-  level: z.array(commentSchema),
+  level: z.array(getCommentSchema().omit({ threadOf: true, related: true })),
 });
 
 export type CommentDetails = z.infer<typeof commentDetailsSchema>;

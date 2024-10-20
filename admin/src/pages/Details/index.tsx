@@ -70,7 +70,7 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
                   }}
                 />
               </Grid.Item>
-              <Grid.Item col={3} s={12}>
+              <Grid.Item col={3} s={12} alignItems="flex-start">
                 <DetailsEntry
                   config={config}
                   entity={entity}

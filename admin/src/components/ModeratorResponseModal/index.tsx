@@ -1,4 +1,4 @@
-import { Flex, IconButton, Modal, Button } from '@strapi/design-system';
+import { Button, Flex, IconButton, Modal } from '@strapi/design-system';
 import { useNotification } from '@strapi/strapi/admin';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { FC, useState } from 'react';
@@ -26,13 +26,13 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
   const getOnSuccess = (message: string) => async () => {
     await queryClient.invalidateQueries({
       queryKey: api.getDetailsCommentKey(id),
-      exact: false
-    })
+      exact: false,
+    });
     toggleNotification({
       message: getMessage(message),
       type: 'success',
     });
-  }
+  };
 
   const postCommentMutation = useMutation({
     mutationFn: api.postComment,
@@ -70,10 +70,9 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
   return (
     <Modal.Root open={isModalVisible} onOpenChange={onToggleModal}>
       <Modal.Trigger>
-        <IconButton
-          onClick={onToggleModal}
-          icon={<Icon />}
-        />
+        <IconButton onClick={onToggleModal}>
+          <Icon />
+        </IconButton>
       </Modal.Trigger>
       <Modal.Content>
         <Modal.Header>

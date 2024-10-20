@@ -32,7 +32,9 @@ export const ConfirmationDialog: FC<ConfirmationDialogProps> = ({
 
   return (
     <Dialog.Root open={isOpen}>
-      <Dialog.Trigger><Trigger onClick={onToggleModal} /> </Dialog.Trigger>
+      <Dialog.Trigger>
+        <Trigger onClick={onToggleModal} />
+      </Dialog.Trigger>
       <Dialog.Content>
         <Dialog.Header>{title}</Dialog.Header>
         <Dialog.Body icon={<WarningCircle />}>

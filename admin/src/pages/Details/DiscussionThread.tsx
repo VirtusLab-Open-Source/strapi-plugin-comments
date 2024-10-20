@@ -17,7 +17,6 @@ type DiscussionThreadProps = {
 };
 export const DiscussionThread: FC<DiscussionThreadProps> = ({ allowedActions, isReloading, level, selected }) => {
   const rootThread = selected?.threadOf;
-
   return (
     <Box background="neutral0" width="100%" padding={4} position="relative" height="100%">
       {isReloading && <LoadingIndicatorOverlay />}
@@ -57,7 +56,7 @@ export const DiscussionThread: FC<DiscussionThreadProps> = ({ allowedActions, is
           return (
             <DiscussionThreadItem
               key={`comment-${item.id}`}
-              item={item}
+              item={item as unknown as any}
               root={isNil(rootThread)}
               blockedThread={rootThread?.blockedThread || item.blockedThread}
               isSelected={isSelected}

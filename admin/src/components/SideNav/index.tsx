@@ -7,11 +7,11 @@ export const SideNav = () => {
       <SubNavHeader label="Comments" />
       <SubNavSections>
         <SubNavSection label="Moderation">
-          <SubNavLink href="discover">
+          <SubNavLink href="/admin/plugins/comments/discover">
             Discover
           </SubNavLink>
           <SubNavLink
-            href="reports"
+            href="/admin/plugins/comments/reports"
             withBullet={false}
           >
             Reports

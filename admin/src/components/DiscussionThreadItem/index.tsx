@@ -44,19 +44,22 @@ export const DiscussionThreadItem: FC<PropsWithChildren<DiscussionThreadItemProp
           paddingBottom={2}
           direction="column"
           gap={2}
+          width="100%"
         >
-          <Flex grow={1} alignItems="center" marginTop="6px">
-            <Typography variant="omega" textColor="neutral800">
-              <DiscussionThreadItemContentTypographyRenderer dangerouslySetInnerHTML={{ __html: item.content }} />
-            </Typography>
+          <Flex width="100%" justifyContent="space-between" marginTop="6px">
+            <Flex grow={1} alignItems="center">
+              <Typography variant="omega" textColor="neutral800">
+                <DiscussionThreadItemContentTypographyRenderer dangerouslySetInnerHTML={{ __html: item.content }} />
+              </Typography>
+            </Flex>
+            {!preview && (
+              <DiscussionThreadItemActions
+                {...props}
+                root={root || pinned}
+                preview={preview}
+              />
+            )}
           </Flex>
-          {!preview && (
-            <DiscussionThreadItemActions
-              {...props}
-              root={root || pinned}
-              preview={preview}
-            />
-          )}
           <DiscussionThreadItemFooter {...props} />
         </Flex>
       </Flex>

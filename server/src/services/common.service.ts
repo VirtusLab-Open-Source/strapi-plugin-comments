@@ -1,16 +1,17 @@
 import { Params } from '@strapi/database/dist/entity-manager/types';
 import { UID } from '@strapi/strapi';
-import { get, isNil, isNumber, isObject, omit as filterItem, parseInt } from 'lodash';
+import { first, get, isEmpty, isNil, isNumber, isObject, isString, omit as filterItem, parseInt, uniq } from 'lodash';
 import { isProfane, replaceProfanities } from 'no-profanity';
 import { StrapiStore } from 'strapi-typed';
 import { CommentModelKeys, CommentsPluginConfig, Effect, ToBeFixed } from '../@types';
-import { Comment, Id, StrapiContext } from '../@types-v5';
+import { Comment, Id, RelatedEntity, StrapiContext } from '../@types-v5';
+import { ContentTypesUUIDs } from '../content-types';
 import { getCommentRepository, getOrderBy } from '../repositories';
 import { CONFIG_PARAMS } from '../utils/constants';
 import PluginError from '../utils/PluginError';
 import { ContentType, LifeCycleHookName } from '../utils/types';
 import { FindAllFlatCommentsValidatorSchema } from '../validators';
-import { buildAuthorModel, buildConfigQueryProp, filterOurResolvedReports, getRelatedGroups } from './utils/functions';
+import { buildAuthorModel, buildConfigQueryProp, buildNestedStructure, filterOurResolvedReports, getRelatedGroups } from './utils/functions';
 
 
 /**
@@ -91,7 +92,6 @@ const commonService = ({ strapi }: StrapiContext) => ({
   // Find comments in the flat structure
   async findAllFlat({
     fields,
-    relation,
     limit,
     skip,
     sort,
@@ -99,9 +99,10 @@ const commonService = ({ strapi }: StrapiContext) => ({
     populate,
     omit: baseOmit = [],
     isAdmin = false,
-  }: FindAllFlatCommentsValidatorSchema) {
+    query = {},
+  }: FindAllFlatCommentsValidatorSchema, relatedEntity?: any): Promise<any> {
     const omit = baseOmit.filter((field) => !REQUIRED_FIELDS.includes(field));
-    const defaultSelect: Array<CommentModelKeys> = (["id", "related"] as const).filter((field) => !omit.includes(field));
+    const defaultSelect: Array<CommentModelKeys> = (['id', 'related'] as const).filter((field) => !omit.includes(field));
 
     const populateClause: FindAllFlatCommentsValidatorSchema['populate'] = {
       authorUser: true,
@@ -109,12 +110,113 @@ const commonService = ({ strapi }: StrapiContext) => ({
     };
     const doNotPopulateAuthor = isAdmin ? [] : await this.getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
     const [operator, direction] = getOrderBy(sort);
+    const fieldsQuery = {
+      sort: { [operator]: direction },
+      select: Array.isArray(fields) ? uniq([...fields, defaultSelect]) : fields,
+    };
+    // const method =
+    const entries = await getCommentRepository(strapi).findMany({
+      where: {
+        ...filter,
+        ...query,
+      },
+      populate: populateClause,
+      ...fieldsQuery,
+      limit: limit || PAGE_SIZE,
+      offset: skip || 0,
+    });
+    console.log('entries', entries.length);
+    // TODO: add pagination with total count
+    const entriesWithThreads = await Promise.all<{
+      id: Id;
+      itemsInTread: number;
+      firstThreadItemId: Id | undefined;
+    }>(
+      entries.map(async (_) => {
+        const { results, pagination: { total } } = await getCommentRepository(strapi)
+        .findWithCount({
+          where: {
+            threadOf: _.id,
+          },
+        });
+        return {
+          id: _.id,
+          itemsInTread: total,
+          firstThreadItemId: first(results)?.id,
+        };
+      }),
+    );
+    const relatedEntities = omit.includes('related') ? [] : relatedEntity !== null ? [relatedEntity] : await this.findRelatedEntitiesFor([...entries]);
+    const hasRelatedEntitiesToMap = relatedEntities.filter((_: RelatedEntity) => _).length > 0;
+
+    const result = entries.map((_: Comment) => {
+      const threadedItem = entriesWithThreads.find(
+        (item: {
+          id: Id;
+          itemsInTread: number;
+          firstThreadItemId: Id | undefined;
+        }) => item.id === _.id,
+      );
+      const parsedThreadOf = isString(query.threadOf)
+        ? parseInt(query.threadOf)
+        : query.threadOf;
+
+      let authorUserPopulate = {};
+      if (isObject(populateClause?.authorUser)) {
+        authorUserPopulate = 'populate' in populateClause.authorUser ? (populateClause.authorUser.populate) : populateClause.authorUser;
+      }
+
+      const primitiveThreadOf = isString(parsedThreadOf) || isNumber(parsedThreadOf) ?
+        parsedThreadOf :
+        null;
+
+      return this.sanitizeCommentEntity(
+        {
+          ..._,
+          threadOf: primitiveThreadOf || _.threadOf,
+          gotThread: (threadedItem?.itemsInTread || 0) > 0,
+          threadFirstItemId: threadedItem?.firstThreadItemId,
+        } as ToBeFixed,
+        doNotPopulateAuthor,
+        omit,
+        authorUserPopulate,
+      );
+    });
+
+    return {
+      data: hasRelatedEntitiesToMap
+        ? result.map((_: Comment) =>
+          this.mergeRelatedEntityTo(_, relatedEntities),
+        )
+        : result,
+      // TODO
+      // ...(isEmpty(meta) ? {} : { meta }),
+    };
 
   },
 
   // Find comments and create relations tree structure
-  async findAllInHierarchy(criteria: any, relatedEntity: any) {
-    return []
+  async findAllInHierarchy(
+    {
+      query,
+      populate,
+      sort,
+      fields,
+      startingFromId,
+      dropBlockedThreads,
+      isAdmin = false,
+      omit = [],
+    }: any,
+    relatedEntity?: any,
+  ) {
+    const entities = await this.findAllFlat({ query, populate, sort, fields, isAdmin, omit }, relatedEntity);
+    return buildNestedStructure(
+      entities?.data,
+      startingFromId,
+      'threadOf',
+      dropBlockedThreads,
+      false,
+    );
   },
 
   // Find single comment
@@ -147,11 +249,47 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
 
   // Find all related entiries
-  async findRelatedEntitiesFor() {
+  async findRelatedEntitiesFor(entries: Array<Comment>) {
+    const data = entries.reduce(
+      (acc: { [key: string]: Array<string | number> }, curr: Comment) => {
+        const [relatedUid, relatedStringId] = getRelatedGroups(curr.related);
+        const parsedRelatedId = parseInt(relatedStringId);
+        const relatedId = isNumber(parsedRelatedId)
+          ? parsedRelatedId
+          : relatedStringId;
+        return {
+          ...acc,
+          [relatedUid]: [...(acc[relatedUid] || []), relatedId],
+        };
+      },
+      {},
+    );
+    return Promise.all<Array<RelatedEntity>>(
+      Object.entries(data).map(
+        async ([relatedUid, relatedStringIds]): Promise<Array<RelatedEntity>> =>
+          strapi.query(relatedUid as ContentTypesUUIDs)
+          .findMany({
+            where: { id: Array.from(new Set(relatedStringIds as ToBeFixed)) },
+          })
+          .then((relatedEntities: Array<RelatedEntity>) =>
+            relatedEntities.map((_: RelatedEntity) => ({
+              ..._,
+              uid: relatedUid,
+            })),
+          ),
+      ),
+    ).then((result) => result.flat(2));
   },
 
   // Merge related entity with comment
-  mergeRelatedEntityTo() {
+  mergeRelatedEntityTo(entity: Comment, relatedEntities: Array<RelatedEntity> = []) {
+    return {
+      ...entity,
+      related: relatedEntities.find(
+        (relatedEntity) =>
+          entity.related === `${relatedEntity.uid}:${relatedEntity.id}`
+      ),
+    };
   },
 
   async modifiedNestedNestedComments<T extends keyof Comment>(id: Id, fieldName: T, value: Comment[T]): Promise<boolean> {

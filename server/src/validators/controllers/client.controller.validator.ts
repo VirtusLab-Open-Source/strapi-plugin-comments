@@ -61,6 +61,7 @@ export const getFindAllFlatCommentsValidator = (enabledCollections: string[], re
     filter: getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true }),
     isAdmin: z.boolean().optional().default(false),
     populate: z.record(z.boolean()).optional(),
+    query: z.record(z.string()).optional(),
   }).merge(getStringToNumberValidator({ limit: AVAILABLE_OPERATORS.single, skip: AVAILABLE_OPERATORS.single }));
 
   const result = zodObject.safeParse({

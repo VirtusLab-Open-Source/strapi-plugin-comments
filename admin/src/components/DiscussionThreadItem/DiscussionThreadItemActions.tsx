@@ -126,7 +126,6 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
   const isUnblockEnabled = !blockedThread && blocked;
   const isRemovable = !blockedThread && !blocked && isAdminAuthor;
   const isThreadStartEnabled = !hasActiveThread && !pinned && (!blockedThread && !blocked);
-
   return (
     <>
       <Flex direction="row" marginLeft={1} alignItems="flex-start">
@@ -153,12 +152,7 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
                 startIcon={<Lock />}
                 loading={unblockItemThreadMutation.isPending}
                 variant="danger"
-              >
-                {getMessage(
-                  'page.details.actions.thread.block',
-                  'Block thread',
-                )}
-              </ActionButton>
+              />
             )}>
             {getMessage(
               'page.details.actions.thread.block.confirmation.description',
@@ -180,44 +174,41 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
         )}
         {anyGroupButtonsVisible && (
           <IconButtonGroup isSingle withMargin>
-            {!isAdminComment && (<>
-              {isBlockEnabled && (
-                <ConfirmationDialog
-                  title={getMessage(
-                    'page.details.actions.comment.block.confirmation.header',
-                  )}
-                  labelConfirm={getMessage(
-                    'page.details.actions.comment.block.confirmation.button.confirm',
-                  )}
-                  onConfirm={handleBlockConfirm}
-                  Trigger={({ onClick }) => (
-                    <IconButton
-                      onClick={onClick}
-                      loading={blockItemMutation.isPending}
-                      icon={<Lock />}
-                      label={getMessage(
-                        'page.details.actions.comment.block',
-                        'Block',
-                      )}
-                    />
-                  )}>
-                  {getMessage(
-                    'page.details.actions.comment.block.confirmation.description',
-                  )}
-                </ConfirmationDialog>
-              )}
-              {isUnblockEnabled && (
-                <IconButton
-                  onClick={handleUnblockClick}
-                  loading={unBlockItemMutation.isPending}
-                  icon={<UnlockIcon />}
-                  label={getMessage(
-                    'page.details.actions.comment.unblock',
-                    'Unblock',
-                  )}
-                />
-              )}
-            </>)}
+            {!isAdminComment && (
+              <>
+                {isBlockEnabled && (
+                  <ConfirmationDialog
+                    title={getMessage(
+                      'page.details.actions.comment.block.confirmation.header',
+                    )}
+                    labelConfirm={getMessage(
+                      'page.details.actions.comment.block.confirmation.button.confirm',
+                    )}
+                    onConfirm={handleBlockConfirm}
+                    Trigger={({ onClick }) => (
+                      <IconButton
+                        onClick={onClick}
+                        loading={blockItemMutation.isPending}
+                      >
+                        <Lock />
+                      </IconButton>
+                    )}
+                  >
+                    {getMessage(
+                      'page.details.actions.comment.block.confirmation.description',
+                    )}
+                  </ConfirmationDialog>
+                )}
+                {isUnblockEnabled && (
+                  <IconButton
+                    onClick={handleUnblockClick}
+                    loading={unBlockItemMutation.isPending}
+                  >
+                    <UnlockIcon />
+                  </IconButton>
+                )}
+              </>
+            )}
             {needsApproval && (
               <ApproveFlow
                 id={id}
@@ -239,12 +230,9 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
               <IconButton
                 onClick={handleDeleteClick}
                 loading={deleteItemMutation.isPending}
-                icon={<Trash />}
-                label={getMessage(
-                  'page.details.actions.comment.delete',
-                  'Delete comment',
-                )}
-              />
+              >
+                <Trash />
+              </IconButton>
             )}
             <ReviewFlow
               item={item}
@@ -262,19 +250,16 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
           <IconButtonGroup isSingle withMargin>
             <IconButton
               onClick={handleDrillDownClick}
-              icon={<Eye />}
-              label={getMessage(
-                'page.details.panel.discussion.nav.drilldown',
-                'Drilldown thread',
-              )}
               style={
                 blocked && !blockedThread
                   ? { marginTop: '1px', marginRight: '.5rem' }
                   : {}
-              }
-            />
+              }>
+              <Eye />
+            </IconButton>
           </IconButtonGroup>
         )}
+        {/* TODO: debug problem */}
         {isThreadStartEnabled && (
           <IconButtonGroup isSingle withMargin>
             <ModeratorResponseModal

@@ -148,8 +148,7 @@ export default ({ strapi }: StrapiContext) => ({
         ...reportsPopulation,
       },
     };
-    // TODO: explain with @mateusz
-    const defaultPopulate = defaultAuthorUserPopulate ? {
+    const defaultPopulate = {
       populate: {
         ...basePopulate.populate,
         authorUser: defaultAuthorUserPopulate,
@@ -160,7 +159,7 @@ export default ({ strapi }: StrapiContext) => ({
           },
         },
       },
-    } : basePopulate;
+    };
 
     const entity = await strapi.query(getModelUid(strapi, 'comment')).findOne({
       where: {
