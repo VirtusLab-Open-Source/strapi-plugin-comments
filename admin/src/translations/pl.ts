@@ -1,4 +1,6 @@
-{
+import type { CommentsPluginTranslations } from './en';
+
+export default {
   "plugin.name": "Komentarze",
   "plugin.section": "Plugin komentarzy",
   "plugin.section.item": "Konfiguracja",
@@ -189,4 +191,4 @@
   "customField.comments.input.populate.label": "Uzupełnienie",
   "customField.comments.input.populate.author.label": "Uzupełnij pole autora",
   "customField.comments.input.populate.avatar.label": "Uzupełnij pole awatara"
-}
+} satisfies CommentsPluginTranslations;

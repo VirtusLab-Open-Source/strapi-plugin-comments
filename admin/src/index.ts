@@ -1,8 +1,9 @@
+import { flattenObject, prefixPluginTranslations } from '@sensinum/strapi-utils';
 import * as pluginPkg from "../../package.json";
 import { pluginId } from "./pluginId";
 import PluginIcon from "./components/PluginIcon";
 import pluginPermissions from "./permissions";
-import App from './pages/App';
+import trads from './translations';
 
 const { name, displayName } = pluginPkg.strapi;
 
@@ -16,9 +17,7 @@ export default {
         id: `${pluginId}.plugin.name`,
         defaultMessage: displayName,
       },
-      Component: async () => {
-        return App;
-      },
+      Component:  () => import('./pages/App'),
       permissions: pluginPermissions.access,
     });
 
@@ -63,15 +62,24 @@ export default {
   //
   //   registerCustomFields(app);
   },
-  //
-  // registerTrads({ locales = [] }: { locales: Array<TranslationKey>}) {
-  //   return locales
-  //   .filter((locale: string) => Object.keys(trads).includes(locale))
-  //   .map((locale: string) => {
-  //     return {
-  //       data: prefixPluginTranslations(get<Translations, TranslationKey>(trads, locale as TranslationKey, trads.en), pluginId),
-  //       locale,
-  //     };
-  //   });
-  // },
+
+  registerTrads: async function ({ locales = [] }: { locales: string[] }) {
+    return Promise.all(
+      locales.map(async (locale: string) => {
+        if (locale in trads) {
+          const typedLocale = locale as keyof typeof trads;
+          return trads[typedLocale]().then(({ default: trad }) => {
+            return {
+              data: prefixPluginTranslations(flattenObject(trad), pluginId),
+              locale,
+            };
+          });
+        }
+        return {
+          data: prefixPluginTranslations(flattenObject({}), pluginId),
+          locale,
+        };
+      }),
+    );
+  },
 };

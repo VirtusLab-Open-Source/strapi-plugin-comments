@@ -44,7 +44,7 @@ const controllers = ({ strapi }: StrapiContext) => {
     async unblockComment(ctx: RequestContextWithId) {
       const either = getIdValidator(ctx.params);
       if (isRight(either)) {
-        return adminService.changeBlockedComment(unwrapEither(either).id, true);
+        return adminService.changeBlockedComment(unwrapEither(either).id, false);
       }
       throw throwError(ctx, unwrapEither(either));
     },

@@ -189,10 +189,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
           this.mergeRelatedEntityTo(_, relatedEntities),
         )
         : result,
-      // TODO
-      // ...(isEmpty(meta) ? {} : { meta }),
     };
-
   },
 
   // Find comments and create relations tree structure

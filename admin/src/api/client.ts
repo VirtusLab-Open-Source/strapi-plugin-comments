@@ -63,8 +63,8 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
       throw error;
     });
   },
-  getDetailsCommentKey(id: number | string, filters?: any): string[] {
-    return [URL_PREFIX, 'details', id.toString(), filters ? JSON.stringify(filters) : undefined].filter(Boolean) as string[];
+  getDetailsCommentKey(id?: number | string, filters?: any): string[] {
+    return [URL_PREFIX, 'details', id?.toString(), filters ? JSON.stringify(filters) : undefined].filter(Boolean) as string[];
   },
   async getContentTypeData(uid: string) {
     const response = await fetch.get(`/content-type-builder/content-types/${uid}`);

@@ -3,7 +3,7 @@ import { Eye, Pencil, Plus, Trash } from '@strapi/icons';
 import { useNotification } from '@strapi/strapi/admin';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isEmpty, isNil } from 'lodash';
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAPI } from '../../hooks/useAPI';
@@ -58,13 +58,24 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
     mutationKey: ['resolveAllAbuseReportsForThread', id],
     mutationFn: api.resolveAllAbuseReportsForThread,
   });
+  const onSuccess = useCallback(() => {
+    const detailsCommentKey = api.getDetailsCommentKey();
+    return queryClient.invalidateQueries({
+      queryKey: detailsCommentKey,
+      exact: false,
+    });
+  }, [api, queryClient]);
+
   const {
     blockItemMutation,
     unBlockItemMutation,
     blockThreadMutation,
     unblockItemThreadMutation,
     deleteItemMutation,
-  } = useCommentMutation(id, {});
+  } = useCommentMutation(id, {
+    unBlockItemSuccess: onSuccess,
+    blockItemSuccess: onSuccess,
+  });
 
   const isAdminAuthor = String(user?.id) === author?.id;
 
