@@ -1,13 +1,26 @@
-import { isEmpty, set } from 'lodash';
-import { Comment, DBQuery, Id, StrapiContext, Where } from '../@types-v5';
-import { APPROVAL_STATUS } from '../const';
-import { getCommentRepository, getDefaultAuthorPopulate, getOrderBy, getReportCommentRepository } from '../repositories';
-import { getModelUid } from '../repositories/utils';
-import { getPluginService } from '../utils/getPluginService';
-import PluginError from '../utils/PluginError';
+import { isEmpty, set } from "lodash";
+import { Comment, DBQuery, Id, StrapiContext, Where } from "../@types-v5";
+import { APPROVAL_STATUS } from "../const";
+import {
+  getCommentRepository,
+  getDefaultAuthorPopulate,
+  getOrderBy,
+  getReportCommentRepository,
+} from "../repositories";
+import { getModelUid } from "../repositories/utils";
+import { getPluginService } from "../utils/getPluginService";
+import PluginError from "../utils/PluginError";
 
-import { CommentQueryValidatorSchema, FindOneValidatorSchema, PostCommentValidatorSchema, ReportQueryValidatorSchema, ResolveAbuseReportValidatorSchema, ResolveCommentMultipleAbuseReportsValidatorSchema, UpdateCommentValidatorSchema } from '../validators';
-import { filterOurResolvedReports, getAuthorName } from './utils/functions';
+import {
+  CommentQueryValidatorSchema,
+  FindOneValidatorSchema,
+  PostCommentValidatorSchema,
+  ReportQueryValidatorSchema,
+  ResolveAbuseReportValidatorSchema,
+  ResolveCommentMultipleAbuseReportsValidatorSchema,
+  UpdateCommentValidatorSchema,
+} from "../validators";
+import { filterOurResolvedReports, getAuthorName } from "./utils/functions";
 
 /**
  * Comments Plugin - Moderation services
@@ -15,7 +28,7 @@ import { filterOurResolvedReports, getAuthorName } from './utils/functions';
 
 export default ({ strapi }: StrapiContext) => ({
   getCommonService() {
-    return getPluginService(strapi, 'common');
+    return getPluginService(strapi, "common");
   },
 
   // Find all comments
@@ -28,12 +41,14 @@ export default ({ strapi }: StrapiContext) => ({
 
     const params: DBQuery = {
       orderBy: orderBy ? { [operator]: direction } : undefined,
-      where: isEmpty(filters) ? defaultWhere : { ...defaultWhere, ...filters } as Where,
+      where: isEmpty(filters)
+        ? defaultWhere
+        : ({ ...defaultWhere, ...filters } as Where),
       offset: (page - 1) * pageSize,
       limit: pageSize,
     };
     if (_q) {
-      set(params, 'where.content.$contains', _q);
+      set(params, "where.content.$contains", _q);
     }
     const populate = {
       authorUser: getDefaultAuthorPopulate(strapi),
@@ -44,8 +59,10 @@ export default ({ strapi }: StrapiContext) => ({
         },
       },
     };
-    console.log('params', params);
-    const { pagination, results } = await getCommentRepository(strapi).findWithCount({
+    console.log("params", params);
+    const { pagination, results } = await getCommentRepository(
+      strapi,
+    ).findWithCount({
       ...params,
       count: true,
       populate,
@@ -53,50 +70,51 @@ export default ({ strapi }: StrapiContext) => ({
     return {
       pagination,
       result: results
-      .map((_) => this.getCommonService().sanitizeCommentEntity(_, [], []))
-      .map(_ => {
-        console.log('');
-        return {
-          ..._,
-          approvalStatus: 'APPROVED',
-          threadOf: {
-            id: 1,
-            content: 'Page content',
-            blocked: false,
-            blockedThread: false,
-            blockReason: '',
-            isAdminComment: false,
-            removed: false,
-            approvalStatus: 'APPROVED',
-            related: 'api::page.page',
-            createdAt: '',
-            updatedAt: '',
-            author: {
+        .map((_) => this.getCommonService().sanitizeCommentEntity(_, [], []))
+        .map((_) => {
+          console.log("");
+          return {
+            ..._,
+            approvalStatus: "APPROVED",
+            threadOf: {
               id: 1,
-              name: 'John Doe',
-              email: 'test@test.com',
-              avatar: null,
+              content: "Page content",
+              blocked: false,
+              blockedThread: false,
+              blockReason: "",
+              isAdminComment: false,
+              removed: false,
+              approvalStatus: "APPROVED",
+              related: "api::page.page",
+              createdAt: "",
+              updatedAt: "",
+              author: {
+                id: 1,
+                name: "John Doe",
+                email: "test@test.com",
+                avatar: null,
+              },
             },
-          },
-          // TODO
-          related: {
-            id: 1,
-            documentId: 'dcyo9gr4bbtwjqm3zks2zl60',
-            title: 'Page title',
-            createdAt: '',
-            updatedAt: '',
-            publishedAt: '',
-            uid: 'api::page.page',
-          },
-        };
-      }),
+            // TODO
+            related: {
+              id: 1,
+              documentId: "dcyo9gr4bbtwjqm3zks2zl60",
+              title: "Page title",
+              createdAt: "",
+              updatedAt: "",
+              publishedAt: "",
+              uid: "api::page.page",
+            },
+          };
+        }),
       // TODO
       // .map(_ => this.getCommonService().mergeRelatedEntityTo(_, )),
     };
   },
 
   async findReports(query: ReportQueryValidatorSchema) {
-    const { total, commentWithThreadIds, entities } = await getReportCommentRepository(strapi).findAll(query);
+    const { total, commentWithThreadIds, entities } =
+      await getReportCommentRepository(strapi).findAll(query);
     const defaultAuthorUserPopulate = getDefaultAuthorPopulate(strapi);
 
     const result = entities.map((_) => {
@@ -105,13 +123,23 @@ export default ({ strapi }: StrapiContext) => ({
 
       const entity = {
         ..._,
-        related: commonService.sanitizeCommentEntity({
-          ..._.related,
-          gotThread: isCommentWithThread,
-        }, []),
+        related: commonService.sanitizeCommentEntity(
+          {
+            ..._.related,
+            gotThread: isCommentWithThread,
+          },
+          [],
+        ),
       };
       return filterOurResolvedReports(
-        commonService.sanitizeCommentEntity(entity, [], [], typeof defaultAuthorUserPopulate !== 'boolean' ? defaultAuthorUserPopulate?.populate : {}),
+        commonService.sanitizeCommentEntity(
+          entity,
+          [],
+          [],
+          typeof defaultAuthorUserPopulate !== "boolean"
+            ? defaultAuthorUserPopulate?.populate
+            : {},
+        ),
       );
     });
 
@@ -126,11 +154,12 @@ export default ({ strapi }: StrapiContext) => ({
         total,
       },
     };
-
   },
   async findOneAndThread({ id, removed, ...query }: FindOneValidatorSchema) {
     const defaultAuthorUserPopulate = getDefaultAuthorPopulate(strapi);
-    const defaultWhere = !removed ? { $or: [{ removed: false }, { removed: { $notNull: false } }] } : {};
+    const defaultWhere = !removed
+      ? { $or: [{ removed: false }, { removed: { $notNull: false } }] }
+      : {};
     const reportsPopulation = {
       reports: {
         where: {
@@ -161,7 +190,7 @@ export default ({ strapi }: StrapiContext) => ({
       },
     };
 
-    const entity = await strapi.query(getModelUid(strapi, 'comment')).findOne({
+    const entity = await getCommentRepository(strapi).findOne({
       where: {
         id,
       },
@@ -169,33 +198,37 @@ export default ({ strapi }: StrapiContext) => ({
     });
 
     if (!entity) {
-      throw new PluginError(404, 'Not found');
+      throw new PluginError(404, "Not found");
     }
 
-    const { relatedId, uid } = this.getCommonService().parseRelationString(entity.related);
-    const relatedEntity = await strapi.entityService.findOne(uid, relatedId)
-    .then((_) => {
-      if (!_) {
-        throw new PluginError(404, 'Relation not found');
-      }
-      return ({ ..._, uid });
-    });
+    const { relatedId, uid } = this.getCommonService().parseRelationString(
+      entity.related,
+    );
+    const relatedEntity = await strapi.entityService
+      .findOne(uid, relatedId)
+      .then((_) => {
+        if (!_) {
+          throw new PluginError(404, "Relation not found");
+        }
+        return { ..._, uid };
+      });
     const levelThreadId = (entity?.threadOf as Comment)?.id || null;
 
-    const entitiesOnSameLevel = await this.getCommonService().findAllInHierarchy(
-      {
-        query: {
-          ...defaultWhere,
-          ...query,
-          threadOf: levelThreadId,
-          related: entity.related,
+    const entitiesOnSameLevel =
+      await this.getCommonService().findAllInHierarchy(
+        {
+          query: {
+            ...defaultWhere,
+            ...query,
+            threadOf: levelThreadId,
+            related: entity.related,
+          },
+          ...defaultPopulate,
+          startingFromId: levelThreadId,
+          isAdmin: true,
         },
-        ...defaultPopulate,
-        startingFromId: levelThreadId,
-        isAdmin: true,
-      },
-      false,
-    );
+        false,
+      );
 
     const selectedEntity = this.getCommonService().sanitizeCommentEntity(
       {
@@ -204,9 +237,10 @@ export default ({ strapi }: StrapiContext) => ({
       },
       [],
       [],
-      typeof defaultAuthorUserPopulate !== 'boolean' ? defaultAuthorUserPopulate?.populate : {},
+      typeof defaultAuthorUserPopulate !== "boolean"
+        ? defaultAuthorUserPopulate?.populate
+        : {},
     );
-
 
     return {
       entity: relatedEntity,
@@ -216,7 +250,10 @@ export default ({ strapi }: StrapiContext) => ({
   },
   async changeBlockedComment(id: Id, forceStatus?: boolean) {
     const entry = await this.getCommonService().findOne({ id });
-    return this.getCommonService().updateComment({ id }, { blocked: forceStatus || !entry.blocked });
+    return this.getCommonService().updateComment(
+      { id },
+      { blocked: forceStatus || !entry.blocked },
+    );
   },
   async deleteComment(id: Id) {
     return getCommentRepository(strapi).delete({ where: { id } });
@@ -224,29 +261,44 @@ export default ({ strapi }: StrapiContext) => ({
   async blockCommentThread(id: Id, forceStatus?: boolean) {
     const entry = await this.getCommonService().findOne({ id });
     const status = forceStatus || !entry.blocked;
-    const updatedEntry = await this.getCommonService()
-    .updateComment({ id }, { blocked: status, blockedThread: status });
+    const updatedEntry = await this.getCommonService().updateComment(
+      { id },
+      { blocked: status, blockedThread: status },
+    );
     await this.blockNestedThreads(id, status);
     return this.getCommonService().sanitizeCommentEntity(updatedEntry, []);
   },
   async approveComment(id: Id) {
-    const entity = await getCommentRepository(strapi).update({ where: { id }, data: { approvalStatus: APPROVAL_STATUS.APPROVED } });
+    const entity = await getCommentRepository(strapi).update({
+      where: { id },
+      data: { approvalStatus: APPROVAL_STATUS.APPROVED },
+    });
     if (!entity) {
-      throw new PluginError(404, 'Not found');
+      throw new PluginError(404, "Not found");
     }
     return this.getCommonService().sanitizeCommentEntity(entity, []);
   },
   async rejectComment(id: Id) {
-    const entity = await getCommentRepository(strapi).update({ where: { id }, data: { approvalStatus: APPROVAL_STATUS.REJECTED } });
+    const entity = await getCommentRepository(strapi).update({
+      where: { id },
+      data: { approvalStatus: APPROVAL_STATUS.REJECTED },
+    });
     if (!entity) {
-      throw new PluginError(404, 'Not found');
+      throw new PluginError(404, "Not found");
     }
     return this.getCommonService().sanitizeCommentEntity(entity, []);
   },
   async blockNestedThreads(id: Id, status: boolean) {
-    return this.getCommonService().modifiedNestedNestedComments(id, 'blockedThread', status);
+    return this.getCommonService().modifiedNestedNestedComments(
+      id,
+      "blockedThread",
+      status,
+    );
   },
-  async resolveAbuseReport({ id: commentId, reportId }: ResolveAbuseReportValidatorSchema) {
+  async resolveAbuseReport({
+    id: commentId,
+    reportId,
+  }: ResolveAbuseReportValidatorSchema) {
     return getReportCommentRepository(strapi).update({
       where: {
         id: reportId,
@@ -257,13 +309,16 @@ export default ({ strapi }: StrapiContext) => ({
       },
     });
   },
-  async resolveCommentMultipleAbuseReports({ id: commentId, reportIds: ids }: ResolveCommentMultipleAbuseReportsValidatorSchema) {
+  async resolveCommentMultipleAbuseReports({
+    id: commentId,
+    reportIds: ids,
+  }: ResolveCommentMultipleAbuseReportsValidatorSchema) {
     const reports = await getReportCommentRepository(strapi).findMany({
       where: {
         id: ids,
         related: commentId,
       },
-      populate: ['related'],
+      populate: ["related"],
     });
 
     if (reports.length === ids.length) {
@@ -278,13 +333,15 @@ export default ({ strapi }: StrapiContext) => ({
     }
     throw new PluginError(
       400,
-      'At least one of selected reports got invalid comment entity relation. Try again.',
+      "At least one of selected reports got invalid comment entity relation. Try again.",
     );
-
   },
   async resolveAllAbuseReportsForComment(id: Id) {
     if (!id) {
-      throw new PluginError(400, 'There is something wrong with comment Id. Try again.');
+      throw new PluginError(
+        400,
+        "There is something wrong with comment Id. Try again.",
+      );
     }
     // TODO: explain with @mateusz and test
     return getReportCommentRepository(strapi).updateMany({
@@ -296,18 +353,20 @@ export default ({ strapi }: StrapiContext) => ({
         resolved: true,
       },
     });
-
   },
   async resolveAllAbuseReportsForThread(commentId: Id) {
     if (!commentId) {
-      throw new PluginError(400, 'There is something wrong with comment Id. Try again.');
+      throw new PluginError(
+        400,
+        "There is something wrong with comment Id. Try again.",
+      );
     }
     // TODO: explain with @mateusz and test
     const commentsInThread = await getCommentRepository(strapi).findMany({
       where: {
         threadOf: commentId,
       },
-      select: ['id'],
+      select: ["id"],
     });
     return getReportCommentRepository(strapi).updateMany({
       // TODO: tests update many allow update only by ids?
@@ -319,9 +378,10 @@ export default ({ strapi }: StrapiContext) => ({
         resolved: true,
       },
     });
-
   },
-  async resolveMultipleAbuseReports({ reportIds }: ResolveCommentMultipleAbuseReportsValidatorSchema) {
+  async resolveMultipleAbuseReports({
+    reportIds,
+  }: ResolveCommentMultipleAbuseReportsValidatorSchema) {
     return getReportCommentRepository(strapi).updateMany({
       where: {
         id: { $in: reportIds },
@@ -332,9 +392,11 @@ export default ({ strapi }: StrapiContext) => ({
     });
   },
   async postComment({ id, author, content }: PostCommentValidatorSchema) {
-    const entity = await getCommentRepository(strapi).findOne({ where: { id } });
+    const entity = await getCommentRepository(strapi).findOne({
+      where: { id },
+    });
     if (!entity) {
-      throw new PluginError(404, 'Not found');
+      throw new PluginError(404, "Not found");
     }
     return getCommentRepository(strapi).create({
       data: {
@@ -349,9 +411,12 @@ export default ({ strapi }: StrapiContext) => ({
     });
   },
   async updateComment({ id, content }: UpdateCommentValidatorSchema) {
-    const entity = await getCommentRepository(strapi).update({ where: { id }, data: { content } });
+    const entity = await getCommentRepository(strapi).update({
+      where: { id },
+      data: { content },
+    });
     if (!entity) {
-      throw new PluginError(404, 'Not found');
+      throw new PluginError(404, "Not found");
     }
     return this.getCommonService().sanitizeCommentEntity(entity, []);
   },
