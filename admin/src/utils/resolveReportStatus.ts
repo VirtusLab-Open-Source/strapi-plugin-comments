@@ -1,12 +1,12 @@
-import {isNil} from 'lodash';
-import {ToBeFixed} from '../../../server/src/@types';
-import {REPORT_STATUS} from './constants';
+import { isNil } from 'lodash';
+import { Report } from '../api/schemas';
+import { REPORT_STATUS } from './constants';
 
 const resolveReportStatus = ({
   resolved,
-  related: {blocked, blockedThread},
+  related: { blocked, blockedThread },
   approvalStatus,
-}: ToBeFixed) => {
+}: Report): typeof REPORT_STATUS[keyof typeof REPORT_STATUS] => {
   const gotApprovalFlow = !isNil(approvalStatus);
 
   if (blocked || blockedThread) {
@@ -20,7 +20,7 @@ const resolveReportStatus = ({
   if (gotApprovalFlow) {
     const status = approvalStatus.toUpperCase();
     if (Object.keys(REPORT_STATUS).includes(status)) {
-      return status;
+      return status as typeof REPORT_STATUS[keyof typeof REPORT_STATUS];
     }
     return REPORT_STATUS.PENDING;
   }

@@ -62,7 +62,6 @@ export const ReviewFlow: FC<Props> = ({
 
   const onClickResolveSelected = async () => {
     reportMutation.resolveMultiple.mutate({
-      id: item.id,
       reportIds: selectedItems,
     });
   };

@@ -9,7 +9,7 @@ import { useAPI } from '../../hooks/useAPI';
 import { AllowedActions } from '../../types';
 import { getMessage } from '../../utils';
 import { ReportReasonBadge } from '../ReportReasonBadge';
-import { ReportStatusBadge } from '../ReportStatusBadge';
+import { CommentReportStatusBadge } from '../CommentReportStatusBadge';
 
 type Props = {
   commentId: number;
@@ -122,7 +122,7 @@ export const ReportReviewTable: FC<Props> = ({
                 })}
               </Th>
               <Th>
-                <ReportStatusBadge resolved={report.resolved} />
+                <CommentReportStatusBadge resolved={report.resolved} />
               </Th>
               <Th>
                 {!report.resolved && (

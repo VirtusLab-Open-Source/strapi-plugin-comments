@@ -1,10 +1,12 @@
-import { Checkbox, Table, Tbody, Th, Thead, Tr, Typography } from '@strapi/design-system';
-import { Layouts, Page, SearchInput, useNotification, useQueryParams } from '@strapi/strapi/admin';
+import { Button, Checkbox, Flex, Table, Tbody, Th, Thead, Tr, Typography } from '@strapi/design-system';
+import { Check } from '@strapi/icons';
+import { Layouts, Page, Pagination, SearchInput, useNotification, useQueryParams } from '@strapi/strapi/admin';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { FC, useCallback, useState } from 'react';
 import { Config } from '../../api/schemas';
 import { ReportsTableRow } from '../../components/ReportsTableRow';
-import { usePermissions } from '../../hooks/usePermissions';
+import { useAPI } from '../../hooks/useAPI';
+import { useCommentMutations } from '../../hooks/useCommentMutations';
 import { useReports } from '../../hooks/useReports';
 import { getMessage } from '../../utils';
 
@@ -21,17 +23,12 @@ const tableHeaders = [
 
 export const Reports: FC<{ config: Config }> = ({ config }) => {
   const { toggleNotification } = useNotification();
+  const api = useAPI();
   const [{ query: queryParams }] = useQueryParams();
   const [selectedItems, setSelectedItems] = useState<Array<number>>([]);
-
-  const _q = (queryParams as any)?._q || '';
+  const { reportMutation } = useCommentMutations();
   const queryClient = useQueryClient();
-  const {
-    canAccess,
-    canModerate,
-    canAccessReports,
-    canReviewReports,
-  } = usePermissions();
+
 
   const { data: { result, pagination } } = useReports(queryParams as Record<string, string>);
   const isAllChecked = selectedItems.length > 0 ? selectedItems.length === result.length ? true : 'indeterminate' : false;
@@ -48,6 +45,17 @@ export const Reports: FC<{ config: Config }> = ({ config }) => {
     }
     , []);
 
+  const handleClickResolveSelected = async () => {
+    await reportMutation.resolveMultiple.mutateAsync({
+      reportIds: selectedItems,
+    });
+    await queryClient.invalidateQueries({
+      exact: false,
+      queryKey: api.reports.findAll.getKey(),
+    });
+    setSelectedItems([]);
+  };
+
   return (
     <>
       <Page.Title children={'Comments - reports'} />
@@ -57,7 +65,28 @@ export const Reports: FC<{ config: Config }> = ({ config }) => {
           subtitle={`${pagination.total} entries found`}
           as="h2"
         />
-        <Layouts.Action startActions={<SearchInput label="Search" />} />
+        <Layouts.Action startActions={(
+          <Flex gap="2">
+            <SearchInput label="Search" />
+            {selectedItems.length > 0 && (
+              <Button
+                variant="success"
+                onClick={handleClickResolveSelected}
+                startIcon={<Check />}
+              >
+                {getMessage(
+                  {
+                    id: `page.details.panel.discussion.warnings.reports.dialog.actions.resolve.selected`,
+                    props: {
+                      count: selectedItems.length,
+                    },
+                  },
+                  'Resolve selected',
+                )}
+              </Button>
+            )}
+          </Flex>
+        )} />
         <Layouts.Content>
           <Table>
             <Thead>
@@ -91,6 +120,10 @@ export const Reports: FC<{ config: Config }> = ({ config }) => {
               })}
             </Tbody>
           </Table>
+          <Pagination.Root pageCount={pagination.pageCount} total={pagination.total}>
+            <Pagination.PageSize />
+            <Pagination.Links />
+          </Pagination.Root>
         </Layouts.Content>
       </Page.Main>
     </>

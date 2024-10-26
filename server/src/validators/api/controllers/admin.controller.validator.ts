@@ -92,6 +92,15 @@ export const getResolveCommentMultipleAbuseReportsValidator = (params: unknown) 
   return validate(result);
 };
 
+export const getMultipleAbuseReportsValidator = (params: unknown) => {
+  const result = getStringToNumberValidator({ reportIds: AVAILABLE_OPERATORS.array })
+  .safeParse(params);
+
+  return validate(result);
+};
+export type MultipleAbuseReportsValidatorSchema = ExtractRightEither<ReturnType<typeof getMultipleAbuseReportsValidator>>;
+
+
 export type ResolveCommentMultipleAbuseReportsValidatorSchema = ExtractRightEither<ReturnType<typeof getResolveCommentMultipleAbuseReportsValidator>>;
 
 export const postCommentValidator = z.object({

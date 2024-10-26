@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { useIntl } from 'react-intl';
 import { Report } from '../../api/schemas';
 import { getMessage } from '../../utils';
+import { ReportStatusBadge } from '../ReportStatusBadge';
 import { ReviewFlow } from '../ReviewFlow';
 import { CommentReviewModal } from './CommentReviewModal';
 import { ReportsActions } from './ReportsActions';
@@ -44,8 +45,7 @@ export const ReportsTableRow: FC<ReportsTableRowProps> = ({ item, isChecked, onS
       </Td>
       <Td style={cellMaxWidth}>
         <Typography textColor="neutral800" ellipsis>
-          {/*TODO: badge*/}
-          1
+         <ReportStatusBadge item={item} />
         </Typography>
       </Td>
       <Td>

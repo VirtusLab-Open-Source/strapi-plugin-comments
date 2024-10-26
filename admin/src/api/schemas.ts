@@ -172,6 +172,7 @@ export const reportSchema = z.object({
   author: z.unknown(),
   content: z.string(),
   id: z.number(),
+  approvalStatus: approvalStatusSchema.nullable().optional(),
   reason: reportReasonUnion,
   reports: z.array(z.unknown()),
   resolved: z.boolean().optional(),

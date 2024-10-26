@@ -5,7 +5,7 @@ import { throwError } from '../utils/throwError';
 import {
   getCommentQueryValidator,
   getFindOneValidator,
-  getIdValidator,
+  getIdValidator, getMultipleAbuseReportsValidator,
   getPostCommentValidator,
   getReportQueryValidator,
   getResolveAbuseReportValidator,
@@ -120,9 +120,7 @@ const controllers = ({ strapi }: StrapiContext) => {
     },
 
     async resolveMultipleAbuseReports(ctx: RequestContext<Array<Id>>) {
-      const either = getResolveCommentMultipleAbuseReportsValidator({
-        reportIds: ctx.request.body,
-      });
+      const either = getMultipleAbuseReportsValidator(ctx.request.body);
       if (isRight(either)) {
         return adminService.resolveMultipleAbuseReports(unwrapEither(either));
       }

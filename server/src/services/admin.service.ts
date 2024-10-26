@@ -5,7 +5,7 @@ import { getCommentRepository, getDefaultAuthorPopulate, getOrderBy, getReportCo
 import { getPluginService } from '../utils/getPluginService';
 import PluginError from '../utils/PluginError';
 
-import { CommentQueryValidatorSchema, FindOneValidatorSchema, PostCommentValidatorSchema, ReportQueryValidatorSchema, ResolveAbuseReportValidatorSchema, ResolveCommentMultipleAbuseReportsValidatorSchema, UpdateCommentValidatorSchema } from '../validators/api';
+import { CommentQueryValidatorSchema, FindOneValidatorSchema, MultipleAbuseReportsValidatorSchema, PostCommentValidatorSchema, ReportQueryValidatorSchema, ResolveAbuseReportValidatorSchema, ResolveCommentMultipleAbuseReportsValidatorSchema, UpdateCommentValidatorSchema } from '../validators/api';
 import { filterOurResolvedReports, getAuthorName } from './utils/functions';
 
 /**
@@ -69,8 +69,8 @@ export default ({ strapi }: StrapiContext) => ({
       _q,
       orderBy: orderBy ?? { [operator]: direction },
       where: isEmpty(filters) ? defaultWhere : { ...defaultWhere, ...filters } as Where,
-      offset: (page - 1) * pageSize,
-      limit: pageSize,
+      page,
+      pageSize,
     };
 
     if (_q) {
@@ -80,6 +80,8 @@ export default ({ strapi }: StrapiContext) => ({
       ...params,
       populate: ['related'],
     });
+    console.log('params', params);
+
     const reportCommentsIds = results.map((entity) => typeof entity.related === 'object' ? entity.related.id : null).filter(Boolean);
 
     const defaultAuthorUserPopulate = getDefaultAuthorPopulate(strapi);
@@ -116,6 +118,7 @@ export default ({ strapi }: StrapiContext) => ({
         ),
       );
     });
+
 
 
     return {
@@ -347,7 +350,7 @@ export default ({ strapi }: StrapiContext) => ({
   },
   async resolveMultipleAbuseReports({
     reportIds,
-  }: ResolveCommentMultipleAbuseReportsValidatorSchema) {
+  }: MultipleAbuseReportsValidatorSchema) {
     return getReportCommentRepository(strapi).updateMany({
       where: {
         id: { $in: reportIds },
