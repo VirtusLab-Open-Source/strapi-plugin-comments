@@ -15,12 +15,12 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
     const response = await fetch.get(`/${URL_PREFIX}/settings/config`);
     return configSchema.parseAsync(response.data);
   },
-  async getComments() {
-    const response = await fetch.get(`/${URL_PREFIX}/moderate/all`);
+  async getComments(queryParams: Record<string, string>) {
+    const response = await fetch.get(`/${URL_PREFIX}/moderate/all?${stringify(queryParams, { encode: false })}`);
     return commentsSchema.parseAsync(response.data);
   },
-  getCommentsKey() {
-    return [URL_PREFIX, 'moderate', 'all'];
+  getCommentsKey(queryParams?: Record<string, string>) {
+    return [URL_PREFIX, 'moderate', 'all', queryParams ? JSON.stringify(queryParams) : undefined].filter(Boolean) as string[];
   },
   approveComment(id: number) {
     return fetch.put(`/${URL_PREFIX}/moderate/single/${id}/approve`);

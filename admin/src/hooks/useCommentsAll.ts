@@ -3,12 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { orderBy } from 'lodash';
 import { getApiClient } from '../api';
 
-export const useCommentsAll = () => {
+export const useCommentsAll = (queryParams: Record<string, string>) => {
   const fetch = getFetchClient();
   const apiClient = getApiClient(fetch);
   return useQuery({
-    queryKey: apiClient.getCommentsKey(),
-    queryFn: () => apiClient.getComments().then(res => ({
+    queryKey: apiClient.getCommentsKey(queryParams),
+    queryFn: () => apiClient.getComments(queryParams).then(res => ({
       ...res,
       result: res.result.map((item) => ({
         ...item,

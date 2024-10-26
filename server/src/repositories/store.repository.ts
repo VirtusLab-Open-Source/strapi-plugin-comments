@@ -12,7 +12,6 @@ export const getStoreRepository = once((strapi: Core.Strapi) => {
       prop: P,
       defaultValue?: CommentsPluginConfig[P],
     ) {
-      console.log('strapi.config.get()', strapi.config.get(pluginSelector));
       return strapi.config.get([pluginSelector, prop].join('.'), defaultValue);
     },
     async getStore() {

@@ -73,8 +73,10 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
     unblockItemThreadMutation,
     deleteItemMutation,
   } = useCommentMutation(id, {
-    unBlockItemSuccess: onSuccess,
     blockItemSuccess: onSuccess,
+    unBlockItemSuccess: onSuccess,
+    deleteItemSuccess: onSuccess,
+
   });
 
   const isAdminAuthor = String(user?.id) === author?.id;
@@ -155,6 +157,10 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
             labelConfirm={getMessage(
               'page.details.actions.thread.block.confirmation.button.confirm',
             )}
+            labelCancel={getMessage(
+              "components.confirmation.dialog.button.cancel",
+              "Cancel"
+            )}
             iconConfirm={<Lock />}
             onConfirm={handleOnConfirm}
             Trigger={({ onClick }) => (
@@ -195,6 +201,10 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
                     labelConfirm={getMessage(
                       'page.details.actions.comment.block.confirmation.button.confirm',
                     )}
+                    labelCancel={getMessage(
+                      "components.confirmation.dialog.button.cancel",
+                      "Cancel"
+                    )}
                     onConfirm={handleBlockConfirm}
                     Trigger={({ onClick }) => (
                       <IconButton
@@ -229,7 +239,7 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
             )}
             {isAdminAuthor && !isBlocked && (
               <ModeratorResponseModal
-                content=""
+                content={content}
                 id={id}
                 Icon={Pencil}
                 title={getMessage(

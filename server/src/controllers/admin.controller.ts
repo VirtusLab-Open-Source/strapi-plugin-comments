@@ -2,7 +2,18 @@ import { Id, RequestContext, StrapiContext } from '../@types-v5';
 import { isRight, unwrapEither } from '../utils/Either';
 import { getPluginService } from '../utils/getPluginService';
 import { throwError } from '../utils/throwError';
-import { getCommentQueryValidator, getFindOneValidator, getIdValidator, getPostCommentValidator, getReportQueryValidator, getResolveAbuseReportValidator, getResolveCommentMultipleAbuseReportsValidator, getUpdateCommentValidator, IdValidatorSchema, PostCommentValidatorSchema } from '../validators';
+import {
+  getCommentQueryValidator,
+  getFindOneValidator,
+  getIdValidator,
+  getPostCommentValidator,
+  getReportQueryValidator,
+  getResolveAbuseReportValidator,
+  getResolveCommentMultipleAbuseReportsValidator,
+  getUpdateCommentValidator,
+  IdValidatorSchema,
+  PostCommentValidatorSchema,
+} from '../validators/api';
 
 type RequestContextWithId<T = unknown> = RequestContext<T, { id: string }>;
 const controllers = ({ strapi }: StrapiContext) => {

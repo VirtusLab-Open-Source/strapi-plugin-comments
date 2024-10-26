@@ -4,7 +4,7 @@ import { PluginServices } from '../services';
 import { isRight, unwrapEither } from '../utils/Either';
 import { getPluginService } from '../utils/getPluginService';
 import { throwError } from '../utils/throwError';
-import { CommentData, FindAllFlatCommentsValidatorSchema, getCreateNewCommentValidator, getFindAllFlatCommentsValidator } from '../validators';
+import { CommentData, FindAllFlatCommentsValidatorSchema, getCreateNewCommentValidator, getFindAllFlatCommentsValidator } from '../validators/api';
 
 const controllers = ({ strapi }: StrapiContext) => {
   const storeRepository = getStoreRepository(strapi);

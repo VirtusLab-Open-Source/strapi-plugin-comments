@@ -1,7 +1,7 @@
 import { Button, Flex, IconButton, Modal } from '@strapi/design-system';
 import { useNotification } from '@strapi/strapi/admin';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { FC, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { useAPI } from '../../hooks/useAPI';
 import { getMessage } from '../../utils';
 import { Wysiwyg } from '../Wysiwyg';
@@ -59,18 +59,21 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
     });
   };
 
-  const onToggleModal = () => setIsModalVisible((prev) => !prev);
+  const onToggleModal = useCallback(() => {
+    console.log('', 1);
+    setIsModalVisible((prev) => !prev);
+  }, []);
   const handleCommentChange = () => {};
   const intlLabel = {
     id: '',
     defaultMessage: '',
     values: {},
   };
-
+  console.log('isModalVisible', isModalVisible);
   return (
     <Modal.Root open={isModalVisible} onOpenChange={onToggleModal}>
       <Modal.Trigger>
-        <IconButton onClick={onToggleModal}>
+        <IconButton>
           <Icon />
         </IconButton>
       </Modal.Trigger>
@@ -89,9 +92,9 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
           />
         </Modal.Body>
         <Modal.Footer>
-          <Flex gap={2}>
+          <Flex gap={2} justifyContent="space-between" width="100%">
             <Button onClick={onToggleModal} variant="tertiary">
-              {getMessage('compontents.confirmation.dialog.button.cancel')}
+              {getMessage('components.confirmation.dialog.button.cancel')}
             </Button>
             {content.length ? (
               <Button onClick={onClickUpdateComment}>

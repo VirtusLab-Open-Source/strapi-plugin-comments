@@ -25,13 +25,13 @@ export default ({ strapi }: StrapiContext) => ({
     };
     const [operator, direction] = getOrderBy(orderBy);
 
-    const params: DBQuery = {
+    const params: Partial<DBQuery> = {
       orderBy: orderBy ? { [operator]: direction } : undefined,
       where: isEmpty(filters)
         ? defaultWhere
         : ({ ...defaultWhere, ...filters } as Where),
-      offset: (page - 1) * pageSize,
-      limit: pageSize,
+      page,
+      pageSize,
     };
     if (_q) {
       set(params, 'where.content.$contains', _q);
@@ -45,7 +45,6 @@ export default ({ strapi }: StrapiContext) => ({
         },
       },
     };
-    console.log('params', params);
     const { pagination, results } = await getCommentRepository(
       strapi,
     ).findWithCount({
@@ -53,48 +52,12 @@ export default ({ strapi }: StrapiContext) => ({
       count: true,
       populate,
     });
+    const relatedEntities = await this.getCommonService().findRelatedEntitiesFor(results);
     return {
       pagination,
       result: results
-      .map((_) => this.getCommonService().sanitizeCommentEntity(_, [], []))
-      .map((_) => {
-        console.log('');
-        return {
-          ..._,
-          approvalStatus: 'APPROVED',
-          threadOf: {
-            id: 1,
-            content: 'Page content',
-            blocked: false,
-            blockedThread: false,
-            blockReason: '',
-            isAdminComment: false,
-            removed: false,
-            approvalStatus: 'APPROVED',
-            related: 'api::page.page',
-            createdAt: '',
-            updatedAt: '',
-            author: {
-              id: 1,
-              name: 'John Doe',
-              email: 'test@test.com',
-              avatar: null,
-            },
-          },
-          // TODO
-          related: {
-            id: 1,
-            documentId: 'dcyo9gr4bbtwjqm3zks2zl60',
-            title: 'Page title',
-            createdAt: '',
-            updatedAt: '',
-            publishedAt: '',
-            uid: 'api::page.page',
-          },
-        };
-      }),
-      // TODO
-      // .map(_ => this.getCommonService().mergeRelatedEntityTo(_, )),
+        .map((_) => this.getCommonService().sanitizeCommentEntity(_, [], []))
+        .map(_ => this.getCommonService().mergeRelatedEntityTo(_, relatedEntities))
     };
   },
 
@@ -143,9 +106,7 @@ export default ({ strapi }: StrapiContext) => ({
   },
   async findOneAndThread({ id, removed, ...query }: FindOneValidatorSchema) {
     const defaultAuthorUserPopulate = getDefaultAuthorPopulate(strapi);
-    const defaultWhere = !removed
-      ? { $or: [{ removed: false }, { removed: { $notNull: false } }] }
-      : {};
+    const defaultWhere = !removed ? { $or: [{ removed: false }, { removed: { $notNull: false } }] } : {};
     const reportsPopulation = {
       reports: {
         where: {
@@ -236,17 +197,13 @@ export default ({ strapi }: StrapiContext) => ({
   },
   async changeBlockedComment(id: Id, forceStatus?: boolean) {
     const entry = await this.getCommonService().findOne({ id });
-    console.log('entry', entry);
-    console.log('forceStatus', forceStatus);
-    console.log('entry.blocked', entry.blocked);
-    console.log('id', id);
     return this.getCommonService().updateComment(
       { id },
       { blocked: !isNil(forceStatus) ? forceStatus : !entry.blocked },
     );
   },
   async deleteComment(id: Id) {
-    return getCommentRepository(strapi).delete({ where: { id } });
+    return getCommentRepository(strapi).update({ where: { id }, data: { removed: true } });
   },
   async blockCommentThread(id: Id, forceStatus?: boolean) {
     const entry = await this.getCommonService().findOne({ id });

@@ -8,13 +8,14 @@ import { pluginId } from '../../pluginId';
 import { AllowedActions } from '../../types';
 import { handleAPIError } from '../../utils';
 
-export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModerate'], queryKey?: string[] }> = ({ id, canModerate }) => {
+export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModerate'], queryKey?: string[] }> = ({ id, canModerate, queryKey }) => {
   const { toggleNotification } = useNotification();
   const queryClient = useQueryClient();
   const apiClient = useAPI();
-  const onSuccess = (message: string) => () => {
-    queryClient.invalidateQueries({
-      queryKey: apiClient.getCommentsKey(),
+  const onSuccess = (message: string) => async () => {
+    await queryClient.invalidateQueries({
+      exact: false,
+      queryKey,
     });
     toggleNotification({
       type: 'success',

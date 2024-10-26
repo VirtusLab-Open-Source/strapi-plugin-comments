@@ -1,4 +1,4 @@
-import { Button, Dialog, Flex, Modal, Typography } from '@strapi/design-system';
+import { Button, Dialog, Flex, Typography, Box } from '@strapi/design-system';
 import { WarningCircle } from '@strapi/icons';
 import React, { FC, ReactNode, useState } from 'react';
 
@@ -51,21 +51,20 @@ export const ConfirmationDialog: FC<ConfirmationDialogProps> = ({
             <Button
               onClick={onToggleModal}
               disabled={isLoading}
-              variant="tertiary"
-            >
-              {labelCancel}
+              variant="tertiary">
+              {labelCancel || 'Cancel'}
             </Button>
           </Dialog.Cancel>
           <Dialog.Action>
-            <Button
-              onClick={internalOnConfirm}
-              variant="danger-light"
-              loading={isLoading}
-              disabled={isLoading}
-              startIcon={iconConfirm}
-            >
-              {labelConfirm}
-            </Button>
+              <Button
+                onClick={internalOnConfirm}
+                variant="danger-light"
+                loading={isLoading}
+                disabled={isLoading}
+                startIcon={iconConfirm}
+              >
+                {labelConfirm}
+              </Button>
           </Dialog.Action>
         </Dialog.Footer>
       </Dialog.Content>

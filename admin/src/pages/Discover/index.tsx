@@ -12,7 +12,7 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
   const { trackUsage } = useTracking();
   const { toggleNotification } = useNotification();
   const [{ query: queryParams }] = useQueryParams();
-  const _q = (queryParams as any)?._q || '';
+  const _q = (queryParams as Record<string, string>)?._q || '';
 
   const {
     isLoadingForPermissions,
@@ -27,7 +27,7 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
     isLoading: isLoadingForData,
     data: { result, pagination },
     isFetching,
-  } = useCommentsAll();
+  } = useCommentsAll(queryParams as Record<string, string>);
 
   return (
     <>

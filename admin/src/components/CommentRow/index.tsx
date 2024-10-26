@@ -67,6 +67,7 @@ export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports, can
               <ApproveFlow
                 id={item.id}
                 canModerate={canModerate}
+                queryKey={api.getCommentsKey()}
               />
             )}
             <ReviewFlow

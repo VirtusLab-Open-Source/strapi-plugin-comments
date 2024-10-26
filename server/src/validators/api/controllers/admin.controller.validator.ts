@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { REPORT_REASON } from '../../const/REPORT_REASON';
-import { ExtractRightEither, makeLeft, makeRight } from '../../utils/Either';
-import PluginError from '../../utils/PluginError';
-import { AVAILABLE_OPERATORS, filtersValidator, getFiltersOperators, getStringToNumberValidator, orderByValidator, stringToNumberValidator } from '../utils';
+import { REPORT_REASON } from '../../../const/REPORT_REASON';
+import { ExtractRightEither, makeLeft, makeRight } from '../../../utils/Either';
+import PluginError from '../../../utils/PluginError';
+import { AVAILABLE_OPERATORS, filtersValidator, getFiltersOperators, getStringToNumberValidator, orderByValidator, stringToNumberValidator } from '../../utils';
 
 
 export const getIdValidator = (params: unknown) => {
@@ -95,7 +95,7 @@ export const getFindOneValidator = (id: string | number, params: object) => {
   const result = getStringToNumberValidator({ id: AVAILABLE_OPERATORS.single })
   .merge(entryFilters)
   .merge(z.object({
-    removed: z.boolean().optional(),
+    removed: z.string().optional().transform((v) => v === 'true'),
   })).safeParse({ ...params, id });
 
   if (!result.success) {

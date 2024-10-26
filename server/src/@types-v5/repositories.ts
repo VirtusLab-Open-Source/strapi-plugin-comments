@@ -25,4 +25,6 @@ export type DBQuery = {
   orderBy?: Record<string, string> | string;
   offset: number;
   limit: number;
+  pageSize: number;
+  page: number;
 };

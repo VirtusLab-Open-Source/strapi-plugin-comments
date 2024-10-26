@@ -13,7 +13,6 @@ const settingsController = ({ strapi }: StrapiContext) => {
       // }
     },
     async getForSettingsPage(ctx: RequestContext) {
-      console.log('getForSettingsPage::',);
       try {
         return await settingsService.getConfig(true);
       } catch (e) {

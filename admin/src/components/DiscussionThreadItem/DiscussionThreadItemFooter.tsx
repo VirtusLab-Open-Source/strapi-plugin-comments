@@ -27,7 +27,7 @@ export const DiscussionThreadItemFooter: FC<PropsWithChildren<DiscussionThreadIt
       <DiscussionThreadItemFooterMeta>
         {item.author && <UserAvatar avatar={avatar} name={name} isAdminComment={item.isAdminComment} />}
         <Typography variant="pi" fontWeight="bold" textColor="neutral800">
-          {name || getMessage('compontents.author.unknown')}
+          {name || getMessage('components.author.unknown')}
         </Typography>
         <Typography variant="pi" textColor="neutral600">
           {dateTime}

@@ -159,13 +159,13 @@ const en = {
   'page.settings.loading': 'Fetching configuration...',
   'page.settings.form.author.blockedProps.label': 'Blocked author details',
   'page.settings.form.author.blockedProps.hint': 'Specified properties will be filtered out from author\'s details (comma-separated)',
-  'compontents.confirmation.dialog.header': 'Confirmation',
-  'compontents.confirmation.dialog.description': 'Do you really want to perform this action?',
-  'compontents.confirmation.dialog.button.confirm': 'Yes, I do',
-  'compontents.confirmation.dialog.button.cancel': 'Cancel',
-  'compontents.toogle.enabled': 'Enabled',
-  'compontents.toogle.disabled': 'Disabled',
-  'compontents.author.unknown': 'Author removed',
+  'components.confirmation.dialog.header': 'Confirmation',
+  'components.confirmation.dialog.description': 'Do you really want to perform this action?',
+  'components.confirmation.dialog.button.confirm': 'Yes, I do',
+  'components.confirmation.dialog.button.cancel': 'Cancel',
+  'components.toogle.enabled': 'Enabled',
+  'components.toogle.disabled': 'Disabled',
+  'components.author.unknown': 'Author removed',
   'components.reason.unknown': 'Reason not provided',
   'components.content.unknown': 'Content not provided',
   'components.notAccessPage.back': 'Back to homepage',
@@ -191,5 +191,5 @@ const en = {
   'customField.comments.input.populate.avatar.label': 'Populate avatar field',
 };
 
-export type CommentsPluginTranslations = typeof en;
+export type CommentsPluginTranslations = Partial<typeof en>;
 export default en;

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import PluginError from '../../utils/PluginError';
+import PluginError from '../../../utils/PluginError';
 
 const validator = z.object({
   enabledCollections: z.array(z.string()),

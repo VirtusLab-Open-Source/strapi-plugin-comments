@@ -86,8 +86,8 @@ const reportSchema = z.object({
 const baseCommentSchema = z.object({
   id: z.number(),
   content: z.string(),
-  blocked: z.boolean(),
-  blockedThread: z.boolean().nullable(),
+  blocked: z.boolean().nullable().default(false),
+  blockedThread: z.boolean().nullable().default(false),
   blockReason: z.string().nullable(),
   isAdminComment: z.boolean().nullable(),
   removed: z.boolean().nullable(),
@@ -117,7 +117,9 @@ function getCommentSchema() {
   return baseCommentSchema.extend({
     related: relatedSchema,
     documentId: z.string(),
-    threadOf: z.lazy(() => baseCommentSchema.merge(z.object({ related: z.string(), threadOf: commentSchema.nullable().optional(), documentId: z.string().optional() }))),
+    threadOf: z.lazy(() =>
+      baseCommentSchema.merge(z.object({ related: z.string(), threadOf: commentSchema.nullable().optional(), documentId: z.string().optional() }))
+    ).nullable().optional(),
   });
 }
 
