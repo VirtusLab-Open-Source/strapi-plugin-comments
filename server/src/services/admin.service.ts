@@ -5,7 +5,7 @@ import { getCommentRepository, getDefaultAuthorPopulate, getOrderBy, getReportCo
 import { getPluginService } from '../utils/getPluginService';
 import PluginError from '../utils/PluginError';
 
-import { CommentQueryValidatorSchema, FindOneValidatorSchema, PostCommentValidatorSchema, ReportQueryValidatorSchema, ResolveAbuseReportValidatorSchema, ResolveCommentMultipleAbuseReportsValidatorSchema, UpdateCommentValidatorSchema } from '../validators';
+import { CommentQueryValidatorSchema, FindOneValidatorSchema, PostCommentValidatorSchema, ReportQueryValidatorSchema, ResolveAbuseReportValidatorSchema, ResolveCommentMultipleAbuseReportsValidatorSchema, UpdateCommentValidatorSchema } from '../validators/api';
 import { filterOurResolvedReports, getAuthorName } from './utils/functions';
 
 /**
@@ -18,8 +18,7 @@ export default ({ strapi }: StrapiContext) => ({
   },
 
   // Find all comments
-  async findAll(query: CommentQueryValidatorSchema) {
-    const { _q, orderBy, page, pageSize, filters } = query;
+  async findAll({ _q, orderBy, page, pageSize, filters }: CommentQueryValidatorSchema) {
     const defaultWhere = {
       $or: [{ removed: { $eq: false } }, { removed: { $eq: null } }],
     };
@@ -56,8 +55,8 @@ export default ({ strapi }: StrapiContext) => ({
     return {
       pagination,
       result: results
-        .map((_) => this.getCommonService().sanitizeCommentEntity(_, [], []))
-        .map(_ => this.getCommonService().mergeRelatedEntityTo(_, relatedEntities))
+      .map((_) => this.getCommonService().sanitizeCommentEntity(_, [], []))
+      .map(_ => this.getCommonService().mergeRelatedEntityTo(_, relatedEntities)),
     };
   },
 
@@ -152,13 +151,13 @@ export default ({ strapi }: StrapiContext) => ({
       entity.related,
     );
     const relatedEntity = await strapi.entityService
-    .findOne(uid, relatedId)
-    .then((_) => {
-      if (!_) {
-        throw new PluginError(404, 'Relation not found');
-      }
-      return { ..._, uid };
-    });
+                                      .findOne(uid, relatedId)
+                                      .then((_) => {
+                                        if (!_) {
+                                          throw new PluginError(404, 'Relation not found');
+                                        }
+                                        return { ..._, uid };
+                                      });
     const levelThreadId = (entity?.threadOf as Comment)?.id || null;
 
     const entitiesOnSameLevel =

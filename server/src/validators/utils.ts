@@ -1,4 +1,6 @@
 import { z, ZodArray, ZodObject } from 'zod';
+import { makeLeft, makeRight } from '../utils/Either';
+import PluginError from '../utils/PluginError';
 
 export const equalValidators = z.union([
   z.object({ $eq: z.string().min(1) }),
@@ -35,12 +37,16 @@ export const notContainsValidators = z.union([
 ]);
 
 export const stringToNumberValidator = z
-.union([z.string(), z.number()])
-.transform((value) => Number(value))
-.pipe(z.number());
+  .union([z.string(), z.number()])
+  .transform((value) => Number(value))
+  .pipe(z.number());
 
+export const stringToBooleanValidator = z
+  .union([z.string(), z.boolean()])
+  .transform((value) => typeof value === 'string' ? ['t', 'true'].includes(value) : value)
+  .pipe(z.boolean());
 
-export const qOperator = z.object({
+export const qOperatorValidator = z.object({
   _q: z.string().optional(),
 });
 export const orderByValidator = z.string().regex(
@@ -93,4 +99,14 @@ export const getStringToNumberValidator = <T extends Record<string, keyof typeof
   return z.object(schema) as Result<T>;
 };
 
+
+export const validate =<I, O>(result: z.SafeParseReturnType<I, O>) =>{
+  if (!result.success) {
+    const message = result.error.issues
+                          .map((i) => `Path: ${i.path.join('.')} Code: ${i.code} Message: ${i.message}`)
+                          .join('\n');
+    return makeLeft(new PluginError(400, message));
+  }
+  return makeRight(result.data)
+}
 

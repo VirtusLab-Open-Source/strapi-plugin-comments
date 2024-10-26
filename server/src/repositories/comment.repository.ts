@@ -5,28 +5,29 @@ import { getModelUid } from './utils';
 
 type ResultFindPage = Awaited<ReturnType<Repository['findPage']>>;
 export const getCommentRepository = once((strapi: CoreStrapi) => {
+  const modelUid = getModelUid(strapi, 'comment');
 
   return {
     findMany<T extends Comment = Comment>(params: Params): Promise<T[]> {
-      return strapi.query(getModelUid(strapi, 'comment')).findMany(params);
+      return strapi.query(modelUid).findMany(params);
     },
     findWithCount<T extends Comment = Comment>(params: Params): Promise<Omit<ResultFindPage, 'results'> & { results: T[] }> {
-      return strapi.query(getModelUid(strapi, 'comment')).findPage(params);
+      return strapi.query(modelUid).findPage(params);
     },
     findOne<T extends Comment = Comment>(params: FindOneParams): Promise<T | null> {
-      return strapi.query(getModelUid(strapi, 'comment')).findOne(params);
+      return strapi.query(modelUid).findOne(params);
     },
     update<T extends Comment = Comment>(params: Params): Promise<T> {
-      return strapi.query(getModelUid(strapi, 'comment')).update(params);
+      return strapi.query(modelUid).update(params);
     },
     delete<T extends Comment = Comment>(params: Params): Promise<T | null> {
-      return strapi.query(getModelUid(strapi, 'comment')).delete(params);
+      return strapi.query(modelUid).delete(params);
     },
     updateMany(params: Params) {
-      return strapi.query(getModelUid(strapi, 'comment')).updateMany(params);
+      return strapi.query(modelUid).updateMany(params);
     },
     create<T extends Comment = Comment>(params: Pick<Params, 'data'>): Promise<T> {
-      return strapi.query(getModelUid(strapi, 'comment')).create(params);
+      return strapi.query(modelUid).create(params);
     },
 
   };
