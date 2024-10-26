@@ -1,19 +1,17 @@
-import { getFetchClient } from '@strapi/strapi/admin';
 import { useQuery } from '@tanstack/react-query';
 import { orderBy } from 'lodash';
-import { getApiClient } from '../api';
+import { useAPI } from './useAPI';
 
 export const useCommentsAll = (queryParams: Record<string, string>) => {
-  const fetch = getFetchClient();
-  const apiClient = getApiClient(fetch);
+  const api = useAPI();
   return useQuery({
-    queryKey: apiClient.getCommentsKey(queryParams),
-    queryFn: () => apiClient.getComments(queryParams).then(res => ({
+    queryKey: api.comments.findAll.getKey(queryParams),
+    queryFn: () => api.comments.findAll.query(queryParams).then(res => ({
       ...res,
       result: res.result.map((item) => ({
         ...item,
         reports: orderBy(item.reports, ['resolved', 'createdAt'], ['desc', 'desc']),
-      }))
+      })),
     })).catch((error) => {
       console.log('error', error);
       throw error;

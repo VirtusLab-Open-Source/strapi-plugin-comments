@@ -25,7 +25,7 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
 
   const getOnSuccess = (message: string) => async () => {
     await queryClient.invalidateQueries({
-      queryKey: api.getDetailsCommentKey(id),
+      queryKey: api.comments.findOne.getKey(id),
       exact: false,
     });
     toggleNotification({
@@ -35,12 +35,12 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
   };
 
   const postCommentMutation = useMutation({
-    mutationFn: api.postComment,
+    mutationFn: api.comments.postComment,
     onSuccess: getOnSuccess('page.details.actions.comment.post.confirmation'),
   });
 
   const updateCommentMutation = useMutation({
-    mutationFn: api.updateComment,
+    mutationFn: api.comments.updateComment,
     onSuccess: getOnSuccess('page.details.actions.comment.update.confirmation'),
   });
 

@@ -4,7 +4,7 @@ import { useNotification } from '@strapi/strapi/admin';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React, { FC } from 'react';
 import { useIntl } from 'react-intl';
-import { Report } from '../../api/schemas';
+import { CommentReport } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
 import { AllowedActions } from '../../types';
 import { getMessage } from '../../utils';
@@ -13,7 +13,7 @@ import { ReportStatusBadge } from '../ReportStatusBadge';
 
 type Props = {
   commentId: number;
-  reports: Report[];
+  reports: CommentReport[];
   selectedItems: number[];
   allowedActions: AllowedActions;
   onBlockButtonsStateChange: (disabled: boolean) => void;
@@ -35,14 +35,14 @@ export const ReportReviewTable: FC<Props> = ({
 
   const resolveReportMutation = useMutation({
     mutationKey: ['resolveReport', commentId],
-    mutationFn: api.resolveReport,
+    mutationFn: api.reports.resolve,
   });
 
   const onCheckAll = (checked: boolean) => {
     onSelectionChange(checked ? reports.map((report) => report.id) : []);
   };
 
-  const onCheckItemChange = (report: Report) =>
+  const onCheckItemChange = (report: CommentReport) =>
     (checked: boolean) => {
       if (checked) {
         onSelectionChange([...selectedItems, report.id]);
@@ -55,7 +55,7 @@ export const ReportReviewTable: FC<Props> = ({
     try {
       await resolveReportMutation.mutateAsync({ id: commentId, reportId });
       await queryClient.invalidateQueries({
-        queryKey: api.getCommentsKey(),
+        queryKey: api.comments.findAll.getKey(),
       });
       // TODO
       // toggleNotification('success', 'notification.success');

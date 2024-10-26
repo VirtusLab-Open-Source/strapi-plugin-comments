@@ -60,12 +60,38 @@ export default ({ strapi }: StrapiContext) => ({
     };
   },
 
-  async findReports(query: ReportQueryValidatorSchema) {
-    const { total, commentWithThreadIds, entities } =
-      await getReportCommentRepository(strapi).findAll(query);
-    const defaultAuthorUserPopulate = getDefaultAuthorPopulate(strapi);
+  async findReports({ _q, orderBy, filters, page, pageSize }: ReportQueryValidatorSchema) {
+    const defaultWhere: Where = {
+      resolved: { $notNull: true },
+    };
+    const [operator, direction] = getOrderBy(orderBy);
+    const params: DBQuery = {
+      _q,
+      orderBy: orderBy ?? { [operator]: direction },
+      where: isEmpty(filters) ? defaultWhere : { ...defaultWhere, ...filters } as Where,
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+    };
 
-    const result = entities.map((_) => {
+    if (_q) {
+      set(params, 'where.content.$contains', _q);
+    }
+    const { pagination, results } = await getReportCommentRepository(strapi).findPage({
+      ...params,
+      populate: ['related'],
+    });
+    const reportCommentsIds = results.map((entity) => typeof entity.related === 'object' ? entity.related.id : null).filter(Boolean);
+
+    const defaultAuthorUserPopulate = getDefaultAuthorPopulate(strapi);
+    const commentsThreads = await getCommentRepository(strapi).findMany({
+      where: {
+        threadOf: reportCommentsIds,
+      },
+      populate: ['threadOf'],
+      limit: Number.MAX_SAFE_INTEGER,
+    });
+    const commentWithThreadIds = Array.from(new Set(commentsThreads.map(({ threadOf }) => threadOf.id)));
+    const result = results.map((_) => {
       const isCommentWithThread = commentWithThreadIds.includes(_.related.id);
       const commonService = this.getCommonService();
 
@@ -91,16 +117,10 @@ export default ({ strapi }: StrapiContext) => ({
       );
     });
 
-    const pageCount = Math.floor(total / query.pageSize);
 
     return {
       result,
-      pagination: {
-        page: query.page,
-        pageSize: query.pageSize,
-        pageCount: total % query.pageSize === 0 ? pageCount : pageCount + 1,
-        total,
-      },
+      pagination,
     };
   },
   async findOneAndThread({ id, removed, ...query }: FindOneValidatorSchema) {

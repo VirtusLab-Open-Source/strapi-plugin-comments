@@ -31,7 +31,7 @@ const InnerApp = () => {
       <Routes>
         <Route path="/discover" element={<Discover config={config} />} />
         <Route path="/discover/:id" element={<Details config={config} />} />
-        <Route path="/reports" element={<Reports />} />
+        <Route path="/reports" element={<Reports config={config} />} />
         <Route path="*" element={<Navigate to="discover" replace />} />
       </Routes>
     </Layouts.Root>

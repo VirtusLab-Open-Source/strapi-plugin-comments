@@ -28,8 +28,8 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
   );
 
   const { data: { entity, level, selected }, isLoading: isLoadingForData, isFetching } = useQuery({
-    queryKey: api.getDetailsCommentKey(id!, filters),
-    queryFn: () => api.getDetailsComment(id!, filters),
+    queryKey: api.comments.findOne.getKey(id!, filters),
+    queryFn: () => api.comments.findOne.query(id!, filters),
     initialData: {
       level: [],
       selected: {} as any,
@@ -39,8 +39,8 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
   const entityUidValid = entity?.uid && regexUID.test(entity.uid);
 
   const { data: contentTypeData } = useQuery({
-    queryKey: api.getAdditionalDataKey(entity?.uid, canAccess),
-    queryFn: () => api.getContentTypeData(entity?.uid),
+    queryKey: api.contentTypeBuilder.getKey(entity?.uid, canAccess),
+    queryFn: () => api.contentTypeBuilder.query(entity?.uid),
     enabled: !!entityUidValid,
   });
 

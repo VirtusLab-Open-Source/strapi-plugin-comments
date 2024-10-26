@@ -1,10 +1,10 @@
 import { FC, useMemo } from 'react';
-import { Report } from '../../api/schemas';
+import { CommentReport } from '../../api/schemas';
 import { getMessage } from '../../utils';
 import { REPORT_REASON } from '../../utils/constants';
 import { StatusBadge } from '../StatusBadge';
 
-const getColor = (reason: Report['reason']) => {
+const getColor = (reason: CommentReport['reason']) => {
   switch (reason) {
     case REPORT_REASON.DISCRIMINATION:
       return 'danger';
@@ -14,7 +14,7 @@ const getColor = (reason: Report['reason']) => {
       return 'neutral';
   }
 };
-export const ReportReasonBadge: FC<Pick<Report, 'reason'>> = ({ reason }) => {
+export const ReportReasonBadge: FC<Pick<CommentReport, 'reason'>> = ({ reason }) => {
   const color = useMemo(() => getColor(reason), [reason]);
 
   return (

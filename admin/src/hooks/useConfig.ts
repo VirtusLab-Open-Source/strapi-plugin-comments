@@ -5,11 +5,12 @@ import { useAPI } from './useAPI';
 export const useConfig = (setSettings: (settings: Config) => void) => {
   const apiClient = useAPI();
   return useQuery({
-    queryKey: apiClient.getConfigKey(),
-    queryFn: () => apiClient.getSettingsConfiguration()
-    .then(response => {
-      setSettings(response);
-      return response;
-    }),
+    queryKey: apiClient.config.getKey(),
+    queryFn: () => apiClient.config
+                            .query()
+                            .then(response => {
+                              setSettings(response);
+                              return response;
+                            }),
   });
 };

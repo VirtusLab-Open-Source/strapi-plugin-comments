@@ -1,6 +1,5 @@
 import { Table, Tbody, Th, Thead, Tr } from '@strapi/design-system';
 import { Layouts, Page, Pagination, SearchInput, useNotification, useQueryParams, useTracking } from '@strapi/strapi/admin';
-import { noop } from 'lodash';
 import { FC } from 'react';
 import { Config } from '../../api/schemas';
 import { CommentRow } from '../../components/CommentRow';
@@ -65,7 +64,7 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
               ))}
             </Tbody>
           </Table>
-          <Pagination.Root pageCount={pagination.pageCount} total={pagination.total} onPageSizeChange={noop}>
+          <Pagination.Root pageCount={pagination.pageCount} total={pagination.total}>
             <Pagination.PageSize />
             <Pagination.Links />
           </Pagination.Root>

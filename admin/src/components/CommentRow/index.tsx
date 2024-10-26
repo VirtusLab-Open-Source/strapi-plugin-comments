@@ -67,14 +67,11 @@ export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports, can
               <ApproveFlow
                 id={item.id}
                 canModerate={canModerate}
-                queryKey={api.getCommentsKey()}
+                queryKey={api.comments.findAll.getKey()}
               />
             )}
             <ReviewFlow
               item={item}
-              queryKey={api.getCommentsKey()}
-              isAnyActionLoading={false}
-              allowedActions={{ canModerate, canAccessReports, canReviewReports }}
             />
             <IconButton
               onClick={onClickDetails(item.id)}

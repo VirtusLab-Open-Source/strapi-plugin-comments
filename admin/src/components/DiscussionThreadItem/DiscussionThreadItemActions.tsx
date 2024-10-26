@@ -1,16 +1,16 @@
-import { Button, Flex, IconButton } from '@strapi/design-system';
+import { Flex, IconButton } from '@strapi/design-system';
 import { Eye, Pencil, Plus, Trash } from '@strapi/icons';
 import { useNotification } from '@strapi/strapi/admin';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isEmpty, isNil } from 'lodash';
 import { FC, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import { useAPI } from '../../hooks/useAPI';
-import { useCommentMutation } from '../../hooks/useCommentMutation';
+import { useCommentMutations } from '../../hooks/useCommentMutations';
 import { usePermissions } from '../../hooks/usePermissions';
 import { getMessage } from '../../utils';
 import { COMMENT_STATUS } from '../../utils/constants';
+import { ActionButton } from '../ActionButton';
 import { ApproveFlow } from '../ApproveFlow';
 import { CommentStatusBadge } from '../CommentStatusBadge';
 import { ConfirmationDialog } from '../ConfirmationDialog';
@@ -20,14 +20,6 @@ import UnlockIcon from '../icons/unlock';
 import { ModeratorResponseModal } from '../ModeratorResponseModal';
 import { ReviewFlow } from '../ReviewFlow';
 import { DiscussionThreadItemProps } from './props';
-
-export const ActionButton = styled(Button)<{ isSingle?: boolean }>(({ isSingle }) => {
-  return {
-    padding: '7px 16px',
-    marginLeft: isSingle ? '0' : '.5rem',
-    whiteSpace: 'nowrap',
-  };
-});
 
 
 export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ item, pinned, preview }) => {
@@ -54,29 +46,20 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
   const { toggleNotification } = useNotification();
   const queryClient = useQueryClient();
 
-  const resolveAllAbuseReportsForThreadMutation = useMutation({
-    mutationKey: ['resolveAllAbuseReportsForThread', id],
-    mutationFn: api.resolveAllAbuseReportsForThread,
-  });
   const onSuccess = useCallback(() => {
-    const detailsCommentKey = api.getDetailsCommentKey();
+    const detailsCommentKey = api.comments.findOne.getKey(id);
     return queryClient.invalidateQueries({
       queryKey: detailsCommentKey,
       exact: false,
     });
-  }, [api, queryClient]);
+  }, [queryClient, api.comments.findOne, id]);
 
-  const {
-    blockItemMutation,
-    unBlockItemMutation,
-    blockThreadMutation,
-    unblockItemThreadMutation,
-    deleteItemMutation,
-  } = useCommentMutation(id, {
-    blockItemSuccess: onSuccess,
-    unBlockItemSuccess: onSuccess,
-    deleteItemSuccess: onSuccess,
-
+  const { commentMutation, reportMutation } = useCommentMutations({
+    comment: {
+      blockSuccess: onSuccess,
+      unBlockSuccess: onSuccess,
+      deleteSuccess: onSuccess,
+    },
   });
 
   const isAdminAuthor = String(user?.id) === author?.id;
@@ -94,27 +77,27 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
   const isStatusBadgeVisible = isBlocked || reviewFlowEnabled;
 
   const isLoading =
-    unBlockItemMutation.isPending ||
-    blockItemMutation.isPending ||
-    blockThreadMutation.isPending ||
-    unblockItemThreadMutation.isPending;
+    commentMutation.unBlock.isPending ||
+    commentMutation.block.isPending ||
+    commentMutation.blockThread.isPending ||
+    commentMutation.unBlockThread.isPending;
 
   const handleUnblockThreadClick = () => {
-    unblockItemThreadMutation.mutate(id);
+    commentMutation.unBlockThread.mutate(id);
   };
   const handleUnblockClick = () => {
-    unBlockItemMutation.mutate(id);
+    commentMutation.unBlock.mutate(id);
   };
   const handleDeleteClick = () => {
-    deleteItemMutation.mutate(id);
+    commentMutation.delete.mutate(id);
   };
   const handleBlockConfirm = async () => {
-    await blockItemMutation.mutateAsync(id);
+    await commentMutation.block.mutateAsync(id);
   };
   const handleOnConfirm = async () => {
     await Promise.all([
-      blockThreadMutation.mutateAsync(id),
-      resolveAllAbuseReportsForThreadMutation.mutateAsync(id),
+      commentMutation.blockThread.mutateAsync(id),
+      reportMutation.resolveAllAbuseThread.mutateAsync(id),
     ]);
   };
   const handleDrillDownClick = async () => {
@@ -158,8 +141,8 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
               'page.details.actions.thread.block.confirmation.button.confirm',
             )}
             labelCancel={getMessage(
-              "components.confirmation.dialog.button.cancel",
-              "Cancel"
+              'components.confirmation.dialog.button.cancel',
+              'Cancel',
             )}
             iconConfirm={<Lock />}
             onConfirm={handleOnConfirm}
@@ -167,7 +150,7 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
               <ActionButton
                 onClick={onClick}
                 startIcon={<Lock />}
-                loading={unblockItemThreadMutation.isPending}
+                loading={commentMutation.unBlockThread.isPending}
                 variant="danger"
               />
             )}>
@@ -180,7 +163,7 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
           <ActionButton
             onClick={handleUnblockThreadClick}
             startIcon={<UnlockIcon />}
-            loading={unblockItemThreadMutation.isPending}
+            loading={commentMutation.unBlockThread.isPending}
             variant="success"
           >
             {getMessage(
@@ -202,14 +185,14 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
                       'page.details.actions.comment.block.confirmation.button.confirm',
                     )}
                     labelCancel={getMessage(
-                      "components.confirmation.dialog.button.cancel",
-                      "Cancel"
+                      'components.confirmation.dialog.button.cancel',
+                      'Cancel',
                     )}
                     onConfirm={handleBlockConfirm}
                     Trigger={({ onClick }) => (
                       <IconButton
                         onClick={onClick}
-                        loading={blockItemMutation.isPending}
+                        loading={commentMutation.block.isPending}
                       >
                         <Lock />
                       </IconButton>
@@ -223,7 +206,7 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
                 {isUnblockEnabled && (
                   <IconButton
                     onClick={handleUnblockClick}
-                    loading={unBlockItemMutation.isPending}
+                    loading={commentMutation.block.isPending}
                   >
                     <UnlockIcon />
                   </IconButton>
@@ -234,7 +217,7 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
               <ApproveFlow
                 id={id}
                 canModerate={canModerate}
-                queryKey={api.getDetailsCommentKey(id)}
+                queryKey={api.comments.findOne.getKey(id)}
               />
             )}
             {isAdminAuthor && !isBlocked && (
@@ -250,20 +233,13 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
             {isRemovable && (
               <IconButton
                 onClick={handleDeleteClick}
-                loading={deleteItemMutation.isPending}
+                loading={commentMutation.delete.isPending}
               >
                 <Trash />
               </IconButton>
             )}
             <ReviewFlow
               item={item}
-              queryKey={api.getDetailsCommentKey(id)}
-              allowedActions={{
-                canModerate,
-                canAccessReports,
-                canReviewReports,
-              }}
-              isAnyActionLoading={isLoading}
             />
           </IconButtonGroup>
         )}

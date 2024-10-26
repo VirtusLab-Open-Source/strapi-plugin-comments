@@ -1,12 +1,12 @@
 import { Button, Flex, IconButton, Modal } from '@strapi/design-system';
 import { Check } from '@strapi/icons';
 import { useNotification } from '@strapi/strapi/admin';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { FC, useState } from 'react';
 import { Comment } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
-import { useCommentMutation } from '../../hooks/useCommentMutation';
-import { AllowedActions } from '../../types';
+import { useCommentMutations } from '../../hooks/useCommentMutations';
+import { usePermissions } from '../../hooks/usePermissions';
 import { DiscussionThreadItem } from '../DiscussionThreadItem';
 import Lock from '../icons/lock';
 import ReviewIcon from '../icons/review';
@@ -14,14 +14,11 @@ import { ReportReviewTable } from './ReportReviewTable';
 
 type Props = {
   item: Comment;
-  queryKey: string[];
-  isAnyActionLoading: boolean;
-  allowedActions: AllowedActions;
 };
 export const ReviewFlow: FC<Props> = ({
   item,
-  allowedActions: { canModerate, canAccessReports, canReviewReports },
 }) => {
+  const { canModerate, canAccessReports, canReviewReports } = usePermissions();
   const { blockedThread, reports } = item;
   const api = useAPI();
 
@@ -34,17 +31,13 @@ export const ReviewFlow: FC<Props> = ({
   const queryClient = useQueryClient();
   const hasAnySelectedItems = selectedItems.length > 0;
 
-  const {
-    blockItemMutation,
-    blockThreadMutation,
-    resolveAllAbuseReportsForCommentMutation,
-    resolveMultipleReportsMutation,
-    resolveAllAbuseReportsForThreadMutation
-  } = useCommentMutation(item.id, {
-    resolveMultipleReportsSuccess: () => {
-      return queryClient.invalidateQueries({
-        queryKey: api.getCommentsKey(),
-      });
+  const { reportMutation, commentMutation } = useCommentMutations({
+    report: {
+      resolveMultipleSuccess: () => {
+        return queryClient.invalidateQueries({
+          queryKey: api.comments.findAll.getKey(),
+        });
+      },
     },
   });
 
@@ -54,25 +47,26 @@ export const ReviewFlow: FC<Props> = ({
 
   const onOnClickBlockComment = async () => {
     await Promise.all([
-      resolveAllAbuseReportsForCommentMutation.mutateAsync(item.id),
-      blockItemMutation.mutateAsync(item.id),
+      reportMutation.resolveAllAbuse.mutateAsync(item.id),
+      commentMutation.block.mutateAsync(item.id),
     ]);
   };
 
   const onOnClickBlockThread = async () => {
     await Promise.all([
-      blockThreadMutation.mutateAsync(item.id),
-      resolveAllAbuseReportsForThreadMutation.mutateAsync(item.id),
+      commentMutation.blockThread.mutateAsync(item.id),
+      reportMutation.resolveAllAbuseThread.mutateAsync(item.id),
     ]);
   };
 
 
   const onClickResolveSelected = async () => {
-    resolveMultipleReportsMutation.mutate({
+    reportMutation.resolveMultiple.mutate({
       id: item.id,
       reportIds: selectedItems,
     });
   };
+  console.log('canReviewReports', canReviewReports);
 
   return (
     <Modal.Root open={isModalVisible} onOpenChange={onToggleModal}>

@@ -71,13 +71,14 @@ const approvalStatusSchema = z.union([
   z.literal(COMMENT_STATUS.TO_REVIEW),
   z.literal(COMMENT_STATUS.UNKNOWN),
 ]);
-const reportSchema = z.object({
+const reportReasonUnion = z.union([
+  z.literal('BAD_LANGUAGE'),
+  z.literal('DISCRIMINATION'),
+  z.literal('OTHER'),
+]);
+const commentReportSchema = z.object({
   id: z.number(),
-  reason: z.union([
-    z.literal('BAD_LANGUAGE'),
-    z.literal('DISCRIMINATION'),
-    z.literal('OTHER'),
-  ]),
+  reason: reportReasonUnion,
   content: z.string(),
   resolved: z.boolean(),
   createdAt: z.string(),
@@ -86,15 +87,15 @@ const reportSchema = z.object({
 const baseCommentSchema = z.object({
   id: z.number(),
   content: z.string(),
-  blocked: z.boolean().nullable().default(false),
-  blockedThread: z.boolean().nullable().default(false),
+  blocked: z.boolean().nullable(),
+  blockedThread: z.boolean().nullable(),
   blockReason: z.string().nullable(),
   isAdminComment: z.boolean().nullable(),
   removed: z.boolean().nullable(),
   approvalStatus: approvalStatusSchema.nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  reports: z.array(reportSchema).nullable().optional(),
+  reports: z.array(commentReportSchema).nullable().optional(),
   author: authorSchema,
   gotThread: z.boolean().nullable().optional(),
 });
@@ -111,7 +112,7 @@ const paginationSchema = z.object({
 
 // const threadOfSchema = baseCommentSchema.omit({ related: true }).merge(z.object({ related: z.string(), threadOf: commentSchema.nullable().optional() }));
 
-export type Report = z.infer<typeof reportSchema>;
+export type CommentReport = z.infer<typeof commentReportSchema>;
 
 function getCommentSchema() {
   return baseCommentSchema.extend({
@@ -166,3 +167,22 @@ export const contentTypeSchema = z.object({
 });
 
 export type ContentType = z.infer<typeof contentTypeSchema>;
+
+export const reportSchema = z.object({
+  author: z.unknown(),
+  content: z.string(),
+  id: z.number(),
+  reason: reportReasonUnion,
+  reports: z.array(z.unknown()),
+  resolved: z.boolean().optional(),
+  updatedAt: z.string().nullable(),
+  createdAt: z.string(),
+  related: baseCommentSchema,
+})
+
+export type Report = z.infer<typeof reportSchema>;
+
+export const reportsSchema = z.object({
+  pagination: paginationSchema,
+  result: z.array(reportSchema),
+});
