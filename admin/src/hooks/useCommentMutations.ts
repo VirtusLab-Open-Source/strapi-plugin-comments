@@ -16,6 +16,7 @@ type MutationKey = {
     resolveMultiple: boolean;
     resolveAllAbuse: boolean;
     resolveAllAbuseThread: boolean;
+    resolveCommentMultipleReports: boolean;
   }
 }
 type CallbacksMutation = {
@@ -65,6 +66,13 @@ export const useCommentMutations = (callbacksMutation: CallbacksMutation = { com
     onError: callbacksMutation.report?.resolveMultipleError,
   });
 
+
+  const resolveCommentMultipleReports = useMutation({
+    mutationFn: canExecuteMutations(api.reports.resolveCommentMultipleReports),
+    onSuccess: callbacksMutation.report?.resolveCommentMultipleReportsSuccess,
+    onError: callbacksMutation.report?.resolveCommentMultipleReportsError,
+  });
+
   const resolveReportMutation = useMutation({
     mutationFn: canExecuteMutations(api.reports.resolve),
     onSuccess: callbacksMutation.report?.resolveSuccess,
@@ -97,6 +105,7 @@ export const useCommentMutations = (callbacksMutation: CallbacksMutation = { com
       resolveMultiple: resolveMultipleReportsMutation,
       resolveAllAbuse: resolveAllAbuseReportsForCommentMutation,
       resolveAllAbuseThread: resolveAllAbuseReportsForThreadMutation,
+      resolveCommentMultipleReports: resolveCommentMultipleReports,
     },
   }), [
     blockItemMutation,

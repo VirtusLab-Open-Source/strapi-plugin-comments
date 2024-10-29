@@ -1,16 +1,17 @@
 import { Params } from '@strapi/database/dist/entity-manager/types';
 import { UID } from '@strapi/strapi';
-import { first, get, isEmpty, isNil, isNumber, isObject, isString, omit as filterItem, parseInt, uniq } from 'lodash';
+import { first, get, isNil, isNumber, isObject, isString, omit as filterItem, parseInt, uniq } from 'lodash';
 import { isProfane, replaceProfanities } from 'no-profanity';
+import * as console from 'node:console';
 import { StrapiStore } from 'strapi-typed';
-import { CommentModelKeys, CommentsPluginConfig, Effect, ToBeFixed } from '../@types';
-import { Comment, Id, RelatedEntity, StrapiContext } from '../@types-v5';
+import { Id, RelatedEntity, StrapiContext, ToBeFixed } from '../@types-v5';
+import { CommentsPluginConfig } from '../@types-v5/config';
 import { ContentTypesUUIDs } from '../content-types';
 import { getCommentRepository, getOrderBy } from '../repositories';
 import { CONFIG_PARAMS } from '../utils/constants';
 import PluginError from '../utils/PluginError';
-import { ContentType, LifeCycleHookName } from '../utils/types';
-import { FindAllFlatCommentsValidatorSchema } from '../validators';
+import { FindAllFlatCommentsValidatorSchema } from '../validators/api';
+import { Comment, CommentRelated, CommentWithRelated } from '../validators/repositories';
 import { buildAuthorModel, buildConfigQueryProp, buildNestedStructure, filterOurResolvedReports, getRelatedGroups } from './utils/functions';
 
 
@@ -21,12 +22,12 @@ import { buildAuthorModel, buildConfigQueryProp, buildNestedStructure, filterOur
 const PAGE_SIZE = 10;
 const REQUIRED_FIELDS = ['id'];
 
-type LifecycleHookRecord = Partial<Record<LifeCycleHookName, Array<Effect<ToBeFixed>>>>;
+// type LifecycleHookRecord = Partial<Record<LifeCycleHookName, Array<Effect<ToBeFixed>>>>;
 
-const lifecycleHookListeners: Record<ContentType, LifecycleHookRecord> = {
-  comment: {},
-  'comment-report': {},
-};
+// const lifecycleHookListeners: Record<ContentType, LifecycleHookRecord> = {
+//   comment: {},
+//   'comment-report': {},
+// };
 
 type ParsedRelation = {
   uid: UID.ContentType;
@@ -66,7 +67,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     );
     return isNil(result) ? defaultValue : result;
   },
-  sanitizeCommentEntity(entity: Comment, blockedAuthors: string[], omitProps: Array<keyof Comment> = [], populate: any = {}): Comment {
+  sanitizeCommentEntity(entity: Comment | CommentWithRelated, blockedAuthors: string[], omitProps: Array<keyof Comment> = [], populate: any = {}): Comment {
     const fieldsToPopulate = Array.isArray(populate) ? populate : Object.keys(populate || {});
     return filterItem({
       ...buildAuthorModel(
@@ -79,7 +80,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
       ),
     }, omitProps) as Comment;
   },
-  parseRelationString(relation: `${string}::${string}`): ParsedRelation {
+  parseRelationString(relation: `${string}::${string}` | string): ParsedRelation {
     const [uid, relatedStringId] = getRelatedGroups(relation);
     const parsedRelatedId = parseInt(relatedStringId, 10);
     const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
@@ -100,9 +101,9 @@ const commonService = ({ strapi }: StrapiContext) => ({
     omit: baseOmit = [],
     isAdmin = false,
     query = {},
-  }: FindAllFlatCommentsValidatorSchema, relatedEntity?: any): Promise<any> {
+  }: FindAllFlatCommentsValidatorSchema, relatedEntity?: any): Promise<{ data: CommentRelated[] }> {
     const omit = baseOmit.filter((field) => !REQUIRED_FIELDS.includes(field));
-    const defaultSelect: Array<CommentModelKeys> = (['id', 'related'] as const).filter((field) => !omit.includes(field));
+    const defaultSelect = (['id', 'related'] as const).filter((field) => !omit.includes(field));
 
     const populateClause: FindAllFlatCommentsValidatorSchema['populate'] = {
       authorUser: true,
@@ -149,7 +150,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     const relatedEntities = omit.includes('related') ? [] : relatedEntity !== null ? [relatedEntity] : await this.findRelatedEntitiesFor([...entries]);
     const hasRelatedEntitiesToMap = relatedEntities.filter((_: RelatedEntity) => _).length > 0;
 
-    const result = entries.map((_: Comment) => {
+    const result = entries.map((_) => {
       const threadedItem = entriesWithThreads.find(
         (item: {
           id: Id;
@@ -157,9 +158,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
           firstThreadItemId: Id | undefined;
         }) => item.id === _.id,
       );
-      const parsedThreadOf = isString(query.threadOf)
-        ? parseInt(query.threadOf)
-        : query.threadOf;
+      const parsedThreadOf = isString(query.threadOf) ? parseInt(query.threadOf) : query.threadOf;
 
       let authorUserPopulate = {};
       if (isObject(populateClause?.authorUser)) {
@@ -178,17 +177,13 @@ const commonService = ({ strapi }: StrapiContext) => ({
           threadFirstItemId: threadedItem?.firstThreadItemId,
         } as ToBeFixed,
         doNotPopulateAuthor,
-        omit,
+        omit as Array<keyof Comment>,
         authorUserPopulate,
       );
     });
 
     return {
-      data: hasRelatedEntitiesToMap
-        ? result.map((_: Comment) =>
-          this.mergeRelatedEntityTo(_, relatedEntities),
-        )
-        : result,
+      data: hasRelatedEntitiesToMap ? result.map((_) => this.mergeRelatedEntityTo(_, relatedEntities)) : result,
     };
   },
 
@@ -217,8 +212,8 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
 
   // Find single comment
-  async findOne<T extends Comment = Comment>(criteria: Partial<Params['where']>) {
-    const entity = await getCommentRepository(strapi).findOne<T>({
+  async findOne(criteria: Partial<Params['where']>) {
+    const entity = await getCommentRepository(strapi).findOne({
       where: criteria,
       populate: {
         reports: true,
@@ -233,7 +228,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     return filterOurResolvedReports(item);
   },
 
-  async findMany<T extends Comment>(criteria: Params): Promise<T[]> {
+  async findMany(criteria: Params) {
     return getCommentRepository(strapi).findMany(criteria);
   },
 
@@ -246,7 +241,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
 
   // Find all related entiries
-  async findRelatedEntitiesFor(entries: Array<Comment>) {
+  async findRelatedEntitiesFor(entries: Array<Comment>): Promise<Array<CommentRelated>> {
     const data = entries.reduce(
       (acc: { [key: string]: Array<string | number> }, curr: Comment) => {
         const [relatedUid, relatedStringId] = getRelatedGroups(curr.related);
@@ -261,30 +256,30 @@ const commonService = ({ strapi }: StrapiContext) => ({
       },
       {},
     );
-    return Promise.all<Array<RelatedEntity>>(
+    return Promise.all(
       Object.entries(data).map(
-        async ([relatedUid, relatedStringIds]): Promise<Array<RelatedEntity>> =>
+        async ([relatedUid, relatedStringIds]) =>
           strapi.query(relatedUid as ContentTypesUUIDs)
-          .findMany({
-            where: { id: Array.from(new Set(relatedStringIds as ToBeFixed)) },
-          })
-          .then((relatedEntities: Array<RelatedEntity>) =>
-            relatedEntities.map((_: RelatedEntity) => ({
-              ..._,
-              uid: relatedUid,
-            })),
-          ),
+                .findMany({
+                  where: { id: Array.from(new Set(relatedStringIds)) },
+                })
+                .then((relatedEntities) =>
+                  relatedEntities.map((_) => ({
+                    ..._,
+                    uid: relatedUid,
+                  })),
+                ),
       ),
     ).then((result) => result.flat(2));
   },
 
   // Merge related entity with comment
-  mergeRelatedEntityTo(entity: Comment, relatedEntities: Array<RelatedEntity> = []) {
+  mergeRelatedEntityTo(entity: Comment, relatedEntities: Array<CommentRelated> = []): CommentWithRelated {
     return {
       ...entity,
       related: relatedEntities.find(
         (relatedEntity) =>
-          entity.related === `${relatedEntity.uid}:${relatedEntity.id}`
+          entity.related === `${relatedEntity.uid}:${relatedEntity.id}`,
       ),
     };
   },

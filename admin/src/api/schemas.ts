@@ -119,7 +119,7 @@ function getCommentSchema() {
     related: relatedSchema,
     documentId: z.string(),
     threadOf: z.lazy(() =>
-      baseCommentSchema.merge(z.object({ related: z.string(), threadOf: commentSchema.nullable().optional(), documentId: z.string().optional() }))
+      baseCommentSchema.merge(z.object({ related: z.string(), threadOf: commentSchema.nullable().optional(), documentId: z.string().optional() })),
     ).nullable().optional(),
   });
 }
@@ -141,7 +141,7 @@ export const commentsSchema = z.object({
 
 export const commentDetailsSchema = z.object({
   entity: relatedSchema,
-  selected: baseCommentSchema.merge(z.object({ related: z.string(), threadOf: commentSchema.nullable().optional() })).nullable(),
+  selected: baseCommentSchema.merge(z.object({ related: z.string(), threadOf: getCommentSchema().omit({ related: true }).merge(z.object({ related: z.string() })).nullable().optional() })).nullable(),
   level: z.array(getCommentSchema().omit({ threadOf: true, related: true })),
 });
 
@@ -179,7 +179,7 @@ export const reportSchema = z.object({
   updatedAt: z.string().nullable(),
   createdAt: z.string(),
   related: baseCommentSchema,
-})
+});
 
 export type Report = z.infer<typeof reportSchema>;
 

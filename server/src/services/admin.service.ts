@@ -65,7 +65,7 @@ export default ({ strapi }: StrapiContext) => ({
       resolved: { $notNull: true },
     };
     const [operator, direction] = getOrderBy(orderBy);
-    const params: DBQuery = {
+    const params = {
       _q,
       orderBy: orderBy ?? { [operator]: direction },
       where: isEmpty(filters) ? defaultWhere : { ...defaultWhere, ...filters } as Where,
@@ -80,7 +80,6 @@ export default ({ strapi }: StrapiContext) => ({
       ...params,
       populate: ['related'],
     });
-    console.log('params', params);
 
     const reportCommentsIds = results.map((entity) => typeof entity.related === 'object' ? entity.related.id : null).filter(Boolean);
 
@@ -118,7 +117,6 @@ export default ({ strapi }: StrapiContext) => ({
         ),
       );
     });
-
 
 
     return {
@@ -170,9 +168,7 @@ export default ({ strapi }: StrapiContext) => ({
       throw new PluginError(404, 'Not found');
     }
 
-    const { relatedId, uid } = this.getCommonService().parseRelationString(
-      entity.related,
-    );
+    const { relatedId, uid } = this.getCommonService().parseRelationString(entity.related);
     const relatedEntity = await strapi.entityService
                                       .findOne(uid, relatedId)
                                       .then((_) => {
@@ -181,7 +177,7 @@ export default ({ strapi }: StrapiContext) => ({
                                         }
                                         return { ..._, uid };
                                       });
-    const levelThreadId = (entity?.threadOf as Comment)?.id || null;
+    const levelThreadId = entity?.threadOf?.id || null;
 
     const entitiesOnSameLevel =
       await this.getCommonService().findAllInHierarchy(
@@ -289,6 +285,7 @@ export default ({ strapi }: StrapiContext) => ({
       },
       populate: ['related'],
     });
+    console.log('reports', reports);
 
     if (reports.length === ids.length) {
       return getReportCommentRepository(strapi).updateMany({
@@ -323,7 +320,7 @@ export default ({ strapi }: StrapiContext) => ({
       },
     });
   },
-  async resolveAllAbuseReportsForThread(commentId: Id) {
+  async resolveAllAbuseReportsForThread(commentId: number) {
     if (!commentId) {
       throw new PluginError(
         400,

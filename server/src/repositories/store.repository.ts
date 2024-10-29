@@ -1,8 +1,8 @@
 import { Core } from '@strapi/strapi';
 import { once } from 'lodash';
+import { CommentsPluginConfig } from '../@types-v5/config';
 import { REGEX } from '../const';
 import { Either, makeRight } from '../utils/Either';
-import { CommentsPluginConfig } from '../validators';
 
 export const getStoreRepository = once((strapi: Core.Strapi) => {
   const pluginSelector = 'plugin::comments';

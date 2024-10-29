@@ -1,12 +1,13 @@
 import { isEmpty } from 'lodash';
-import { AdminUser, Comment, StrapiContext } from '../@types-v5';
+import { AdminUser, StrapiContext } from '../@types-v5';
 import { APPROVAL_STATUS, CONFIG_PARAMS } from '../const';
-import { getModelUid } from '../repositories/utils';
+import { getCommentRepository } from '../repositories';
 import { isLeft, unwrapEither } from '../utils/Either';
 import PluginError from '../utils/error';
 import { getPluginService } from '../utils/getPluginService';
 import { tryCatch } from '../utils/tryCatch';
-import { CommentData } from '../validators';
+import { CommentData } from '../validators/api';
+import { Comment } from '../validators/repositories';
 import { resolveUserContextError } from './utils/functions';
 
 /**
@@ -74,9 +75,8 @@ export const clientService = ({ strapi }: StrapiContext) => {
       if (isApprovalFlowEnabled && approvalStatus && approvalStatus !== APPROVAL_STATUS.PENDING) {
         throw new PluginError(400, 'Invalid approval status');
       }
-      const modelUid = getModelUid(strapi, 'comment');
 
-      const comment = await strapi.query(modelUid).create<Comment>({
+      const comment = await getCommentRepository(strapi).create({
         data: {
           ...authorData,
           content: clearContent,

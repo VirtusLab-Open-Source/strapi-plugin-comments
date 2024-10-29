@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash';
-import { CommentsPluginConfig, IServiceCommon } from './@types';
 import { StrapiContext } from './@types-v5';
+import { CommentsPluginConfig } from './@types-v5/config';
 import permissions from './permissions';
 import { getPluginService } from './utils/getPluginService';
 

@@ -96,6 +96,9 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
     resolveMultipleReports({ reportIds }: { reportIds: number[] }) {
       return fetch.put(`/${URL_PREFIX}/moderate/multiple/report/resolve`, { reportIds });
     },
+    resolveCommentMultipleReports({ id, reportIds }: { id: number, reportIds: number[] }) {
+      return fetch.put(`/${URL_PREFIX}/moderate/single/${id}/report/resolve`, { reportIds });
+    },
     resolveAllAbuseReportsForComment(id: number) {
       return fetch.put(`/${URL_PREFIX}/moderate/all/${id}/report/resolve`);
     },

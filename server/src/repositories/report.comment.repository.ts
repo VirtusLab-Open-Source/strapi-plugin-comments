@@ -1,27 +1,27 @@
 import { Params } from '@strapi/database/dist/entity-manager/types';
 import { once } from 'lodash';
-import { CommentReport, CoreStrapi, Repository } from '../@types-v5';
+import { CoreStrapi } from '../@types-v5';
+import { ReportResultValidator, reportResultValidator } from '../validators/repositories';
 import { getModelUid } from './utils';
 
-type ResultFindPage = Awaited<ReturnType<Repository['findPage']>>;
 export const getReportCommentRepository = once((strapi: CoreStrapi) => {
   return {
-    async findAll(query: Params) {
-      return strapi.query(getModelUid(strapi, 'comment-report')).findMany(query);
+    async findPage(params: Params): Promise<ReportResultValidator['findPage']> {
+      return strapi.query(getModelUid(strapi, 'comment-report')).findPage(params)
+                   .then(reportResultValidator.findPage.parseAsync);
     },
-    findPage<T extends CommentReport = CommentReport>(params: Params): Promise<Omit<ResultFindPage, 'results'> & { results: T[] }> {
-      return strapi.query(getModelUid(strapi, 'comment-report')).findPage(params);
-    },
-    findMany<T extends CommentReport = CommentReport>(params: Params): Promise<T[]> {
+    findMany(params: Params) {
+      console.log('findMany', params);
       return strapi.query(getModelUid(strapi, 'comment-report')).findMany(params);
     },
-    findOne() {},
-    update<T extends CommentReport = CommentReport>(params: Params): Promise<T | null> {
-      return strapi.query(getModelUid(strapi, 'comment-report')).update(params);
+    async update(params: Params): Promise<ReportResultValidator['update']> {
+      return strapi.query(getModelUid(strapi, 'comment-report')).update(params)
+                   .then(reportResultValidator.update.parseAsync);
     },
-    updateMany(params: Params) {
+    async updateMany(params: Params) {
       return strapi.query(getModelUid(strapi, 'comment-report')).updateMany(params);
     },
+    findOne() {},
     delete() {},
     create() {},
   };

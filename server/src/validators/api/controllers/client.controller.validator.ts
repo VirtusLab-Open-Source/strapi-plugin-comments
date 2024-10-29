@@ -41,8 +41,8 @@ export const getCreateNewCommentValidator = (
   });
   if (!result.success) {
     const message = result.error.issues
-    .map((i) => `Path: ${i.path.join('.')} Code: ${i.code} Message: ${i.message}`)
-    .join('\n');
+                          .map((i) => `Path: ${i.path.join('.')} Code: ${i.code} Message: ${i.message}`)
+                          .join('\n');
     return makeLeft(new PluginError(400, message));
   }
   return makeRight(result.data as CommentData);
@@ -60,7 +60,7 @@ export const getFindAllFlatCommentsValidator = (enabledCollections: string[], re
     omit: z.string().optional().array(),
     filter: getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true }),
     isAdmin: z.boolean().optional().default(false),
-    populate: z.record(z.boolean()).optional(),
+    populate: z.record(z.union([z.boolean(), z.object({ populate: z.boolean() })])).optional(),
     query: z.record(z.string()).optional(),
   }).merge(getStringToNumberValidator({ limit: AVAILABLE_OPERATORS.single, skip: AVAILABLE_OPERATORS.single }));
 
@@ -71,8 +71,8 @@ export const getFindAllFlatCommentsValidator = (enabledCollections: string[], re
 
   if (!result.success) {
     const message = result.error.issues
-    .map((i) => `Path: ${i.path.join('.')} Code: ${i.code} Message: ${i.message}`)
-    .join('\n');
+                          .map((i) => `Path: ${i.path.join('.')} Code: ${i.code} Message: ${i.message}`)
+                          .join('\n');
     return makeLeft(new PluginError(400, message));
   }
   return makeRight(result.data);

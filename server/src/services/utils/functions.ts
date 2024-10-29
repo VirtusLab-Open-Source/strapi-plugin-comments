@@ -1,6 +1,7 @@
 import { Id, IStrapi, StrapiAdmin, StrapiUser } from "strapi-typed";
 import { CommentAuthor, ToBeFixed } from "../../@types";
-import { AdminUser, Comment } from '../../@types-v5';
+import { AdminUser } from '../../@types-v5';
+import { Comment } from "../../validators/repositories";
 import PluginError from "../../utils/error";
 import { REGEX } from "../../utils/constants";
 import { first, get, isObject, isArray, isEmpty, isString } from "lodash";
