@@ -39,8 +39,8 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
   const entityUidValid = entity?.uid && regexUID.test(entity.uid);
 
   const { data: contentTypeData } = useQuery({
-    queryKey: api.contentTypeBuilder.getKey(entity?.uid, canAccess),
-    queryFn: () => api.contentTypeBuilder.query(entity?.uid),
+    queryKey: api.contentTypeBuilder.single.getKey(entity?.uid, canAccess),
+    queryFn: () => api.contentTypeBuilder.single.query(entity?.uid),
     enabled: !!entityUidValid,
   });
 

@@ -1,7 +1,7 @@
 import { getFetchClient } from '@strapi/strapi/admin';
 import { isEmpty, once } from 'lodash';
 import { stringify } from 'qs';
-import { commentDetailsSchema, commentsSchema, configSchema, contentTypeSchema, reportSchema, reportsSchema } from './schemas';
+import { commentDetailsSchema, commentsSchema, configSchema, contentTypeSchema, contentTypesSchema, reportsSchema, rolesListSchema } from './schemas';
 
 const URL_PREFIX = 'comments';
 
@@ -18,12 +18,32 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
     },
   },
   contentTypeBuilder: {
-    getKey(uid: string, canAccess: boolean) {
-      return [URL_PREFIX, 'moderate', 'content-type', canAccess, uid];
+    single: {
+      getKey(uid: string, canAccess: boolean) {
+        return [URL_PREFIX, 'moderate', 'content-type', canAccess, uid];
+      },
+      async query(uid: string) {
+        const response = await fetch.get(`/content-type-builder/content-types/${uid}`);
+        return contentTypeSchema.parseAsync(response.data).then((data) => data.data);
+      },
     },
-    async query(uid: string) {
-      const response = await fetch.get(`/content-type-builder/content-types/${uid}`);
-      return contentTypeSchema.parseAsync(response.data).then((data) => data.data);
+    all: {
+      getKey() {
+        return [URL_PREFIX, 'moderate', 'content-types'];
+      },
+      async query() {
+        const response = await fetch.get('/content-type-builder/content-types');
+        return contentTypesSchema.parseAsync(response.data).then((data) => data.data);
+      },
+    },
+  },
+  roles: {
+    getKey() {
+      return [URL_PREFIX, 'moderate', 'roles'];
+    },
+    async query() {
+      const response = await fetch.get('/admin/roles');
+      return rolesListSchema.parseAsync(response.data).then((data) => data.data);
     },
   },
   comments: {
@@ -106,5 +126,15 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
       return fetch.put(`/${URL_PREFIX}/moderate/thread/${id}/report/resolve-thread`);
     },
   },
-
+  settings: {
+    update(body: any) {
+      return fetch.put(`/${URL_PREFIX}/settings/config`, body);
+    },
+    restore() {
+      return fetch.del(`/${URL_PREFIX}/settings/config`);
+    },
+    restart() {
+      return fetch.post(`/${URL_PREFIX}/settings/restart`);
+    },
+  },
 }));

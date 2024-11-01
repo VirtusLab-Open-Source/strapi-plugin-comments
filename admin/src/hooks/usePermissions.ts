@@ -9,6 +9,8 @@ export const usePermissions = () => {
       moderate: pluginPermissions.moderate,
       accessReports: pluginPermissions.reports,
       reviewReports: pluginPermissions.reportsReview,
+      settings: pluginPermissions.settings,
+      canSettingsChange: pluginPermissions.settingsChange,
     }),
     [],
   );
@@ -19,13 +21,17 @@ export const usePermissions = () => {
       canModerate,
       canAccessReports,
       canReviewReports,
+      ...rest
     },
   } = useRBAC(viewPermissions);
+  console.log('rest', rest);
   return {
     isLoadingForPermissions,
     canAccess: canAccess ?? true,
     canModerate: canModerate ?? true,
     canAccessReports: canAccessReports ?? true,
     canReviewReports: canReviewReports ?? true,
+    canSettings: true,
+    canSettingsChange: true,
   };
 };

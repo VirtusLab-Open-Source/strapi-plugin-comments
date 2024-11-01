@@ -19,6 +19,14 @@ export const configSchema = z.object({
   enabledCollections: z.array(z.string()),
   moderatorRoles: z.array(z.string()),
   isGQLPluginEnabled: z.boolean(),
+  badWords: z.boolean().nullable().optional(),
+  gql: z.object({
+    auth: z.boolean().nullable(),
+  }).optional(),
+  client: z.object({
+    url: z.string().nullable(),
+    contactEmail: z.string().nullable(),
+  }).default({ url: null, contactEmail: null }),
 });
 
 
@@ -148,22 +156,27 @@ export const commentDetailsSchema = z.object({
 export type CommentDetails = z.infer<typeof commentDetailsSchema>;
 
 
-export const contentTypeSchema = z.object({
-  data: z.object({
-    apiID: z.string(),
-    uid: z.string(),
-    schema: z.object({
-      attributes: z.record(z.any()),
-      collectionName: z.string(),
-      description: z.string(),
-      displayName: z.string(),
-      draftAndPublish: z.boolean(),
-      kind: z.string(),
-      pluralName: z.string(),
-      singularName: z.string(),
-      visible: z.boolean(),
-    }),
+const singleContentTypeSchema = z.object({
+  apiID: z.string(),
+  uid: z.string(),
+  schema: z.object({
+    attributes: z.record(z.any()),
+    collectionName: z.string(),
+    description: z.string(),
+    displayName: z.string(),
+    draftAndPublish: z.boolean(),
+    kind: z.string(),
+    pluralName: z.string(),
+    singularName: z.string(),
+    visible: z.boolean(),
   }),
+});
+export const contentTypeSchema = z.object({
+  data: singleContentTypeSchema,
+});
+
+export const contentTypesSchema = z.object({
+  data: z.array(singleContentTypeSchema),
 });
 
 export type ContentType = z.infer<typeof contentTypeSchema>;
@@ -186,4 +199,23 @@ export type Report = z.infer<typeof reportSchema>;
 export const reportsSchema = z.object({
   pagination: paginationSchema,
   result: z.array(reportSchema),
+});
+
+
+const roleSchema = z.object({
+  id: z.number(),
+  documentId: z.string(),
+  name: z.string(),
+  code: z.string(),
+  description: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  publishedAt: z.string(),
+  locale: z.string().nullable(),
+  usersCount: z.number(),
+});
+export const rolesListSchema = z.object({
+  data: z.array(
+    roleSchema,
+  ),
 });

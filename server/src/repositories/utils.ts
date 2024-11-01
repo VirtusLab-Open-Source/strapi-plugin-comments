@@ -1,5 +1,5 @@
 import { Core } from '@strapi/strapi';
-import { z, ZodArray, ZodObject, ZodRawShape } from 'zod';
+import { z, ZodRawShape } from 'zod';
 import { CoreStrapi } from '../@types-v5';
 import { ContentTypesUUIDs, KeysContentTypes } from '../content-types';
 

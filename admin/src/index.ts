@@ -1,8 +1,8 @@
 import { flattenObject, prefixPluginTranslations } from '@sensinum/strapi-utils';
-import * as pluginPkg from "../../package.json";
-import { pluginId } from "./pluginId";
-import PluginIcon from "./components/PluginIcon";
-import pluginPermissions from "./permissions";
+import * as pluginPkg from '../../package.json';
+import PluginIcon from './components/PluginIcon';
+import pluginPermissions from './permissions';
+import { pluginId } from './pluginId';
 import trads from './translations';
 
 const { name, displayName } = pluginPkg.strapi;
@@ -17,50 +17,44 @@ export default {
         id: `${pluginId}.plugin.name`,
         defaultMessage: displayName,
       },
-      Component:  () => import('./pages/App'),
+      Component: () => import('./pages/App'),
       permissions: pluginPermissions.access,
     });
 
+    console.log('app', app);
 
 
-  //
-  //   app.createSettingSection(
-  //     {
-  //       id: pluginId,
-  //       intlLabel: {
-  //         id: `${pluginId}.plugin.section`,
-  //         defaultMessage: `${displayName} plugin`,
-  //       },
-  //     },
-  //     [
-  //       {
-  //         intlLabel: {
-  //           id: `${pluginId}.plugin.section.item`,
-  //           defaultMessage: "Configuration",
-  //         },
-  //         id: "comments",
-  //         to: `/settings/${pluginId}`,
-  //         Component: async () => {
-  //           const component = await import(
-  //             /* webpackChunkName: "documentation-settings" */ "./pages/Settings"
-  //           );
-  //
-  //           return component;
-  //         },
-  //         permissions: pluginPermissions.settings,
-  //       },
-  //     ]
-  //   );
-  //
-  //   app.addReducers(reducers);
-  //   app.registerPlugin({
-  //     id: pluginId,
-  //     initializer: Initializer,
-  //     isReady: false,
-  //     name,
-  //   });
-  //
-  //   registerCustomFields(app);
+    app.createSettingSection(
+      {
+        id: pluginId,
+        intlLabel: {
+          id: `${pluginId}.plugin.section`,
+          defaultMessage: `${displayName} plugin`,
+        },
+      },
+      [
+        {
+          intlLabel: {
+            id: `${pluginId}.plugin.section.item`,
+            defaultMessage: 'Configuration',
+          },
+          id: 'comments',
+          to: `/settings/${pluginId}`,
+          Component: () => import('./pages/Settings'),
+          permissions: pluginPermissions.settings,
+        },
+      ],
+    );
+    //
+    //   app.addReducers(reducers);
+    //   app.registerPlugin({
+    //     id: pluginId,
+    //     initializer: Initializer,
+    //     isReady: false,
+    //     name,
+    //   });
+    //
+    //   registerCustomFields(app);
   },
 
   registerTrads: async function ({ locales = [] }: { locales: string[] }) {
