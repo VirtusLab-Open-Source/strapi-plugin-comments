@@ -5,7 +5,7 @@ import { getCommentRepository, getDefaultAuthorPopulate, getOrderBy, getReportCo
 import { getPluginService } from '../utils/getPluginService';
 import PluginError from '../utils/PluginError';
 
-import { CommentQueryValidatorSchema, FindOneValidatorSchema, MultipleAbuseReportsValidatorSchema, PostCommentValidatorSchema, ReportQueryValidatorSchema, ResolveAbuseReportValidatorSchema, ResolveCommentMultipleAbuseReportsValidatorSchema, UpdateCommentValidatorSchema } from '../validators/api';
+import { admin as adminValidator  } from '../validators/api';
 import { filterOurResolvedReports, getAuthorName } from './utils/functions';
 
 /**
@@ -18,7 +18,7 @@ export default ({ strapi }: StrapiContext) => ({
   },
 
   // Find all comments
-  async findAll({ _q, orderBy, page, pageSize, filters }: CommentQueryValidatorSchema) {
+  async findAll({ _q, orderBy, page, pageSize, filters }: adminValidator.CommentQueryValidatorSchema) {
     const defaultWhere = {
       $or: [{ removed: { $eq: false } }, { removed: { $eq: null } }],
     };
@@ -60,7 +60,7 @@ export default ({ strapi }: StrapiContext) => ({
     };
   },
 
-  async findReports({ _q, orderBy, filters, page, pageSize }: ReportQueryValidatorSchema) {
+  async findReports({ _q, orderBy, filters, page, pageSize }: adminValidator.ReportQueryValidatorSchema) {
     const defaultWhere: Where = {
       resolved: { $notNull: true },
     };
@@ -124,7 +124,7 @@ export default ({ strapi }: StrapiContext) => ({
       pagination,
     };
   },
-  async findOneAndThread({ id, removed, ...query }: FindOneValidatorSchema) {
+  async findOneAndThread({ id, removed, ...query }: adminValidator.FindOneValidatorSchema) {
     const defaultAuthorUserPopulate = getDefaultAuthorPopulate(strapi);
     const defaultWhere = !removed ? { $or: [{ removed: false }, { removed: { $notNull: false } }] } : {};
     const reportsPopulation = {
@@ -263,7 +263,7 @@ export default ({ strapi }: StrapiContext) => ({
   async resolveAbuseReport({
     id: commentId,
     reportId,
-  }: ResolveAbuseReportValidatorSchema) {
+  }: adminValidator.ResolveAbuseReportValidatorSchema) {
     return getReportCommentRepository(strapi).update({
       where: {
         id: reportId,
@@ -277,7 +277,7 @@ export default ({ strapi }: StrapiContext) => ({
   async resolveCommentMultipleAbuseReports({
     id: commentId,
     reportIds: ids,
-  }: ResolveCommentMultipleAbuseReportsValidatorSchema) {
+  }: adminValidator.ResolveCommentMultipleAbuseReportsValidatorSchema) {
     const reports = await getReportCommentRepository(strapi).findMany({
       where: {
         id: ids,
@@ -347,7 +347,7 @@ export default ({ strapi }: StrapiContext) => ({
   },
   async resolveMultipleAbuseReports({
     reportIds,
-  }: MultipleAbuseReportsValidatorSchema) {
+  }: adminValidator.MultipleAbuseReportsValidatorSchema) {
     return getReportCommentRepository(strapi).updateMany({
       where: {
         id: { $in: reportIds },
@@ -357,7 +357,7 @@ export default ({ strapi }: StrapiContext) => ({
       },
     });
   },
-  async postComment({ id, author, content }: PostCommentValidatorSchema) {
+  async postComment({ id, author, content }: adminValidator.PostCommentValidatorSchema) {
     const entity = await getCommentRepository(strapi).findOne({
       where: { id },
     });
@@ -376,7 +376,7 @@ export default ({ strapi }: StrapiContext) => ({
       },
     });
   },
-  async updateComment({ id, content }: UpdateCommentValidatorSchema) {
+  async updateComment({ id, content }: adminValidator.UpdateCommentValidatorSchema) {
     const entity = await getCommentRepository(strapi).update({
       where: { id },
       data: { content },

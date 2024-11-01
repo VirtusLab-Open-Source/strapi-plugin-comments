@@ -23,7 +23,9 @@ export const getReportCommentRepository = once((strapi: CoreStrapi) => {
     },
     findOne() {},
     delete() {},
-    create() {},
+    async create(params: Params) {
+      return strapi.query(getModelUid(strapi, 'comment-report')).create(params).then(reportResultValidator.create.parseAsync);
+    },
   };
 });
 

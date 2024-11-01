@@ -25,15 +25,15 @@ const relatedSchema = z.object({
 
 const reportSchema = z.object({
   id: z.number(),
-  documentId: z.null(),
+  documentId: z.string().nullable(),
   content: z.string(),
   reason: z.string(),
   resolved: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  publishedAt: z.null(),
-  locale: z.null(),
-  related: relatedSchema,
+  publishedAt: z.string().nullable(),
+  locale: z.string().nullable(),
+  related: relatedSchema.nullable(),
 });
 
 const findPageSchema = z.object({
@@ -50,17 +50,19 @@ const updateResultSchema = z.object({
   createdAt: z.string(),
   updatedAt: z.string(),
   publishedAt: z.null(),
-  locale: z.null()
-})
+  locale: z.null(),
+});
 
 export type Report = z.infer<typeof reportSchema>;
 
 export type ReportResultValidator = {
   findPage: z.infer<typeof findPageSchema>;
   update: z.infer<typeof updateResultSchema>
+  create: z.infer<typeof reportSchema>;
 };
 
 export const reportResultValidator = {
   findPage: findPageSchema,
-  update: updateResultSchema
-}
+  update: updateResultSchema,
+  create: reportSchema,
+};

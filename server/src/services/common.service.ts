@@ -10,7 +10,7 @@ import { ContentTypesUUIDs } from '../content-types';
 import { getCommentRepository, getOrderBy } from '../repositories';
 import { CONFIG_PARAMS } from '../utils/constants';
 import PluginError from '../utils/PluginError';
-import { FindAllFlatCommentsValidatorSchema } from '../validators/api';
+import { client as clientValidator } from '../validators/api';
 import { Comment, CommentRelated, CommentWithRelated } from '../validators/repositories';
 import { buildAuthorModel, buildConfigQueryProp, buildNestedStructure, filterOurResolvedReports, getRelatedGroups } from './utils/functions';
 
@@ -101,11 +101,11 @@ const commonService = ({ strapi }: StrapiContext) => ({
     omit: baseOmit = [],
     isAdmin = false,
     query = {},
-  }: FindAllFlatCommentsValidatorSchema, relatedEntity?: any): Promise<{ data: CommentRelated[] }> {
+  }: clientValidator.FindAllFlatSchema, relatedEntity?: any): Promise<{ data: CommentRelated[] }> {
     const omit = baseOmit.filter((field) => !REQUIRED_FIELDS.includes(field));
     const defaultSelect = (['id', 'related'] as const).filter((field) => !omit.includes(field));
 
-    const populateClause: FindAllFlatCommentsValidatorSchema['populate'] = {
+    const populateClause: clientValidator.FindAllFlatSchema['populate'] = {
       authorUser: true,
       ...(isObject(populate) ? populate : {}),
     };
@@ -198,7 +198,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
       dropBlockedThreads,
       isAdmin = false,
       omit = [],
-    }: any,
+    }: clientValidator.FindAllInHierarchyValidatorSchema,
     relatedEntity?: any,
   ) {
     const entities = await this.findAllFlat({ query, populate, sort, fields, isAdmin, omit }, relatedEntity);
@@ -237,7 +237,47 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
 
   // Find all for author
-  async findAllPerAuthor() {
+  async findAllPerAuthor({
+      query = {},
+      populate = {},
+      pagination,
+      sort,
+      fields,
+      isAdmin = false,
+      authorId,
+    }: clientValidator.FindAllPerAuthorValidatorSchema,
+    isStrapiAuthor: boolean = false,
+  ) {
+    {
+      if (isNil(authorId)) {
+        return {
+          data: [],
+        };
+      }
+
+      const { related, ...restQuery } = query;
+
+      const authorQuery = isStrapiAuthor ? {
+        authorUser: {
+          id: authorId,
+        },
+      } : {
+        authorId,
+      };
+
+      const response = await this.findAllFlat({
+        query: {
+          ...restQuery,
+          ...authorQuery,
+        },
+        pagination, populate, sort, fields, isAdmin,
+      });
+
+      return {
+        ...response,
+        data: response.data.map(({ author, ...rest }: Comment): Comment => rest),
+      };
+    }
   },
 
   // Find all related entiries

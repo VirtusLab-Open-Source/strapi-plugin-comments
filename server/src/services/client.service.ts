@@ -1,12 +1,12 @@
 import { isEmpty } from 'lodash';
 import { AdminUser, StrapiContext } from '../@types-v5';
 import { APPROVAL_STATUS, CONFIG_PARAMS } from '../const';
-import { getCommentRepository } from '../repositories';
+import { getCommentRepository, getReportCommentRepository } from '../repositories';
 import { isLeft, unwrapEither } from '../utils/Either';
 import PluginError from '../utils/error';
 import { getPluginService } from '../utils/getPluginService';
 import { tryCatch } from '../utils/tryCatch';
-import { CommentData } from '../validators/api';
+import { client } from '../validators/api';
 import { Comment } from '../validators/repositories';
 import { resolveUserContextError } from './utils/functions';
 
@@ -15,7 +15,7 @@ import { resolveUserContextError } from './utils/functions';
  */
 
 export const clientService = ({ strapi }: StrapiContext) => {
-  const createAuthor = (isValidContent: boolean, author: CommentData['author'], user?: AdminUser) => {
+  const createAuthor = (isValidContent: boolean, author: client.NewCommentValidatorSchema['author'], user?: AdminUser) => {
     if (isValidContent && user) {
       return {
         authorUser: user.id,
@@ -36,7 +36,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
     },
 
     // Create a comment
-    async create({ relation, content, threadOf, author, approvalStatus }: CommentData, user?: AdminUser) {
+    async create({ relation, content, threadOf, author, approvalStatus }: client.NewCommentValidatorSchema, user?: AdminUser) {
       const { uid, relatedId } = this.getCommonService().parseRelationString(relation);
       const relatedEntity = await strapi.entityService.findOne(uid, relatedId);
       if (!relatedEntity) {
@@ -102,20 +102,136 @@ export const clientService = ({ strapi }: StrapiContext) => {
     },
 
     // Update a comment
-    async update() {
+    async update({ commentId, content }: client.UpdateCommentValidatorSchema, user?: AdminUser) {
+      const validContext = this.getCommonService().isValidUserContext(user);
+
+      if (!validContext) {
+        throw resolveUserContextError(user);
+      }
+      // TODO: check if user is allowed to update this comment
+      if (await this.getCommonService().checkBadWords(content)) {
+        const blockedAuthorProps = await this.getCommonService().getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
+        const entity = await getCommentRepository(strapi).update({
+          where: { id: commentId },
+          data: { content },
+          populate: { threadOf: true, authorUser: true },
+        });
+        return this.getCommonService().sanitizeCommentEntity(entity, blockedAuthorProps);
+      }
     },
 
     // Report abuse in comment
-    async reportAbuse() {
+    async reportAbuse({ commentId, relation, ...payload }: client.ReportAbuseValidatorSchema, user?: AdminUser) {
+      if (!this.getCommonService().isValidUserContext(user)) {
+        throw resolveUserContextError(user);
+      }
+
+      try {
+        const reportAgainstEntity = await this.getCommonService().findOne({
+          id: commentId,
+          related: relation,
+        });
+
+        if (reportAgainstEntity.isAdminComment) {
+          throw new PluginError(
+            403,
+            `You're not allowed to take an action on that entity. This in a admin comment.`,
+          );
+        }
+
+        if (reportAgainstEntity) {
+          const entity = await getReportCommentRepository(strapi)
+          .create({
+            data: {
+              ...payload,
+              resolved: false,
+              related: commentId,
+            },
+          });
+          if (entity) {
+            const response = {
+              ...entity,
+              related: reportAgainstEntity,
+            };
+            try {
+              await this.sendAbuseReportEmail(entity.reason, entity.content); // Could also add some info about relation
+              return response;
+            } catch (err) {
+              return response;
+            }
+          } else {
+            throw new PluginError(500, 'Report cannot be created');
+          }
+        }
+        throw new PluginError(
+          403,
+          `You're not allowed to take an action on that entity. Make sure that comment exist or you've authenticated your request properly.`,
+        );
+      } catch (e) {
+        throw e;
+      }
     },
 
-    async markAsRemoved() {
+    async markAsRemoved({ commentId, relation, authorId }: client.RemoveCommentValidatorSchema, user: AdminUser) {
+      if (!this.getCommonService().isValidUserContext(user)) {
+        throw resolveUserContextError(user);
+      }
+
+      const author = user?.id || authorId;
+
+      if (!author) {
+        throw new PluginError(
+          403,
+          `You're not allowed to take an action on that entity. Make sure that you've provided proper "authorId" or authenticated your request properly.`,
+        );
+      }
+
+      try {
+        const byAuthor = user?.id
+          ? {
+            authorUser: author,
+          }
+          : {
+            authorId: author,
+          };
+        const entity = await this.getCommonService().findOne({
+          id: commentId,
+          related: relation,
+          ...byAuthor,
+        });
+        if (entity) {
+          const removedEntity = await getCommentRepository(strapi)
+          .update({
+            where: {
+              id: commentId,
+              related: relation,
+            },
+            data: { removed: true },
+            populate: { threadOf: true, authorUser: true },
+          });
+
+          await this.markAsRemovedNested(commentId, true);
+          const doNotPopulateAuthor = await this.getCommonService().getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
+
+          return this.getCommonService().sanitizeCommentEntity(removedEntity, doNotPopulateAuthor);
+        } else {
+          throw new PluginError(
+            404,
+            `Entity does not exist or you're not allowed to take an action on it`,
+          );
+        }
+      } catch (e) {
+        throw new PluginError(
+          404,
+          `Entity does not exist or you're not allowed to take an action on it`,
+        );
+      }
     },
 
-    async sendAbuseReportEmail() {
+    async sendAbuseReportEmail(reason: string, content: string) {
     },
 
-    async markAsRemovedNested() {
+    async markAsRemovedNested(commentId: string | number, status: boolean) {
     },
 
     async sendResponseNotification(_entry: Comment) {},
