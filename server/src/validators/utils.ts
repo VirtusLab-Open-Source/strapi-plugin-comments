@@ -1,4 +1,5 @@
 import { z, ZodArray, ZodObject } from 'zod';
+import { REGEX } from '../const';
 import { makeLeft, makeRight } from '../utils/Either';
 import PluginError from '../utils/PluginError';
 
@@ -100,13 +101,54 @@ export const getStringToNumberValidator = <T extends Record<string, keyof typeof
 };
 
 
-export const validate =<I, O>(result: z.SafeParseReturnType<I, O>) =>{
+export const validate = <I, O>(result: z.SafeParseReturnType<I, O>) => {
   if (!result.success) {
     const message = result.error.issues
                           .map((i) => `Path: ${i.path.join('.')} Code: ${i.code} Message: ${i.message}`)
                           .join('\n');
     return makeLeft(new PluginError(400, message));
   }
-  return makeRight(result.data)
-}
+  return makeRight(result.data);
+};
 
+export const getRelationValidator = (enabledCollections: string[]) => z
+.string()
+.regex(REGEX.relatedUid, {
+  message: `Field "relation" got incorrect format, use format like "api::<collection name>.<content type name>:<entity id>"`,
+})
+.refine(
+  (v) => enabledCollections.some((ct) => v.startsWith(ct)),
+  'Invalid relation or not enabled collections',
+) as z.ZodEffects<z.ZodString, `{${string}::${string}.${number}}`, string>;
+
+export const externalAuthorSchema = z.object({
+  id: z.number(),
+  name: z.string().min(1).max(100).optional(),
+  email: z.string().email().optional(),
+  avatar: z.string().url().optional(),
+});
+
+export const getFiltersValidator = <T extends z.ZodRawShape>(filters: z.ZodObject<T>) => {
+  return z
+  .object(
+    {
+      $and: z.array(filters.optional()).optional(),
+      $or: z.array(filters.optional()).optional(),
+    },
+    {
+      message: 'Filter object must have at least one field or wrong operator',
+      required_error: 'Filter object must have at least one field or wrong operator',
+      invalid_type_error: 'Filter object must have at least one field or wrong operator',
+    },
+  );
+};
+
+export const getFindQueryValidator = <T extends z.ZodRawShape>(filters: z.ZodObject<T>) => {
+  return z.object({
+    _q: z.string().optional(),
+    orderBy: orderByValidator.optional().nullable(),
+    pageSize: stringToNumberValidator.default(10),
+    page: stringToNumberValidator.default(1),
+    filters: getFiltersValidator(filters).optional(),
+  });
+};

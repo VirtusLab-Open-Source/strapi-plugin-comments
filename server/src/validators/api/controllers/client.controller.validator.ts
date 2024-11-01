@@ -2,8 +2,7 @@ import { AUTHOR_TYPE } from 'src/utils/constants';
 import { z } from 'zod';
 import { APPROVAL_STATUS } from '../../../const';
 import { ExtractRightEither } from '../../../utils/Either';
-import { AVAILABLE_OPERATORS, getFiltersOperators, getStringToNumberValidator, orderByValidator, validate } from '../../utils';
-import { externalAuthorSchema, getRelationValidator } from '../utils';
+import { AVAILABLE_OPERATORS, externalAuthorSchema, getFiltersOperators, getRelationValidator, getStringToNumberValidator, orderByValidator, validate } from '../../utils';
 
 const getNewCommentSchema = (enabledCollections: string[]) => {
   return z.object({
@@ -43,7 +42,6 @@ export const updateCommentValidator = (
 };
 
 export type UpdateCommentValidatorSchema = ExtractRightEither<ReturnType<typeof updateCommentValidator>>;
-
 
 export const findAllFlatValidator = (enabledCollections: string[], relation: string, payload: object) => {
   const zodObject = z.object({

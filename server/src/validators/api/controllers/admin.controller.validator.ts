@@ -1,39 +1,13 @@
 import { z } from 'zod';
 import { REPORT_REASON } from '../../../const/REPORT_REASON';
 import { ExtractRightEither } from '../../../utils/Either';
-import { AVAILABLE_OPERATORS, filtersValidator, getFiltersOperators, getStringToNumberValidator, orderByValidator, stringToNumberValidator, validate } from '../../utils';
-
+import { AVAILABLE_OPERATORS, filtersValidator, getFiltersOperators, getFindQueryValidator, getStringToNumberValidator, stringToNumberValidator, validate } from '../../utils';
 
 export const getIdValidator = (params: unknown) => {
   return validate(getStringToNumberValidator({ id: AVAILABLE_OPERATORS.single }).safeParse(params));
 };
 
 export type IdValidatorSchema = ExtractRightEither<ReturnType<typeof getIdValidator>>;
-
-const getFiltersValidator = <T extends z.ZodRawShape>(filters: z.ZodObject<T>) => {
-  return z
-  .object(
-    {
-      $and: z.array(filters.optional()).optional(),
-      $or: z.array(filters.optional()).optional(),
-    },
-    {
-      message: 'Filter object must have at least one field or wrong operator',
-      required_error: 'Filter object must have at least one field or wrong operator',
-      invalid_type_error: 'Filter object must have at least one field or wrong operator',
-    },
-  );
-};
-
-const getFindQueryValidator = <T extends z.ZodRawShape>(filters: z.ZodObject<T>) => {
-  return z.object({
-    _q: z.string().optional(),
-    orderBy: orderByValidator.optional().nullable(),
-    pageSize: stringToNumberValidator.default(10),
-    page: stringToNumberValidator.default(1),
-    filters: getFiltersValidator(filters).optional(),
-  });
-};
 
 const entryFilters = getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true })
 .merge(z.object({
@@ -47,7 +21,6 @@ export const getCommentQueryValidator = (query: unknown) => {
 };
 
 export type CommentQueryValidatorSchema = z.infer<typeof commentValidator>;
-
 
 const reportValidator = getFindQueryValidator(z
 .object({
@@ -64,7 +37,6 @@ export const getReportQueryValidator = (query: unknown) => {
 };
 
 export type ReportQueryValidatorSchema = z.infer<typeof reportValidator>;
-
 
 export const getFindOneValidator = (id: string | number, params: object) => {
   const result = getStringToNumberValidator({ id: AVAILABLE_OPERATORS.single })
@@ -84,7 +56,6 @@ export const getResolveAbuseReportValidator = (params: unknown) => {
 
 export type ResolveAbuseReportValidatorSchema = ExtractRightEither<ReturnType<typeof getResolveAbuseReportValidator>>;
 
-
 export const getResolveCommentMultipleAbuseReportsValidator = (params: unknown) => {
   const result = getStringToNumberValidator({ id: AVAILABLE_OPERATORS.single, reportIds: AVAILABLE_OPERATORS.array })
   .safeParse(params);
@@ -99,7 +70,6 @@ export const getMultipleAbuseReportsValidator = (params: unknown) => {
   return validate(result);
 };
 export type MultipleAbuseReportsValidatorSchema = ExtractRightEither<ReturnType<typeof getMultipleAbuseReportsValidator>>;
-
 
 export type ResolveCommentMultipleAbuseReportsValidatorSchema = ExtractRightEither<ReturnType<typeof getResolveCommentMultipleAbuseReportsValidator>>;
 
@@ -120,7 +90,6 @@ export const getPostCommentValidator = (params: unknown) => {
 };
 
 export type PostCommentValidatorSchema = z.infer<typeof postCommentValidator>;
-
 
 export const getUpdateCommentValidator = (params: unknown) => {
   return validate(postCommentValidator.pick({ content: true, id: true }).safeParse(params));
