@@ -6,3 +6,5 @@ export const paginationSchema = z.object({
   pageCount: z.number(),
   total: z.number(),
 });
+
+export type Pagination = z.infer<typeof paginationSchema>

@@ -24,7 +24,6 @@ export const usePermissions = () => {
       ...rest
     },
   } = useRBAC(viewPermissions);
-  console.log('rest', rest);
   return {
     isLoadingForPermissions,
     canAccess: canAccess ?? true,

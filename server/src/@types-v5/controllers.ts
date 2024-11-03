@@ -6,7 +6,7 @@ export type AdminUser = {
   email: string;
   username: string;
 };
-export type RequestContext<Body = unknown, PathParams = unknown, QueryParams = object> = Omit<
+export type RequestContext<Body = object, PathParams = object, QueryParams = object> = Omit<
   Context,
   'body' | 'query' | 'request'
 > & {

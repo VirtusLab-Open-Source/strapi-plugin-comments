@@ -160,7 +160,7 @@ const singleContentTypeSchema = z.object({
   apiID: z.string(),
   uid: z.string(),
   schema: z.object({
-    attributes: z.record(z.any()),
+    attributes: z.record(z.object({ type: z.union([z.literal('string'), z.string()]) })),
     collectionName: z.string(),
     description: z.string(),
     displayName: z.string(),

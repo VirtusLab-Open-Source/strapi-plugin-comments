@@ -2,9 +2,8 @@ import { Params } from '@strapi/database/dist/entity-manager/types';
 import { UID } from '@strapi/strapi';
 import { first, get, isNil, isNumber, isObject, isString, omit as filterItem, parseInt, uniq } from 'lodash';
 import { isProfane, replaceProfanities } from 'no-profanity';
-import * as console from 'node:console';
 import { StrapiStore } from 'strapi-typed';
-import { Id, RelatedEntity, StrapiContext, ToBeFixed } from '../@types-v5';
+import { Id, RelatedEntity, StrapiContext } from '../@types-v5';
 import { CommentsPluginConfig } from '../@types-v5/config';
 import { ContentTypesUUIDs } from '../content-types';
 import { getCommentRepository, getOrderBy } from '../repositories';
@@ -12,6 +11,7 @@ import { CONFIG_PARAMS } from '../utils/constants';
 import PluginError from '../utils/PluginError';
 import { client as clientValidator } from '../validators/api';
 import { Comment, CommentRelated, CommentWithRelated } from '../validators/repositories';
+import { Pagination } from '../validators/repositories/utils';
 import { buildAuthorModel, buildConfigQueryProp, buildNestedStructure, filterOurResolvedReports, getRelatedGroups } from './utils/functions';
 
 
@@ -100,8 +100,9 @@ const commonService = ({ strapi }: StrapiContext) => ({
     populate,
     omit: baseOmit = [],
     isAdmin = false,
+    pagination,
     query = {},
-  }: clientValidator.FindAllFlatSchema, relatedEntity?: any): Promise<{ data: CommentRelated[] }> {
+  }: clientValidator.FindAllFlatSchema, relatedEntity?: any): Promise<{ data: Array<CommentWithRelated | Comment>, pagination?: Pagination }> {
     const omit = baseOmit.filter((field) => !REQUIRED_FIELDS.includes(field));
     const defaultSelect = (['id', 'related'] as const).filter((field) => !omit.includes(field));
 
@@ -126,13 +127,11 @@ const commonService = ({ strapi }: StrapiContext) => ({
       limit: limit || PAGE_SIZE,
       offset: skip || 0,
     });
-    console.log('entries', entries.length);
-    // TODO: add pagination with total count
-    const entriesWithThreads = await Promise.all<{
-      id: Id;
-      itemsInTread: number;
-      firstThreadItemId: Id | undefined;
-    }>(
+    let paginationData: Pagination = undefined;
+    if (pagination?.withCount) {
+      paginationData = await getCommentRepository(strapi).findWithCount({ where: query }).then((result) => result.pagination);
+    }
+    const entriesWithThreads = await Promise.all(
       entries.map(async (_) => {
         const { results, pagination: { total } } = await getCommentRepository(strapi)
         .findWithCount({
@@ -151,13 +150,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     const hasRelatedEntitiesToMap = relatedEntities.filter((_: RelatedEntity) => _).length > 0;
 
     const result = entries.map((_) => {
-      const threadedItem = entriesWithThreads.find(
-        (item: {
-          id: Id;
-          itemsInTread: number;
-          firstThreadItemId: Id | undefined;
-        }) => item.id === _.id,
-      );
+      const threadedItem = entriesWithThreads.find((item) => item.id === _.id);
       const parsedThreadOf = isString(query.threadOf) ? parseInt(query.threadOf) : query.threadOf;
 
       let authorUserPopulate = {};
@@ -165,9 +158,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
         authorUserPopulate = 'populate' in populateClause.authorUser ? (populateClause.authorUser.populate) : populateClause.authorUser;
       }
 
-      const primitiveThreadOf = isString(parsedThreadOf) || isNumber(parsedThreadOf) ?
-        parsedThreadOf :
-        null;
+      const primitiveThreadOf: string | number = isString(parsedThreadOf) || isNumber(parsedThreadOf) ? parsedThreadOf : null;
 
       return this.sanitizeCommentEntity(
         {
@@ -175,7 +166,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
           threadOf: primitiveThreadOf || _.threadOf,
           gotThread: (threadedItem?.itemsInTread || 0) > 0,
           threadFirstItemId: threadedItem?.firstThreadItemId,
-        } as ToBeFixed,
+        },
         doNotPopulateAuthor,
         omit as Array<keyof Comment>,
         authorUserPopulate,
@@ -184,6 +175,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
 
     return {
       data: hasRelatedEntitiesToMap ? result.map((_) => this.mergeRelatedEntityTo(_, relatedEntities)) : result,
+      pagination: paginationData,
     };
   },
 
@@ -270,12 +262,16 @@ const commonService = ({ strapi }: StrapiContext) => ({
           ...restQuery,
           ...authorQuery,
         },
-        pagination, populate, sort, fields, isAdmin,
+        pagination,
+        populate,
+        sort,
+        fields,
+        isAdmin,
       });
 
       return {
         ...response,
-        data: response.data.map(({ author, ...rest }: Comment): Comment => rest),
+        data: response.data.map(({ author, ...rest }) => rest),
       };
     }
   },

@@ -1,4 +1,4 @@
-import { Button, Dialog, Flex, Typography, Box } from '@strapi/design-system';
+import { Button, Dialog, Flex, Typography } from '@strapi/design-system';
 import { WarningCircle } from '@strapi/icons';
 import React, { FC, ReactNode, useState } from 'react';
 
@@ -37,14 +37,13 @@ export const ConfirmationDialog: FC<ConfirmationDialogProps> = ({
       </Dialog.Trigger>
       <Dialog.Content>
         <Dialog.Header>{title}</Dialog.Header>
-        <Dialog.Body icon={<WarningCircle />}>
-          <div>
-            <Flex justifyContent="center">
-              <Typography id="confirm-description">
-                {children}
-              </Typography>
-            </Flex>
-          </div>
+        <Dialog.Body>
+          <Flex justifyContent="center" direction="column">
+            <WarningCircle fill="danger500" stroke="danger500" height="24" width="24" />
+            <Typography id="confirm-description">
+              {children}
+            </Typography>
+          </Flex>
         </Dialog.Body>
         <Dialog.Footer>
           <Dialog.Cancel>
@@ -56,15 +55,15 @@ export const ConfirmationDialog: FC<ConfirmationDialogProps> = ({
             </Button>
           </Dialog.Cancel>
           <Dialog.Action>
-              <Button
-                onClick={internalOnConfirm}
-                variant="danger-light"
-                loading={isLoading}
-                disabled={isLoading}
-                startIcon={iconConfirm}
-              >
-                {labelConfirm}
-              </Button>
+            <Button
+              onClick={internalOnConfirm}
+              variant="danger-light"
+              loading={isLoading}
+              disabled={isLoading}
+              startIcon={iconConfirm}
+            >
+              {labelConfirm}
+            </Button>
           </Dialog.Action>
         </Dialog.Footer>
       </Dialog.Content>

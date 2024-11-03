@@ -64,7 +64,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
     throw throwError(ctx, unwrapEither(result));
   },
 
-  async put(ctx: RequestContext<any, any>) {
+  async put(ctx: RequestContext) {
     const { user } = ctx.state;
     const configResult = await this.getStoreRepository().get(true);
     if (isRight(configResult)) {
@@ -85,7 +85,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
     throw throwError(ctx, unwrapEither(configResult));
   },
 
-  async reportAbuse(ctx: RequestContext<any, any>) {
+  async reportAbuse(ctx: RequestContext) {
     const { state } = ctx;
     const { user } = state;
     const configResult = await this.getStoreRepository().get(true);
@@ -106,7 +106,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
     throw throwError(ctx, unwrapEither(configResult));
   },
 
-  async removeComment(ctx: RequestContext<any, any, any>) {
+  async removeComment(ctx: RequestContext) {
     const { state } = ctx;
     const { user } = state;
     const configResult = await this.getStoreRepository().get(true);

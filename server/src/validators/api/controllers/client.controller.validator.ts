@@ -1,8 +1,8 @@
-import { AUTHOR_TYPE } from 'src/utils/constants';
 import { z } from 'zod';
 import { APPROVAL_STATUS } from '../../../const';
+import { AUTHOR_TYPE } from '../../../utils/constants';
 import { ExtractRightEither } from '../../../utils/Either';
-import { AVAILABLE_OPERATORS, externalAuthorSchema, getFiltersOperators, getRelationValidator, getStringToNumberValidator, orderByValidator, validate } from '../../utils';
+import { AVAILABLE_OPERATORS, externalAuthorSchema, filtersValidator, getFiltersOperators, getRelationValidator, getStringToNumberValidator, orderByValidator, primitiveUnion, stringToBooleanValidator, validate } from '../../utils';
 
 const getNewCommentSchema = (enabledCollections: string[]) => {
   return z.object({
@@ -52,7 +52,12 @@ export const findAllFlatValidator = (enabledCollections: string[], relation: str
     filter: getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true }),
     isAdmin: z.boolean().optional().default(false),
     populate: z.record(z.union([z.boolean(), z.object({ populate: z.boolean() })])).optional(),
-    query: z.record(z.string()).optional(),
+    query: z.record(z.union([z.record(z.union([z.string(), z.number()])), z.string(), z.number()])).optional(),
+    pagination: z.object({
+      page: z.number().optional().default(1),
+      pageSize: z.number().optional().default(10),
+      withCount: stringToBooleanValidator.optional().default(false),
+    }).optional(),
   }).merge(getStringToNumberValidator({ limit: AVAILABLE_OPERATORS.single, skip: AVAILABLE_OPERATORS.single }));
 
   return validate(zodObject.safeParse({
@@ -72,9 +77,16 @@ export const findAllInHierarchyValidator = (enabledCollections: string[], relati
     filter: getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true }),
     isAdmin: z.boolean().optional().default(false),
     populate: z.record(z.union([z.boolean(), z.object({ populate: z.boolean() })])).optional(),
-    query: z.record(z.string()).optional(),
+    query: z.union([
+      z.record(z.union([z.record(primitiveUnion), primitiveUnion])),
+      z.object({
+        $and: z.array(z.record(filtersValidator)).optional(),
+        $or: z.array(z.record(filtersValidator)).optional(),
+      }),
+    ]).optional(),
     startingFromId: z.number().optional(),
     dropBlockedThreads: z.boolean().optional().default(false),
+
   }).merge(getStringToNumberValidator({ limit: AVAILABLE_OPERATORS.single, skip: AVAILABLE_OPERATORS.single }));
 
   return validate(zodObject.safeParse({

@@ -29,7 +29,7 @@ export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModer
 
   const approveItemMutation = useMutation({
     mutationKey: ['approveItem', id],
-    mutationFn: apiClient.approveComment,
+    mutationFn: apiClient.comments.approve,
     onSuccess: onSuccess('success.approveItem'),
     onError,
   });
@@ -40,7 +40,7 @@ export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModer
 
   const rejectItemMutation = useMutation({
     mutationKey: ['rejectItem', id],
-    mutationFn: apiClient.rejectComment,
+    mutationFn: apiClient.comments.reject,
     onSuccess: onSuccess('success.rejectItem'),
     onError,
   });

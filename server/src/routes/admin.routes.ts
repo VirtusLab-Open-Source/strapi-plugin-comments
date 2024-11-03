@@ -176,7 +176,7 @@ const settingsRoutes: StrapiRoute<'settings'>[] = [
     },
   },
   {
-    method: 'GET',
+    method: 'POST',
     path: '/settings/restart',
     handler: 'settings.restart',
     config: {

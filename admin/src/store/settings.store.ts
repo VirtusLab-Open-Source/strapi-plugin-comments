@@ -12,9 +12,9 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
     approvalFlow: [],
     blockedAuthorProps: [],
     reportReasons: {
-      BAD_LANGUAGE: '',
-      DISCRIMINATION: '',
-      OTHER: '',
+      BAD_LANGUAGE: 'BAD_LANGUAGE',
+      DISCRIMINATION: 'DISCRIMINATION',
+      OTHER: 'OTHER',
     },
     regex: {
       uid: '',
@@ -25,6 +25,10 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
     enabledCollections: [],
     moderatorRoles: [],
     isGQLPluginEnabled: false,
+    client: {
+      url: '',
+      contactEmail: '',
+    },
   },
-  setSettings: (settings: any) => set({ settings }),
+  setSettings: (settings: Config) => set({ settings }),
 }));

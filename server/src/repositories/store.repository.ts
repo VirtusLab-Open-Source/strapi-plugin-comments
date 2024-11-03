@@ -1,8 +1,9 @@
 import { Core } from '@strapi/strapi';
 import { once } from 'lodash';
-import { CommentsPluginConfig } from '../@types-v5/config';
 import { REGEX } from '../const';
+import { REPORT_REASON } from '../const/REPORT_REASON';
 import { Either, makeRight } from '../utils/Either';
+import { CommentsPluginConfig } from '../validators/api/controllers/settings.controller.validator';
 
 export const getStoreRepository = once((strapi: Core.Strapi) => {
   const pluginSelector = 'plugin::comments';
@@ -71,7 +72,17 @@ export const getStoreRepository = once((strapi: Core.Strapi) => {
     },
     async update(config: CommentsPluginConfig) {
       const pluginStore = await this.getStore();
-      await pluginStore.set({ key: 'config', value: config });
+      await pluginStore.set({
+        key: 'config',
+        value: {
+          ...config,
+          reportReasons: {
+            BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
+            DISCRIMINATION: REPORT_REASON.DISCRIMINATION,
+            OTHER: REPORT_REASON.OTHER,
+          },
+        },
+      });
       return this.get();
     },
     async restore() {

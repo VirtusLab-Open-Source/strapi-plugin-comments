@@ -37,10 +37,12 @@ const baseCommentSchema = z.object({
   locale: z.string().nullable(),
   reports: z.array(reportSchema).default([]),
   gotThread: z.boolean().nullable().optional(),
+  threadFirstItemId: z.number().nullable().optional(),
+  author: z.any(),
 }).merge(reportExternalUserSchema);
 
 const commentSchema = baseCommentSchema.extend({
-  threadOf: z.lazy(() => baseCommentSchema).nullable().optional(),
+  threadOf: z.lazy(() => z.union([z.number(), baseCommentSchema])).nullable().optional(),
 });
 
 const commentRelatedSchema = z.object({

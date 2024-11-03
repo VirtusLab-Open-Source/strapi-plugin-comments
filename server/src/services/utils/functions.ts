@@ -1,7 +1,7 @@
 import { Id, IStrapi, StrapiAdmin, StrapiUser } from "strapi-typed";
 import { CommentAuthor, ToBeFixed } from "../../@types";
 import { AdminUser } from '../../@types-v5';
-import { Comment } from "../../validators/repositories";
+import { Comment, CommentWithRelated } from '../../validators/repositories';
 import PluginError from "../../utils/error";
 import { REGEX } from "../../utils/constants";
 import { first, get, isObject, isArray, isEmpty, isString } from "lodash";
@@ -9,7 +9,7 @@ import { first, get, isObject, isArray, isEmpty, isString } from "lodash";
 declare var strapi: IStrapi;
 
 export const buildNestedStructure = (
-  entities: Array<Comment>,
+  entities: Array<Comment | CommentWithRelated>,
   id: Id | null = null,
   field: string = "threadOf",
   dropBlockedThreads = false,

@@ -68,6 +68,7 @@ export const filtersValidator = z.union([
   endWithValidators,
   containsValidators,
   notContainsValidators,
+  z.object({ $notNull: z.boolean() }),
 ]);
 
 export const getFiltersOperators = <T extends Record<string, boolean>>(dictionary: T): ZodObject<{ [key in keyof T]: typeof filtersValidator }> => {
@@ -102,6 +103,7 @@ export const getStringToNumberValidator = <T extends Record<string, keyof typeof
 
 
 export const validate = <I, O>(result: z.SafeParseReturnType<I, O>) => {
+  console.log('result', result);
   if (!result.success) {
     const message = result.error.issues
                           .map((i) => `Path: ${i.path.join('.')} Code: ${i.code} Message: ${i.message}`)
@@ -152,3 +154,4 @@ export const getFindQueryValidator = <T extends z.ZodRawShape>(filters: z.ZodObj
     filters: getFiltersValidator(filters).optional(),
   });
 };
+export const primitiveUnion = z.union([z.string(), z.number(), z.boolean()]);

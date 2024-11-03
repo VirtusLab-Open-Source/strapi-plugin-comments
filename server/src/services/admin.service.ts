@@ -1,11 +1,11 @@
 import { isEmpty, isNil, set } from 'lodash';
-import { Comment, DBQuery, Id, StrapiContext, Where } from '../@types-v5';
+import { DBQuery, Id, StrapiContext, Where } from '../@types-v5';
 import { APPROVAL_STATUS } from '../const';
 import { getCommentRepository, getDefaultAuthorPopulate, getOrderBy, getReportCommentRepository } from '../repositories';
 import { getPluginService } from '../utils/getPluginService';
 import PluginError from '../utils/PluginError';
 
-import { admin as adminValidator  } from '../validators/api';
+import { admin as adminValidator } from '../validators/api';
 import { filterOurResolvedReports, getAuthorName } from './utils/functions';
 
 /**
@@ -91,7 +91,10 @@ export default ({ strapi }: StrapiContext) => ({
       populate: ['threadOf'],
       limit: Number.MAX_SAFE_INTEGER,
     });
-    const commentWithThreadIds = Array.from(new Set(commentsThreads.map(({ threadOf }) => threadOf.id)));
+    const commentWithThreadIds = Array.from(new Set(commentsThreads
+      .map(({ threadOf }) => typeof threadOf === 'object' ? threadOf.id : null)
+      .filter(Boolean)),
+    );
     const result = results.map((_) => {
       const isCommentWithThread = commentWithThreadIds.includes(_.related.id);
       const commonService = this.getCommonService();
@@ -126,7 +129,7 @@ export default ({ strapi }: StrapiContext) => ({
   },
   async findOneAndThread({ id, removed, ...query }: adminValidator.FindOneValidatorSchema) {
     const defaultAuthorUserPopulate = getDefaultAuthorPopulate(strapi);
-    const defaultWhere = !removed ? { $or: [{ removed: false }, { removed: { $notNull: false } }] } : {};
+    const defaultWhere: any = !removed ? { $or: [{ removed: false }, { removed: { $notNull: false } }] } : {};
     const reportsPopulation = {
       reports: {
         where: {
@@ -144,7 +147,7 @@ export default ({ strapi }: StrapiContext) => ({
         ...reportsPopulation,
       },
     };
-    const defaultPopulate = {
+    const defaultPopulate: any = {
       populate: {
         ...basePopulate.populate,
         authorUser: defaultAuthorUserPopulate,
@@ -177,7 +180,7 @@ export default ({ strapi }: StrapiContext) => ({
                                         }
                                         return { ..._, uid };
                                       });
-    const levelThreadId = entity?.threadOf?.id || null;
+    const levelThreadId = typeof entity.threadOf === 'object' ? entity.threadOf.id : null;
 
     const entitiesOnSameLevel =
       await this.getCommonService().findAllInHierarchy(
