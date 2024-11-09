@@ -180,7 +180,7 @@ export default ({ strapi }: StrapiContext) => ({
                                         }
                                         return { ..._, uid };
                                       });
-    const levelThreadId = typeof entity.threadOf === 'object' ? entity.threadOf.id : null;
+    const levelThreadId =  entity.threadOf && typeof entity.threadOf === 'object' ? entity.threadOf.id : null;
 
     const entitiesOnSameLevel =
       await this.getCommonService().findAllInHierarchy(
