@@ -27,7 +27,7 @@ const baseCommentSchema = z.object({
   blocked: z.boolean().nullable(),
   blockedThread: z.boolean().nullable(),
   blockReason: z.string().nullable(),
-  isAdminComment: z.string().nullable(),
+  isAdminComment: z.boolean().nullable(),
   removed: z.boolean().nullable(),
   approvalStatus: z.string().nullable(),
   related: z.string(),

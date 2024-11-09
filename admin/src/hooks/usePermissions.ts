@@ -10,27 +10,28 @@ export const usePermissions = () => {
       accessReports: pluginPermissions.reports,
       reviewReports: pluginPermissions.reportsReview,
       settings: pluginPermissions.settings,
-      canSettingsChange: pluginPermissions.settingsChange,
+      settingsChange: pluginPermissions.settingsChange,
     }),
     [],
   );
   const {
     isLoading: isLoadingForPermissions,
     allowedActions: {
-      canAccess,
-      canModerate,
-      canAccessReports,
-      canReviewReports,
-      ...rest
+      canCommentsModerate,
+      canCommentsRead,
+      canReportsRead,
+      canSettingsChange,
+      canSettingsRead,
+      canReportsReview,
     },
   } = useRBAC(viewPermissions);
   return {
     isLoadingForPermissions,
-    canAccess: canAccess ?? true,
-    canModerate: canModerate ?? true,
-    canAccessReports: canAccessReports ?? true,
-    canReviewReports: canReviewReports ?? true,
-    canSettings: true,
-    canSettingsChange: true,
+    canAccess: canCommentsRead || canReportsRead || canSettingsRead,
+    canModerate: canCommentsModerate,
+    canAccessReports: canReportsRead,
+    canReviewReports: canReportsReview,
+    canSettings: canSettingsRead,
+    canSettingsChange: canSettingsChange,
   };
 };

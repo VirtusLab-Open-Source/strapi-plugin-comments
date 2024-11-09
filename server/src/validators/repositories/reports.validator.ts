@@ -12,15 +12,15 @@ const relatedSchema = z.object({
   authorId: z.string(),
   authorName: z.string(),
   authorEmail: z.string(),
-  authorAvatar: z.null(),
-  isAdminComment: z.null(),
-  removed: z.null(),
-  approvalStatus: z.null(),
+  authorAvatar: z.string().nullable(),
+  isAdminComment: z.boolean().nullable(),
+  removed: z.boolean().nullable(),
+  approvalStatus: z.string().nullable(),
   related: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
   publishedAt: z.string(),
-  locale: z.null(),
+  locale: z.string().nullable(),
 });
 
 const reportSchema = z.object({
@@ -43,14 +43,14 @@ const findPageSchema = z.object({
 
 const updateResultSchema = z.object({
   id: z.number(),
-  documentId: z.null(),
+  documentId: z.string().nullable(),
   content: z.string(),
   reason: z.string(),
   resolved: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  publishedAt: z.null(),
-  locale: z.null(),
+  publishedAt: z.string().nullable(),
+  locale: z.string().nullable(),
 });
 
 export type Report = z.infer<typeof reportSchema>;

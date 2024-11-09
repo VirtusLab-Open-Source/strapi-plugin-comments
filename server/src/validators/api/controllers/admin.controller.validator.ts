@@ -73,16 +73,17 @@ export type MultipleAbuseReportsValidatorSchema = ExtractRightEither<ReturnType<
 
 export type ResolveCommentMultipleAbuseReportsValidatorSchema = ExtractRightEither<ReturnType<typeof getResolveCommentMultipleAbuseReportsValidator>>;
 
+const authorSchema = z.object({
+  id: z.union([z.string(), z.number()]),
+  email: z.string().email(),
+  lastname: z.string().nullable().optional(),
+  username: z.string().nullable().optional(),
+  firstname: z.string().nullable().optional(),
+});
 export const postCommentValidator = z.object({
   id: z.union([z.string(), z.number()]),
   content: z.string(),
-  author: z.object({
-    id: z.union([z.string(), z.number()]),
-    email: z.string().email(),
-    lastname: z.string().optional(),
-    username: z.string().optional(),
-    firstname: z.string().optional(),
-  }),
+  author: authorSchema,
 });
 
 export const getPostCommentValidator = (params: unknown) => {

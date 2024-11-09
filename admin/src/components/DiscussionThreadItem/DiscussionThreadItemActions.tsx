@@ -1,14 +1,15 @@
 import { Flex, IconButton } from '@strapi/design-system';
 import { Eye, Pencil, Plus, Trash } from '@strapi/icons';
 import { useNotification } from '@strapi/strapi/admin';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { isEmpty, isNil } from 'lodash';
 import { FC, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAPI } from '../../hooks/useAPI';
 import { useCommentMutations } from '../../hooks/useCommentMutations';
 import { usePermissions } from '../../hooks/usePermissions';
-import { getMessage } from '../../utils';
+import { useUserContext } from '../../hooks/useUserContext';
+import { getMessage, getUrl } from '../../utils';
 import { COMMENT_STATUS } from '../../utils/constants';
 import { ActionButton } from '../ActionButton';
 import { ApproveFlow } from '../ApproveFlow';
@@ -30,14 +31,13 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
     content,
     blockedThread,
     gotThread,
-    // threadFirstItemId,
+    threadFirstItemId,
     reports = [],
     approvalStatus,
     author,
     isAdminComment,
   } = item;
-  // TODO: replace with real user
-  const user = { id: 1 };
+  const user = useUserContext();
 
   const api = useAPI();
   const { canModerate, canAccessReports, canReviewReports } = usePermissions();
@@ -70,10 +70,8 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
   const isRejected = gotApprovalFlow && approvalStatus === COMMENT_STATUS.REJECTED;
   const openReports = reports?.filter((_) => !_.resolved);
   const hasReports = !isEmpty(openReports);
-  const reviewFlowEnabled =
-    (canAccessReports || canReviewReports) && hasReports;
-  const hasActiveThread =
-    gotThread && !(removed || preview || pinned || blockedThread);
+  const reviewFlowEnabled = (canAccessReports || canReviewReports) && hasReports;
+  const hasActiveThread = gotThread && !(removed || preview || pinned || blockedThread);
   const isStatusBadgeVisible = isBlocked || reviewFlowEnabled;
 
   const isLoading =
@@ -101,8 +99,9 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
     ]);
   };
   const handleDrillDownClick = async () => {
-    // TODO: navigate to thread
-    // navigate(`/discussion/${threadFirstItemId}`);
+    if (threadFirstItemId) {
+      navigate(getUrl(`discover/${threadFirstItemId}`));
+    }
   };
 
   if (removed || isRejected || !canModerate) {
@@ -152,7 +151,12 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
                 startIcon={<Lock />}
                 loading={commentMutation.unBlockThread.isPending}
                 variant="danger"
-              />
+              >
+                {getMessage(
+                  'page.details.actions.thread.block',
+                  'Block thread',
+                )}
+              </ActionButton>
             )}>
             {getMessage(
               'page.details.actions.thread.block.confirmation.description',
@@ -256,16 +260,13 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
             </IconButton>
           </IconButtonGroup>
         )}
-        {/* TODO: debug problem */}
         {isThreadStartEnabled && (
           <IconButtonGroup isSingle withMargin>
             <ModeratorResponseModal
               content=""
               id={id}
               Icon={Plus}
-              title={getMessage(
-                'page.details.actions.thread.modal.start.thread',
-              )}
+              title={getMessage('page.details.actions.thread.modal.start.thread')}
             />
           </IconButtonGroup>
         )}

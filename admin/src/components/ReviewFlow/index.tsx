@@ -7,6 +7,7 @@ import { Comment } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
 import { useCommentMutations } from '../../hooks/useCommentMutations';
 import { usePermissions } from '../../hooks/usePermissions';
+import { getMessage } from '../../utils';
 import { DiscussionThreadItem } from '../DiscussionThreadItem';
 import Lock from '../icons/lock';
 import ReviewIcon from '../icons/review';
@@ -65,7 +66,6 @@ export const ReviewFlow: FC<Props> = ({
       reportIds: selectedItems,
     });
   };
-  console.log('canReviewReports', canReviewReports);
 
   return (
     <Modal.Root open={isModalVisible} onOpenChange={onToggleModal}>
@@ -81,7 +81,10 @@ export const ReviewFlow: FC<Props> = ({
       <Modal.Content>
         <Modal.Header>
           <Modal.Title>
-            Moderation: Review open reports
+            {getMessage(
+              'page.details.panel.discussion.warnings.reports.dialog.header',
+              'Open reports',
+            )}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -104,7 +107,7 @@ export const ReviewFlow: FC<Props> = ({
         <Modal.Footer>
           <Flex justifyContent="space-between" width="100%">
             <Button onClick={onToggleModal}>
-              Cancel
+              {getMessage('components.confirmation.dialog.button.cancel')}
             </Button>
             <Flex gap={1}>
               <Button
@@ -113,7 +116,7 @@ export const ReviewFlow: FC<Props> = ({
                 startIcon={<Lock />}
                 disabled={blockButtonsDisabled}
               >
-                Block comment
+                {getMessage('page.details.actions.comment.block')}
               </Button>
               {item.gotThread && (
                 <Button
@@ -122,7 +125,7 @@ export const ReviewFlow: FC<Props> = ({
                   startIcon={<Lock />}
                   disabled={blockButtonsDisabled}
                 >
-                  Block thread
+                  {getMessage('page.details.actions.thread.block')}
                 </Button>
               )}
               {hasAnySelectedItems && (
@@ -132,7 +135,15 @@ export const ReviewFlow: FC<Props> = ({
                   startIcon={<Check />}
                   disabled={blockButtonsDisabled}
                 >
-                  Resolve selected
+                  {getMessage(
+                    {
+                      id: `page.details.panel.discussion.warnings.reports.dialog.actions.resolve.selected`,
+                      props: {
+                        count: selectedItems.length,
+                      },
+                    },
+                    "Resolve selected",
+                  )}
                 </Button>
               )}
             </Flex>

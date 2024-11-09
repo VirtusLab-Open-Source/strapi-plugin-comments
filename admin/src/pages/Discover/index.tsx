@@ -4,36 +4,22 @@ import { FC } from 'react';
 import { Config } from '../../api/schemas';
 import { CommentRow } from '../../components/CommentRow';
 import { useCommentsAll } from '../../hooks/useCommentsAll';
-import { usePermissions } from '../../hooks/usePermissions';
+import { getMessage } from '../../utils';
 
 
 export const Discover: FC<{ config: Config }> = ({ config }) => {
   const { trackUsage } = useTracking();
   const { toggleNotification } = useNotification();
   const [{ query: queryParams }] = useQueryParams();
-  const _q = (queryParams as Record<string, string>)?._q || '';
 
-  const {
-    isLoadingForPermissions,
-    canAccess,
-    canModerate,
-    canAccessReports,
-    canReviewReports,
-  } = usePermissions();
-
-
-  const {
-    isLoading: isLoadingForData,
-    data: { result, pagination },
-    isFetching,
-  } = useCommentsAll(queryParams as Record<string, string>);
+  const { data: { result, pagination } } = useCommentsAll(queryParams as Record<string, string>);
 
   return (
     <>
       <Page.Title children={'Comments - discover'} />
       <Page.Main>
         <Layouts.Header
-          title="Discover threads"
+          title={getMessage('page.discover.header')}
           subtitle={`${pagination.total} entries found`}
           as="h2"
         />
@@ -42,13 +28,27 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
           <Table>
             <Thead>
               <Tr>
-                <Th>Id</Th>
-                <Th>Author</Th>
-                <Th>Message</Th>
-                <Th>Thread of</Th>
-                <Th>Entry</Th>
-                <Th>Last update</Th>
-                <Th>Status</Th>
+                <Th>
+                  {getMessage('page.discover.table.header.id')}
+                </Th>
+                <Th>
+                  {getMessage('page.discover.table.header.author')}
+                </Th>
+                <Th>
+                  {getMessage('page.discover.table.header.message')}
+                </Th>
+                <Th>
+                  {getMessage('page.discover.table.header.thread')}
+                </Th>
+                <Th>
+                  {getMessage('page.discover.table.header.entry')}
+                </Th>
+                <Th>
+                  {getMessage('page.discover.table.header.lastUpdate')}
+                </Th>
+                <Th>
+                  {getMessage('page.discover.table.header.status')}
+                </Th>
                 <Th />
               </Tr>
             </Thead>
@@ -57,9 +57,6 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
                 <CommentRow
                   key={comment.id}
                   item={comment}
-                  canModerate={canModerate}
-                  canAccessReports={canAccessReports}
-                  canReviewReports={canReviewReports}
                 />
               ))}
             </Tbody>

@@ -1,7 +1,7 @@
 import { getFetchClient } from '@strapi/strapi/admin';
 import { isEmpty, once } from 'lodash';
 import { stringify } from 'qs';
-import { commentDetailsSchema, commentsSchema, configSchema, contentTypeSchema, contentTypesSchema, reportsSchema, rolesListSchema } from './schemas';
+import { commentDetailsSchema, commentsSchema, configSchema, contentTypeSchema, contentTypesSchema, reportsSchema, rolesListSchema, User, userSchema } from './schemas';
 
 const URL_PREFIX = 'comments';
 
@@ -44,6 +44,15 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
     async query() {
       const response = await fetch.get('/admin/roles');
       return rolesListSchema.parseAsync(response.data).then((data) => data.data);
+    },
+  },
+  user: {
+    getKey() {
+      return [URL_PREFIX, 'moderate', 'user'];
+    },
+    async query() {
+      const response = await fetch.get('/admin/users/me');
+      return userSchema.parseAsync(response.data).then((data) => data.data);
     },
   },
   comments: {
@@ -90,7 +99,7 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
     delete(id: number) {
       return fetch.del(`/${URL_PREFIX}/moderate/single/${id}/delete`);
     },
-    postComment({ id, content, author }: { id: number | string, content: string, author: string | number }) {
+    postComment({ id, content, author }: { id: number | string, content: string, author: User }) {
       return fetch.post(`/${URL_PREFIX}/moderate/thread/${id}/postComment`, { content, author });
     },
     updateComment({ id, content }: { id: number | string, content: string }) {

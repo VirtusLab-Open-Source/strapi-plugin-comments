@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Comment } from '../../api/schemas';
-import { resolveCommentStatus, resolveCommentStatusColor } from '../../utils';
+import { getMessage, resolveCommentStatus, resolveCommentStatusColor } from '../../utils';
 import { StatusBadge } from '../StatusBadge';
 import { startCase } from 'lodash';
 
@@ -8,6 +8,7 @@ export const CommentStatusBadge: FC<{ item: Comment, canAccessReports: boolean; 
   const reviewFlowEnabled = canAccessReports && hasReports && !(item.blocked || item.blockedThread);
   const status = resolveCommentStatus({ ...item, reviewFlowEnabled });
   const color = resolveCommentStatusColor(status);
+  const openReports = item.reports?.filter((_) => !_.resolved) ?? [];
 
   return (
     <StatusBadge
@@ -15,7 +16,15 @@ export const CommentStatusBadge: FC<{ item: Comment, canAccessReports: boolean; 
       textColor={`${color}700`}
       color={color}
     >
-      {startCase(status.toLowerCase())}
+      {getMessage(
+        {
+          id: `page.common.item.status.${status}`,
+          props: {
+            count: openReports.length,
+          },
+        },
+        status,
+      )}
     </StatusBadge>
   )
 };

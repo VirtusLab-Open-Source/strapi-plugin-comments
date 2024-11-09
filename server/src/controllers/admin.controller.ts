@@ -5,7 +5,7 @@ import { getPluginService } from '../utils/getPluginService';
 import { throwError } from '../utils/throwError';
 import { admin as adminValidator } from '../validators/api';
 
-type RequestContextWithId<T = unknown> = RequestContext<T, { id: string }>;
+type RequestContextWithId<T = object> = RequestContext<T, { id: string }>;
 const controllers = ({ strapi }: StrapiContext) => ({
   getService<T extends keyof PluginServices>(name: T): PluginServices[T] {
     return getPluginService(strapi, name);
@@ -74,7 +74,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
     throw throwError(ctx, unwrapEither(either));
   },
 
-  async resolveAbuseReport(ctx: RequestContext<unknown, { id: string, reportId: string }>) {
+  async resolveAbuseReport(ctx: RequestContext<object, { id: string, reportId: string }>) {
     const either = adminValidator.getResolveAbuseReportValidator(ctx.params);
     if (isRight(either)) {
       return this.getService('admin').resolveAbuseReport(unwrapEither(either));
@@ -140,7 +140,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
     throw throwError(ctx, unwrapEither(either));
   },
 
-  async approveComment(ctx: RequestContext<unknown, adminValidator.IdValidatorSchema>) {
+  async approveComment(ctx: RequestContext<object, adminValidator.IdValidatorSchema>) {
     const either = adminValidator.getIdValidator(ctx.params);
     if (isRight(either)) {
       return this.getService('admin').approveComment(unwrapEither(either).id);
@@ -148,7 +148,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
     throw throwError(ctx, unwrapEither(either));
   },
 
-  async rejectComment(ctx: RequestContext<unknown, adminValidator.IdValidatorSchema>) {
+  async rejectComment(ctx: RequestContext<object, adminValidator.IdValidatorSchema>) {
     const either = adminValidator.getIdValidator(ctx.params);
     if (isRight(either)) {
       return this.getService('admin').rejectComment(unwrapEither(either).id);

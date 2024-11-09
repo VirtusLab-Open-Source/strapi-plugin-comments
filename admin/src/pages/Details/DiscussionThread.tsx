@@ -8,6 +8,7 @@ import { DiscussionThreadItem } from '../../components/DiscussionThreadItem';
 import { LoadingIndicatorOverlay } from '../../components/LoadingIndicatorOverlay';
 import { AllowedActions } from '../../types';
 import { getMessage } from '../../utils';
+import { ModeratorResponse } from './ModeratorResponse';
 
 type DiscussionThreadProps = {
   readonly allowedActions: AllowedActions;
@@ -15,8 +16,8 @@ type DiscussionThreadProps = {
   readonly level: CommentDetails['level'];
   readonly selected: CommentDetails['selected'];
 };
-export const DiscussionThread: FC<DiscussionThreadProps> = ({ allowedActions, isReloading, level, selected }) => {
-  const rootThread = selected?.threadOf;
+export const DiscussionThread: FC<DiscussionThreadProps> = ({ isReloading, level, selected }) => {
+  const rootThread = selected?.threadOf
   return (
     <Box background="neutral0" width="100%" padding={4} position="relative" height="100%">
       {isReloading && <LoadingIndicatorOverlay />}
@@ -42,14 +43,6 @@ export const DiscussionThread: FC<DiscussionThreadProps> = ({ allowedActions, is
           )}
       </Flex>
       <Flex as="ul" direction="column" alignItems="flex-start" marginBottom={4}>
-        {rootThread && (
-          <DiscussionThreadItem
-            root
-            pinned
-            isThreadAuthor
-            item={rootThread}
-          />
-        )}
         {level.map((item) => {
           const isSelected = selected?.id === item.id;
           const isThreadAuthor = !isNil(selected?.threadOf?.author?.id) && selected?.threadOf?.author?.id === item?.author?.id;
@@ -64,6 +57,12 @@ export const DiscussionThread: FC<DiscussionThreadProps> = ({ allowedActions, is
             />
           );
         })}
+        {rootThread && (
+          <ModeratorResponse
+            id={rootThread.id}
+            blockedThread={!!rootThread.blockedThread}
+          />
+        )}
       </Flex>
     </Box>
   );

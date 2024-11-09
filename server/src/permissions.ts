@@ -1,17 +1,16 @@
-import { ToBeFixed } from "./@types/common";
 
 export default {
-  render: (uid: ToBeFixed) => `plugin::comments.${uid}`,
+  render: (uid: string) => `plugin::comments.${uid}`,
   comments: {
-    read: "read",
-    moderate: "moderate",
+    read: "comments-read",
+    moderate: "comments-moderate",
   },
   reports: {
-    read: "reports.read",
-    action: "reports.action",
+    read: "reports-read",
+    review: "reports-review",
   },
   settings: {
-    read: "settings.read",
-    change: "settings.change",
+    read: "settings-read",
+    change: "settings-change",
   },
 };

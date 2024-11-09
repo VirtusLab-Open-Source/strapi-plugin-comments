@@ -1,10 +1,13 @@
 import { Flex, IconButton, Link, Td, Tr } from '@strapi/design-system';
 import { Eye } from '@strapi/icons';
-import { isEmpty, isNil, noop } from 'lodash';
+import { isEmpty, isNil } from 'lodash';
 import { FC, SyntheticEvent } from 'react';
+import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import { Comment } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
+import { usePermissions } from '../../hooks/usePermissions';
+import { getMessage } from '../../utils';
 import { ApproveFlow } from '../ApproveFlow';
 import { CommentStatusBadge } from '../CommentStatusBadge';
 import { IconButtonGroup } from '../IconButtonGroup';
@@ -12,13 +15,17 @@ import { ReviewFlow } from '../ReviewFlow';
 
 type Props = {
   readonly item: Comment;
-  readonly canAccessReports: boolean;
-  readonly canModerate: boolean;
-  readonly canReviewReports: boolean;
 };
-export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports, canReviewReports }) => {
+export const CommentRow: FC<Props> = ({ item }) => {
+  const {
+    canAccessReports,
+    canModerate,
+    // TODO
+    canReviewReports,
+  } = usePermissions();
   const api = useAPI();
   const navigate = useNavigate();
+  const { formatDate } = useIntl();
 
   const hasReports = !isEmpty(item.reports?.filter((_) => !_.resolved));
 
@@ -31,7 +38,7 @@ export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports, can
     evt.preventDefault();
     evt.stopPropagation();
     navigate(id.toString());
-  }
+  };
 
   return (
     <Tr>
@@ -41,7 +48,13 @@ export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports, can
       <Td>
         {item.threadOf ? (
           <Link href={`discover/${item.threadOf.id}`} onClick={onClickDetails(item.threadOf.id)}>
-            {item.threadOf.content}
+            {getMessage(
+              {
+                id: 'page.discover.table.cell.thread',
+                props: { id: item.threadOf.id },
+              },
+              '#' + item.threadOf.id,
+            )}
           </Link>
         ) : '-'}
       </Td>
@@ -52,7 +65,12 @@ export const CommentRow: FC<Props> = ({ item, canModerate, canAccessReports, can
           </Link>
         )}
       </Td>
-      <Td>{item.updatedAt}</Td>
+      <Td>
+        {formatDate(item.updatedAt || item.createdAt, {
+          dateStyle: 'long',
+          timeStyle: 'short',
+        })}
+      </Td>
       <Td>
         <CommentStatusBadge
           item={item}

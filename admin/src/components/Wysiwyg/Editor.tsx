@@ -103,7 +103,6 @@ const Editor = React.forwardRef<EditorApi, EditorProps>(
       }),
       [editorRef]
     );
-    console.log('value', value);
 
     return (
       <EditorAndPreviewWrapper>

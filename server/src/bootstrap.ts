@@ -5,17 +5,6 @@ import permissions from './permissions';
 import { getPluginService } from './utils/getPluginService';
 
 export default async ({ strapi }: StrapiContext) => {
-  // Provide GQL support
-  if (strapi.plugin('graphql')) {
-    const config: CommentsPluginConfig = await getPluginService(strapi,
-      'common',
-    ).getConfig();
-    const { enabledCollections } = config;
-    if (!isEmpty(enabledCollections)) {
-      await require('./graphql')({ strapi, config });
-    }
-  }
-
   // Check if the plugin users-permissions is installed because the navigation needs it
   if (Object.keys(strapi.plugins).indexOf('users-permissions') === -1) {
     throw new Error(
@@ -45,7 +34,7 @@ export default async ({ strapi }: StrapiContext) => {
     {
       section: 'plugins',
       displayName: 'Reports: Moderate',
-      uid: permissions.reports.action,
+      uid: permissions.reports.review,
       pluginName: 'comments',
     },
     {

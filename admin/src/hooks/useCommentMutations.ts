@@ -10,6 +10,7 @@ type MutationKey = {
     blockThread: boolean;
     unBlockThread: boolean;
     delete: boolean;
+    postComment: boolean;
   },
   report: {
     resolve: boolean;
@@ -59,6 +60,12 @@ export const useCommentMutations = (callbacksMutation: CallbacksMutation = { com
     onSuccess: callbacksMutation.comment?.deleteSuccess,
     onError: callbacksMutation.comment?.deleteError,
   });
+
+  const postCommentMutation = useMutation({
+    mutationFn: canExecuteMutations(api.comments.postComment),
+    onSuccess: callbacksMutation.comment?.postCommentSuccess,
+    onError: callbacksMutation.comment?.postCommentError,
+  });
   // Reports
   const resolveMultipleReportsMutation = useMutation({
     mutationFn: canExecuteMutations(api.reports.resolveMultipleReports),
@@ -99,6 +106,7 @@ export const useCommentMutations = (callbacksMutation: CallbacksMutation = { com
       blockThread: blockThreadMutation,
       unBlockThread: unblockItemThreadMutation,
       delete: deleteItemMutation,
+      postComment: postCommentMutation,
     },
     reportMutation: {
       resolve: resolveReportMutation,

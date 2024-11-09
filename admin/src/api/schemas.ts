@@ -106,6 +106,7 @@ const baseCommentSchema = z.object({
   reports: z.array(commentReportSchema).nullable().optional(),
   author: authorSchema,
   gotThread: z.boolean().nullable().optional(),
+  threadFirstItemId: z.number().nullable().optional(),
 });
 
 type BaseComment = z.infer<typeof baseCommentSchema>;
@@ -219,3 +220,31 @@ export const rolesListSchema = z.object({
     roleSchema,
   ),
 });
+
+export const userSchema = z.object({
+  data: z.object({
+    id: z.number(),
+    documentId: z.string(),
+    firstname: z.string(),
+    lastname: z.string(),
+    username: z.string().nullable(),
+    email: z.string(),
+    isActive: z.boolean(),
+    blocked: z.boolean(),
+    preferedLanguage: z.string().nullable(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    publishedAt: z.string(),
+    locale: z.null(),
+    roles: z.array(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+        description: z.string(),
+        code: z.string()
+      })
+    )
+  })
+})
+
+export type User = z.infer<typeof userSchema>['data'];

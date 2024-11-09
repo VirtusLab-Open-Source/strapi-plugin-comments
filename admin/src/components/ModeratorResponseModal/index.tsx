@@ -3,6 +3,7 @@ import { Form, useNotification } from '@strapi/strapi/admin';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { FC, useCallback, useRef, useState } from 'react';
 import { useAPI } from '../../hooks/useAPI';
+import { useUserContext } from '../../hooks/useUserContext';
 import { getMessage } from '../../utils';
 import { Wysiwyg } from '../Wysiwyg';
 
@@ -21,7 +22,7 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
   const queryClient = useQueryClient();
   const api = useAPI();
 
-  const user = { id: 1 };
+  const user = useUserContext();
 
   const getOnSuccess = (message: string) => async () => {
     await queryClient.invalidateQueries({
