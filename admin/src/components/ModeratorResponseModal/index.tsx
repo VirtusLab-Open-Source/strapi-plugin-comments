@@ -22,7 +22,7 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
   const queryClient = useQueryClient();
   const api = useAPI();
 
-  const user = useUserContext();
+  const author = useUserContext();
 
   const getOnSuccess = (message: string) => async () => {
     await queryClient.invalidateQueries({
@@ -55,8 +55,8 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
     } else {
       await postCommentMutation.mutateAsync({
         id,
+        author,
         content: values.content,
-        author: user.id,
       });
     }
   };

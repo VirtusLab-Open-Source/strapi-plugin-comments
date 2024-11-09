@@ -88,9 +88,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
                 queryKey={api.comments.findAll.getKey()}
               />
             )}
-            <ReviewFlow
-              item={item}
-            />
+            {canReviewReports && <ReviewFlow item={item} />}
             <IconButton
               onClick={onClickDetails(item.id)}
               label="View"
