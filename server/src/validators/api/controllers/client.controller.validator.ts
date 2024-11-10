@@ -62,14 +62,6 @@ const querySchema = z.object({
   ]).optional(),
 });
 
-//   query: z.union([
-//       z.record(z.union([z.record(primitiveUnion), primitiveUnion])),
-//       z.object({
-//         $and: z.array(z.record(filtersValidator)).optional(),
-//         $or: z.array(z.record(filtersValidator)).optional(),
-//       }),
-//     ]).optional(),
-// ----------------------------
 
 export const findAllFlatValidator = (enabledCollections: string[], relation: string, payload: object) => {
   const zodObject = z
@@ -99,23 +91,16 @@ export const findAllInHierarchyValidator = (enabledCollections: string[], relati
   const zodObject = z
   .object({
     sort: orderByValidator.optional().nullable().default('createdAt:desc'),
-    fields: z.string().optional().array(),
-    omit: z.string().optional().array(),
-    filter: getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true }),
+    fields: z.string().array().optional(),
+    omit: z.string().array().optional(),
+    filter: getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true }).optional(),
     isAdmin: z.boolean().optional().default(false),
     populate: z.record(z.union([z.boolean(), z.object({ populate: z.boolean() })])).optional(),
-    query: z.union([
-      z.record(z.union([z.record(primitiveUnion), primitiveUnion])),
-      z.object({
-        $and: z.array(z.record(filtersValidator)).optional(),
-        $or: z.array(z.record(filtersValidator)).optional(),
-      }),
-    ]).optional(),
     startingFromId: z.number().optional(),
     dropBlockedThreads: z.boolean().optional().default(false),
-
+    limit: stringToNumberValidator.optional(),
+    skip: stringToNumberValidator.optional(),
   })
-  .merge(getStringToNumberValidator({ limit: AVAILABLE_OPERATORS.single, skip: AVAILABLE_OPERATORS.single }))
   .merge(getRelationSchema(enabledCollections))
   .merge(querySchema);
 

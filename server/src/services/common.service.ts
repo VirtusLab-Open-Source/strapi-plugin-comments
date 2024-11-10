@@ -89,7 +89,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
       sort: { [operator]: direction },
       select: Array.isArray(fields) ? uniq([...fields, defaultSelect]) : fields,
     };
-    // const method =
+    console.log('populateClause', populateClause);
     const entries = await getCommentRepository(strapi).findMany({
       where: {
         ...filter,
@@ -132,6 +132,8 @@ const commonService = ({ strapi }: StrapiContext) => ({
       }
 
       const primitiveThreadOf = typeof parsedThreadOf === 'number' ? parsedThreadOf : null;
+      console.log('primitiveThreadOf', primitiveThreadOf);
+      console.log('_.threadOf', _.threadOf);
 
       return this.sanitizeCommentEntity(
         {

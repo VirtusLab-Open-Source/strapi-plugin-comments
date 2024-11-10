@@ -16,8 +16,9 @@ export const buildNestedStructure = (
 ): Array<Comment> =>
   entities
   .filter((entity: Comment) => {
-    // mongo by default not return `null` for empty data
     const entityField: any = get(entity, field);
+    console.log('id', id);
+    console.log('entityField', entityField);
     if (entityField === null && id === null) {
       return true;
     }
@@ -26,7 +27,7 @@ export const buildNestedStructure = (
       data = data.toString();
     }
     return (
-      (data && data === id) ||
+      (data && data == id) ||
       (isObject(entityField) && (entityField as any).id === id)
     );
   })

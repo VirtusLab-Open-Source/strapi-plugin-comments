@@ -41,6 +41,11 @@ const controllers = ({ strapi }: StrapiContext) => ({
   },
 
   async findAllInHierarchy(ctx: RequestContext<object, Pick<clientValidator.FindAllInHierarchyValidatorSchema, 'relation'>>) {
+    console.log('1', 1);
+    console.log('1', 1);
+    console.log('1', 1);
+    console.log('1', 1);
+    console.log('1', 1);
     const configResult = await this.getStoreRepository().get(true);
     if (isRight(configResult)) {
       const config = unwrapEither(configResult);

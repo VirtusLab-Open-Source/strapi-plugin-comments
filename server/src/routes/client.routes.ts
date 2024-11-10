@@ -7,6 +7,7 @@ const routes: StrapiRoute<'client'>[] = [
     handler: 'client.findAllInHierarchy',
     config: {
       policies: [],
+      auth: false,
       description:
         'Find all comments related to configured Collection / Single Type and return them in a nested structure',
       tag: {
