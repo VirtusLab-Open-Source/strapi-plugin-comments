@@ -1,30 +1,30 @@
 import { Core } from '@strapi/strapi';
 import { once } from 'lodash';
-import { REGEX } from '../const';
-import { REPORT_REASON } from '../const/REPORT_REASON';
+import { PLUGIN_SELECTOR, REGEX, REPORT_REASON } from '../const';
 import { Either, makeRight } from '../utils/Either';
 import { CommentsPluginConfig } from '../validators/api/controllers/settings.controller.validator';
 
 export const getStoreRepository = once((strapi: Core.Strapi) => {
-  const pluginSelector = 'plugin::comments';
-
   return {
     getLocalConfig<P extends keyof CommentsPluginConfig>(
       prop: P,
       defaultValue?: CommentsPluginConfig[P],
     ) {
-      return strapi.config.get([pluginSelector, prop].join('.'), defaultValue);
+      return strapi.config.get([PLUGIN_SELECTOR, prop].join('.'), defaultValue);
     },
     async getStore() {
       return await strapi.store({ type: 'plugin', name: 'comments' });
+    },
+    async getConfig(): Promise<Required<CommentsPluginConfig>> {
+      const store = await this.getStore();
+      return await store.get({ key: 'config' }) as Promise<Required<CommentsPluginConfig>>;
     },
     async get<T extends boolean>(
       viaSettingsPage?: T,
     ): Promise<
       Either<unknown, T extends true ? CommentsPluginConfig : Omit<CommentsPluginConfig, 'enabledCollections' | 'moderatorRoles' | 'isGQLPluginEnabled'>>
     > {
-      const pluginStore = await this.getStore();
-      const config = (await pluginStore.get({ key: 'config' })) as Required<CommentsPluginConfig>;
+      const config = await this.getConfig();
       const additionalConfiguration = {
         regex: Object.keys(REGEX).reduce(
           (prev, curr) => {

@@ -1,7 +1,4 @@
-/**
- * Comments Collection Type
- */
-import { REPORT_REASON } from '../../const/REPORT_REASON';
+import { REPORT_REASON } from '../../const';
 
 export default {
   collectionName: "plugin_comments_reports",

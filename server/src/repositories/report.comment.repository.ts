@@ -1,30 +1,38 @@
 import { Params } from '@strapi/database/dist/entity-manager/types';
 import { once } from 'lodash';
 import { CoreStrapi } from '../@types-v5';
+import { getConfig } from '../utils/getConfig';
 import { ReportResultValidator, reportResultValidator } from '../validators/repositories';
+import { shouldValidateObject } from '../validators/repositories/utils';
 import { getModelUid } from './utils';
 
 export const getReportCommentRepository = once((strapi: CoreStrapi) => {
+  const modelUid = getModelUid(strapi, 'comment-report');
+  const repository = strapi.query(modelUid);
+
   return {
     async findPage(params: Params): Promise<ReportResultValidator['findPage']> {
-      return strapi.query(getModelUid(strapi, 'comment-report')).findPage(params)
-                   .then(reportResultValidator.findPage.parseAsync);
+      const isValidationEnabled = await getConfig(strapi, 'isValidationEnabled', false);
+      return repository.findPage(params)
+                       .then(shouldValidateObject(isValidationEnabled, reportResultValidator.findPage));
     },
-    findMany(params: Params) {
+    async findMany(params: Params) {
       console.log('findMany', params);
-      return strapi.query(getModelUid(strapi, 'comment-report')).findMany(params);
+      const isValidationEnabled = await getConfig(strapi, 'isValidationEnabled', false);
+      return repository.findMany(params);
     },
     async update(params: Params): Promise<ReportResultValidator['update']> {
-      return strapi.query(getModelUid(strapi, 'comment-report')).update(params)
-                   .then(reportResultValidator.update.parseAsync);
+      const isValidationEnabled = await getConfig(strapi, 'isValidationEnabled', false);
+      return repository.update(params)
+                       .then(shouldValidateObject(isValidationEnabled, reportResultValidator.update));
     },
     async updateMany(params: Params) {
-      return strapi.query(getModelUid(strapi, 'comment-report')).updateMany(params);
+      return repository.updateMany(params);
     },
-    findOne() {},
-    delete() {},
     async create(params: Params) {
-      return strapi.query(getModelUid(strapi, 'comment-report')).create(params).then(reportResultValidator.create.parseAsync);
+      const isValidationEnabled = await getConfig(strapi, 'isValidationEnabled', false);
+      return repository.create(params)
+                       .then(shouldValidateObject(isValidationEnabled, reportResultValidator.create));
     },
   };
 });

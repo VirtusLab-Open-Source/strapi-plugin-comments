@@ -1,26 +1,24 @@
-import { Effect } from "../@types/utils";
-
-export type ContentType = "comment" | "comment-report";
+export type ContentType = 'comment' | 'comment-report';
 
 export type LifeCycleHookName =
-  | "beforeCreate"
-  | "beforeCreateMany"
-  | "afterCreate"
-  | "afterCreateMany"
-  | "beforeUpdate"
-  | "beforeUpdateMany"
-  | "afterUpdate"
-  | "afterUpdateMany"
-  | "beforeDelete"
-  | "beforeDeleteMany"
-  | "afterDelete"
-  | "afterDeleteMany"
-  | "beforeCount"
-  | "afterCount"
-  | "beforeFindOne"
-  | "afterFindOne"
-  | "beforeFindMany"
-  | "afterFindMany";
+  | 'beforeCreate'
+  | 'beforeCreateMany'
+  | 'afterCreate'
+  | 'afterCreateMany'
+  | 'beforeUpdate'
+  | 'beforeUpdateMany'
+  | 'afterUpdate'
+  | 'afterUpdateMany'
+  | 'beforeDelete'
+  | 'beforeDeleteMany'
+  | 'afterDelete'
+  | 'afterDeleteMany'
+  | 'beforeCount'
+  | 'afterCount'
+  | 'beforeFindOne'
+  | 'afterFindOne'
+  | 'beforeFindMany'
+  | 'afterFindMany';
 
 export interface LifeCycleEvent<
   THookName extends LifeCycleHookName = LifeCycleHookName,
@@ -33,7 +31,7 @@ export interface LifeCycleEvent<
     uid: string;
     tableName: string;
     attributes: Record<string, unknown>;
-    lifecycles: Partial<Record<LifeCycleHookName, Effect<LifeCycleEvent>>>;
+    lifecycles: Partial<Record<LifeCycleHookName, any>>;
     indexes: Array<{
       type?: string;
       name: string;

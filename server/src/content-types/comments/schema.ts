@@ -1,8 +1,5 @@
 import { APPROVAL_STATUS } from '../../const';
 
-/**
- * Comments Collection Type
- */
 export default {
   collectionName: "plugin_comments_comments",
   info: {
