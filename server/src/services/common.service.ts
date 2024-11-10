@@ -219,8 +219,6 @@ const commonService = ({ strapi }: StrapiContext) => ({
         };
       }
 
-      const { related, ...restQuery } = query;
-
       const authorQuery = isStrapiAuthor ? {
         authorUser: {
           id: authorId,
@@ -231,7 +229,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
 
       const response = await this.findAllFlat({
         query: {
-          ...restQuery,
+          ...filterItem(query, ['related']),
           ...authorQuery,
         },
         pagination,

@@ -59,7 +59,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
     if (isRight(result)) {
       return this.getService('common').findAllPerAuthor(
         flatInput(result.right),
-        ![AUTHOR_TYPE.GENERIC.toLowerCase(), AUTHOR_TYPE.GENERIC].includes(ctx.params.type),
+        ctx.params.type ? ![AUTHOR_TYPE.GENERIC.toLowerCase(), AUTHOR_TYPE.GENERIC].includes(ctx.params.type) : false,
       );
     }
     throw throwError(ctx, unwrapEither(result));

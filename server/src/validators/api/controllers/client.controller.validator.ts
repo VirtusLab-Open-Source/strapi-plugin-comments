@@ -62,24 +62,25 @@ const querySchema = z.object({
   ]).default({}),
 });
 
-
-export const findAllFlatValidator = (enabledCollections: string[], relation: string, payload: object) => {
-  const zodObject = z
+const getBaseFindSchema = (enabledCollections: string[]) => {
+  return z
   .object({
     sort: orderByValidator.optional().nullable().default('createdAt:desc'),
-    fields: z.string().optional().array(),
-    omit: z.string().optional().array(),
-    filter: getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true }),
+    fields: z.string().array().optional(),
+    omit: z.string().array().optional(),
+    filter: getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true }).optional(),
     isAdmin: z.boolean().optional().default(false),
     populate: z.record(z.union([z.boolean(), z.object({ populate: z.boolean() })])).optional(),
     query: z.record(z.union([z.record(z.union([z.string(), z.number()])), z.string(), z.number()])).optional(),
+    limit: stringToNumberValidator.optional(),
+    skip: stringToNumberValidator.optional(),
   })
-  .merge(getStringToNumberValidator({ limit: AVAILABLE_OPERATORS.single, skip: AVAILABLE_OPERATORS.single }))
   .merge(getRelationSchema(enabledCollections))
   .merge(paginationSchema)
   .merge(querySchema);
-
-  return validate(zodObject.safeParse({
+};
+export const findAllFlatValidator = (enabledCollections: string[], relation: string, payload: object) => {
+  return validate(getBaseFindSchema(enabledCollections).safeParse({
     ...payload,
     relation,
   }));
@@ -88,23 +89,25 @@ export const findAllFlatValidator = (enabledCollections: string[], relation: str
 export type FindAllFlatSchema = ExtractRightEither<ReturnType<typeof findAllFlatValidator>>;
 
 export const findAllInHierarchyValidator = (enabledCollections: string[], relation: string, payload: object) => {
-  const zodObject = z
-  .object({
-    sort: orderByValidator.optional().nullable().default('createdAt:desc'),
-    fields: z.string().array().optional(),
-    omit: z.string().array().optional(),
-    filter: getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true }).optional(),
-    isAdmin: z.boolean().optional().default(false),
-    populate: z.record(z.union([z.boolean(), z.object({ populate: z.boolean() })])).optional(),
+  const schema = getBaseFindSchema(enabledCollections)
+  .pick({
+    sort: true,
+    fields: true,
+    omit: true,
+    filter: true,
+    isAdmin: true,
+    populate: true,
+    limit: true,
+    skip: true,
+    relation: true,
+    query: true,
+  })
+  .merge(z.object({
     startingFromId: z.number().optional(),
     dropBlockedThreads: z.boolean().optional().default(false),
-    limit: stringToNumberValidator.optional(),
-    skip: stringToNumberValidator.optional(),
-  })
-  .merge(getRelationSchema(enabledCollections))
-  .merge(querySchema);
+  }));
 
-  return validate(zodObject.safeParse({
+  return validate(schema.safeParse({
     ...payload,
     relation,
   }));
@@ -113,22 +116,25 @@ export const findAllInHierarchyValidator = (enabledCollections: string[], relati
 export type FindAllInHierarchyValidatorSchema = ExtractRightEither<ReturnType<typeof findAllInHierarchyValidator>>;
 
 export const findAllPerAuthorValidator = (params: object, payload: object) => {
-  const zodObject = z.object({
-    authorId: z.union([z.string(), z.number()]),
-    query: z.record(z.string()).optional(),
-    sort: orderByValidator.optional().nullable().default('createdAt:desc'),
-    fields: z.string().optional().array(),
-    omit: z.string().optional().array(),
-    isAdmin: z.boolean().optional().default(false),
-    populate: z.record(z.union([z.boolean(), z.object({ populate: z.boolean() })])).optional(),
+  const schema = getBaseFindSchema([])
+  .pick({
+    sort: true,
+    fields: true,
+    omit: true,
+    isAdmin: true,
+    populate: true,
+    limit: true,
+    skip: true,
+    pagination: true,
+    query: true,
+  })
+  .merge(z.object({
     type: z.union([z.literal(AUTHOR_TYPE.GENERIC), z.literal('generic')]).optional(),
-    pagination: z.object({
-      page: z.number().optional(),
-      pageSize: z.number().optional(),
-    }).optional(),
-  }).merge(getStringToNumberValidator({ limit: AVAILABLE_OPERATORS.single, skip: AVAILABLE_OPERATORS.single }));
+    authorId: z.union([z.string(), z.number()]),
+  }));
 
-  return validate(zodObject.safeParse({
+
+  return validate(schema.safeParse({
     ...payload,
     ...params,
   }));
