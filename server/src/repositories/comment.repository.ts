@@ -12,10 +12,7 @@ export const getCommentRepository = once((strapi: CoreStrapi) => {
     async findMany(params: Params): Promise<CommentResultValidator['findMany']> {
       const isValidationEnabled = await getConfig(strapi, 'isValidationEnabled', false);
       return strapi.query(modelUid).findMany(params)
-                   .then(result => {
-                     console.log('result[0]', result[0]);
-                     return shouldValidateArray(isValidationEnabled, commentResultValidator.findMany)(result);
-                   });
+                   .then(shouldValidateArray(isValidationEnabled, commentResultValidator.findMany));
     },
     async findWithCount(params: Params): Promise<CommentResultValidator['findWithCount']> {
       const isValidationEnabled = await getConfig(strapi, 'isValidationEnabled', false);

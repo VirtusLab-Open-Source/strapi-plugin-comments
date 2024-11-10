@@ -17,8 +17,6 @@ export const buildNestedStructure = (
   entities
   .filter((entity: Comment) => {
     const entityField: any = get(entity, field);
-    console.log('id', id);
-    console.log('entityField', entityField);
     if (entityField === null && id === null) {
       return true;
     }

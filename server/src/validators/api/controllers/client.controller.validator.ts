@@ -59,7 +59,7 @@ const querySchema = z.object({
       $or: z.array(z.record(filtersValidator)).optional(),
     }),
     z.record(z.union([z.record(primitiveUnion), primitiveUnion])),
-  ]).optional(),
+  ]).default({}),
 });
 
 

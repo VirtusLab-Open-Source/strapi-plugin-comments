@@ -6,6 +6,7 @@ import { isRight, unwrapEither } from '../utils/Either';
 import { getPluginService } from '../utils/getPluginService';
 import { throwError } from '../utils/throwError';
 import { client as clientValidator } from '../validators/api';
+import { flatInput } from './utils/parsers';
 
 const controllers = ({ strapi }: StrapiContext) => ({
   getService<T extends keyof PluginServices>(name: T): PluginServices[T] {
@@ -33,7 +34,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
       const config = unwrapEither(configResult);
       const result = clientValidator.findAllFlatValidator(config.enabledCollections, ctx.params.relation, ctx.request.body);
       if (isRight(result)) {
-        return this.getService('common').findAllFlat(result.right);
+        return this.getService('common').findAllFlat(flatInput(result.right));
       }
       throw throwError(ctx, unwrapEither(result));
     }
@@ -41,17 +42,12 @@ const controllers = ({ strapi }: StrapiContext) => ({
   },
 
   async findAllInHierarchy(ctx: RequestContext<object, Pick<clientValidator.FindAllInHierarchyValidatorSchema, 'relation'>>) {
-    console.log('1', 1);
-    console.log('1', 1);
-    console.log('1', 1);
-    console.log('1', 1);
-    console.log('1', 1);
     const configResult = await this.getStoreRepository().get(true);
     if (isRight(configResult)) {
       const config = unwrapEither(configResult);
       const result = clientValidator.findAllInHierarchyValidator(config.enabledCollections, ctx.params.relation, ctx.request.body);
       if (isRight(result)) {
-        return this.getService('common').findAllInHierarchy(result.right);
+        return this.getService('common').findAllInHierarchy(flatInput(result.right));
       }
       throw throwError(ctx, unwrapEither(result));
     }
@@ -62,7 +58,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
     const result = clientValidator.findAllPerAuthorValidator(ctx.params, ctx.request.body);
     if (isRight(result)) {
       return this.getService('common').findAllPerAuthor(
-        result.right,
+        flatInput(result.right),
         ![AUTHOR_TYPE.GENERIC.toLowerCase(), AUTHOR_TYPE.GENERIC].includes(ctx.params.type),
       );
     }
