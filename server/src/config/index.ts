@@ -26,7 +26,7 @@ const reportReasonsSchema = z.object({
 
 export const schemaConfig = z.object({
   isValidationEnabled: z.boolean().optional(),
-  reportReasons: reportReasonsSchema.optional().nullable(),
+  reportReasons: reportReasonsSchema.optional(),
   isGQLPluginEnabled: z.boolean().optional(),
   [CONFIG_PARAMS.ENABLED_COLLECTIONS]: z.array(z.string()),
   [CONFIG_PARAMS.MODERATOR_ROLES]: z.array(z.string()),

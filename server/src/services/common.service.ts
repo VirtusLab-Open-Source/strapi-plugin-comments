@@ -63,7 +63,6 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
 
 
-
   // Find comments in the flat structure
   async findAllFlat({
     fields,
@@ -125,14 +124,14 @@ const commonService = ({ strapi }: StrapiContext) => ({
 
     const result = entries.map((_) => {
       const threadedItem = entriesWithThreads.find((item) => item.id === _.id);
-      const parsedThreadOf = isString(query.threadOf) ? parseInt(query.threadOf) : query.threadOf;
+      const parsedThreadOf = 'threadOf' in query ? (isString(query.threadOf) ? parseInt(query.threadOf) : query.threadOf) : null;
 
       let authorUserPopulate = {};
       if (isObject(populateClause?.authorUser)) {
         authorUserPopulate = 'populate' in populateClause.authorUser ? (populateClause.authorUser.populate) : populateClause.authorUser;
       }
 
-      const primitiveThreadOf: string | number = isString(parsedThreadOf) || isNumber(parsedThreadOf) ? parsedThreadOf : null;
+      const primitiveThreadOf = typeof parsedThreadOf === 'number' ? parsedThreadOf : null;
 
       return this.sanitizeCommentEntity(
         {

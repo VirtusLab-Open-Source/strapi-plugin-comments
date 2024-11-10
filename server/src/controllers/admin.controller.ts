@@ -11,7 +11,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
     return getPluginService(strapi, name);
   },
   async findAll(ctx: RequestContext) {
-    const either = adminValidator.getCommentQueryValidator(ctx.query);
+    const either = adminValidator.getCommentFindAllValidator(ctx.query);
     if (isRight(either)) {
       return this.getService('admin').findAll(unwrapEither(either));
     }
@@ -19,7 +19,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
   },
 
   async findReports(ctx: RequestContext) {
-    const either = adminValidator.getReportQueryValidator(ctx.query);
+    const either = adminValidator.getReportFindReportsValidator(ctx.query);
     if (isRight(either)) {
       return this.getService('admin').findReports(unwrapEither(either));
     }
@@ -27,7 +27,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
   },
 
   async findOne(ctx: RequestContextWithId) {
-    const either = adminValidator.getFindOneValidator(ctx.params.id, ctx.query);
+    const either = adminValidator.getCommentFindOneValidator(ctx.params.id, ctx.query);
     if (isRight(either)) {
       return this.getService('admin').findOneAndThread(unwrapEither(either));
     }
@@ -75,7 +75,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
   },
 
   async resolveAbuseReport(ctx: RequestContext<object, { id: string, reportId: string }>) {
-    const either = adminValidator.getResolveAbuseReportValidator(ctx.params);
+    const either = adminValidator.getCommentResolveAbuseReportValidator(ctx.params);
     if (isRight(either)) {
       return this.getService('admin').resolveAbuseReport(unwrapEither(either));
     }
@@ -83,7 +83,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
   },
 
   async resolveCommentMultipleAbuseReports(ctx: RequestContextWithId<Array<Id>>) {
-    const either = adminValidator.getResolveCommentMultipleAbuseReportsValidator({
+    const either = adminValidator.getCommentResolveMultipleAbuseReportsValidator({
       ...ctx.request.body,
       id: ctx.params.id,
     });
@@ -110,15 +110,15 @@ const controllers = ({ strapi }: StrapiContext) => ({
   },
 
   async resolveMultipleAbuseReports(ctx: RequestContext<Array<Id>>) {
-    const either = adminValidator.getMultipleAbuseReportsValidator(ctx.request.body);
+    const either = adminValidator.getReportsMultipleAbuseValidator(ctx.request.body);
     if (isRight(either)) {
       return this.getService('admin').resolveMultipleAbuseReports(unwrapEither(either));
     }
     throw throwError(ctx, unwrapEither(either));
   },
 
-  async postComment(ctx: RequestContext<Omit<adminValidator.PostCommentValidatorSchema, 'id'>, Pick<adminValidator.PostCommentValidatorSchema, 'id'>>) {
-    const either = adminValidator.getPostCommentValidator({
+  async postComment(ctx: RequestContext<Omit<adminValidator.CommentPostValidatorSchema, 'id'>, Pick<adminValidator.CommentPostValidatorSchema, 'id'>>) {
+    const either = adminValidator.getCommentPostValidator({
       id: ctx.params.id,
       content: ctx.request.body.content,
       author: ctx.request.body.author,
@@ -129,7 +129,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
     throw throwError(ctx, unwrapEither(either));
   },
 
-  async updateComment(ctx: RequestContext<Omit<adminValidator.PostCommentValidatorSchema, 'id'>, Pick<adminValidator.PostCommentValidatorSchema, 'id'>>) {
+  async updateComment(ctx: RequestContext<Omit<adminValidator.CommentPostValidatorSchema, 'id'>, Pick<adminValidator.CommentPostValidatorSchema, 'id'>>) {
     const either = adminValidator.getUpdateCommentValidator({
       id: ctx.params.id,
       content: ctx.request.body.content,

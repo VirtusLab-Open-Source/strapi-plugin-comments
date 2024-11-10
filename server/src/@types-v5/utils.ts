@@ -1,55 +1,29 @@
-import { Data, Entity, FindOneParams, Params } from '@strapi/database/dist/entity-manager/types';
-import type { CountResult, ID } from '@strapi/database/dist/types';
-import type { Core } from '@strapi/strapi';
 import { Database } from '@strapi/database';
-import { CommentsContentTypes, ContentTypesUUIDs, KeysContentTypes } from '../content-types';
-
-export interface Repository {
-  findOne(params?: FindOneParams): Promise<any>;
-  findMany(params?: Params): Promise<any[]>;
-  findWithCount(params?: Params): Promise<[any[], number]>;
-  findPage(params: Params): Promise<{
-    results: any[];
-    pagination: {
-      page: number;
-      pageSize: number;
-      pageCount: number;
-      total: number;
-    };
-  }>;
-  create(params: Params): Promise<any>;
-  createMany(params: Params): Promise<CountResult & {
-    ids: ID[];
-  }>;
-  update(params: Params): Promise<any>;
-  updateMany(params: Params): Promise<CountResult>;
-  delete(params: Params): Promise<any>;
-  deleteMany(params?: Params): Promise<CountResult>;
-  count(params?: Params): Promise<number>;
-  attachRelations(id: ID, data: Data): Promise<any>;
-  updateRelations(id: ID, data: Data): Promise<any>;
-  deleteRelations(id: ID): Promise<any>;
-  populate(entity: Entity, populate: Params['populate']): Promise<any>;
-  load(entity: any, field: string | string[], populate?: Params['populate']): Promise<any>;
-  loadPages<TField extends string>(entity: any, field: TField | TField[], populate?: Params['populate']): Promise<any>;
-}
+import { FindOneParams, Params } from '@strapi/database/dist/entity-manager/types';
+import type { Core } from '@strapi/strapi';
+import { ContentTypesUUIDs } from '../content-types';
 
 
 type DatabaseRepository = ReturnType<Database['query']> & {
   findOne: <T>(params: FindOneParams) => Promise<T | null>;
   create: <T>(params: Params) => Promise<T>;
 };
-export type CoreStrapi = Omit<Core.Strapi, 'query'> & {
+export type CoreStrapi = Omit<Core.Strapi, 'query' | 'plugin'> & {
   query: <T extends ContentTypesUUIDs>(query: T) => DatabaseRepository;
+  plugin: (pluginName: string) => Omit<Core.Plugin, 'contentTypes'> & {
+    contentTypes: Record<string, Core.Plugin['contentTypes'][string] & {
+      uid: string
+    }>
+  }
 }
 
 export type StrapiContext = {
-  readonly strapi: CoreStrapi ;
+  readonly strapi: CoreStrapi;
 };
 
 export type Id = number | string;
 
-type CommentApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
+type CommentApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export type Comment<TAuthor = CommentAuthor> = {
   id: Id;

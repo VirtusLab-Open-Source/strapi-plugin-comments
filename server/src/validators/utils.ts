@@ -38,14 +38,14 @@ export const notContainsValidators = z.union([
 ]);
 
 export const stringToNumberValidator = z
-  .union([z.string(), z.number()])
-  .transform((value) => Number(value))
-  .pipe(z.number());
+.union([z.string(), z.number()])
+.transform((value) => Number(value))
+.pipe(z.number());
 
 export const stringToBooleanValidator = z
-  .union([z.string(), z.boolean()])
-  .transform((value) => typeof value === 'string' ? ['t', 'true'].includes(value) : value)
-  .pipe(z.boolean());
+.union([z.string(), z.boolean()])
+.transform((value) => typeof value === 'string' ? ['t', 'true'].includes(value) : value)
+.pipe(z.boolean());
 
 export const qOperatorValidator = z.object({
   _q: z.string().optional(),
@@ -80,9 +80,6 @@ export const getFiltersOperators = <T extends Record<string, boolean>>(dictionar
   }, {} as Record<string, typeof filtersValidator>)) as ZodObject<{ [key in keyof T]: typeof filtersValidator }>;
 };
 
-export const getArrayFiltersValidator = <T extends Record<string, boolean>>(dictionary: T) => {
-  return z.array(getFiltersOperators(dictionary));
-};
 
 export const AVAILABLE_OPERATORS = {
   single: 'single',
@@ -101,6 +98,12 @@ export const getStringToNumberValidator = <T extends Record<string, keyof typeof
   return z.object(schema) as Result<T>;
 };
 
+
+export const queryPaginationSchema = z.object({ pageSize: stringToNumberValidator.default(10), page: stringToNumberValidator.default(1) })
+                                      .merge(qOperatorValidator)
+                                      .merge(z.object({
+                                        orderBy: orderByValidator.optional().nullable(),
+                                      }));
 
 export const validate = <I, O>(result: z.SafeParseReturnType<I, O>) => {
   if (!result.success) {
@@ -129,28 +132,5 @@ export const externalAuthorSchema = z.object({
   avatar: z.string().url().optional(),
 });
 
-export const getFiltersValidator = <T extends z.ZodRawShape>(filters: z.ZodObject<T>) => {
-  return z
-  .object(
-    {
-      $and: z.array(filters.optional()).optional(),
-      $or: z.array(filters.optional()).optional(),
-    },
-    {
-      message: 'Filter object must have at least one field or wrong operator',
-      required_error: 'Filter object must have at least one field or wrong operator',
-      invalid_type_error: 'Filter object must have at least one field or wrong operator',
-    },
-  );
-};
 
-export const getFindQueryValidator = <T extends z.ZodRawShape>(filters: z.ZodObject<T>) => {
-  return z.object({
-    _q: z.string().optional(),
-    orderBy: orderByValidator.optional().nullable(),
-    pageSize: stringToNumberValidator.default(10),
-    page: stringToNumberValidator.default(1),
-    filters: getFiltersValidator(filters).optional(),
-  });
-};
 export const primitiveUnion = z.union([z.string(), z.number(), z.boolean()]);

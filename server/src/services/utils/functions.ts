@@ -1,99 +1,66 @@
-import { Id, IStrapi, StrapiAdmin, StrapiUser } from "strapi-typed";
-import { CommentAuthor, ToBeFixed } from "../../@types";
-import { AdminUser } from '../../@types-v5';
+import { StrapiAdmin, StrapiUser } from '@sensinum/strapi-utils';
+import { get, isArray, isEmpty, isObject, isString } from 'lodash';
+import { AdminUser, CommentAuthor, CoreStrapi, Id } from '../../@types-v5';
+import { REGEX } from '../../utils/constants';
+import PluginError from '../../utils/error';
 import { Comment, CommentWithRelated } from '../../validators/repositories';
-import PluginError from "../../utils/error";
-import { REGEX } from "../../utils/constants";
-import { first, get, isObject, isArray, isEmpty, isString } from "lodash";
 
-declare var strapi: IStrapi;
+declare var strapi: CoreStrapi;
 
 export const buildNestedStructure = (
   entities: Array<Comment | CommentWithRelated>,
   id: Id | null = null,
-  field: string = "threadOf",
+  field: string = 'threadOf',
   dropBlockedThreads = false,
-  blockNestedThreads = false
+  blockNestedThreads = false,
 ): Array<Comment> =>
   entities
-    .filter((entity: Comment) => {
-      // mongo by default not return `null` for empty data
-      const entityField: any = get(entity, field);
-      if (entityField === null && id === null) {
-        return true;
-      }
-      let data = entityField;
-      if (data && typeof id === "string") {
-        data = data.toString();
-      }
-      return (
-        (data && data === id) ||
-        (isObject(entityField) && (entityField as any).id === id)
-      );
-    })
-    .map((entity: Comment) => ({
-      ...entity,
-      [field]: undefined,
-      related: undefined,
-      blockedThread: blockNestedThreads || entity.blockedThread,
-      children:
-        entity.blockedThread && dropBlockedThreads
-          ? []
-          : buildNestedStructure(
-              entities,
-              entity.id,
-              field,
-              dropBlockedThreads,
-              entity.blockedThread
-            ),
-    }));
-
-export const isEqualEntity = (
-  existing: Comment,
-  data: ToBeFixed,
-  user: StrapiUser
-): boolean => {
-  const { author: existingAuthor = {} as CommentAuthor } = existing;
-  const { author } = data;
-
-  // Disallow approval status change by Client
-  if (data.approvalStatus && existing.approvalStatus !== data.approvalStatus) {
-    return false;
-  }
-
-  // Make sure that author is exact the same
-  if (user) {
-    const existingUserId = existingAuthor?.id || existingAuthor;
-    const receivedUserId = user?.id || author?.id;
-    return receivedUserId && existingUserId === receivedUserId;
-  }
-  return existingAuthor.id === author?.id;
-};
+  .filter((entity: Comment) => {
+    // mongo by default not return `null` for empty data
+    const entityField: any = get(entity, field);
+    if (entityField === null && id === null) {
+      return true;
+    }
+    let data = entityField;
+    if (data && typeof id === 'string') {
+      data = data.toString();
+    }
+    return (
+      (data && data === id) ||
+      (isObject(entityField) && (entityField as any).id === id)
+    );
+  })
+  .map((entity: Comment) => ({
+    ...entity,
+    [field]: undefined,
+    related: undefined,
+    blockedThread: blockNestedThreads || entity.blockedThread,
+    children:
+      entity.blockedThread && dropBlockedThreads
+        ? []
+        : buildNestedStructure(
+          entities,
+          entity.id,
+          field,
+          dropBlockedThreads,
+          entity.blockedThread,
+        ),
+  }));
 
 export const getRelatedGroups = (related: string): Array<string> =>
   related.split(REGEX.relatedUid).filter((s) => s && s.length > 0);
 
 export const getModelUid = (name: string): string => {
-  return strapi.plugin("comments").contentTypes[name]?.uid;
+  return strapi.plugin('comments').contentTypes[name]?.uid;
 };
 
 export const filterOurResolvedReports = (item: Comment): Comment =>
   item
     ? {
-        ...item,
-        reports: (item.reports || []).filter((report) => !report.resolved),
-      }
+      ...item,
+      reports: (item.reports || []).filter((report) => !report.resolved),
+    }
     : item;
-
-export const convertContentTypeNameToSlug = (str: string): string => {
-  const plainConversion = str.replace(
-    /[A-Z]/g,
-    (letter) => `-${letter.toLowerCase()}`
-  );
-  return first(plainConversion) === "-"
-    ? plainConversion.slice(1, plainConversion.length)
-    : plainConversion;
-};
 
 export const buildAuthorModel = (
   // TODO
@@ -125,7 +92,7 @@ export const buildAuthorModel = (
           isString(authorUser.avatar) || isObject(authorUser.avatar)
             ? authorUser.avatar
             : undefined,
-      }
+      },
     );
   } else if (authorId) {
     author = {
@@ -138,7 +105,7 @@ export const buildAuthorModel = (
 
   author = isEmpty(author) ? author : Object.fromEntries(
     Object.entries(author)
-      .filter(([name]) => !blockedAuthorProps.includes(name))
+          .filter(([name]) => !blockedAuthorProps.includes(name)),
   ) as CommentAuthor;
 
   return {
@@ -148,23 +115,23 @@ export const buildAuthorModel = (
 };
 
 export const buildConfigQueryProp = (
-  prop: undefined | string | Array<string> = ""
-): string => (isArray(prop) ? prop.join(".") : prop ?? "");
+  prop: undefined | string | Array<string> = '',
+): string => (isArray(prop) ? prop.join('.') : prop ?? '');
 
 export const resolveUserContextError = (user?: AdminUser | StrapiUser): PluginError => {
   if (user) {
-    throw new PluginError(401, "Not authenticated");
+    throw new PluginError(401, 'Not authenticated');
   } else {
-    throw new PluginError(403, "Not authorized");
+    throw new PluginError(403, 'Not authorized');
   }
 };
 
 export const getAuthorName = (author: StrapiAdmin): string => {
-  
-  const {lastname, username, firstname} = author;
 
-  if(lastname)
-    return `${firstname} ${lastname}`
+  const { lastname, username, firstname } = author;
+
+  if (lastname)
+    return `${firstname} ${lastname}`;
   else
-    return username || firstname 
+    return username || firstname;
 };

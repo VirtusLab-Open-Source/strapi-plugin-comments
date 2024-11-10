@@ -1,9 +1,8 @@
-import { Core } from '@strapi/strapi';
 import { z, ZodRawShape } from 'zod';
 import { CoreStrapi } from '../@types-v5';
 import { ContentTypesUUIDs, KeysContentTypes } from '../content-types';
 
-export const getModelUid = (strapi: Core.Strapi, name: KeysContentTypes): ContentTypesUUIDs => {
+export const getModelUid = (strapi: CoreStrapi, name: KeysContentTypes): ContentTypesUUIDs => {
   return strapi.plugin('comments').contentType(name)?.uid;
 };
 

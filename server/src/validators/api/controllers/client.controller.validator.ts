@@ -2,9 +2,9 @@ import { z } from 'zod';
 import { APPROVAL_STATUS } from '../../../const';
 import { AUTHOR_TYPE } from '../../../utils/constants';
 import { ExtractRightEither } from '../../../utils/Either';
-import { AVAILABLE_OPERATORS, externalAuthorSchema, filtersValidator, getFiltersOperators, getRelationValidator, getStringToNumberValidator, orderByValidator, primitiveUnion, stringToBooleanValidator, validate } from '../../utils';
+import { AVAILABLE_OPERATORS, externalAuthorSchema, filtersValidator, getFiltersOperators, getRelationValidator, getStringToNumberValidator, orderByValidator, primitiveUnion, stringToBooleanValidator, stringToNumberValidator, validate } from '../../utils';
 
-const getNewCommentSchema = (enabledCollections: string[]) => {
+const getCommentSchema = (enabledCollections: string[]) => {
   return z.object({
     relation: getRelationValidator(enabledCollections),
     content: z.string().min(1),
@@ -14,38 +14,66 @@ const getNewCommentSchema = (enabledCollections: string[]) => {
   });
 };
 
-const getUpdateCommentSchema = (enabledCollections: string[]) => {
-  return z.object({
-    relation: getRelationValidator(enabledCollections),
-    content: z.string().min(1),
-  }).merge(getStringToNumberValidator({ commentId: AVAILABLE_OPERATORS.single }));
-};
-
 export const newCommentValidator = (
   enabledCollections: string[],
   relation: string,
   payload: object,
 ) => {
-  return validate(getNewCommentSchema(enabledCollections).safeParse({
+  return validate(getCommentSchema(enabledCollections).safeParse({
     ...payload,
     relation,
   }));
 };
 
-export type NewCommentValidatorSchema = z.infer<ReturnType<typeof getNewCommentSchema>>;
+export type NewCommentValidatorSchema = ExtractRightEither<ReturnType<typeof newCommentValidator>>;
 
 export const updateCommentValidator = (
   enabledCollections: string[],
   payload: object,
 ) => {
-  return validate(getUpdateCommentSchema(enabledCollections).safeParse(payload));
+  return validate(
+    getCommentSchema(enabledCollections).pick({ content: true, relation: true })
+                                        .merge(getStringToNumberValidator({ commentId: AVAILABLE_OPERATORS.single }))
+                                        .safeParse(payload),
+  );
 };
 
 export type UpdateCommentValidatorSchema = ExtractRightEither<ReturnType<typeof updateCommentValidator>>;
 
+const getRelationSchema = (enabledCollections: string[]) => z.object({
+  relation: getRelationValidator(enabledCollections),
+});
+
+const paginationSchema = z.object({
+  pagination: z.object({
+    pageSize: stringToNumberValidator.default(10),
+    page: stringToNumberValidator.default(1),
+    withCount: stringToBooleanValidator.optional().default(false),
+  }).optional(),
+});
+
+const querySchema = z.object({
+  query: z.union([
+    z.object({
+      $and: z.array(z.record(filtersValidator)).optional(),
+      $or: z.array(z.record(filtersValidator)).optional(),
+    }),
+    z.record(z.union([z.record(primitiveUnion), primitiveUnion])),
+  ]).optional(),
+});
+
+//   query: z.union([
+//       z.record(z.union([z.record(primitiveUnion), primitiveUnion])),
+//       z.object({
+//         $and: z.array(z.record(filtersValidator)).optional(),
+//         $or: z.array(z.record(filtersValidator)).optional(),
+//       }),
+//     ]).optional(),
+// ----------------------------
+
 export const findAllFlatValidator = (enabledCollections: string[], relation: string, payload: object) => {
-  const zodObject = z.object({
-    relation: getRelationValidator(enabledCollections),
+  const zodObject = z
+  .object({
     sort: orderByValidator.optional().nullable().default('createdAt:desc'),
     fields: z.string().optional().array(),
     omit: z.string().optional().array(),
@@ -53,12 +81,11 @@ export const findAllFlatValidator = (enabledCollections: string[], relation: str
     isAdmin: z.boolean().optional().default(false),
     populate: z.record(z.union([z.boolean(), z.object({ populate: z.boolean() })])).optional(),
     query: z.record(z.union([z.record(z.union([z.string(), z.number()])), z.string(), z.number()])).optional(),
-    pagination: z.object({
-      page: z.number().optional().default(1),
-      pageSize: z.number().optional().default(10),
-      withCount: stringToBooleanValidator.optional().default(false),
-    }).optional(),
-  }).merge(getStringToNumberValidator({ limit: AVAILABLE_OPERATORS.single, skip: AVAILABLE_OPERATORS.single }));
+  })
+  .merge(getStringToNumberValidator({ limit: AVAILABLE_OPERATORS.single, skip: AVAILABLE_OPERATORS.single }))
+  .merge(getRelationSchema(enabledCollections))
+  .merge(paginationSchema)
+  .merge(querySchema);
 
   return validate(zodObject.safeParse({
     ...payload,
@@ -69,8 +96,8 @@ export const findAllFlatValidator = (enabledCollections: string[], relation: str
 export type FindAllFlatSchema = ExtractRightEither<ReturnType<typeof findAllFlatValidator>>;
 
 export const findAllInHierarchyValidator = (enabledCollections: string[], relation: string, payload: object) => {
-  const zodObject = z.object({
-    relation: getRelationValidator(enabledCollections),
+  const zodObject = z
+  .object({
     sort: orderByValidator.optional().nullable().default('createdAt:desc'),
     fields: z.string().optional().array(),
     omit: z.string().optional().array(),
@@ -87,7 +114,10 @@ export const findAllInHierarchyValidator = (enabledCollections: string[], relati
     startingFromId: z.number().optional(),
     dropBlockedThreads: z.boolean().optional().default(false),
 
-  }).merge(getStringToNumberValidator({ limit: AVAILABLE_OPERATORS.single, skip: AVAILABLE_OPERATORS.single }));
+  })
+  .merge(getStringToNumberValidator({ limit: AVAILABLE_OPERATORS.single, skip: AVAILABLE_OPERATORS.single }))
+  .merge(getRelationSchema(enabledCollections))
+  .merge(querySchema);
 
   return validate(zodObject.safeParse({
     ...payload,

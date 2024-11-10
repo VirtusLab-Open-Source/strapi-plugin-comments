@@ -1,4 +1,4 @@
-import { isEmpty, once, set } from 'lodash';
+import { once, set } from 'lodash';
 import { CoreStrapi, DBQuery, Where } from '../../@types-v5';
 import { getDefaultAuthorPopulate, getOrderBy } from '../../repositories';
 import { admin as adminValidator } from '../../validators/api';
@@ -12,17 +12,15 @@ export const getAdminServiceUtils = once((strapi: CoreStrapi) => {
         };
       },
       createParams(
-        orderBy: adminValidator.CommentQueryValidatorSchema['orderBy'],
-        filters: adminValidator.CommentQueryValidatorSchema['filters'],
-        page: adminValidator.CommentQueryValidatorSchema['page'],
-        pageSize: adminValidator.CommentQueryValidatorSchema['pageSize'],
-        _q: adminValidator.CommentQueryValidatorSchema['_q'],
-        defaultWhere: Where,
+        orderBy: adminValidator.CommentFindAllSchema['orderBy'],
+        page: adminValidator.CommentFindAllSchema['page'],
+        pageSize: adminValidator.CommentFindAllSchema['pageSize'],
+        _q: adminValidator.CommentFindAllSchema['_q'],
       ) {
         const [operator, direction] = getOrderBy(orderBy);
         const params: Partial<DBQuery> = {
           orderBy: orderBy ? { [operator]: direction } : undefined,
-          where: isEmpty(filters) ? defaultWhere : ({ ...defaultWhere, ...filters } as Where),
+          where: this.getDefaultWhere(),
           page,
           pageSize,
         };
@@ -52,17 +50,15 @@ export const getAdminServiceUtils = once((strapi: CoreStrapi) => {
         };
       },
       createParams(
-        orderBy: adminValidator.CommentQueryValidatorSchema['orderBy'],
-        filters: adminValidator.CommentQueryValidatorSchema['filters'],
-        page: adminValidator.CommentQueryValidatorSchema['page'],
-        pageSize: adminValidator.CommentQueryValidatorSchema['pageSize'],
-        _q: adminValidator.CommentQueryValidatorSchema['_q'],
-        defaultWhere: Where,
+        orderBy: adminValidator.CommentFindAllSchema['orderBy'],
+        page: adminValidator.CommentFindAllSchema['page'],
+        pageSize: adminValidator.CommentFindAllSchema['pageSize'],
+        _q: adminValidator.CommentFindAllSchema['_q'],
       ) {
         const [operator, direction] = getOrderBy(orderBy);
         const params: Partial<DBQuery> = {
           orderBy: orderBy ? { [operator]: direction } : undefined,
-          where: isEmpty(filters) ? defaultWhere : ({ ...defaultWhere, ...filters } as Where),
+          where: this.getDefaultWhere(),
           page,
           pageSize,
         };

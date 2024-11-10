@@ -17,15 +17,12 @@ export default ({ strapi }: StrapiContext) => {
     },
 
     // Find all comments
-    async findAll({ _q, orderBy, page, pageSize, filters }: adminValidator.CommentQueryValidatorSchema) {
-      const defaultWhere = utils.findAll.getDefaultWhere();
+    async findAll({ _q, orderBy, page, pageSize }: adminValidator.CommentFindAllSchema) {
       const params = utils.findAll.createParams(
         orderBy,
-        filters,
         page,
         pageSize,
         _q,
-        defaultWhere,
       );
 
       const populate = utils.findAll.getPopulate();
@@ -45,15 +42,12 @@ export default ({ strapi }: StrapiContext) => {
       };
     },
 
-    async findReports({ _q, orderBy, filters, page, pageSize }: adminValidator.ReportQueryValidatorSchema) {
-      const defaultWhere = utils.findReports.getDefaultWhere();
-      const params = utils.findAll.createParams(
+    async findReports({ _q, orderBy, page, pageSize }: adminValidator.ReportFindReportsValidator) {
+      const params = utils.findReports.createParams(
         orderBy,
-        filters,
         page,
         pageSize,
         _q,
-        defaultWhere,
       );
       const { pagination, results } = await getReportCommentRepository(strapi).findPage({
         ...params,
@@ -214,7 +208,7 @@ export default ({ strapi }: StrapiContext) => {
     async resolveAbuseReport({
       id: commentId,
       reportId,
-    }: adminValidator.ResolveAbuseReportValidatorSchema) {
+    }: adminValidator.CommentResolveAbuseReportValidatorSchema) {
       return getReportCommentRepository(strapi).update({
         where: {
           id: reportId,
@@ -228,7 +222,7 @@ export default ({ strapi }: StrapiContext) => {
     async resolveCommentMultipleAbuseReports({
       id: commentId,
       reportIds: ids,
-    }: adminValidator.ResolveCommentMultipleAbuseReportsValidatorSchema) {
+    }: adminValidator.CommentResolveMultipleAbuseReportsValidatorSchema) {
       const reports = await getReportCommentRepository(strapi).findMany({
         where: {
           id: ids,
@@ -294,7 +288,7 @@ export default ({ strapi }: StrapiContext) => {
     },
     async resolveMultipleAbuseReports({
       reportIds,
-    }: adminValidator.MultipleAbuseReportsValidatorSchema) {
+    }: adminValidator.ReportsMultipleAbuseValidator) {
       return getReportCommentRepository(strapi).updateMany({
         where: {
           id: { $in: reportIds },
@@ -304,7 +298,7 @@ export default ({ strapi }: StrapiContext) => {
         },
       });
     },
-    async postComment({ id, author, content }: adminValidator.PostCommentValidatorSchema) {
+    async postComment({ id, author, content }: adminValidator.CommentPostValidatorSchema) {
       const entity = await getCommentRepository(strapi).findOne({
         where: { id },
       });

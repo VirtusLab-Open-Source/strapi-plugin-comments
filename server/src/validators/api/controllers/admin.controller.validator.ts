@@ -1,7 +1,8 @@
 import { z } from 'zod';
-import { REPORT_REASON } from '../../../const/REPORT_REASON';
 import { ExtractRightEither } from '../../../utils/Either';
-import { AVAILABLE_OPERATORS, filtersValidator, getFiltersOperators, getFindQueryValidator, getStringToNumberValidator, stringToNumberValidator, validate } from '../../utils';
+import { AVAILABLE_OPERATORS, getStringToNumberValidator, queryPaginationSchema, validate } from '../../utils';
+
+export const baseAdminPanelQuery = queryPaginationSchema.merge(z.object({ _q: z.string().optional() }));
 
 export const getIdValidator = (params: unknown) => {
   return validate(getStringToNumberValidator({ id: AVAILABLE_OPERATORS.single }).safeParse(params));
@@ -9,69 +10,51 @@ export const getIdValidator = (params: unknown) => {
 
 export type IdValidatorSchema = ExtractRightEither<ReturnType<typeof getIdValidator>>;
 
-const entryFilters = getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true })
-.merge(z.object({
-  threadOf: stringToNumberValidator.optional(),
-}));
 
-const commentValidator = getFindQueryValidator(entryFilters);
-
-export const getCommentQueryValidator = (query: unknown) => {
-  return validate(commentValidator.safeParse(query));
+export const getCommentFindAllValidator = (query: unknown) => {
+  return validate(baseAdminPanelQuery.safeParse(query));
 };
 
-export type CommentQueryValidatorSchema = z.infer<typeof commentValidator>;
+export type CommentFindAllSchema = ExtractRightEither<ReturnType<typeof getCommentFindAllValidator>>;
 
-const reportValidator = getFindQueryValidator(z
-.object({
-  content: filtersValidator.optional(),
-  reason: z.nativeEnum(REPORT_REASON).optional(),
-  resolved: z.boolean().optional(),
-  // TODO: check relation
-  // createdAt: zodDynamicValueOperators,
-  // updatedAt: zodDynamicValueOperators,
-  // threadOf: z.object({ id: zodDynamicValueOperators }).optional(),
-}));
-export const getReportQueryValidator = (query: unknown) => {
-  return validate(reportValidator.safeParse(query));
+export const getReportFindReportsValidator = (query: unknown) => {
+  return validate(baseAdminPanelQuery.safeParse(query));
 };
+export type ReportFindReportsValidator = ExtractRightEither<ReturnType<typeof getReportFindReportsValidator>>;
 
-export type ReportQueryValidatorSchema = z.infer<typeof reportValidator>;
 
-export const getFindOneValidator = (id: string | number, params: object) => {
+export const getCommentFindOneValidator = (id: string | number, params: object) => {
   const result = getStringToNumberValidator({ id: AVAILABLE_OPERATORS.single })
-  .merge(entryFilters)
-  .merge(z.object({
-    removed: z.string().optional().transform((v) => v === 'true'),
-  })).safeParse({ ...params, id });
+  .merge(z.object({ removed: z.string().optional().transform((v) => v === 'true') }))
+  .safeParse({ ...params, id });
 
   return validate(result);
 };
 
-export type FindOneValidatorSchema = ExtractRightEither<ReturnType<typeof getFindOneValidator>>;
+export type FindOneValidatorSchema = ExtractRightEither<ReturnType<typeof getCommentFindOneValidator>>;
 
-export const getResolveAbuseReportValidator = (params: unknown) => {
+export const getCommentResolveAbuseReportValidator = (params: unknown) => {
   return validate(getStringToNumberValidator({ id: AVAILABLE_OPERATORS.single, reportId: AVAILABLE_OPERATORS.single }).safeParse(params));
 };
 
-export type ResolveAbuseReportValidatorSchema = ExtractRightEither<ReturnType<typeof getResolveAbuseReportValidator>>;
+export type CommentResolveAbuseReportValidatorSchema = ExtractRightEither<ReturnType<typeof getCommentResolveAbuseReportValidator>>;
 
-export const getResolveCommentMultipleAbuseReportsValidator = (params: unknown) => {
+export const getCommentResolveMultipleAbuseReportsValidator = (params: unknown) => {
   const result = getStringToNumberValidator({ id: AVAILABLE_OPERATORS.single, reportIds: AVAILABLE_OPERATORS.array })
   .safeParse(params);
 
   return validate(result);
 };
 
-export const getMultipleAbuseReportsValidator = (params: unknown) => {
+export type CommentResolveMultipleAbuseReportsValidatorSchema = ExtractRightEither<ReturnType<typeof getCommentResolveMultipleAbuseReportsValidator>>;
+
+export const getReportsMultipleAbuseValidator = (params: unknown) => {
   const result = getStringToNumberValidator({ reportIds: AVAILABLE_OPERATORS.array })
   .safeParse(params);
 
   return validate(result);
 };
-export type MultipleAbuseReportsValidatorSchema = ExtractRightEither<ReturnType<typeof getMultipleAbuseReportsValidator>>;
-
-export type ResolveCommentMultipleAbuseReportsValidatorSchema = ExtractRightEither<ReturnType<typeof getResolveCommentMultipleAbuseReportsValidator>>;
+export type ReportsMultipleAbuseValidator = ExtractRightEither<ReturnType<typeof getReportsMultipleAbuseValidator>>;
 
 const authorSchema = z.object({
   id: z.union([z.string(), z.number()]),
@@ -86,11 +69,11 @@ export const postCommentValidator = z.object({
   author: authorSchema,
 });
 
-export const getPostCommentValidator = (params: unknown) => {
+export const getCommentPostValidator = (params: unknown) => {
   return validate(postCommentValidator.safeParse(params));
 };
 
-export type PostCommentValidatorSchema = z.infer<typeof postCommentValidator>;
+export type CommentPostValidatorSchema = z.infer<typeof postCommentValidator>;
 
 export const getUpdateCommentValidator = (params: unknown) => {
   return validate(postCommentValidator.pick({ content: true, id: true }).safeParse(params));
