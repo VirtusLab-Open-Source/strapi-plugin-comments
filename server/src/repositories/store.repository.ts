@@ -7,10 +7,10 @@ import { CommentsPluginConfig } from '../validators/api/controllers/settings.con
 export const getStoreRepository = once((strapi: Core.Strapi) => {
   return {
     getLocalConfig<P extends keyof CommentsPluginConfig>(
-      prop: P,
+      prop?: P,
       defaultValue?: CommentsPluginConfig[P],
     ) {
-      return strapi.config.get([PLUGIN_SELECTOR, prop].join('.'), defaultValue);
+      return strapi.config.get([PLUGIN_SELECTOR, prop].filter(Boolean).join('.'), defaultValue);
     },
     async getStore() {
       return await strapi.store({ type: 'plugin', name: 'comments' });

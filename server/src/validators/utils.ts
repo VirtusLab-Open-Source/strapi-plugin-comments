@@ -103,7 +103,6 @@ export const getStringToNumberValidator = <T extends Record<string, keyof typeof
 
 
 export const validate = <I, O>(result: z.SafeParseReturnType<I, O>) => {
-  console.log('result', result);
   if (!result.success) {
     const message = result.error.issues
                           .map((i) => `Path: ${i.path.join('.')} Code: ${i.code} Message: ${i.message}`)

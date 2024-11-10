@@ -1,45 +1,28 @@
 import { z } from 'zod';
+import { dbBaseCommentSchema } from './comment.schema';
 import { paginationSchema } from './utils';
 
 const reportSchema = z.object({
   id: z.number(),
-  documentId: z.null(),
+  documentId: z.string().nullable(),
   content: z.string(),
   reason: z.string(),
   resolved: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  publishedAt: z.null(),
-  locale: z.null(),
+  publishedAt: z.string().nullable(),
+  locale: z.string().nullable(),
 });
 
-const reportExternalUserSchema = z.object({
-  authorId: z.string().nullable(),
-  authorName: z.string().nullable(),
-  authorEmail: z.string().email().nullable(),
-  authorAvatar: z.string().nullable(),
-  authorUser: z.string().optional().nullable(),
-});
-const baseCommentSchema = z.object({
-  id: z.number(),
-  documentId: z.string(),
-  content: z.string(),
-  blocked: z.boolean().nullable(),
-  blockedThread: z.boolean().nullable(),
-  blockReason: z.string().nullable(),
-  isAdminComment: z.boolean().nullable(),
-  removed: z.boolean().nullable(),
-  approvalStatus: z.string().nullable(),
-  related: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  publishedAt: z.string(),
-  locale: z.string().nullable(),
-  reports: z.array(reportSchema).default([]),
-  gotThread: z.boolean().nullable().optional(),
-  threadFirstItemId: z.number().nullable().optional(),
-  author: z.any(),
-}).merge(reportExternalUserSchema);
+const baseCommentSchema = dbBaseCommentSchema.merge(
+  z.object({
+      gotThread: z.boolean().nullable().optional(),
+      threadFirstItemId: z.number().nullable().optional(),
+      reports: z.array(reportSchema).default([]),
+      author: z.any(),
+    },
+  ),
+);
 
 const commentSchema = baseCommentSchema.extend({
   threadOf: z.lazy(() => z.union([z.number(), baseCommentSchema])).nullable().optional(),

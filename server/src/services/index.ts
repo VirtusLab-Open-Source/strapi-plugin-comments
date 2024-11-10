@@ -1,6 +1,6 @@
 'use strict';
 
-import adminServices from './admin.service';
+import adminServices from './admin/admin.service';
 import clientServices from './client.service';
 import commonServices from './common.service';
 import settingsService from './settings.service';

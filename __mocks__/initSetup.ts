@@ -1,4 +1,4 @@
-import { get, set, pick, isEmpty } from "lodash";
+import { get, isEmpty, pick, set } from 'lodash';
 
 
 // @ts-ignore
@@ -90,7 +90,7 @@ const mockStrapi = (config: any = {}, toStore: boolean = false, database: any = 
         services: {
           common: require("../server/src/services/common.service"),
           client: require("../server/src/services/client.service"),
-          admin: require("../server/src/services/admin.service"),
+          admin: require("../server/src/services/admin/admin.service"),
         },
         contentTypes: {
           comment: {

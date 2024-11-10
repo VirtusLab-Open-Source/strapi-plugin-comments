@@ -2,32 +2,21 @@ import { Params } from '@strapi/database/dist/entity-manager/types';
 import { UID } from '@strapi/strapi';
 import { first, get, isNil, isNumber, isObject, isString, omit as filterItem, parseInt, uniq } from 'lodash';
 import { isProfane, replaceProfanities } from 'no-profanity';
-import { StrapiStore } from 'strapi-typed';
 import { Id, RelatedEntity, StrapiContext } from '../@types-v5';
-import { CommentsPluginConfig } from '../@types-v5/config';
+import { CommentsPluginConfig } from '../config';
 import { ContentTypesUUIDs } from '../content-types';
-import { getCommentRepository, getOrderBy } from '../repositories';
+import { getCommentRepository, getOrderBy, getStoreRepository } from '../repositories';
 import { CONFIG_PARAMS } from '../utils/constants';
 import PluginError from '../utils/PluginError';
 import { client as clientValidator } from '../validators/api';
 import { Comment, CommentRelated, CommentWithRelated } from '../validators/repositories';
 import { Pagination } from '../validators/repositories/utils';
-import { buildAuthorModel, buildConfigQueryProp, buildNestedStructure, filterOurResolvedReports, getRelatedGroups } from './utils/functions';
+import { buildAuthorModel, buildNestedStructure, filterOurResolvedReports, getRelatedGroups } from './utils/functions';
 
-
-/**
- * Comments Plugin - common services
- */
 
 const PAGE_SIZE = 10;
 const REQUIRED_FIELDS = ['id'];
 
-// type LifecycleHookRecord = Partial<Record<LifeCycleHookName, Array<Effect<ToBeFixed>>>>;
-
-// const lifecycleHookListeners: Record<ContentType, LifecycleHookRecord> = {
-//   comment: {},
-//   'comment-report': {},
-// };
 
 type ParsedRelation = {
   uid: UID.ContentType;
@@ -36,37 +25,29 @@ type ParsedRelation = {
 
 
 const commonService = ({ strapi }: StrapiContext) => ({
-  async getConfig<T extends keyof CommentsPluginConfig>(
-    prop?: T,
-    defaultValue?: CommentsPluginConfig[T],
-    useLocal = true,
-  ): Promise<T extends string ? CommentsPluginConfig[T] : CommentsPluginConfig> {
-    const pluginStore = await this.getPluginStore();
-    const config = await pluginStore.get({
-      key: 'config',
-    });
+  async getConfig<T extends keyof CommentsPluginConfig>(prop?: T, defaultValue?: CommentsPluginConfig[T], useLocal = true): Promise<T extends string ? CommentsPluginConfig[T] : CommentsPluginConfig> {
+    const storeRepository = getStoreRepository(strapi);
+    const config = await storeRepository.getConfig();
     if (prop && config && !useLocal) {
       return get(config, prop, defaultValue) as T extends string
         ? CommentsPluginConfig[T]
         : CommentsPluginConfig;
     }
     if (useLocal) {
-      return this.getLocalConfig(prop, defaultValue);
+      return storeRepository.getLocalConfig(prop, defaultValue) as T extends string ? CommentsPluginConfig[T] : CommentsPluginConfig;
     }
-    return config as any;
+    return config as T extends string ? CommentsPluginConfig[T] : CommentsPluginConfig;
+  },
+  parseRelationString(relation: `${string}::${string}` | string): ParsedRelation {
+    const [uid, relatedStringId] = getRelatedGroups(relation);
+    const parsedRelatedId = parseInt(relatedStringId, 10);
+    const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
+    return { uid: uid as UID.ContentType, relatedId };
+  },
+  isValidUserContext<T extends { id?: string | number }>(user?: T): boolean {
+    return !!(user?.id);
   },
 
-  async getPluginStore(): Promise<StrapiStore> {
-    return strapi.store({ type: 'plugin', name: 'comments' }) as StrapiStore;
-  },
-
-  getLocalConfig<T>(prop?: string, defaultValue?: any): T {
-    const queryProp: string = buildConfigQueryProp(prop);
-    const result: T = strapi.config.get(
-      `plugin.comments${queryProp ? '.' + queryProp : ''}`,
-    );
-    return isNil(result) ? defaultValue : result;
-  },
   sanitizeCommentEntity(entity: Comment | CommentWithRelated, blockedAuthors: string[], omitProps: Array<keyof Comment> = [], populate: any = {}): Comment {
     const fieldsToPopulate = Array.isArray(populate) ? populate : Object.keys(populate || {});
     return filterItem({
@@ -80,15 +61,8 @@ const commonService = ({ strapi }: StrapiContext) => ({
       ),
     }, omitProps) as Comment;
   },
-  parseRelationString(relation: `${string}::${string}` | string): ParsedRelation {
-    const [uid, relatedStringId] = getRelatedGroups(relation);
-    const parsedRelatedId = parseInt(relatedStringId, 10);
-    const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
-    return { uid: uid as UID.ContentType, relatedId };
-  },
-  isValidUserContext<T extends { id?: string | number }>(user?: T): boolean {
-    return user ? !!user.id : true;
-  },
+
+
 
   // Find comments in the flat structure
   async findAllFlat({

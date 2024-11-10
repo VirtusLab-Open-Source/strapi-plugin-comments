@@ -3,7 +3,7 @@ import { once } from 'lodash';
 import { CoreStrapi } from '../@types-v5';
 import { getConfig } from '../utils/getConfig';
 import { ReportResultValidator, reportResultValidator } from '../validators/repositories';
-import { shouldValidateObject } from '../validators/repositories/utils';
+import { shouldValidateArray, shouldValidateObject } from '../validators/repositories/utils';
 import { getModelUid } from './utils';
 
 export const getReportCommentRepository = once((strapi: CoreStrapi) => {
@@ -16,10 +16,10 @@ export const getReportCommentRepository = once((strapi: CoreStrapi) => {
       return repository.findPage(params)
                        .then(shouldValidateObject(isValidationEnabled, reportResultValidator.findPage));
     },
-    async findMany(params: Params) {
-      console.log('findMany', params);
+    async findMany(params: Params): Promise<ReportResultValidator['findMany']> {
       const isValidationEnabled = await getConfig(strapi, 'isValidationEnabled', false);
-      return repository.findMany(params);
+      return repository.findMany(params)
+                       .then(shouldValidateArray(isValidationEnabled, reportResultValidator.findMany));
     },
     async update(params: Params): Promise<ReportResultValidator['update']> {
       const isValidationEnabled = await getConfig(strapi, 'isValidationEnabled', false);

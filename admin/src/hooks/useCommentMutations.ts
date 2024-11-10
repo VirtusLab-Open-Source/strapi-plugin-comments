@@ -74,7 +74,7 @@ export const useCommentMutations = (callbacksMutation: CallbacksMutation = { com
   });
 
 
-  const resolveCommentMultipleReports = useMutation({
+  const resolveCommentMultipleReportsMutation = useMutation({
     mutationFn: canExecuteMutations(api.reports.resolveCommentMultipleReports),
     onSuccess: callbacksMutation.report?.resolveCommentMultipleReportsSuccess,
     onError: callbacksMutation.report?.resolveCommentMultipleReportsError,
@@ -113,7 +113,7 @@ export const useCommentMutations = (callbacksMutation: CallbacksMutation = { com
       resolveMultiple: resolveMultipleReportsMutation,
       resolveAllAbuse: resolveAllAbuseReportsForCommentMutation,
       resolveAllAbuseThread: resolveAllAbuseReportsForThreadMutation,
-      resolveCommentMultipleReports: resolveCommentMultipleReports,
+      resolveCommentMultipleReports: resolveCommentMultipleReportsMutation,
     },
   }), [
     blockItemMutation,
