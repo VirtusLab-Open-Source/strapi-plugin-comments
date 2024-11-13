@@ -1,4 +1,4 @@
-import { Table, Tbody, Th, Thead, Tr } from '@strapi/design-system';
+import { Table, Tbody, Th, Thead, Tr, Typography } from '@strapi/design-system';
 import { Layouts, Page, Pagination, SearchInput, useNotification, useQueryParams, useTracking } from '@strapi/strapi/admin';
 import { FC } from 'react';
 import { Config } from '../../api/schemas';
@@ -29,25 +29,39 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
             <Thead>
               <Tr>
                 <Th>
-                  {getMessage('page.discover.table.header.id')}
+                  <Typography variant="sigma">
+                    {getMessage('page.discover.table.header.id')}
+                  </Typography>
                 </Th>
                 <Th>
-                  {getMessage('page.discover.table.header.author')}
+                  <Typography variant="sigma">
+                    {getMessage('page.discover.table.header.author')}
+                  </Typography>
                 </Th>
                 <Th>
-                  {getMessage('page.discover.table.header.message')}
+                  <Typography variant="sigma">
+                    {getMessage('page.discover.table.header.message')}
+                  </Typography>
                 </Th>
                 <Th>
-                  {getMessage('page.discover.table.header.thread')}
+                  <Typography variant="sigma">
+                    {getMessage('page.discover.table.header.thread')}
+                  </Typography>
                 </Th>
                 <Th>
-                  {getMessage('page.discover.table.header.entry')}
+                  <Typography variant="sigma">
+                    {getMessage('page.discover.table.header.entry')}
+                  </Typography>
                 </Th>
                 <Th>
-                  {getMessage('page.discover.table.header.lastUpdate')}
+                  <Typography variant="sigma">
+                    {getMessage('page.discover.table.header.lastUpdate')}
+                  </Typography>
                 </Th>
                 <Th>
-                  {getMessage('page.discover.table.header.status')}
+                  <Typography variant="sigma">
+                    {getMessage('page.discover.table.header.status')}
+                  </Typography>
                 </Th>
                 <Th />
               </Tr>

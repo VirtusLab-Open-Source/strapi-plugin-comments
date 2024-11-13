@@ -1,4 +1,3 @@
-import { ToBeFixed } from "../../../server/src/@types";
 import { COMMENT_STATUS } from "./constants";
 
 const resolveCommentStatusColor = (status: typeof COMMENT_STATUS[keyof typeof COMMENT_STATUS]) => {

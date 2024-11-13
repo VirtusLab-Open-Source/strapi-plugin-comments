@@ -1,7 +1,6 @@
 import { first } from "lodash";
-import { ToBeFixed } from "../../../server/src/@types";
 
-const renderEntryTitle = (entry: ToBeFixed, config: ToBeFixed = {}) => {
+const renderEntryTitle = (entry: any, config: any = {}) => {
   const { entryLabel } = config;
   const rule =
     entry.uid in entryLabel ? entryLabel[entry.uid] : entryLabel["*"];
