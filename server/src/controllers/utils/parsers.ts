@@ -1,35 +1,43 @@
 import { ToBeFixed } from '../../@types-v5';
 import PluginError from '../../utils/error';
+import { client } from '../../validators/api';
 
-const assertNotEmpty: <T>(
-  value: T | null | undefined,
-  customError?: Error,
-) => asserts value is T = (value, customError) => {
-  if (value) {
-    return value;
-  }
+// Define base interface for filters
+interface BaseFilters {
+  $or?: Record<string, any>[];
+  content?: any;
+  authorName?: any;
+  createdAt?: any;
+  approvalStatus?: any;
+  [key: string]: any;
+}
 
-  throw (
-    customError ?? new PluginError(400, 'Non-empty value expected, empty given')
-  );
+// Union type of all possible input types
+type FlatInputParams = client.FindAllFlatSchema | client.FindAllInHierarchyValidatorSchema | client.FindAllPerAuthorValidatorSchema;
+
+const assertNotEmpty = <T>(value: T | null | undefined, customError?: Error): asserts value is T => {
+  if (value) return;
+  throw customError ?? new PluginError(400, 'Non-empty value expected, empty given');
 };
-// TODO: TBD with @Mateusz
-export const flatInput = <T>(payload: T): T => {
+
+export const flatInput = <T extends FlatInputParams>(payload: T): T => {
   const { 
-    relation,
     sort,
-    pagination,
     fields,
     omit,
-    filters,
+    filters = {} as BaseFilters,
     populate = {},
-    filterBy,
-    filterByValue,
-  } = payload as any;
-  console.log('query', filters);
+    relation,
+    pagination,
+  } = payload as FlatInputParams & {
+    filters?: BaseFilters;
+    populate?: Record<string, boolean | { populate: boolean }>;
+    pagination?: client.FindAllFlatSchema['pagination'];
+    relation?: client.FindAllFlatSchema['relation'];
+  };
   
-  const orOperator = (filters?.$or || []).filter(
-    (_: ToBeFixed) => !Object.keys(_).includes('removed'),
+  const orOperator = (filters.$or || []).filter(
+    (item) => !Object.keys(item).includes('removed'),
   );
 
   let basePopulate = {
@@ -41,12 +49,12 @@ export const flatInput = <T>(payload: T): T => {
       populate: {
         authorUser: true,
         ...populate,
-      },
+      } as { authorUser: boolean | { populate: boolean }, [key: string]: boolean | { populate: boolean } },
     },
   };
 
   // Cover case when someone wants to populate author instead of authorUser
-  if (populate.author) {
+  if ('author' in populate) {
     const { author, ...restPopulate } = populate;
     basePopulate = {
       ...restPopulate,
@@ -57,36 +65,12 @@ export const flatInput = <T>(payload: T): T => {
         populate: {
           authorUser: author,
           ...restPopulate,
-        },
+        } as { authorUser: boolean | { populate: boolean }, [key: string]: boolean | { populate: boolean } },
       },
     };
   }
 
-  if (filterBy === 'DATE_CREATED') {
-    const date = new Date(filterByValue);
-
-    if (!filterByValue || Number.isNaN(+date)) {
-      throw new PluginError(400, 'Invalid date specified in "filterByValue"');
-    }
-
-    const start = date.setHours(0, 0, 0, 0);
-    const end = date.setHours(23, 59, 59, 999);
-
-    filters.createdAt = {
-      $between: [start, end],
-    };
-  }
-
-  if (filterBy === 'APPROVAL_STATUS') {
-    assertNotEmpty(
-      filterByValue,
-      new PluginError(400, 'Empty "filterByValue" parameter'),
-    );
-
-    filters.approvalStatus = filterByValue;
-  }
-
-  console.log('filters', filters);
+  const updatedFilters = { ...filters };
 
   return {
     ...payload,
@@ -103,5 +87,5 @@ export const flatInput = <T>(payload: T): T => {
     sort,
     fields,
     omit,
-  } as unknown as T;
+  } as T;
 };

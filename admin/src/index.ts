@@ -21,9 +21,6 @@ export default {
       permissions: pluginPermissions.access,
     });
 
-    console.log('app', app);
-
-
     app.createSettingSection(
       {
         id: pluginId,
@@ -45,16 +42,6 @@ export default {
         },
       ],
     );
-    //
-    //   app.addReducers(reducers);
-    //   app.registerPlugin({
-    //     id: pluginId,
-    //     initializer: Initializer,
-    //     isReady: false,
-    //     name,
-    //   });
-    //
-    //   registerCustomFields(app);
   },
 
   registerTrads: async function ({ locales = [] }: { locales: string[] }) {

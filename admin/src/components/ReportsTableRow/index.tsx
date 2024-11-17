@@ -21,7 +21,6 @@ export const ReportsTableRow: FC<ReportsTableRowProps> = ({ item, isChecked, onS
   const onCheckedChange = () => {
     onSelectionChange(item.id);
   };
-  console.log('isChecked', isChecked);
 
   return (
     <Tr>

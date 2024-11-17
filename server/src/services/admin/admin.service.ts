@@ -34,7 +34,7 @@ export default ({ strapi }: StrapiContext) => {
       });
 
       const relatedEntities = await this.getCommonService().findRelatedEntitiesFor(results);
-      console.log("🚀 ~ findAll ~ relatedEntities:", relatedEntities)
+
       return {
         pagination,
         result: results.map((_) => this.getCommonService().sanitizeCommentEntity(_, [], []))

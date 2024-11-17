@@ -98,7 +98,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
       limit: limit || PAGE_SIZE,
       offset: skip || 0,
     });
-    console.log('entries', entries);
+
     let paginationData: Pagination = undefined;
     if (pagination?.withCount) {
       paginationData = await getCommentRepository(strapi).findWithCount({ where: { ...filters, ...(locale ? { locale } : {}) } }).then((result) => result.pagination);

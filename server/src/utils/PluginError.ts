@@ -12,7 +12,6 @@ export default class PluginError extends Error {
     super();
     this.name = 'Strapi:Plugin:Comments';
     this.status = status || 500;
-    console.log('message', message);
     this.message = message || 'Internal error';
     this.payload = payload;
 

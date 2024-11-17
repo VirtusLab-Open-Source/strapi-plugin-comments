@@ -7,6 +7,14 @@ import { Comment, CommentWithRelated } from '../../validators/repositories';
 
 declare var strapi: CoreStrapi;
 
+interface StrapiAuthorUser {
+  id: Id;
+  username: string;
+  email: string;
+  avatar?: string | object;
+  [key: string]: unknown;
+}
+
 export const buildNestedStructure = (
   entities: Array<Comment | CommentWithRelated>,
   id: Id | null = null,
@@ -62,8 +70,7 @@ export const filterOurResolvedReports = (item: Comment): Comment =>
     : item;
 
 export const buildAuthorModel = (
-  // TODO
-  item: any,
+  item: Comment | CommentWithRelated,
   blockedAuthorProps: Array<string>,
   fieldsToPopulate: Array<string> = [],
 ): Comment => {
@@ -77,20 +84,18 @@ export const buildAuthorModel = (
   } = item;
   let author: CommentAuthor = {} as CommentAuthor;
 
-  if (authorUser) {
+  if (authorUser && typeof authorUser !== 'string') {
+    const user = authorUser as StrapiAuthorUser;
     author = fieldsToPopulate.reduce(
       (prev, curr) => ({
         ...prev,
-        [curr]: authorUser[curr],
+        [curr]: user[curr],
       }),
       {
-        id: authorUser.id,
-        name: authorUser.username,
-        email: authorUser.email,
-        avatar:
-          isString(authorUser.avatar) || isObject(authorUser.avatar)
-            ? authorUser.avatar
-            : undefined,
+        id: user.id,
+        name: user.username,
+        email: user.email,
+        avatar: user.avatar,
       },
     );
   } else if (authorId) {
@@ -110,7 +115,7 @@ export const buildAuthorModel = (
   return {
     ...rest,
     author,
-  };
+  } as Comment;
 };
 
 export const buildConfigQueryProp = (
@@ -125,12 +130,17 @@ export const resolveUserContextError = (user?: AdminUser | StrapiUser): PluginEr
   }
 };
 
-export const getAuthorName = (author: StrapiAdmin): string => {
+type AuthorNameProps = {
+  lastname?: string;
+  firstname?: string;
+  username?: string;
+};
 
+export const getAuthorName = (author: AuthorNameProps): string => {
   const { lastname, username, firstname } = author;
 
-  if (lastname)
+  if (lastname && firstname) {
     return `${firstname} ${lastname}`;
-  else
-    return username || firstname;
+  }
+  return username || firstname || '';
 };

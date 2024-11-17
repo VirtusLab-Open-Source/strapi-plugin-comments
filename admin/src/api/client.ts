@@ -72,10 +72,7 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
       async query(id: number | string, filters: any) {
         const queryFilters = !isEmpty(filters) ? `?${stringify(filters, { encode: false })}` : '';
         const response = await fetch.get(`/${URL_PREFIX}/moderate/single/${id}${queryFilters}`);
-        return commentDetailsSchema.parseAsync(response.data).catch((error) => {
-          console.log('error', error);
-          throw error;
-        });
+        return commentDetailsSchema.parseAsync(response.data);
       },
     },
     approve(id: number) {
@@ -113,10 +110,7 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
       },
       async query(queryParams?: Record<string, string>) {
         const response = await fetch.get(`/${URL_PREFIX}/moderate/reports${queryParams ? `?${stringify(queryParams, { encode: false })}` : ''}`);
-        return reportsSchema.parseAsync(response.data).catch((error) => {
-          console.log('error', error);
-          throw error;
-        });
+        return reportsSchema.parseAsync(response.data);
       },
     },
     resolve({ id, reportId }: { id: number, reportId: number }) {
