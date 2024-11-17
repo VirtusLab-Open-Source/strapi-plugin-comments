@@ -6,6 +6,7 @@ const routes: StrapiRoute<'client'>[] = [
     path: '/:relation',
     handler: 'client.findAllInHierarchy',
     config: {
+      auth: false,
       policies: [],
       description:
         'Find all comments related to configured Collection / Single Type and return them in a nested structure',
@@ -21,6 +22,7 @@ const routes: StrapiRoute<'client'>[] = [
     path: '/:relation',
     handler: 'client.post',
     config: {
+      auth: false,
       policies: [],
       description: 'Post a comment against configured Collection / Single Type',
       tag: {
@@ -35,6 +37,7 @@ const routes: StrapiRoute<'client'>[] = [
     path: '/:relation/flat',
     handler: 'client.findAllFlat',
     config: {
+      auth: false,
       policies: [],
       description:
         'Find all comments related to configured Collection / Single Type and return them in a flat structure for further processing',
@@ -50,6 +53,7 @@ const routes: StrapiRoute<'client'>[] = [
     path: '/:relation/comment/:commentId',
     handler: 'client.put',
     config: {
+      auth: false,
       policies: [],
       description:
         'Update comment related to configured Collection / Single Type if user is the author',
@@ -65,6 +69,7 @@ const routes: StrapiRoute<'client'>[] = [
     path: '/:relation/comment/:commentId/report-abuse',
     handler: 'client.reportAbuse',
     config: {
+      auth: false,
       policies: [],
       description: 'Report an abuse against comment for configured Collection / Single Type',
       tag: {
@@ -79,6 +84,7 @@ const routes: StrapiRoute<'client'>[] = [
     path: '/:relation/comment/:commentId',
     handler: 'client.removeComment',
     config: {
+      auth: false,
       policies: [],
       description:
         'Remove comment related to configured Collection / Single Type if user is the author',
@@ -94,6 +100,7 @@ const routes: StrapiRoute<'client'>[] = [
     path: '/author/:authorId',
     handler: 'client.findAllPerAuthor',
     config: {
+      auth: false,
       policies: [],
       description: 'Find all comments created by Strapi user',
       tag: {
@@ -108,6 +115,7 @@ const routes: StrapiRoute<'client'>[] = [
     path: '/author/:authorId/:type',
     handler: 'client.findAllPerAuthor',
     config: {
+      auth: false,
       policies: [],
       description: 'Find all comments created by specified type of user',
       tag: {

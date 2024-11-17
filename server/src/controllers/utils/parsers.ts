@@ -15,10 +15,19 @@ const assertNotEmpty: <T>(
 };
 // TODO: TBD with @Mateusz
 export const flatInput = <T>(payload: T): T => {
-  const { relation, query, sort, pagination, fields, omit } = payload as any;
-
-  const { populate = {}, filterBy, filterByValue, ...restQuery } = query;
-  const filters = restQuery?.filters || restQuery;
+  const { 
+    relation,
+    sort,
+    pagination,
+    fields,
+    omit,
+    filters,
+    populate = {},
+    filterBy,
+    filterByValue,
+  } = payload as any;
+  console.log('query', filters);
+  
   const orOperator = (filters?.$or || []).filter(
     (_: ToBeFixed) => !Object.keys(_).includes('removed'),
   );
@@ -77,9 +86,11 @@ export const flatInput = <T>(payload: T): T => {
     filters.approvalStatus = filterByValue;
   }
 
+  console.log('filters', filters);
+
   return {
     ...payload,
-    query: {
+    filters: {
       ...filters,
       $or: [...orOperator, { removed: { $null: true } }, { removed: false }],
       related: relation,

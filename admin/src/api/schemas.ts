@@ -41,6 +41,7 @@ const relatedSchema = z.intersection(
     createdAt: z.string(),
     updatedAt: z.string(),
     publishedAt: z.string().nullable(),
+    locale: z.string().nullable().optional(),
   }),
   z.record(z.unknown()),
 );

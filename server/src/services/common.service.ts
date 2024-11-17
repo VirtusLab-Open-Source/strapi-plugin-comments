@@ -20,7 +20,7 @@ const REQUIRED_FIELDS = ['id'];
 
 type ParsedRelation = {
   uid: UID.ContentType;
-  relatedId: string | number;
+  relatedId: string;
 };
 
 
@@ -40,9 +40,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
   parseRelationString(relation: `${string}::${string}` | string): ParsedRelation {
     const [uid, relatedStringId] = getRelatedGroups(relation);
-    const parsedRelatedId = parseInt(relatedStringId, 10);
-    const relatedId = isNumber(parsedRelatedId) ? parsedRelatedId : relatedStringId;
-    return { uid: uid as UID.ContentType, relatedId };
+    return { uid: uid as UID.ContentType, relatedId: relatedStringId };
   },
   isValidUserContext<T extends { id?: string | number }>(user?: T): boolean {
     return !!(user?.id);
@@ -69,12 +67,12 @@ const commonService = ({ strapi }: StrapiContext) => ({
     limit,
     skip,
     sort,
-    filter,
     populate,
     omit: baseOmit = [],
     isAdmin = false,
     pagination,
-    query = {},
+    filters = {},
+    locale,
   }: clientValidator.FindAllFlatSchema, relatedEntity?: any): Promise<{ data: Array<CommentWithRelated | Comment>, pagination?: Pagination }> {
     const omit = baseOmit.filter((field) => !REQUIRED_FIELDS.includes(field));
     const defaultSelect = (['id', 'related'] as const).filter((field) => !omit.includes(field));
@@ -89,19 +87,21 @@ const commonService = ({ strapi }: StrapiContext) => ({
       sort: { [operator]: direction },
       select: Array.isArray(fields) ? uniq([...fields, defaultSelect]) : fields,
     };
+
     const entries = await getCommentRepository(strapi).findMany({
       where: {
-        ...filter,
-        ...query,
+        ...filters,
+        ...(locale ? { locale } : {}),
       },
       populate: populateClause,
       ...fieldsQuery,
       limit: limit || PAGE_SIZE,
       offset: skip || 0,
     });
+    console.log('entries', entries);
     let paginationData: Pagination = undefined;
     if (pagination?.withCount) {
-      paginationData = await getCommentRepository(strapi).findWithCount({ where: query }).then((result) => result.pagination);
+      paginationData = await getCommentRepository(strapi).findWithCount({ where: { ...filters, ...(locale ? { locale } : {}) } }).then((result) => result.pagination);
     }
     const entriesWithThreads = await Promise.all(
       entries.map(async (_) => {
@@ -123,7 +123,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
 
     const result = entries.map((_) => {
       const threadedItem = entriesWithThreads.find((item) => item.id === _.id);
-      const parsedThreadOf = 'threadOf' in query ? (isString(query.threadOf) ? parseInt(query.threadOf) : query.threadOf) : null;
+      const parsedThreadOf = 'threadOf' in filters ? (isString(filters.threadOf) ? parseInt(filters.threadOf) : filters.threadOf) : null;
 
       let authorUserPopulate = {};
       if (isObject(populateClause?.authorUser)) {
@@ -154,7 +154,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
   // Find comments and create relations tree structure
   async findAllInHierarchy(
     {
-      query,
+      filters,
       populate,
       sort,
       fields,
@@ -162,10 +162,11 @@ const commonService = ({ strapi }: StrapiContext) => ({
       dropBlockedThreads,
       isAdmin = false,
       omit = [],
+      locale,
     }: clientValidator.FindAllInHierarchyValidatorSchema,
     relatedEntity?: any,
   ) {
-    const entities = await this.findAllFlat({ query, populate, sort, fields, isAdmin, omit }, relatedEntity);
+    const entities = await this.findAllFlat({ filters, populate, sort, fields, isAdmin, omit, locale }, relatedEntity);
     return buildNestedStructure(
       entities?.data,
       startingFromId,
@@ -202,7 +203,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
 
   // Find all for author
   async findAllPerAuthor({
-      query = {},
+      filters = {},
       populate = {},
       pagination,
       sort,
@@ -228,8 +229,8 @@ const commonService = ({ strapi }: StrapiContext) => ({
       };
 
       const response = await this.findAllFlat({
-        query: {
-          ...filterItem(query, ['related']),
+        filters: {
+          ...filterItem(filters, ['related']),
           ...authorQuery,
         },
         pagination,
@@ -249,25 +250,36 @@ const commonService = ({ strapi }: StrapiContext) => ({
   // Find all related entiries
   async findRelatedEntitiesFor(entries: Array<Comment>): Promise<Array<CommentRelated>> {
     const data = entries.reduce(
-      (acc: { [key: string]: Array<string | number> }, curr: Comment) => {
+      (acc: { [key: string]: { documentIds: Array<string | number>, locale?: Array<string> } }, curr: Comment) => {
         const [relatedUid, relatedStringId] = getRelatedGroups(curr.related);
-        const parsedRelatedId = parseInt(relatedStringId);
-        const relatedId = isNumber(parsedRelatedId)
-          ? parsedRelatedId
-          : relatedStringId;
+
         return {
           ...acc,
-          [relatedUid]: [...(acc[relatedUid] || []), relatedId],
+          [relatedUid]: {
+            ...(acc[relatedUid] || {}),
+            documentIds: [...(acc[relatedUid]?.documentIds || []), relatedStringId],
+            locale: [...(acc[relatedUid]?.locale || []), curr.locale],
+          }
         };
       },
       {},
     );
+
     return Promise.all(
       Object.entries(data).map(
-        async ([relatedUid, relatedStringIds]) =>
-          strapi.query(relatedUid as ContentTypesUUIDs)
+        async ([relatedUid, { documentIds, locale }]) =>
+          strapi.documents(relatedUid as ContentTypesUUIDs)
                 .findMany({
-                  where: { id: Array.from(new Set(relatedStringIds)) },
+                  filters: {
+                    documentId: {
+                      $in: Array.from(new Set(documentIds)),
+                    },
+                    locale: {
+                      $in: Array.from(new Set(locale)),
+                    },
+                  },
+                  // ? TBD: do we want fetch draft entities?
+                  status: 'published',
                 })
                 .then((relatedEntities) =>
                   relatedEntities.map((_) => ({
@@ -284,8 +296,12 @@ const commonService = ({ strapi }: StrapiContext) => ({
     return {
       ...entity,
       related: relatedEntities.find(
-        (relatedEntity) =>
-          entity.related === `${relatedEntity.uid}:${relatedEntity.id}`,
+        (relatedEntity) => {
+          if(relatedEntity.locale && entity.locale) {
+            return entity.related === `${relatedEntity.uid}:${relatedEntity.documentId}` && entity.locale === relatedEntity.locale;
+          }
+          return entity.related === `${relatedEntity.uid}:${relatedEntity.documentId}`;
+        },
       ),
     };
   },

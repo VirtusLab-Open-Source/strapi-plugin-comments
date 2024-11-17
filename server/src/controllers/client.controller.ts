@@ -27,14 +27,16 @@ const controllers = ({ strapi }: StrapiContext) => ({
     }
     throw throwError(ctx, unwrapEither(configResult));
   },
-
+  
   async findAllFlat(ctx: RequestContext<object, Pick<clientValidator.FindAllFlatSchema, 'relation'>>) {
     const configResult = await this.getStoreRepository().get(true);
     if (isRight(configResult)) {
       const config = unwrapEither(configResult);
-      const result = clientValidator.findAllFlatValidator(config.enabledCollections, ctx.params.relation, ctx.request.body);
+      const result = clientValidator.findAllFlatValidator(config.enabledCollections, ctx.params.relation, ctx.query);
       if (isRight(result)) {
-        return this.getService('common').findAllFlat(flatInput(result.right));
+        return this.getService('common').findAllFlat(
+          flatInput<clientValidator.FindAllFlatSchema>(result.right)
+        );
       }
       throw throwError(ctx, unwrapEither(result));
     }
@@ -45,9 +47,11 @@ const controllers = ({ strapi }: StrapiContext) => ({
     const configResult = await this.getStoreRepository().get(true);
     if (isRight(configResult)) {
       const config = unwrapEither(configResult);
-      const result = clientValidator.findAllInHierarchyValidator(config.enabledCollections, ctx.params.relation, ctx.request.body);
+      const result = clientValidator.findAllInHierarchyValidator(config.enabledCollections, ctx.params.relation, ctx.query);
       if (isRight(result)) {
-        return this.getService('common').findAllInHierarchy(flatInput(result.right));
+        return this.getService('common').findAllInHierarchy(
+          flatInput<clientValidator.FindAllInHierarchyValidatorSchema>(result.right)
+        );
       }
       throw throwError(ctx, unwrapEither(result));
     }
@@ -55,10 +59,10 @@ const controllers = ({ strapi }: StrapiContext) => ({
   },
 
   async findAllPerAuthor(ctx: RequestContext<object, Pick<clientValidator.FindAllPerAuthorValidatorSchema, 'authorId' | 'type'>>) {
-    const result = clientValidator.findAllPerAuthorValidator(ctx.params, ctx.request.body);
+    const result = clientValidator.findAllPerAuthorValidator(ctx.params, ctx.query);
     if (isRight(result)) {
       return this.getService('common').findAllPerAuthor(
-        flatInput(result.right),
+        flatInput<clientValidator.FindAllPerAuthorValidatorSchema>(result.right),
         ctx.params.type ? ![AUTHOR_TYPE.GENERIC.toLowerCase(), AUTHOR_TYPE.GENERIC].includes(ctx.params.type) : false,
       );
     }
@@ -71,7 +75,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
     if (isRight(configResult)) {
       const config = unwrapEither(configResult);
       const result = clientValidator.updateCommentValidator(config.enabledCollections, {
-        ...ctx.request.body,
+        ...ctx.query,
         ...ctx.params,
       });
       if (isRight(result)) {

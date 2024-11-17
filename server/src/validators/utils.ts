@@ -118,12 +118,12 @@ export const validate = <I, O>(result: z.SafeParseReturnType<I, O>) => {
 export const getRelationValidator = (enabledCollections: string[]) => z
 .string()
 .regex(REGEX.relatedUid, {
-  message: `Field "relation" got incorrect format, use format like "api::<collection name>.<content type name>:<entity id>"`,
+  message: `Field "relation" got incorrect format, use format like "api::<collection name>.<content type name>:<document id>"`,
 })
 .refine(
   (v) => enabledCollections.some((ct) => v.startsWith(ct)),
   'Invalid relation or not enabled collections',
-) as z.ZodEffects<z.ZodString, `{${string}::${string}.${number}}`, string>;
+) as z.ZodEffects<z.ZodString, `{${string}::${string}.${string}}`, string>;
 
 export const externalAuthorSchema = z.object({
   id: z.number(),

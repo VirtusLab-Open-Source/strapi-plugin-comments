@@ -36,9 +36,9 @@ export const clientService = ({ strapi }: StrapiContext) => {
     },
 
     // Create a comment
-    async create({ relation, content, threadOf, author, approvalStatus }: client.NewCommentValidatorSchema, user?: AdminUser) {
+    async create({ relation, content, threadOf, author, approvalStatus, locale }: client.NewCommentValidatorSchema, user?: AdminUser) {
       const { uid, relatedId } = this.getCommonService().parseRelationString(relation);
-      const relatedEntity = await strapi.entityService.findOne(uid, relatedId);
+      const relatedEntity = await strapi.documents(uid).findOne({ documentId: relatedId, locale })
       if (!relatedEntity) {
         throw new PluginError(
           400,
@@ -53,7 +53,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
       );
       const threadData = await tryCatch(
         async () => {
-          return threadOf ? await this.getCommonService().findOne({ id: threadOf, related: relation }) : null;
+          return threadOf ? await this.getCommonService().findOne({ id: threadOf, related: relation, locale }) : null;
         },
         new PluginError(400, 'Thread does not exist'),
       );
@@ -63,7 +63,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
       const linkToThread = unwrapEither(threadData);
       const isValidContext = this.getCommonService().isValidUserContext(user);
       if (!isValidContext) {
-        throw resolveUserContextError(user);
+        // throw resolveUserContextError(user);
       }
 
       const clearContent = await this.getCommonService().checkBadWords(content);
@@ -82,6 +82,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
           content: clearContent,
           related: relation,
           approvalStatus: isApprovalFlowEnabled ? APPROVAL_STATUS.PENDING : null,
+          locale,
         },
         populate: {
           authorUser: true,

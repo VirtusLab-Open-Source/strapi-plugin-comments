@@ -31,7 +31,9 @@ const commentSchema = baseCommentSchema.extend({
 const commentRelatedSchema = z.object({
   id: z.number(),
   uid: z.string(),
+  documentId: z.string(),
   requireCommentsApproval: z.boolean().nullable().optional(),
+  locale: z.string().nullable().optional(),
 });
 
 export type CommentRelated = z.infer<typeof commentRelatedSchema>;

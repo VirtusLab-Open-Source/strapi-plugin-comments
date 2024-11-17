@@ -1,7 +1,7 @@
 import { Flex, IconButton, Link, Td, Tr } from '@strapi/design-system';
 import { Eye } from '@strapi/icons';
 import { isEmpty, isNil } from 'lodash';
-import { FC, SyntheticEvent } from 'react';
+import { FC, SyntheticEvent, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import { Comment } from '../../api/schemas';
@@ -20,7 +20,6 @@ export const CommentRow: FC<Props> = ({ item }) => {
   const {
     canAccessReports,
     canModerate,
-    // TODO
     canReviewReports,
   } = usePermissions();
   const api = useAPI();
@@ -39,6 +38,19 @@ export const CommentRow: FC<Props> = ({ item }) => {
     evt.stopPropagation();
     navigate(id.toString());
   };
+
+  const contentTypeLink = useMemo(() => {
+    const related = item.related;
+    if (typeof related === 'string') return null;
+    
+    const localeParam = related.locale ? `?plugins[i18n][locale]=${related.locale}` : '';
+    
+    return (
+      <Link href={`/admin/content-manager/collection-types/${related.uid}/${related.documentId}${localeParam}`}>
+        {related.title}
+      </Link>
+    );
+  }, [item.related]);
 
   return (
     <Tr>
@@ -59,11 +71,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
         ) : '-'}
       </Td>
       <Td>
-        {typeof item.related !== 'string' && (
-          <Link href={`/admin/content-manager/collection-types/${item.related.uid}/${item.related.documentId}`}>
-            {item.related.title}
-          </Link>
-        )}
+        {contentTypeLink}
       </Td>
       <Td>
         {formatDate(item.updatedAt || item.createdAt, {
