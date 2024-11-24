@@ -1,6 +1,6 @@
 import { Params } from '@strapi/database/dist/entity-manager/types';
 import { UID } from '@strapi/strapi';
-import { first, get, isNil, isNumber, isObject, isString, omit as filterItem, parseInt, uniq } from 'lodash';
+import { first, get, isNil, isObject, isString, omit as filterItem, parseInt, uniq } from 'lodash';
 import { isProfane, replaceProfanities } from 'no-profanity';
 import { Id, RelatedEntity, StrapiContext } from '../@types-v5';
 import { CommentsPluginConfig } from '../config';
@@ -24,19 +24,18 @@ type ParsedRelation = {
 };
 
 
+type ConfigResult<T extends keyof CommentsPluginConfig> = T extends keyof CommentsPluginConfig ? CommentsPluginConfig[T] : CommentsPluginConfig;
 const commonService = ({ strapi }: StrapiContext) => ({
-  async getConfig<T extends keyof CommentsPluginConfig>(prop?: T, defaultValue?: CommentsPluginConfig[T], useLocal = true): Promise<T extends string ? CommentsPluginConfig[T] : CommentsPluginConfig> {
+  async getConfig<T extends keyof CommentsPluginConfig>(prop?: T, defaultValue?: CommentsPluginConfig[T], useLocal = false): Promise<ConfigResult<T>> {
     const storeRepository = getStoreRepository(strapi);
     const config = await storeRepository.getConfig();
     if (prop && config && !useLocal) {
-      return get(config, prop, defaultValue) as T extends string
-        ? CommentsPluginConfig[T]
-        : CommentsPluginConfig;
+      return get(config, prop, defaultValue) as ConfigResult<T>;
     }
     if (useLocal) {
-      return storeRepository.getLocalConfig(prop, defaultValue) as T extends string ? CommentsPluginConfig[T] : CommentsPluginConfig;
+      return storeRepository.getLocalConfig(prop, defaultValue) as ConfigResult<T>;
     }
-    return config as T extends string ? CommentsPluginConfig[T] : CommentsPluginConfig;
+    return config as ConfigResult<T>;
   },
   parseRelationString(relation: `${string}::${string}` | string): ParsedRelation {
     const [uid, relatedStringId] = getRelatedGroups(relation);

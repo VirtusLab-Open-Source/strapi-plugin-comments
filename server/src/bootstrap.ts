@@ -1,10 +1,11 @@
-import { isEmpty } from 'lodash';
 import { StrapiContext } from './@types-v5';
-import { CommentsPluginConfig } from './@types-v5/config';
+import { setupGQL } from './graphql';
 import permissions from './permissions';
-import { getPluginService } from './utils/getPluginService';
 
 export default async ({ strapi }: StrapiContext) => {
+  if (strapi.plugin('graphql')) {
+    await setupGQL({ strapi });
+  }
   // Check if the plugin users-permissions is installed because the navigation needs it
   if (Object.keys(strapi.plugins).indexOf('users-permissions') === -1) {
     throw new Error(
