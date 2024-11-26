@@ -60,7 +60,8 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 
 ## ⚙️ Versions
 
-- **Strapi v4** - (current) - [v2.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
+- **Strapi v5** - (current) - [v3.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/v5)
+- **Strapi v4** - [v2.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
 - **Strapi v3** - [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3)
 
 ## ⏳ Installation
@@ -136,13 +137,13 @@ In our minimum support we're following [official Node.js releases timelines](htt
 
 **Supported Strapi versions**:
 
-- Strapi v4.24.x (recently tested)
-- Strapi v4.x
+- Strapi v5.4.1 (recently tested)
+- Strapi v5.x
 
-> This plugin is designed for **Strapi v4** and is not working with v3.x. To get version for **Strapi v3** install version [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3).
+> This plugin is designed for **Strapi v5** and is not working with v4.x and lower. To get version for older **Strapi versions** refer to the [versions section](#-versions).
 
 **Plugin dependencies**
-- `@strapi/plugin-graphql` - required to run because built-in support for GraphQL handled by this plugin 
+- `@strapi/plugin-graphql` - required to run GraphQL handled by this plugin 
 
 **We recommend always using the latest version of Strapi to start your new projects**.
 
