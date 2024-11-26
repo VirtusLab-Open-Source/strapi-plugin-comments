@@ -1,8 +1,8 @@
 import { once } from 'lodash';
 import { CoreStrapi } from '../@types-v5';
+import { CommentsPluginConfig } from '../config';
 import { PLUGIN_SELECTOR, REGEX, REPORT_REASON } from '../const';
 import { Either, makeRight } from '../utils/Either';
-import { CommentsPluginConfig } from '../validators/api/controllers/settings.controller.validator';
 
 export const getStoreRepository = once((strapi: CoreStrapi) => {
   return {

@@ -1,5 +1,7 @@
-import { Primitive, StrapiContext } from "strapi-typed";
+import { Primitive, StrapiContext } from 'strapi-typed';
 import { ToBeFixed } from './utils';
+import nexus from 'nexus'
+
 
 export type StrapiGraphQLContext = StrapiContext;
 
@@ -22,3 +24,4 @@ export type NexusAst = {
   kind: string;
   value: Primitive;
 };
+export type Nexus = typeof nexus;

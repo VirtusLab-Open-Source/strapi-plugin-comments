@@ -1,7 +1,7 @@
 import { StrapiContext } from '../@types-v5';
+import { CommentsPluginConfig } from '../config';
 import { getStoreRepository } from '../repositories';
 import { isRight } from '../utils/Either';
-import { CommentsPluginConfig } from '../validators/api/controllers/settings.controller.validator';
 
 export default ({ strapi }: StrapiContext) => {
   const storeRepository = getStoreRepository(strapi);

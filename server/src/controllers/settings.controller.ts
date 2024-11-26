@@ -1,8 +1,9 @@
 import { RequestContext, StrapiContext } from '../@types-v5';
+import { CommentsPluginConfig } from '../config';
 import { isRight, unwrapEither } from '../utils/Either';
 import { getPluginService } from '../utils/getPluginService';
 import { throwError } from '../utils/throwError';
-import { CommentsPluginConfig, validateConfig } from '../validators/api/controllers/settings.controller.validator';
+import { validateConfig } from '../validators/api/controllers/settings.controller.validator';
 
 const settingsController = ({ strapi }: StrapiContext) => {
   const settingsService = getPluginService(strapi, 'settings');
