@@ -18,7 +18,7 @@ export default (strapi: CoreStrapi, nexus: Nexus) => {
     type: 'ResponseFindAllPerAuthor',
     args: {
       authorId: nonNull(intArg()),
-      authorType: arg({ type: 'AuthorType' }),
+      authorType: arg({ type: 'CommentAuthorType' }),
       filters: getFiltersInputTypeName(contentType),
       pagination: args.PaginationArg,
       sort: args.SortArg,

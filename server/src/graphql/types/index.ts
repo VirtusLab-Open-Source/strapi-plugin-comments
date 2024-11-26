@@ -10,6 +10,7 @@ import { getCreateReport } from './getCreateReport';
 import { getIdType } from './getId';
 import { getIdentityAuthor } from './getIdentityAuthor';
 import { getRemoveComment } from './getRemoveComment';
+import { getReport } from './getReport';
 import { getReportReason } from './getReportReason';
 import { getResponseFindAll } from './getResponseFindAll';
 import { getResponseFindAllPerAuthor } from './getResponseFindAllPerAuthor';
@@ -34,6 +35,7 @@ const typesFactories = [
   getResponseMeta,
   getResponsePagination,
   getUpdateComment,
+  getReport,
 ] as const;
 
 export const getTypes = (config: CommentsPluginConfig, nexus: Nexus) => typesFactories.map((factory) => factory(nexus, config));
