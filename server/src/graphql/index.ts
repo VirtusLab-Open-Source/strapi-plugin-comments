@@ -1,5 +1,5 @@
-import { CoreStrapi, StrapiContext } from '../@types-v5';
-import { Nexus } from '../@types-v5/graphql';
+import { CoreStrapi, StrapiContext } from '../@types';
+import { Nexus } from '../@types/graphql';
 import { CommentsPluginConfig } from '../config';
 import { CONFIG_PARAMS } from '../const';
 

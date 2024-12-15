@@ -1,4 +1,4 @@
-import { StrapiContext } from '../@types-v5';
+import { StrapiContext } from '../@types';
 import { registerCustomFields } from './custom-fields';
 
 const register = (context: StrapiContext) => {

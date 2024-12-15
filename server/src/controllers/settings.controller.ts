@@ -1,4 +1,4 @@
-import { RequestContext, StrapiContext } from '../@types-v5';
+import { RequestContext, StrapiContext } from '../@types';
 import { CommentsPluginConfig } from '../config';
 import { isRight, unwrapEither } from '../utils/Either';
 import { getPluginService } from '../utils/getPluginService';

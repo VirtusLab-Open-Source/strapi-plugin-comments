@@ -1,4 +1,4 @@
-import { Nexus } from "../../@types-v5/graphql";
+import { Nexus } from '../../@types/graphql';
 
 export const getCreateComment = (nexus: Nexus) => {
     return nexus.inputObjectType({

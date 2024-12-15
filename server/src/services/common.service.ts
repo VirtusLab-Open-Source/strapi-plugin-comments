@@ -2,7 +2,7 @@ import { Params } from '@strapi/database/dist/entity-manager/types';
 import { UID } from '@strapi/strapi';
 import { first, get, isNil, isObject, isString, omit as filterItem, parseInt, uniq } from 'lodash';
 import { isProfane, replaceProfanities } from 'no-profanity';
-import { Id, RelatedEntity, StrapiContext } from '../@types-v5';
+import { Id, RelatedEntity, StrapiContext } from '../@types';
 import { CommentsPluginConfig } from '../config';
 import { ContentTypesUUIDs } from '../content-types';
 import { getCommentRepository, getOrderBy, getStoreRepository } from '../repositories';

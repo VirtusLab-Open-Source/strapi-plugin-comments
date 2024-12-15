@@ -1,4 +1,4 @@
-import { Nexus } from '../../@types-v5/graphql';
+import { Nexus } from '../../@types/graphql';
 import { CommentsPluginConfig } from '../../config';
 import { getComment } from './getComment';
 import { getCommentAuthor } from './getCommentAuthor';

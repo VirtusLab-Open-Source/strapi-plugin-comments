@@ -1,4 +1,4 @@
-import { RequestContext } from '../@types-v5';
+import { RequestContext } from '../@types';
 import PluginError from './PluginError';
 
 export const throwError = (

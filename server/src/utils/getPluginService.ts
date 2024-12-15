@@ -1,4 +1,4 @@
-import { CoreStrapi } from '../@types-v5';
+import { CoreStrapi } from '../@types';
 import { PluginServices } from '../services';
 
 

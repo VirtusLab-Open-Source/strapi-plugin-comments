@@ -1,37 +1,28 @@
-import { IStrapi } from "strapi-typed";
-import { registerCustomFields } from "../index";
+import { CoreStrapi } from '../../../@types';
+import { caster } from '../../../test/utils';
+import { registerCustomFields } from '../index';
 
-describe("registerCustomFields()", () => {
-  it("should apply custom field when strapi supports it", () => {
-    const strapi: Pick<IStrapi, "customFields"> = {
+describe('registerCustomFields()', () => {
+  it('should apply custom field when strapi supports it', () => {
+    const strapi = caster<CoreStrapi>({
       customFields: {
         register: jest.fn(),
       },
-    };
+    });
 
-    registerCustomFields({ strapi } as any);
+    registerCustomFields({ strapi });
 
     expect(strapi.customFields.register).toHaveBeenCalled();
-    expect((strapi.customFields.register as jest.Mock).mock.calls[0][0])
-      .toMatchInlineSnapshot(`
-      {
-        "name": "comments",
-        "plugin": "comments",
-        "type": "json",
-      }
-    `);
+    expect(strapi.customFields.register).toHaveBeenCalledTimes(1);
+    expect(strapi.customFields.register).toHaveBeenCalledWith({ name: 'comments', plugin: 'comments', type: 'json' });
   });
-  it("should not require custom fields functionality to bootstrap comments plugin", () => {
-    expect(() =>
-      registerCustomFields({ strapi: { log: { warn: jest.fn() } } } as any)
-    ).not.toThrow();
+  it('should not require custom fields functionality to bootstrap comments plugin', () => {
+    const strapi = caster<CoreStrapi>({ log: { warn: jest.fn() } });
+    expect(() => registerCustomFields({ strapi })).not.toThrow();
   });
-  it("should notify about custom field option", () => {
-    const warn = jest.fn();
-
-    expect(() =>
-      registerCustomFields({ strapi: { log: { warn } } } as any)
-    ).not.toThrow();
-    expect(warn).toHaveBeenCalled();
+  it('should notify about custom field option', () => {
+    const strapi = caster<CoreStrapi>({ log: { warn: jest.fn() } });
+    expect(() => registerCustomFields({ strapi })).not.toThrow();
+    expect(strapi.log.warn).toHaveBeenCalled();
   });
 });

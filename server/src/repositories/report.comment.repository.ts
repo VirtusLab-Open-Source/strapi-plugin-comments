@@ -1,12 +1,12 @@
 import { Params } from '@strapi/database/dist/entity-manager/types';
 import { once } from 'lodash';
-import { CoreStrapi } from '../@types-v5';
+import { CoreStrapi } from '../@types';
 import { getConfig } from '../utils/getConfig';
 import { ReportResultValidator, reportResultValidator } from '../validators/repositories';
 import { shouldValidateArray, shouldValidateObject } from '../validators/repositories/utils';
 import { getModelUid } from './utils';
 
-export const getReportCommentRepository = once((strapi: CoreStrapi) => {
+export const getReportCommentRepositorySource = (strapi: CoreStrapi) => {
   const modelUid = getModelUid(strapi, 'comment-report');
   const repository = strapi.query(modelUid);
 
@@ -23,6 +23,7 @@ export const getReportCommentRepository = once((strapi: CoreStrapi) => {
     },
     async update(params: Params): Promise<ReportResultValidator['update']> {
       const isValidationEnabled = await getConfig(strapi, 'isValidationEnabled', false);
+      console.log('isValidationEnabled', isValidationEnabled);
       return repository.update(params)
                        .then(shouldValidateObject(isValidationEnabled, reportResultValidator.update));
     },
@@ -35,6 +36,8 @@ export const getReportCommentRepository = once((strapi: CoreStrapi) => {
                        .then(shouldValidateObject(isValidationEnabled, reportResultValidator.create));
     },
   };
-});
+};
+
+export const getReportCommentRepository = once(getReportCommentRepositorySource);
 
 export type ReportCommentRepository = ReturnType<typeof getReportCommentRepository>;

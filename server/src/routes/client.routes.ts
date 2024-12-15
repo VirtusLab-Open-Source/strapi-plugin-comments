@@ -1,4 +1,4 @@
-import { StrapiRoute } from '../@types-v5';
+import { StrapiRoute } from '../@types';
 
 const routes: StrapiRoute<'client'>[] = [
   {

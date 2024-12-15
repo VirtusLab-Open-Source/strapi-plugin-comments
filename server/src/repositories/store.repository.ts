@@ -1,5 +1,5 @@
 import { once } from 'lodash';
-import { CoreStrapi } from '../@types-v5';
+import { CoreStrapi } from '../@types';
 import { CommentsPluginConfig } from '../config';
 import { PLUGIN_SELECTOR, REGEX, REPORT_REASON } from '../const';
 import { Either, makeRight } from '../utils/Either';

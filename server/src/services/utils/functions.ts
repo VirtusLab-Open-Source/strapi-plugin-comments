@@ -1,6 +1,6 @@
-import { StrapiAdmin, StrapiUser } from '@sensinum/strapi-utils';
-import { get, isArray, isEmpty, isObject, isString } from 'lodash';
-import { AdminUser, CommentAuthor, CoreStrapi, Id } from '../../@types-v5';
+import { StrapiUser } from '@sensinum/strapi-utils';
+import { get, isArray, isEmpty, isObject } from 'lodash';
+import { AdminUser, CommentAuthor, CoreStrapi, Id } from '../../@types';
 import { REGEX } from '../../utils/constants';
 import PluginError from '../../utils/error';
 import { Comment, CommentWithRelated } from '../../validators/repositories';

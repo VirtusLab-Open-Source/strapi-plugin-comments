@@ -1,4 +1,4 @@
-import { RequestContext, StrapiContext } from '../@types-v5';
+import { RequestContext, StrapiContext } from '../@types';
 import { getStoreRepository } from '../repositories';
 import { PluginServices } from '../services';
 import { AUTHOR_TYPE } from '../utils/constants';

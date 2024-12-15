@@ -1,4 +1,3 @@
-import { ToBeFixed } from '../../@types-v5';
 import PluginError from '../../utils/error';
 import { client } from '../../validators/api';
 

@@ -2,7 +2,7 @@ import { Schema, UID } from '@strapi/strapi';
 import { has, isDate, isNil, isObject, propEq } from 'lodash/fp';
 import { inputObjectType } from 'nexus';
 import type { InputDefinitionBlock } from 'nexus/dist/definitions/definitionBlocks';
-import { StrapiContext, ToBeFixed } from '../@types-v5';
+import { StrapiContext, ToBeFixed } from '../@types';
 
 
 const virtualScalarAttributes = ['id'];

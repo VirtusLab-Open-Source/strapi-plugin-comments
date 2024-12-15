@@ -1,4 +1,4 @@
-import { Nexus } from '../../@types-v5/graphql';
+import { Nexus } from '../../@types/graphql';
 import { AUTHOR_TYPE } from '../../utils/constants';
 
 export const getCommentAuthorType = (nexus: Nexus) => {

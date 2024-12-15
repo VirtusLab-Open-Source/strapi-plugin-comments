@@ -1,5 +1,5 @@
 import { once, set } from 'lodash';
-import { CoreStrapi, DBQuery, Where } from '../../@types-v5';
+import { CoreStrapi, DBQuery, Where } from '../../@types';
 import { getDefaultAuthorPopulate, getOrderBy } from '../../repositories';
 import { admin as adminValidator } from '../../validators/api';
 

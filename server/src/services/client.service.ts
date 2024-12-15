@@ -1,5 +1,5 @@
 import { isEmpty } from 'lodash';
-import { AdminUser, StrapiContext } from '../@types-v5';
+import { AdminUser, StrapiContext } from '../@types';
 import { APPROVAL_STATUS, CONFIG_PARAMS } from '../const';
 import { getCommentRepository, getReportCommentRepository } from '../repositories';
 import { isLeft, unwrapEither } from '../utils/Either';
