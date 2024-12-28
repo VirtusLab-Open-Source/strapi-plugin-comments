@@ -1,8 +1,9 @@
 import type { JestConfigWithTsJest } from 'ts-jest';
 import { defaults as tsjPreset } from 'ts-jest/presets';
 
+
 const config: JestConfigWithTsJest = {
-  testMatch: ["**/server/**/__tests__/?(*.)+(spec|test).(t|j)s"],
+  testMatch: ["**/__tests__/**/?(*.)+(spec|test).(t|j)s"],
   transform: {
     ...tsjPreset.transform,
   },

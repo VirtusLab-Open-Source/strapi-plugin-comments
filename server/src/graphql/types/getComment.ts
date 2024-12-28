@@ -5,6 +5,7 @@ export const getComment = (nexus: Nexus) => {
     name: 'CommentSingle',
     definition(t) {
         t.id("id");
+        t.string("documentId");
         t.nonNull.string("content");
         t.boolean("blocked");
         t.boolean("blockedThread");

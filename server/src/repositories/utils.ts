@@ -9,7 +9,7 @@ export const getDefaultAuthorPopulate = (strapi: CoreStrapi) => {
   const strapiUserTypeUid = 'plugin::users-permissions.user';
   const allowedTypes = ['media', 'relation'];
 
-  const { attributes } = strapi.contentTypes[strapiUserTypeUid] || {};
+  const { attributes } = strapi.contentTypes[strapiUserTypeUid] ?? { attributes: {} };
   const relationTypes = Object.keys(attributes)?.filter((key: string) =>
     allowedTypes.includes(attributes[key]?.type),
   );

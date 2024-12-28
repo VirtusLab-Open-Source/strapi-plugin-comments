@@ -162,8 +162,6 @@ describe('Report repository', () => {
 
       expect(result).toEqual(createdComment);
       expect(reportResultValidator.create.parseAsync).toHaveBeenCalled();
-
     });
-
   });
 });

@@ -15,8 +15,8 @@ import { resolveUserContextError } from './utils/functions';
  */
 
 export const clientService = ({ strapi }: StrapiContext) => {
-  const createAuthor = (isValidContent: boolean, author: client.NewCommentValidatorSchema['author'], user?: AdminUser) => {
-    if (isValidContent && user) {
+  const createAuthor = (author: client.NewCommentValidatorSchema['author'], user?: AdminUser) => {
+    if (user) {
       return {
         authorUser: user.id,
       };
@@ -63,11 +63,11 @@ export const clientService = ({ strapi }: StrapiContext) => {
       const linkToThread = unwrapEither(threadData);
       const isValidContext = this.getCommonService().isValidUserContext(user);
       if (!isValidContext) {
-        // throw resolveUserContextError(user);
+        throw resolveUserContextError(user);
       }
 
       const clearContent = await this.getCommonService().checkBadWords(content);
-      const authorData = createAuthor(isApprovalFlowEnabled, author, user);
+      const authorData = createAuthor(author, user);
       const authorNotProperlyProvided = !isEmpty(authorData) && !(authorData.authorId || authorData.authorUser);
       if (isEmpty(authorData) || authorNotProperlyProvided) {
         throw new PluginError(400, 'Not able to recognise author of a comment. Make sure you\'ve provided "author" property in a payload or authenticated your request properly.');

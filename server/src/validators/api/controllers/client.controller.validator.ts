@@ -9,7 +9,7 @@ const getCommentSchema = (enabledCollections: string[]) => {
     relation: getRelationValidator(enabledCollections),
     content: z.string().min(1),
     author: externalAuthorSchema.optional(),
-    threadOf: z.number().optional(),
+    threadOf: z.string().optional(),
     approvalStatus: z.nativeEnum(APPROVAL_STATUS).optional(),
     locale: z.string().optional(),
   });

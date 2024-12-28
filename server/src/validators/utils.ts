@@ -123,7 +123,7 @@ export const getRelationValidator = (enabledCollections: string[]) => z
 .refine(
   (v) => enabledCollections.some((ct) => v.startsWith(ct)),
   'Invalid relation or not enabled collections',
-) as z.ZodEffects<z.ZodString, `{${string}::${string}.${string}}`, string>;
+) as z.ZodEffects<z.ZodString, `${string}::${string}.${string}`, string>;
 
 export const externalAuthorSchema = z.object({
   id: z.number(),

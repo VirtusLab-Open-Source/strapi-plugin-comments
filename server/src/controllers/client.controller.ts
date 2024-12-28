@@ -19,7 +19,6 @@ const controllers = ({ strapi }: StrapiContext) => ({
     const configResult = await this.getStoreRepository().get(true);
     if (isRight(configResult)) {
       const config = unwrapEither(configResult);
-      console.log('config.enabledCollections', config.enabledCollections);
       const result = clientValidator.newCommentValidator(config.enabledCollections, ctx.params.relation, ctx.request.body);
       if (isRight(result)) {
         return this.getService('client').create(result.right, ctx.state.user);

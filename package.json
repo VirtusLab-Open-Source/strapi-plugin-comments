@@ -135,5 +135,11 @@
     "plugin",
     "comments"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "jest": {
+    "projects": [
+      "<rootDir>/server/jest.server.config.ts",
+      "<rootDir>/admin/jest.admin.config.ts"
+    ]
+  }
 }

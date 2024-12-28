@@ -5,6 +5,7 @@ export const getCommentNested = (nexus: Nexus) => {
     name: 'CommentNested',
     definition(t) {
       t.id('id');
+      t.string('documentId');
       t.nonNull.string('content');
       t.boolean('blocked');
       t.boolean('blockedThread');

@@ -4,7 +4,7 @@ import { CommentsPluginConfig } from '../config';
 import { PLUGIN_SELECTOR, REGEX, REPORT_REASON } from '../const';
 import { Either, makeRight } from '../utils/Either';
 
-export const getStoreRepository = once((strapi: CoreStrapi) => {
+export const getStoreRepositorySource = (strapi: CoreStrapi) => {
   return {
     getLocalConfig<P extends keyof CommentsPluginConfig>(
       prop?: P,
@@ -91,6 +91,8 @@ export const getStoreRepository = once((strapi: CoreStrapi) => {
       return this.get();
     },
   };
-});
+};
+
+export const getStoreRepository = once(getStoreRepositorySource);
 
 export type StoreRepository = ReturnType<typeof getStoreRepository>;

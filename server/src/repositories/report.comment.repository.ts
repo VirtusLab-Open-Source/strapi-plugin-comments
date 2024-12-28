@@ -23,7 +23,6 @@ export const getReportCommentRepositorySource = (strapi: CoreStrapi) => {
     },
     async update(params: Params): Promise<ReportResultValidator['update']> {
       const isValidationEnabled = await getConfig(strapi, 'isValidationEnabled', false);
-      console.log('isValidationEnabled', isValidationEnabled);
       return repository.update(params)
                        .then(shouldValidateObject(isValidationEnabled, reportResultValidator.update));
     },

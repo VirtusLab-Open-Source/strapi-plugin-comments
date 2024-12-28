@@ -207,11 +207,14 @@ const gqlService = ({ strapi }: StrapiContext) => {
               .field(attributeName)
               .hasFiltersEnabeld(),
           );
-
           const isIDFilterEnabled = extension.shadowCRUD(contentType.uid).field('id').hasFiltersEnabeld();
           if (contentType.kind === 'collectionType' && isIDFilterEnabled) {
             t.field('id', { type: getScalarFilterInputTypeName('ID') });
           }
+          // const isDocumentFilterEnabled = extension.shadowCRUD(contentType.uid).field('documentId').hasFiltersEnabeld();
+          // if (contentType.kind === 'collectionType' && isDocumentFilterEnabled) {
+          //   t.field('documentId', { type: getScalarFilterInputTypeName('ID') });
+          // }
           // Add every defined attribute
           for (const [attributeName, attribute] of validAttributes) {
             // Handle scalars
@@ -237,7 +240,6 @@ const gqlService = ({ strapi }: StrapiContext) => {
         },
       });
     },
-
   };
 };
 
