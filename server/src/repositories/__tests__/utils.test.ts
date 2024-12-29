@@ -20,13 +20,11 @@ describe('Utils', () => {
   describe('getDefaultAuthorPopulate', () => {
     it('should return true when avatar is not in attributes', () => {
       const strapi = caster<CoreStrapi>({
-        contentTypes: {
-          'plugin::users-permissions.user': {
-            attributes: {
-              username: { type: 'string' }
-            }
+        contentType: jest.fn().mockReturnValue({
+          attributes: {
+            username: { type: 'string' }
           }
-        }
+        })
       });
 
       const result = getDefaultAuthorPopulate(strapi);
@@ -35,13 +33,11 @@ describe('Utils', () => {
 
     it('should return populate object when avatar exists', () => {
       const strapi = caster<CoreStrapi>({
-        contentTypes: {
-          'plugin::users-permissions.user': {
-            attributes: {
-              avatar: { type: 'media' }
-            }
+        contentType: jest.fn().mockReturnValue({
+          attributes: {
+            avatar: { type: 'media' }
           }
-        }
+        })
       });
 
       const result = getDefaultAuthorPopulate(strapi);
@@ -50,7 +46,7 @@ describe('Utils', () => {
 
     it('should return true when content type is not found', () => {
       const strapi = caster<CoreStrapi>({
-        contentTypes: {}
+        contentType: jest.fn().mockReturnValue(null)
       });
 
       const result = getDefaultAuthorPopulate(strapi);

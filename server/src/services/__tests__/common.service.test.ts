@@ -1,6 +1,7 @@
 import { AdminUser, Id, StrapiContext } from '../../@types';
 import { CommentsPluginConfig } from '../../config';
-import { getCommentRepository, getOrderBy, getStoreRepository } from '../../repositories';
+import { getCommentRepository, getStoreRepository } from '../../repositories';
+import { getOrderBy } from '../../repositories/utils';
 import { caster } from '../../test/utils';
 import PluginError from '../../utils/PluginError';
 import commonService from '../common.service';
@@ -14,6 +15,8 @@ type CommentWithChildren = Comment & {
 jest.mock('../../repositories', () => ({
   getCommentRepository: jest.fn(),
   getStoreRepository: jest.fn(),
+}));
+jest.mock('../../repositories/utils', () => ({
   getOrderBy: jest.fn(),
 }));
 
