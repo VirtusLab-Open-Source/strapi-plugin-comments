@@ -1,5 +1,5 @@
-<div align="center" width="150px">
-  <img style="width: 150px; height: auto;" src="public/assets/logo.png" alt="Logo - Strapi Comments plugin" />
+<div align="center" style="max-width: 10rem; margin: 0 auto">
+  <img style="width: 150px; height: auto;" src="https://www.sensinum.com/img/open-source/strapi-plugin-comments/logo.png" alt="Logo - Strapi Comments plugin" />
 </div>
 <div align="center">
   <h1>Strapi v5 - Comments plugin - Beta</h1>
@@ -23,7 +23,7 @@
 ---
 
 <div style="margin: 20px 0" align="center">
-  <img style="width: 100%; height: auto;" src="public/assets/preview.png" alt="UI preview" />
+  <img style="width: 100%; height: auto;" src="https://www.sensinum.com/img/open-source/strapi-plugin-comments/preview.png" alt="UI preview" />
 </div>
 
 A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provides end to end comments feature with their moderation panel, bad words filtering, abuse reporting and much more.
@@ -47,6 +47,7 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 13. [👨‍💻 Community support](#-community-support)
 
 ## 💎 Versions
+
 - **Strapi v5** - (current) [v3.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
 - **Strapi v4** - [v2.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v4)
 - **Strapi v3** - [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3)
@@ -68,7 +69,7 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 As a ✅ **verified** plugin by Strapi team we're available on the [**Strapi Marketplace**](https://market.strapi.io/plugins/strapi-plugin-comments) as well as **In-App Marketplace** where you can follow the installation instructions.
 
 <div style="margin: 20px 0" align="center">
-  <img style="width: 100%; height: auto;" src="public/assets/marketplace.png" alt="Strapi In-App Marketplace" />
+  <img style="width: 100%; height: auto;" src="https://www.sensinum.com/img/open-source/strapi-plugin-comments/marketplace.png" alt="Strapi In-App Marketplace" />
 </div>
 
 ### Via command line
@@ -124,7 +125,7 @@ To start your journey with **Comments plugin** you must first setup it using the
 On the dedicated page, you will be able to set up all crucial properties which drive the plugin and customize each individual collection for which **Comments plugin** should be enabled.
 
 <div style="margin: 20px 0" align="center">
-  <img style="width: 100%; height: auto;" src="public/assets/configuration.png" alt="Plugin configuration" />
+  <img style="width: 100%; height: auto;" src="https://www.sensinum.com/img/open-source/strapi-plugin-comments/configuration.png" alt="Plugin configuration" />
 </div>
 
 > _Note_
