@@ -10,8 +10,7 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "publish:latest": "cd build && npm publish --tag latest",
-    "prepublish:latest": "npm run clean && npm run build && node build/setup-package.js",
+    "prepublish": "npm run clean && npm run build && node build/setup-package.js",
     "build": "tsc && yarn copy-translations",
     "build:dev": "yarn run build && cp ./package.json ./build",
     "copy-translations": "copyfiles admin/src/translations/*.json build/",
@@ -28,10 +27,10 @@
     "url": "https://github.com/VirtusLab-Open-Source/strapi-plugin-comments"
   },
   "dependencies": {
-    "@strapi/design-system": "1.18.0",
-    "@strapi/plugin-graphql": "^4.25.11",
-    "@strapi/utils": "^4.25.11",
-    "@strapi/types": "4.25.11",
+    "@strapi/design-system": "1.19.0",
+    "@strapi/plugin-graphql": "^4.25.18",
+    "@strapi/utils": "^4.25.18",
+    "@strapi/types": "4.25.18",
     "no-profanity": "^1.4.2",
     "styled-components": "^5.3.8",
     "match-sorter": "^4.0.2",
@@ -39,8 +38,8 @@
     "codemirror5": "npm:codemirror@^5.65.11"
   },
   "devDependencies": {
-    "@strapi/helper-plugin": "^4.25.11",
-    "@strapi/strapi": "4.25.11",
+    "@strapi/helper-plugin": "^4.25.18",
+    "@strapi/strapi": "4.25.18",
     "@types/axios": "^0.14.0",
     "@types/react-intl": "^3.0.0",
     "@types/react-query": "^1.2.9",

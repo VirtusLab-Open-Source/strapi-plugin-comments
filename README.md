@@ -34,32 +34,37 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 
 ### Table of Contents
 
-1. [✨ Features](#-features)
-2. [⏳ Installation](#-installation)
-3. [🖐 Requirements](#-requirements)
-4. [🔧 Configuration](#-configuration)
+1. [💎 Versions](#-versions)
+2. [✨ Features](#-features)
+3. [⏳ Installation](#-installation)
+4. [🖐 Requirements](#-requirements)
+5. [🔧 Configuration](#-configuration)
    - [Settings page](#in-v203-and-newer)
    - [Plugin file](#in-v202-and-older--default-configuration-state-for-v203-and-newer)
-5. [🕸️ Public API - REST](#%EF%B8%8F-public-rest-api-specification)
-6. [🕸️ Public API - GraphQL](#%EF%B8%8F-public-graphql-specification)
-7. [⚗️ Custom fields](#-custom-fields)
-8. [🤝 Contributing](#-contributing)
-9. [👨‍💻 Community support](#-community-support)
+6. [🕸️ Public API - REST](#%EF%B8%8F-public-rest-api-specification)
+7. [🕸️ Public API - GraphQL](#%EF%B8%8F-public-graphql-specification)
+8. [🌿 Model lifecycle hooks](#model-life-cycle-hooks)
+9. [⚗️ Custom fields](#-custom-fields)
+10. [🧩 Examples](#-examples)
+11. [💬 FAQ](#-faq)
+12. [🤝 Contributing](#-contributing)
+13. [👨‍💻 Community support](#-community-support)
+
+## 💎 Versions
+
+- **Strapi v5** - [v3.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
+- **Strapi v4** - (current) [v2.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v4)
+- **Strapi v3** - [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3)
 
 ## ✨ Features
 
 - **Comments Public REST + GraphQL API:** Elegant, entirely customizable and a fully extensible admin panel.
 - **Strapi &amp; generic users:** Support for built-in &amp; also generic non-Strapi users that might be the comments authors.
-- **Strapi Custom Fields support:** Improve an experience of your Content Types by using [dedicated set of custom fields](https://docs-next.strapi.io/user-docs/latest/plugins/introduction-to-plugins.html#custom-fields) for each of them and automate client side processing of Comments.
+- **Strapi Custom Fields support:** Improve an experience of your Content Types by using [dedicated set of custom fields](https://docs-v4.strapi.io/dev-docs/custom-fields) for each of them and automate client side processing of Comments.
 - **Any Content Type relation:** Comments can be linked to any of your Content Types by default. Simply, you're controlling it.
 - **Moderation Panel:** Search & Filter through the bucket with your auditory comments. Manage them by blocking single ones or full threads. All in combined list &amp; hierarchical tree view of threads.
 - **Automated Bad Words filtering:** By default end users are not allowed to post abusing comments where bad words have been used.
 - **Abuse Reporting & Reviewing:** Don't allow inferior language, react to reports from your community, send email notifications about issued reports
-
-## ⚙️ Versions
-
-- **Strapi v4** - (current) - [v2.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
-- **Strapi v3** - [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3)
 
 ## ⏳ Installation
 
@@ -123,7 +128,7 @@ All done. Enjoy 🎉
 
 ## 🖐 Requirements
 
-Complete installation requirements are exact same as for Strapi itself and can be found in the documentation under [Installation Requirements](https://docs.strapi.io/developer-docs/latest/getting-started/introduction.html).
+Complete installation requirements are exact same as for Strapi itself and can be found in the documentation under [Installation Requirements](https://docs-v4.strapi.io/dev-docs/intro).
 
 **Minimum environment requirements**
 
@@ -134,10 +139,10 @@ In our minimum support we're following [official Node.js releases timelines](htt
 
 **Supported Strapi versions**:
 
-- Strapi v4.24.x (recently tested)
+- Strapi v4.25.x (recently tested)
 - Strapi v4.x
 
-> This plugin is designed for **Strapi v4** and is not working with v3.x. To get version for **Strapi v3** install version [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3).
+> This plugin is designed for **Strapi v4**. To get support for other Strapi versions, please follow the [versions](#-versions) section.
 
 **Plugin dependencies**
 - `@strapi/plugin-graphql` - required to run because built-in support for GraphQL handled by this plugin 
@@ -193,7 +198,7 @@ module.exports = ({ env }) => ({
 
 - `enabledCollections` - list of Collection and Single Types for which plugin should be enabled in format like `'api::<collection name>.<content type name>'`. By default it's empty and none comments are not enabled for any of type in Strapi.
 - `no-profanity` - Enabled support for [profanity filtering](https://www.npmjs.com/package/no-profanity). Can be turned off or altered using the [options reference](https://www.npmjs.com/package/no-profanity?activeTab=readme#options). Default value: `true`.
-- `moderatorRoles` - Optional list of names of roles. Users with those roles will be notified by email when a new abuse report is created. This feature requires a built-in [Strapi email plugin](https://docs.strapi.io/developer-docs/latest/plugins/email.html) configured.
+- `moderatorRoles` - Optional list of names of roles. Users with those roles will be notified by email when a new abuse report is created. This feature requires a built-in [Strapi email plugin](https://docs-v4.strapi.io/dev-docs/plugins/email) configured.
 - `approvalFlow` - list of Content Types which are supporting approval flow. Values must be in format like `'api::<collection name>.<content type name>'`. For not included, posted comments are going to be immediately visible.
 - `entryLabel` - ordered list of property names per Content Type to generate related entity label. Keys must be in format like `'api::<collection name>.<content type name>'`. Default formatting set as `*`.
 - `reportReasons` - set of enums you would like to use for issuing abuse reports. Provided by default `'BAD_LANGUAGE'`, `'DISCRIMINATION'` and `'OTHER'`.
@@ -202,7 +207,7 @@ module.exports = ({ env }) => ({
 
 ## Additional GQL Configuration
 
-All you need to do is to install and enable `@strapi/plugin-graphql` for you instance based on the **[official Strapi v4 docs](https://docs.strapi.io/developer-docs/latest/plugins/graphql.html#configurations)** and decide if you would like to call it by anyone (open for world) or only by authenticated users (Strapi users).
+All you need to do is to install and enable `@strapi/plugin-graphql` for you instance based on the **[official Strapi v4 docs](https://docs-v4.strapi.io/dev-docs/plugins/graphql#configurations)** and decide if you would like to call it by anyone (open for world) or only by authenticated users (Strapi users).
 
 > **Important!**
 > If you're using `config/plugins.js` to configure your plugins , please put `comments` property before `graphql`. Otherwise types are not going to be properly added to GraphQL Schema. That's because of dynamic types which base on plugin configuration which are added on `boostrap` stage, not `register`. This is not valid if you're using `graphql` plugin without any custom configuration, so most of cases in real.
@@ -315,8 +320,8 @@ Return a hierarchical tree structure of comments for specified instance of Conte
 
 #### Strapi REST API properties support:
 
-- [field selection](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/populating-fields.html#field-selection)
-- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
+- [field selection](https://docs-v4.strapi.io/dev-docs/api/rest/populate-select#field-selection)
+- [sorting](https://docs-v4.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
 
 ### Get Comments (flat structure)
 
@@ -356,10 +361,10 @@ Return a flat structure of comments for specified instance of Content Type like 
 
 #### Strapi REST API properties support:
 
-- [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/filtering-locale-publication.html#filtering)
-- [field selection](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/populating-fields.html#field-selection)
-- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
-- [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#pagination)
+- [filtering](https://docs-v4.strapi.io/dev-docs/api/rest/filters-locale-publication#filtering)
+- [field selection](https://docs-v4.strapi.io/dev-docs/api/rest/populate-select#field-selection)
+- [sorting](https://docs-v4.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
+- [pagination](https://docs-v4.strapi.io/dev-docs/api/rest/sort-pagination#pagination)
 
 ### Get Comments (by Author)
 
@@ -406,10 +411,10 @@ To skip a field from the response you can use a query param called `omit`. It is
 
 #### Strapi REST API properties support:
 
-- [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/filtering-locale-publication.html#filtering)
-- [field selection](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/populating-fields.html#field-selection)
-- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
-- [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#pagination)
+- [filtering](https://docs-v4.strapi.io/dev-docs/api/rest/filters-locale-publication#filtering)
+- [field selection](https://docs-v4.strapi.io/dev-docs/api/rest/populate-select#field-selection)
+- [sorting](https://docs-v4.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
+- [pagination](https://docs-v4.strapi.io/dev-docs/api/rest/sort-pagination#pagination)
 
 ### Post a Comment
 
@@ -634,7 +639,7 @@ query {
 
 #### Strapi GraphQL API properties support:
 
-- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#sorting)
+- [sorting](https://docs-v4.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
 
 ### Get Comments (flat structure)
 
@@ -685,9 +690,9 @@ query {
 
 #### Strapi GraphQL API properties support:
 
-- [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#filters)
-- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#sorting)
-- [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#pagination)
+- [filtering](https://docs-v4.strapi.io/dev-docs/api/rest/filters-locale-publication#filtering)
+- [sorting](https://docs-v4.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
+- [pagination](https://docs-v4.strapi.io/dev-docs/api/rest/sort-pagination#pagination)
 
 ### Get Comments (by Author)
 
@@ -734,9 +739,9 @@ query {
 
 #### Strapi GraphQL API properties support:
 
-- [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#filters)
-- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#sorting)
-- [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#pagination)
+- [filtering](https://docs-v4.strapi.io/dev-docs/api/rest/filters-locale-publication#filtering)
+- [sorting](https://docs-v4.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
+- [pagination](https://docs-v4.strapi.io/dev-docs/api/rest/sort-pagination#pagination)
 
 ### Post a Comment
 
@@ -935,13 +940,13 @@ Live example of plugin usage can be found in the [VirtusLab Strapi Examples](htt
 
 For developers who upgrades their Strapi instance custom field from Comments plugin is available. Custom field can be picked from content types' edit page or added in definition file.
 
-Read more about this feature in [Strapi's docs](https://docs-next.strapi.io/user-docs/latest/plugins/introduction-to-plugins.html#custom-fields).
+Read more about this feature in [Strapi's docs](https://docs-v4.strapi.io/dev-docs/custom-fields).
 
 ## Model lifecycle hooks
 
 Comments plugin allows to register lifecycle hooks for `Comment` and `Comment report` content types.
 
-You can read more about lifecycle hooks [here](https://docs.strapi.io/dev-docs/backend-customization/models#lifecycle-hooks). (You can set a listener for all of the hooks).
+You can read more about lifecycle hooks [here](https://docs-v4.strapi.io/dev-docs/backend-customization/models#lifecycle-hooks). (You can set a listener for all of the hooks).
 
 Lifecycle hooks can be register either in `register()` or `bootstrap()` methods of your server. You can register more than one listener for a specified lifecycle hook. For example: you want to do three things on report creation and do not want to handle all of these actions in one big function. You can split logic in as many listeners as you want.
 
@@ -978,15 +983,6 @@ Example:
 ```
 
 ## 🤝 Contributing
-
-<div>
-  <a href="https://sharing.clickup.com/tl/xhcmx-83/strapiv-4-comments-roadmap">
-    <img src="https://img.shields.io/website?down_message=roadmap&label=product&up_message=roadmap&url=https%3A%2F%2Fsharing.clickup.com%2Ftl%2Fxhcmx-83%2Fstrapiv-4-comments-roadmap" />
-  </a>
-  <a href="https://sharing.clickup.com/b/xhcmx-63/strapiv-4-comments-board">
-    <img src="https://img.shields.io/website?down_message=board&label=product&up_color=blue&up_message=board&url=https%3A%2F%2Fsharing.clickup.com%2Fb%2Fxhcmx-63%2Fstrapiv-4-comments-board" />
-  </a>
-</div>
 
 Feel free to fork and make a Pull Request to this plugin project. All the input is warmly welcome!
 
