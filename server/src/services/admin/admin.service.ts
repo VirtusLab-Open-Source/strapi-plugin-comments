@@ -69,6 +69,7 @@ export default ({ strapi }: StrapiContext) => {
         .map(({ threadOf }) => typeof threadOf === 'object' ? threadOf.id : null)
         .filter(Boolean)),
       );
+      
       const result = results.map((_) => {
         const isCommentWithThread = commentWithThreadIds.includes(_.related.id);
         const commonService = this.getCommonService();
@@ -116,15 +117,15 @@ export default ({ strapi }: StrapiContext) => {
       }
 
       const { relatedId, uid } = this.getCommonService().parseRelationString(entity.related);
-      const relatedEntity = await strapi.entityService
-                                        .findOne(uid, relatedId)
+      const relatedEntity = await strapi.documents(uid)
+                                        .findOne({ documentId: relatedId })
                                         .then((_) => {
                                           if (!_) {
                                             throw new PluginError(404, 'Relation not found');
                                           }
                                           return { ..._, uid };
                                         });
-      const levelThreadId = entity.threadOf && typeof entity.threadOf === 'object' ? entity.threadOf.id : null;
+      const levelThreadId = entity.threadOf && typeof entity.threadOf === 'object' ? entity.threadOf.documentId : null;
 
       const entitiesOnSameLevel =
         await this.getCommonService().findAllInHierarchy(
