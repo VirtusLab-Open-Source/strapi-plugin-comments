@@ -75,7 +75,7 @@ As a ✅ **verified** plugin by Strapi team we're available on the [**Strapi Mar
 (Use **yarn** to install this plugin within your Strapi project (recommended). [Install yarn with these docs](https://yarnpkg.com/lang/en/docs/install/).)
 
 ```bash
-yarn add strapi-plugin-comments@latest
+yarn add strapi-plugin-comments@legacy
 ```
 
 After successful installation you've to re-build your Strapi instance. To archive that simply use:
