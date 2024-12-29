@@ -74,7 +74,7 @@ jobs:
             yarn prepublish
       - run:
           name: Publish package
-          command: cd build && npm publish --tag latest
+          command: cd build && npm publish --tag legacy
   deployBeta:
     environment:
       CODECOV_TOKEN: c803c20c-c45d-4a63-9ba9-58c7d5d05bbf
