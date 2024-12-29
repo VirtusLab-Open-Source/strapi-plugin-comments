@@ -1,5 +1,5 @@
 import { AdminUser, StrapiContext } from '../../@types';
-import { APPROVAL_STATUS } from '../../const';
+import { APPROVAL_STATUS, REPORT_REASON } from '../../const';
 import { getCommentRepository, getReportCommentRepository } from '../../repositories';
 import { caster } from '../../test/utils';
 import PluginError from '../../utils/error';
@@ -179,8 +179,8 @@ describe('client.service', () => {
     const mockUser: AdminUser = { id: 1, email: 'test@test.com', username: 'test' };
     const mockPayload = {
       commentId: 1,
-      relation: '{api::test.test:1}' as const,
-      reason: 'spam',
+      relation: 'api::test.test:1' as const,
+      reason: REPORT_REASON.BAD_LANGUAGE,
       content: 'Report content',
     };
 
@@ -188,7 +188,7 @@ describe('client.service', () => {
       const strapi = getStrapi();
       const service = getService(strapi);
       const mockComment = { id: 1, content: 'Test comment', isAdminComment: false };
-      const mockReport = { id: 1, reason: 'spam', content: 'Report content' };
+      const mockReport = { id: 1, reason: REPORT_REASON.BAD_LANGUAGE, content: 'Report content' };
 
       mockCommonService.isValidUserContext.mockReturnValue(true);
       mockCommonService.findOne.mockResolvedValue(mockComment);
@@ -202,7 +202,7 @@ describe('client.service', () => {
       });
       expect(mockReportCommentRepository.create).toHaveBeenCalledWith({
         data: {
-          reason: 'spam',
+          reason: REPORT_REASON.BAD_LANGUAGE,
           content: 'Report content',
           resolved: false,
           related: 1,
@@ -226,7 +226,7 @@ describe('client.service', () => {
     const mockUser: AdminUser = { id: 1, email: 'test@test.com', username: 'test' };
     const mockPayload = {
       commentId: 1,
-      relation: '{api::test.test:1}' as const,
+      relation: 'api::test.test:1' as const,
       authorId: null,
     };
 
@@ -247,7 +247,7 @@ describe('client.service', () => {
       expect(mockCommentRepository.update).toHaveBeenCalledWith({
         where: {
           id: 1,
-          related: '{api::test.test:1}',
+          related: 'api::test.test:1',
         },
         data: { removed: true },
         populate: { threadOf: true, authorUser: true },

@@ -1,8 +1,9 @@
 import { z } from 'zod';
+import { CommentsPluginConfig } from '../../../config';
 import { APPROVAL_STATUS } from '../../../const';
-import { AUTHOR_TYPE } from '../../../utils/constants';
+import { AUTHOR_TYPE, CONFIG_PARAMS } from '../../../utils/constants';
 import { ExtractRightEither } from '../../../utils/Either';
-import { AVAILABLE_OPERATORS, externalAuthorSchema, filtersValidator, getFiltersOperators, getRelationValidator, getStringToNumberValidator, orderByValidator, primitiveUnion, stringToBooleanValidator, stringToNumberValidator, validate } from '../../utils';
+import { AVAILABLE_OPERATORS, externalAuthorSchema, getFiltersOperators, getRelationValidator, getStringToNumberValidator, orderByValidator, stringToBooleanValidator, stringToNumberValidator, validate } from '../../utils';
 
 const getCommentSchema = (enabledCollections: string[]) => {
   return z.object({
@@ -134,20 +135,20 @@ export const findAllPerAuthorValidator = (params: object, payload: object) => {
 
 export type FindAllPerAuthorValidatorSchema = ExtractRightEither<ReturnType<typeof findAllPerAuthorValidator>>;
 
-const getReportAbuseSchema = (enabledCollections: string[]) => {
+const getReportAbuseSchema = (config: CommentsPluginConfig) => {
   return z.object({
-    relation: getRelationValidator(enabledCollections),
-    commentId: z.number(),
+    relation: getRelationValidator(config[CONFIG_PARAMS.ENABLED_COLLECTIONS]),
+    commentId: stringToNumberValidator,
     content: z.string().min(1),
-    reason: z.string().min(1),
+    reason: z.nativeEnum(config.reportReasons),
   });
 };
 
 export const reportAbuseValidator = (
-  enabledCollections: string[],
+  config: CommentsPluginConfig,
   payload: object,
 ) => {
-  return validate(getReportAbuseSchema(enabledCollections).safeParse(payload));
+  return validate(getReportAbuseSchema(config).safeParse(payload));
 };
 
 export type ReportAbuseValidatorSchema = ExtractRightEither<ReturnType<typeof reportAbuseValidator>>;

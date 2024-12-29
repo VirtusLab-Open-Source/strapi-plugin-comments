@@ -34,7 +34,7 @@ const reportSchema = z.object({
   updatedAt: z.string(),
   publishedAt: z.string().nullable(),
   locale: z.string().nullable(),
-  related: relatedSchema.nullable(),
+  related: relatedSchema.nullable().optional(),
 });
 
 const findPageSchema = z.object({

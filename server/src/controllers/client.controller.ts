@@ -96,7 +96,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
     const configResult = await this.getStoreRepository().get(true);
     if (isRight(configResult)) {
       const config = unwrapEither(configResult);
-      const result = clientValidator.reportAbuseValidator(config.enabledCollections, {
+      const result = clientValidator.reportAbuseValidator(config, {
         ...ctx.request.body,
         ...ctx.params,
       });
