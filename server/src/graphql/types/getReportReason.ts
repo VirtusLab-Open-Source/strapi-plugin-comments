@@ -1,4 +1,4 @@
-import { Nexus } from '../../@types-v5/graphql';
+import { Nexus } from '../../@types/graphql';
 import { CommentsPluginConfig } from '../../config';
 
 export const getReportReason = (nexus: Nexus, { reportReasons }: CommentsPluginConfig) => {

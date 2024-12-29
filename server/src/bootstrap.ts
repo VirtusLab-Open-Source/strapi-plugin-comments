@@ -1,4 +1,4 @@
-import { StrapiContext } from './@types-v5';
+import { StrapiContext } from './@types';
 import { setupGQL } from './graphql';
 import permissions from './permissions';
 

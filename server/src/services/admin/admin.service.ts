@@ -1,7 +1,8 @@
 import { isNil } from 'lodash';
-import { Id, StrapiContext } from '../../@types-v5';
+import { Id, StrapiContext } from '../../@types';
 import { APPROVAL_STATUS } from '../../const';
-import { getCommentRepository, getDefaultAuthorPopulate, getReportCommentRepository } from '../../repositories';
+import { getCommentRepository, getReportCommentRepository } from '../../repositories';
+import { getDefaultAuthorPopulate } from '../../repositories/utils';
 import { getPluginService } from '../../utils/getPluginService';
 import PluginError from '../../utils/PluginError';
 

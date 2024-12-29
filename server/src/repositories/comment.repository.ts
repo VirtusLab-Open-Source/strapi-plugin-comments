@@ -1,12 +1,12 @@
 import { FindOneParams, Params } from '@strapi/database/dist/entity-manager/types';
 import { once } from 'lodash';
-import { CoreStrapi } from '../@types-v5';
+import { CoreStrapi } from '../@types';
 import { getConfig } from '../utils/getConfig';
 import { CommentResultValidator, commentResultValidator } from '../validators/repositories';
 import { shouldValidateArray, shouldValidateObject } from '../validators/repositories/utils';
 import { getModelUid } from './utils';
 
-export const getCommentRepository = once((strapi: CoreStrapi) => {
+export const getCommentRepositorySource = (strapi: CoreStrapi) => {
   const modelUid = getModelUid(strapi, 'comment');
   return {
     async findMany(params: Params): Promise<CommentResultValidator['findMany']> {
@@ -44,6 +44,8 @@ export const getCommentRepository = once((strapi: CoreStrapi) => {
     },
 
   };
-});
+};
+
+export const getCommentRepository = once(getCommentRepositorySource);
 
 export type CommentRepository = ReturnType<typeof getCommentRepository>;

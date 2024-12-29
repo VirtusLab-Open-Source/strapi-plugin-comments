@@ -1,10 +1,11 @@
-import { Nexus } from "../../@types-v5/graphql";
+import { Nexus } from '../../@types/graphql';
 
 export const getCommentNested = (nexus: Nexus) => {
   return nexus.objectType({
     name: 'CommentNested',
     definition(t) {
       t.id('id');
+      t.string('documentId');
       t.nonNull.string('content');
       t.boolean('blocked');
       t.boolean('blockedThread');

@@ -1,5 +1,6 @@
-import type { JestConfigWithTsJest } from 'ts-jest'
-import { defaults as tsjPreset } from 'ts-jest/presets'
+import type { JestConfigWithTsJest } from 'ts-jest';
+import { defaults as tsjPreset } from 'ts-jest/presets';
+
 
 const config: JestConfigWithTsJest = {
   testMatch: ["**/__tests__/?(*.)+(spec|test).(t|j)s"],
@@ -11,11 +12,11 @@ const config: JestConfigWithTsJest = {
   collectCoverage: true,
   reporters: [ "default", "jest-junit" ],
   globals: {
-    "ts-jest": {
-      diagnostics: {
-        warnOnly: true,
-      },
-    },
+    // "ts-jest": {
+    //   diagnostics: {
+    //     warnOnly: true,
+    //   },
+    // },
   },
 };
 

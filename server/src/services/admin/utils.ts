@@ -1,6 +1,6 @@
 import { once, set } from 'lodash';
-import { CoreStrapi, DBQuery, Where } from '../../@types-v5';
-import { getDefaultAuthorPopulate, getOrderBy } from '../../repositories';
+import { CoreStrapi, DBQuery, Where } from '../../@types';
+import { getDefaultAuthorPopulate, getOrderBy } from '../../repositories/utils';
 import { admin as adminValidator } from '../../validators/api';
 
 export const getAdminServiceUtils = once((strapi: CoreStrapi) => {

@@ -1,4 +1,4 @@
-import { StrapiContext } from '../@types-v5';
+import { StrapiContext } from '../@types';
 import { CommentsPluginConfig } from '../config';
 import { getStoreRepository } from '../repositories';
 import { isRight } from '../utils/Either';

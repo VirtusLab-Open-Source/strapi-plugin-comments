@@ -11,18 +11,14 @@ jest.mock("react-intl", () => ({
 
 describe("getMessage()", () => {
   it("should handle simple string", () => {
-    expect(getMessage("message.key")).toMatchInlineSnapshot(`
-      {
-        "defaultMessage": "",
-        "id": "comments.message.key",
-      }
-    `);
-    expect(getMessage("message.key", "message.default")).toMatchInlineSnapshot(`
-      {
-        "defaultMessage": "message.default",
-        "id": "comments.message.key",
-      }
-    `);
+    expect(getMessage("message.key")).toEqual({
+      defaultMessage: "",
+      id: "comments.message.key",
+    });
+    expect(getMessage("message.key", "message.default")).toEqual({
+      defaultMessage: "message.default",
+      id: "comments.message.key",
+    });
   });
   it("should handle config object", () => {
     expect(
@@ -32,12 +28,10 @@ describe("getMessage()", () => {
         },
         "message.default"
       )
-    ).toMatchInlineSnapshot(`
-      {
-        "defaultMessage": "message.default",
-        "id": "comments.message.key",
-      }
-    `);
+    ).toEqual({
+      defaultMessage: "message.default",
+      id: "comments.message.key",
+    });
   });
   it("should allow out of scope translates", () => {
     expect(
@@ -48,11 +42,9 @@ describe("getMessage()", () => {
         "message.key.default",
         false
       )
-    ).toMatchInlineSnapshot(`
-      {
-        "defaultMessage": "message.key.default",
-        "id": "app.components.message.key",
-      }
-    `);
+    ).toEqual({
+      defaultMessage: "message.key.default",
+      id: "app.components.message.key",
+    });
   });
 });

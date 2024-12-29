@@ -1,5 +1,4 @@
-import { z, ZodRawShape } from 'zod';
-import { CoreStrapi } from '../@types-v5';
+import { CoreStrapi } from '../@types';
 import { ContentTypesUUIDs, KeysContentTypes } from '../content-types';
 
 export const getModelUid = (strapi: CoreStrapi, name: KeysContentTypes): ContentTypesUUIDs => {
@@ -10,7 +9,7 @@ export const getDefaultAuthorPopulate = (strapi: CoreStrapi) => {
   const strapiUserTypeUid = 'plugin::users-permissions.user';
   const allowedTypes = ['media', 'relation'];
 
-  const { attributes } = strapi.contentTypes[strapiUserTypeUid] || {};
+  const { attributes } = strapi.contentType(strapiUserTypeUid) ?? { attributes: {} };
   const relationTypes = Object.keys(attributes)?.filter((key: string) =>
     allowedTypes.includes(attributes[key]?.type),
   );
@@ -27,7 +26,3 @@ export const getDefaultAuthorPopulate = (strapi: CoreStrapi) => {
 export function getOrderBy(orderBy?: string | null) {
   return typeof orderBy === 'string' ? orderBy.split(':') : 'createdAt:desc'.split(':');
 }
-
-export const shouldValidate = <T extends ZodRawShape>(isEnabled: boolean, validator: z.ZodAny) => {
-  return isEnabled ? validator.parse : (args:T) => args as z.infer<typeof validator>;
-};

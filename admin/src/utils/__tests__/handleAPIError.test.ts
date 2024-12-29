@@ -1,8 +1,8 @@
-import handleAPIError from "../handleAPIError";
+import handleAPIError from '../handleAPIError';
 
-describe("handleAPIError()", () => {
-  it("should re-throw error", () => {
-    const err = new Error("Error");
+describe('handleAPIError()', () => {
+  it('should re-throw error', () => {
+    const err = new Error('Error');
 
     expect(() => handleAPIError(null, jest.fn)).toThrowError(Error);
     expect(() => handleAPIError(undefined, jest.fn)).toThrowError();
@@ -10,19 +10,14 @@ describe("handleAPIError()", () => {
     expect(() => handleAPIError(err, jest.fn)).toThrowError(err);
   });
 
-  it("should notify app", () => {
-    const err = new Error("Error");
+  it('should notify app', () => {
+    const err = new Error('Error');
     const notify = jest.fn();
 
-    expect(() => handleAPIError(err, notify, "message")).toThrowError(err);
-    expect(notify).toHaveBeenCalled();
-    expect(notify.mock.calls[0]).toMatchInlineSnapshot(`
-      [
-        {
-          "message": "comments.message",
-          "type": "warning",
-        },
-      ]
-    `);
+    expect(() => handleAPIError(err, notify, 'message')).toThrowError(err);
+    expect(notify).toHaveBeenCalledWith({
+      message: "comments.message",
+      type: "warning",
+    });
   });
 });

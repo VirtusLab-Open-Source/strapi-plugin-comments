@@ -1,4 +1,4 @@
-import { Id, RequestContext, StrapiContext } from '../@types-v5';
+import { Id, RequestContext, StrapiContext } from '../@types';
 import { PluginServices } from '../services';
 import { isRight, unwrapEither } from '../utils/Either';
 import { getPluginService } from '../utils/getPluginService';

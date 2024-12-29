@@ -1,5 +1,3 @@
-import { ToBeFixed } from '../../@types-v5';
-import PluginError from '../../utils/error';
 import { client } from '../../validators/api';
 
 // Define base interface for filters
@@ -14,11 +12,6 @@ interface BaseFilters {
 
 // Union type of all possible input types
 type FlatInputParams = client.FindAllFlatSchema | client.FindAllInHierarchyValidatorSchema | client.FindAllPerAuthorValidatorSchema;
-
-const assertNotEmpty = <T>(value: T | null | undefined, customError?: Error): asserts value is T => {
-  if (value) return;
-  throw customError ?? new PluginError(400, 'Non-empty value expected, empty given');
-};
 
 export const flatInput = <T extends FlatInputParams>(payload: T): T => {
   const { 
@@ -69,8 +62,6 @@ export const flatInput = <T extends FlatInputParams>(payload: T): T => {
       },
     };
   }
-
-  const updatedFilters = { ...filters };
 
   return {
     ...payload,

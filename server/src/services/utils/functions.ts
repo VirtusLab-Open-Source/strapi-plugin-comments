@@ -1,11 +1,9 @@
-import { StrapiAdmin, StrapiUser } from '@sensinum/strapi-utils';
-import { get, isArray, isEmpty, isObject, isString } from 'lodash';
-import { AdminUser, CommentAuthor, CoreStrapi, Id } from '../../@types-v5';
+import { StrapiUser } from '@sensinum/strapi-utils';
+import { get, isEmpty, isObject } from 'lodash';
+import { AdminUser, CommentAuthor, Id } from '../../@types';
 import { REGEX } from '../../utils/constants';
 import PluginError from '../../utils/error';
 import { Comment, CommentWithRelated } from '../../validators/repositories';
-
-declare var strapi: CoreStrapi;
 
 interface StrapiAuthorUser {
   id: Id;
@@ -56,10 +54,6 @@ export const buildNestedStructure = (
 
 export const getRelatedGroups = (related: string): Array<string> =>
   related.split(REGEX.relatedUid).filter((s) => s && s.length > 0);
-
-export const getModelUid = (name: string): string => {
-  return strapi.plugin('comments').contentTypes[name]?.uid;
-};
 
 export const filterOurResolvedReports = (item: Comment): Comment =>
   item
@@ -117,10 +111,6 @@ export const buildAuthorModel = (
     author,
   } as Comment;
 };
-
-export const buildConfigQueryProp = (
-  prop: undefined | string | Array<string> = '',
-): string => (isArray(prop) ? prop.join('.') : prop ?? '');
 
 export const resolveUserContextError = (user?: AdminUser | StrapiUser): PluginError => {
   if (user) {

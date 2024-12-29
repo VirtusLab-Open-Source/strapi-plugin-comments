@@ -1,4 +1,4 @@
-import { RequestContext, StrapiContext } from '../@types-v5';
+import { RequestContext, StrapiContext } from '../@types';
 import { getStoreRepository } from '../repositories';
 import { PluginServices } from '../services';
 import { AUTHOR_TYPE } from '../utils/constants';
@@ -19,7 +19,6 @@ const controllers = ({ strapi }: StrapiContext) => ({
     const configResult = await this.getStoreRepository().get(true);
     if (isRight(configResult)) {
       const config = unwrapEither(configResult);
-      console.log('config.enabledCollections', config.enabledCollections);
       const result = clientValidator.newCommentValidator(config.enabledCollections, ctx.params.relation, ctx.request.body);
       if (isRight(result)) {
         return this.getService('client').create(result.right, ctx.state.user);

@@ -1,4 +1,4 @@
-import { StrapiContext } from '../../@types-v5';
+import { StrapiContext } from '../../@types';
 import { commentsCustomField } from './comments';
 
 export const registerCustomFields = ({ strapi }: StrapiContext) => {

@@ -1,6 +1,6 @@
 import { Kind } from 'graphql';
 import { isNumber } from 'lodash';
-import { Nexus } from '../../@types-v5/graphql';
+import { Nexus } from '../../@types/graphql';
 
 export const getIdType = (nexus: Nexus) => {
   return nexus.scalarType({

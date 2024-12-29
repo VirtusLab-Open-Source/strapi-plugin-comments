@@ -2,10 +2,11 @@ import { Params } from '@strapi/database/dist/entity-manager/types';
 import { UID } from '@strapi/strapi';
 import { first, get, isNil, isObject, isString, omit as filterItem, parseInt, uniq } from 'lodash';
 import { isProfane, replaceProfanities } from 'no-profanity';
-import { Id, RelatedEntity, StrapiContext } from '../@types-v5';
+import { Id, RelatedEntity, StrapiContext } from '../@types';
 import { CommentsPluginConfig } from '../config';
 import { ContentTypesUUIDs } from '../content-types';
-import { getCommentRepository, getOrderBy, getStoreRepository } from '../repositories';
+import { getCommentRepository, getStoreRepository } from '../repositories';
+import { getOrderBy } from '../repositories/utils';
 import { CONFIG_PARAMS } from '../utils/constants';
 import PluginError from '../utils/PluginError';
 import { client as clientValidator } from '../validators/api';
@@ -23,13 +24,12 @@ type ParsedRelation = {
   relatedId: string;
 };
 
-
 type ConfigResult<T extends keyof CommentsPluginConfig> = T extends keyof CommentsPluginConfig ? CommentsPluginConfig[T] : CommentsPluginConfig;
 const commonService = ({ strapi }: StrapiContext) => ({
   async getConfig<T extends keyof CommentsPluginConfig>(prop?: T, defaultValue?: CommentsPluginConfig[T], useLocal = false): Promise<ConfigResult<T>> {
     const storeRepository = getStoreRepository(strapi);
     const config = await storeRepository.getConfig();
-    if (prop && config && !useLocal) {
+    if (prop && !useLocal) {
       return get(config, prop, defaultValue) as ConfigResult<T>;
     }
     if (useLocal) {
@@ -37,7 +37,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     }
     return config as ConfigResult<T>;
   },
-  parseRelationString(relation: `${string}::${string}` | string): ParsedRelation {
+  parseRelationString(relation: `${string}::${string}.${string}:${string}` | string): ParsedRelation {
     const [uid, relatedStringId] = getRelatedGroups(relation);
     return { uid: uid as UID.ContentType, relatedId: relatedStringId };
   },
@@ -58,7 +58,6 @@ const commonService = ({ strapi }: StrapiContext) => ({
       ),
     }, omitProps) as Comment;
   },
-
 
   // Find comments in the flat structure
   async findAllFlat({
@@ -84,7 +83,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     const [operator, direction] = getOrderBy(sort);
     const fieldsQuery = {
       sort: { [operator]: direction },
-      select: Array.isArray(fields) ? uniq([...fields, defaultSelect]) : fields,
+      select: Array.isArray(fields) ? uniq([...fields, defaultSelect].flat()) : fields,
     };
 
     const entries = await getCommentRepository(strapi).findMany({
@@ -304,8 +303,11 @@ const commonService = ({ strapi }: StrapiContext) => ({
       ),
     };
   },
-
-  async modifiedNestedNestedComments<T extends keyof Comment>(id: Id, fieldName: T, value: Comment[T]): Promise<boolean> {
+  // TODO: we need to add deepLimit to the function to prevent infinite loops
+  async modifiedNestedNestedComments<T extends keyof Comment>(id: Id, fieldName: T, value: Comment[T], deepLimit: number = 10): Promise<boolean> {
+    if (deepLimit === 0) {
+      return true;
+    }
     try {
       const entities = await this.findMany({ where: { threadOf: id } });
       const changedEntries = await getCommentRepository(strapi).updateMany({
@@ -315,7 +317,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
       if (entities.length === changedEntries.count && changedEntries.count > 0) {
         const nestedTransactions = await Promise.all(
           entities.map((item) =>
-            this.modifiedNestedNestedComments(item.id, fieldName, value)),
+            this.modifiedNestedNestedComments(item.id, fieldName, value, deepLimit - 1)),
         );
         return nestedTransactions.length === changedEntries.count;
       }

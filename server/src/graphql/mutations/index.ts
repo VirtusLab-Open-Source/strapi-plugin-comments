@@ -1,5 +1,5 @@
-import { CoreStrapi } from '../../@types-v5';
-import { Nexus } from '../../@types-v5/graphql';
+import { CoreStrapi } from '../../@types';
+import { Nexus } from '../../@types/graphql';
 import { getCreateAbuseReport } from './getCreateAbuseReport';
 import { getCreateComment } from './getCreateComment';
 import { getRemoveComment } from './getRemoveComment';
