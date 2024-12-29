@@ -57,9 +57,9 @@ describe('admin.service', () => {
     strapi: {
       contentType: jest.fn().mockReturnValue({ attributes: {} }),
       contentTypes: {},
-      entityService: {
+      documents: jest.fn().mockReturnValue({
         findOne: mockFindOne,
-      },
+      }),
     },
   });
 
