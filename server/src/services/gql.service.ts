@@ -97,7 +97,7 @@ const gqlService = ({ strapi }: StrapiContext) => {
       return queryFilters.reduce((acc, filtersItem) => {
         acc.push(graphQLFiltersToStrapiQuery(filtersItem, contentType));
         return acc;
-      });
+      }, []);
     }
 
     const resultMap: ToBeFixed = {};
