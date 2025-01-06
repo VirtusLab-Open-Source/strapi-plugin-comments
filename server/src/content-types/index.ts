@@ -11,5 +11,5 @@ export type KeysContentTypes = keyof ContentTypes;
 export type CommentsContentTypes = {
   [K in KeysContentTypes]: `plugin::comments.${K}`;
 };
-export type ContentTypesUUIDs = CommentsContentTypes[keyof CommentsContentTypes];
+export type ContentTypesUUIDs = CommentsContentTypes[keyof CommentsContentTypes] | 'admin::user' | 'plugin::users-permissions.user';
 export default contentTypes;

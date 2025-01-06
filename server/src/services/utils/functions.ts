@@ -108,7 +108,7 @@ export const buildAuthorModel = (
 
   return {
     ...rest,
-    author,
+    author: isEmpty(author) ? (item.author || {}) : author,
   } as Comment;
 };
 

@@ -1,14 +1,14 @@
 import { once } from 'lodash';
-import { CoreStrapi } from '../@types';
+import { CoreStrapi, PathTo, PathValue } from '../@types';
 import { CommentsPluginConfig } from '../config';
 import { PLUGIN_SELECTOR, REGEX, REPORT_REASON } from '../const';
 import { Either, makeRight } from '../utils/Either';
 
 export const getStoreRepositorySource = (strapi: CoreStrapi) => {
   return {
-    getLocalConfig<P extends keyof CommentsPluginConfig>(
+    getLocalConfig<P extends  PathTo<CommentsPluginConfig>>(
       prop?: P,
-      defaultValue?: CommentsPluginConfig[P],
+      defaultValue?: PathValue<CommentsPluginConfig, P>,
     ) {
       return strapi.config.get([PLUGIN_SELECTOR, prop].filter(Boolean).join('.'), defaultValue);
     },

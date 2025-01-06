@@ -48,25 +48,21 @@ const relatedSchema = z.intersection(
 
 const authorSchema = z.object({
   id: z.union([z.number(), z.string()]),
-  name: z.string(),
+  name: z.string().optional(),
   email: z.string(),
   avatar: z.union([
     z.object({
-      url: z.string().nullable(),
+      url: z.string(),
+    }),
+    z.object({
+      url: z.string(),
       formats: z.object({
         thumbnail: z.object({
           url: z.string(),
         }).nullable(),
       }),
     }),
-    z.object({
-      id: z.string(),
-      name: z.string(),
-      email: z.string(),
-      url: z.string().nullable(),
-      avatar: z.string().nullable(),
-    }),
-  ]).nullable(),
+  ]).nullable().optional(),
 });
 
 export type Author = z.infer<typeof authorSchema>;
@@ -242,10 +238,10 @@ export const userSchema = z.object({
         id: z.number(),
         name: z.string(),
         description: z.string(),
-        code: z.string()
-      })
-    )
-  })
-})
+        code: z.string(),
+      }),
+    ),
+  }),
+});
 
 export type User = z.infer<typeof userSchema>['data'];

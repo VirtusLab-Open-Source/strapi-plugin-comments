@@ -6,7 +6,6 @@ import { StrapiContext, ToBeFixed } from '../@types';
 
 
 const virtualScalarAttributes = ['id'];
-const customFields = ['filterBy', 'filterByValue'];
 
 
 const addScalarAttribute = (
@@ -96,16 +95,12 @@ const gqlService = ({ strapi }: StrapiContext) => {
     // If filters is a collection, then apply the transformation to every item of the list
     if (Array.isArray(queryFilters)) {
       return queryFilters.reduce((acc, filtersItem) => {
-        if (!customFields.includes(filtersItem)) {
-          acc.push(graphQLFiltersToStrapiQuery(filtersItem, contentType));
-        }
-
+        acc.push(graphQLFiltersToStrapiQuery(filtersItem, contentType));
         return acc;
       });
     }
 
     const resultMap: ToBeFixed = {};
-    const { filterBy, filterByValue, ...filters } = queryFilters;
     const { attributes } = contentType;
 
     const isAttribute = (attributeName: string): boolean => {
@@ -114,7 +109,7 @@ const gqlService = ({ strapi }: StrapiContext) => {
       );
     };
 
-    for (const [key, value] of Object.entries(filters)) {
+    for (const [key, value] of Object.entries(queryFilters)) {
       // If the key is an attribute, update the value
       if (isAttribute(key)) {
         const attribute: ToBeFixed = attributes[key];
@@ -159,28 +154,6 @@ const gqlService = ({ strapi }: StrapiContext) => {
       }
     }
 
-    if (filterBy === 'DATE_CREATED') {
-      const date = new Date(filterByValue);
-
-      if (!filterByValue || Number.isNaN(+date)) {
-        throw new Error('Invalid date specified in "filterByValue"');
-      }
-
-      const start = date.setHours(0, 0, 0, 0);
-      const end = date.setHours(23, 59, 59, 999);
-
-      resultMap.createdAt = {
-        $between: [start, end],
-      };
-    }
-
-    if (filterBy === 'APPROVAL_STATUS') {
-      if (!filterByValue) {
-        throw new Error('Empty "filterByValue" parameter');
-      }
-
-      resultMap.approvalStatus = filterByValue;
-    }
 
     return resultMap;
 
@@ -233,10 +206,6 @@ const gqlService = ({ strapi }: StrapiContext) => {
           for (const operator of rootLevelOperators()) {
             operator.add(t, filtersTypeName);
           }
-          // TODO: explain with Mateusz what is this for
-          customFields.forEach((field) => {
-            t.field(field, { type: 'String' });
-          });
         },
       });
     },

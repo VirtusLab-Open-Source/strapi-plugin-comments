@@ -37,6 +37,10 @@ export const schemaConfig = z.object({
   gql: z.object({
     auth: z.boolean().optional(),
   }).optional(),
+  client: z.object({
+    url: z.string().nullable(),
+    contactEmail: z.string().nullable(),
+  }).default({ url: null, contactEmail: null }),
 });
 
 export type CommentsPluginConfig = z.infer<typeof schemaConfig>;

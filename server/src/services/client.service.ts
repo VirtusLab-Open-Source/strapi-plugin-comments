@@ -18,7 +18,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
   const createAuthor = (author: client.NewCommentValidatorSchema['author'], user?: AdminUser) => {
     if (user) {
       return {
-        authorUser: user.id,
+        authorUser: user.id, 
       };
     } else if (author) {
       return {
@@ -38,7 +38,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
     // Create a comment
     async create({ relation, content, threadOf, author, approvalStatus, locale }: client.NewCommentValidatorSchema, user?: AdminUser) {
       const { uid, relatedId } = this.getCommonService().parseRelationString(relation);
-      const relatedEntity = await strapi.documents(uid).findOne({ documentId: relatedId, locale })
+      const relatedEntity = await strapi.documents(uid).findOne({ documentId: relatedId, locale });
       if (!relatedEntity) {
         throw new PluginError(
           400,
@@ -230,12 +230,89 @@ export const clientService = ({ strapi }: StrapiContext) => {
     },
 
     async sendAbuseReportEmail(reason: string, content: string) {
+      const SUPER_ADMIN_ROLE = 'strapi-super-admin';
+      const rolesToNotify = await this.getCommonService().getConfig(CONFIG_PARAMS.MODERATOR_ROLES, [SUPER_ADMIN_ROLE]);
+      if (rolesToNotify.length > 0) {
+        const emails = await strapi.query('admin::user')
+                                   .findMany({ where: { roles: { code: rolesToNotify } } })
+                                   .then((users) => users.map((user) => user.email));
+        if (emails.length > 0) {
+          const from = await strapi.query('admin::user').findOne({ where: { roles: { code: SUPER_ADMIN_ROLE } } });
+          if (strapi.plugin('email')) {
+            await strapi.plugin('email')
+                        .service('email')
+                        .send({
+                          to: emails,
+                          from: from.email,
+                          subject: 'New abuse report on comment',
+                          text: `
+                        There was a new abuse report on your app. 
+                        Reason: ${reason}
+                        Message: ${content}
+                    `,
+                        });
+          }
+        }
+      }
     },
 
     async markAsRemovedNested(commentId: string | number, status: boolean) {
+      return this.getCommonService().modifiedNestedNestedComments(
+        commentId,
+        'removed',
+        status,
+      );
     },
 
-    async sendResponseNotification(_entry: Comment) {},
+    async sendResponseNotification(entity: Comment) {
+      if (entity.threadOf) {
+        const thread = typeof entity.threadOf === 'object' ? entity.threadOf : await this.getCommonService().findOne({ id: entity.threadOf });
+        let emailRecipient = thread?.author?.email;
+        if (thread.authorUser && !emailRecipient) {
+          const strapiUser = typeof thread.authorUser === 'object' ? thread.authorUser : await strapi.query('plugin::users-permissions.user').findOne({
+            where: { id: thread.authorUser },
+          });
+          emailRecipient = strapiUser?.email;
+        }
+
+        if (emailRecipient) {
+          const superAdmin = await strapi.query('admin::user')
+                                         .findOne({
+                                           where: {
+                                             roles: { code: 'strapi-super-admin' },
+                                           },
+                                         });
+
+          const emailSender = await this.getCommonService().getConfig('client.contactEmail', superAdmin.email);
+          const clientAppUrl = await this.getCommonService().getConfig('client.url', 'our site');
+
+          try {
+            await strapi
+            .plugin('email')
+            .service('email')
+            .send({
+              to: [emailRecipient],
+              from: emailSender,
+              subject: 'You\'ve got a new response to your comment',
+              text: `Hello ${thread?.author?.name || emailRecipient}!
+                You've got a new response to your comment by ${entity?.author?.name || entity?.author?.email}.
+                
+                ------
+
+                "${entity.content}"
+
+                ------
+                
+                Visit ${clientAppUrl} and continue the discussion.
+                `,
+            });
+          } catch (err) {
+            strapi.log.error(err);
+            throw err;
+          }
+        }
+      }
+    },
   });
 };
 

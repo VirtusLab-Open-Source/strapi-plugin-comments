@@ -2,7 +2,7 @@ import { Params } from '@strapi/database/dist/entity-manager/types';
 import { UID } from '@strapi/strapi';
 import { first, get, isNil, isObject, isString, omit as filterItem, parseInt, uniq } from 'lodash';
 import { isProfane, replaceProfanities } from 'no-profanity';
-import { Id, RelatedEntity, StrapiContext } from '../@types';
+import { Id, PathTo, PathValue, RelatedEntity, StrapiContext } from '../@types';
 import { CommentsPluginConfig } from '../config';
 import { ContentTypesUUIDs } from '../content-types';
 import { getCommentRepository, getStoreRepository } from '../repositories';
@@ -24,18 +24,20 @@ type ParsedRelation = {
   relatedId: string;
 };
 
-type ConfigResult<T extends keyof CommentsPluginConfig> = T extends keyof CommentsPluginConfig ? CommentsPluginConfig[T] : CommentsPluginConfig;
+
+type Created = PathTo<CommentsPluginConfig>;
+
 const commonService = ({ strapi }: StrapiContext) => ({
-  async getConfig<T extends keyof CommentsPluginConfig>(prop?: T, defaultValue?: CommentsPluginConfig[T], useLocal = false): Promise<ConfigResult<T>> {
+  async getConfig<T extends Created>(prop?: T, defaultValue?: PathValue<CommentsPluginConfig, T>, useLocal = false): Promise<PathValue<CommentsPluginConfig, T>> {
     const storeRepository = getStoreRepository(strapi);
     const config = await storeRepository.getConfig();
     if (prop && !useLocal) {
-      return get(config, prop, defaultValue) as ConfigResult<T>;
+      return get(config, prop, defaultValue) as PathValue<CommentsPluginConfig, T>;
     }
     if (useLocal) {
-      return storeRepository.getLocalConfig(prop, defaultValue) as ConfigResult<T>;
+      return storeRepository.getLocalConfig(prop, defaultValue) as PathValue<CommentsPluginConfig, T>;
     }
-    return config as ConfigResult<T>;
+    return config as PathValue<CommentsPluginConfig, T>;
   },
   parseRelationString(relation: `${string}::${string}.${string}:${string}` | string): ParsedRelation {
     const [uid, relatedStringId] = getRelatedGroups(relation);
@@ -183,10 +185,12 @@ const commonService = ({ strapi }: StrapiContext) => ({
         authorUser: true,
       },
     });
+    console.log('findOne::entity', entity);
     if (!entity) {
       throw new PluginError(400, 'Comment does not exist. Check your payload please.');
     }
     const doNotPopulateAuthor: Array<string> = await this.getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
+    console.log('doNotPopulateAuthor', doNotPopulateAuthor);
     const item = this.sanitizeCommentEntity(entity, doNotPopulateAuthor);
     return filterOurResolvedReports(item);
   },

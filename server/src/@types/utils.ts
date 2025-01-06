@@ -74,3 +74,22 @@ export type RelatedEntity = {
   requireCommentsApproval?: boolean;
 };
 export type ToBeFixed = any;
+
+
+export type PathTo<T> = T extends object ? {
+  [K in keyof T]: T[K] extends object
+    ? K extends string
+      ? K | `${K}.${PathTo<T[K]>}`
+      : never
+    : K extends string
+      ? K
+      : never
+}[keyof T] : never;
+
+export type PathValue<T, P extends string> = P extends keyof T
+  ? T[P]
+  : P extends `${infer K}.${infer R}`
+    ? K extends keyof T
+      ? PathValue<T[K], R>
+      : never
+    : never;
