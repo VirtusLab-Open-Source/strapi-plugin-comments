@@ -236,6 +236,8 @@ describe('client.service', () => {
       const mockEntity = { id: 1, content: 'Test comment', removed: true };
       const mockSanitizedEntity = { id: 1, content: '[removed]', removed: true };
 
+      jest.spyOn(service, 'markAsRemovedNested').mockResolvedValue(true);
+
       mockCommonService.isValidUserContext.mockReturnValue(true);
       mockCommonService.findOne.mockResolvedValue(mockEntity);
       mockCommentRepository.update.mockResolvedValue(mockEntity);
@@ -244,6 +246,7 @@ describe('client.service', () => {
       const result = await service.markAsRemoved(mockPayload, mockUser);
 
       expect(result).toEqual(mockSanitizedEntity);
+      expect(service.markAsRemovedNested).toHaveBeenCalledWith(1, true);
       expect(mockCommentRepository.update).toHaveBeenCalledWith({
         where: {
           id: 1,
