@@ -109,7 +109,7 @@ In our minimum support we're following [official Node.js releases timelines](htt
 - Strapi v5.6.0 (recently tested)
 - Strapi v5.x
 
-> This plugin is designed for **Strapi v5** and is not working with v4.x and lower. To get support for **Strapi v4** install version [v4.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v4).
+> This plugin is designed for **Strapi v5**. To get support for other Strapi versions, please follow the [versions](#-versions) section.
 
 **Plugin dependencies**
 - `@strapi/plugin-graphql` - required to run GraphQL handled by this plugin 
@@ -228,7 +228,7 @@ Feature / Capability focused permissions:
 
 ```json
 {
-  "id": 1,
+  "documentId": "njx99iv4p4txuqp307ye8625",
   "content": "My comment content",
   "blocked": null,
   "blockedThread": true,
@@ -259,11 +259,11 @@ Feature / Capability focused permissions:
 
 _GraphQL equivalent: [Public GraphQL API -> Get Comments](#get-comments-1)_
 
-`GET <host>/api/comments/api::<collection name>.<content type name>:<entity id>`
+`GET <host>/api/comments/api::<collection name>.<content type name>:<entity document id>`
 
-Return a hierarchical tree structure of comments for specified instance of Content Type like for example `Page` with `ID: 1`.
+Return a hierarchical tree structure of comments for specified instance of Content Type like for example `Page` with `documentId: njx99iv4p4txuqp307ye8625`.
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:1`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625`
 
 **Example response body**
 
@@ -294,11 +294,11 @@ Return a hierarchical tree structure of comments for specified instance of Conte
 
 _GraphQL equivalent: [Public GraphQL API -> Get Comments (flat structure)](#get-comments-flat-structure-1)_
 
-`GET <host>/api/comments/api::<collection name>.<content type name>:<entity id>/flat`
+`GET <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/flat`
 
-Return a flat structure of comments for specified instance of Content Type like for example `Page` with `ID: 1`
+Return a flat structure of comments for specified instance of Content Type like for example `Page` with `documentId: njx99iv4p4txuqp307ye8625`
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:1/flat`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/flat`
 
 **Example response body**
 
@@ -341,8 +341,8 @@ _GraphQL equivalent: [Public GraphQL API -> Get Comments (by Author)](#get-comme
 
 Return a flat structure of comments by specified Author for example `Author` with `ID: 1`
 
-**Example URL**: `https://localhost:1337/api/comments/author/1` - get comments by `ID:1` of Strapi User
-**Example URL**: `https://localhost:1337/api/comments/author/1/generic` - get comments by `ID:1` of Generic User
+**Example URL**: `https://localhost:1337/api/comments/author/1` - get comments by `ID: 1` of Strapi User
+**Example URL**: `https://localhost:1337/api/comments/author/1/generic` - get comments by `ID: 1` of Generic User
 
 #### Skipping fields
 
@@ -387,11 +387,11 @@ To skip a field from the response you can use a query param called `omit`. It is
 
 _GraphQL equivalent: [Public GraphQL API -> Post a Comments](#post-a-comment-1)_
 
-`POST <host>/api/comments/api::<collection name>.<content type name>:<entity id>`
+`POST <host>/api/comments/api::<collection name>.<content type name>:<entity document id>`
 
-Posts a Comment related to specified instance of Content Type like for example `Page` with `ID: 1`
+Posts a Comment related to specified instance of Content Type like for example `Page` with `documentId: njx99iv4p4txuqp307ye8625`
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:1`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625`
 
 **Example request body**
 
@@ -438,11 +438,11 @@ _Strapi user_
 
 _GraphQL equivalent: [Public GraphQL API -> Update Comments](#update-comment-1)_
 
-`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>`
 
-Updates a specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1`
+Updates a specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `documentId: njx99iv4p4txuqp307ye8625`
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:1/comment/2`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2`
 
 **Example request body**
 
@@ -485,11 +485,11 @@ _Strapi user_
 
 _GraphQL equivalent: [Public GraphQL API -> Delete Comment](#delete-comment-1)_
 
-`DELETE <host>/api/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>?authorId=<authorId>`
+`DELETE <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>?authorId=<authorId>`
 
-Deletes a specified Comment based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1`.
+Deletes a specified Comment based on it `commentId` and related to specified instance of Content Type like for example `Page` with `documentId: njx99iv4p4txuqp307ye8625`.
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:1/comment/1?authorId=1`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/1?authorId=1`
 
 **Example response body**
 
@@ -508,11 +508,11 @@ Deletes a specified Comment based on it `commentId` and related to specified ins
 
 _GraphQL equivalent: [Public GraphQL API -> Issue Abuse Report against specified Comment](#issue-abuse-report-against-specified-comment-1)_
 
-`POST <host>/api/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>/report-abuse`
+`POST <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>/report-abuse`
 
-Reports abuse in specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1` and requests moderator attention.
+Reports abuse in specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `documentId: njx99iv4p4txuqp307ye8625` and requests moderator attention.
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:1/comment/2/report-abuse`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2/report-abuse`
 
 **Example request body**
 
@@ -556,7 +556,7 @@ _REST API equivalent: [Public REST API -> Get Comments](#get-comments)_
 
 ```graphql
 query {
-  findAllInHierarchy(relation: "api::page.page:1") {
+  findAllInHierarchy(relation: "api::page.page:njx99iv4p4txuqp307ye8625") {
     id
     content
     blocked
@@ -617,7 +617,7 @@ _REST API equivalent: [Public REST API -> Get Comments (flat structure)](#get-co
 ```graphql
 query {
   findAllFlat(
-    relation: "api::page.page:1"
+    relation: "api::page.page:njx99iv4p4txuqp307ye8625"
     filters: { content: { contains: "Test" } }
   ) {
     id
@@ -653,6 +653,7 @@ query {
       // ...
     ]
   }
+}
 ```
 
 #### Strapi GraphQL API properties support:
@@ -720,7 +721,7 @@ _REST API equivalent: [Public REST API -> Post a Comment](#post-a-comment)_
 mutation createComment {
   createComment(
     input: {
-      relation: "api::page.page:1"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
       content: "Hello World!"
       threadOf: 3
       author: { id: "12345678", name: "John Wick", email: "test@test.pl" } # Optional if using auth / authz requests
@@ -770,7 +771,7 @@ mutation updateComment {
   updateComment(
     input: {
       id: 34
-      relation: "api::page.page:1"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
       content: "I've changed it!"
       author: { id: "12345678" } # Optional if using auth / authz requests
     }
@@ -823,7 +824,7 @@ mutation removeComment {
   removeComment(
     input: {
       id: 33
-      relation: "api::page.page:1"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
       author: { id: "12345678" } # Optional if using auth / authz requests
     }
   ) {
@@ -857,7 +858,7 @@ mutation createAbuseReport {
   createAbuseReport(
     input: {
       commentId: 34
-      relation: "api::page.page:1"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
       reason: BAD_LANGUAGE
       content: "Rude language"
     }
