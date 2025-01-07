@@ -1,73 +1,38 @@
-/**
- *
- * This component is the skeleton around the actual pages, and should only
- * contain code that should be seen on all pages. (e.g. navigation bar)
- *
- */
+import { Layouts } from '@strapi/strapi/admin';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { SideNav } from '../../components/SideNav';
+import { useConfig } from '../../hooks/useConfig';
+import { CommonProviders } from '../../providers/CommonProviders';
+import { useSettingsStore } from '../../store/settings.store';
+import { Details } from '../Details';
+import { Discover } from '../Discover';
+import { Reports } from '../Reports';
 
-// TODO
-// @ts-nocheck
-import React from "react";
-import { connect } from "react-redux";
-import { bindActionCreators, compose } from "redux";
-import {Switch, Route, Redirect} from 'react-router-dom';
-import {useQuery} from 'react-query';
-import {
-  NotFound,
-  LoadingIndicatorPage,
-  useNotification,
-} from '@strapi/helper-plugin';
 
-import ComingSoonPage from '../ComingSoonPage';
-import getUrl from '../../utils/getUrl';
-import Discover from '../Discover';
-import Details from '../Details';
-import Reports from '../Reports';
-import {fetchConfig} from './utils/api';
-import {setConfig} from './reducer/actions';
-import makeAppView from './reducer/selectors';
-
-const App = ({setConfig}) => {
-  const toggleNotification = useNotification();
-
-  const {isLoading, isFetching} = useQuery(
-    'get-config',
-    () => fetchConfig(toggleNotification),
-    {
-      initialData: {},
-      onSuccess: (response) => {
-        setConfig(response);
-      },
-    },
-  );
-
-  if (isLoading || isFetching) {
-    return <LoadingIndicatorPage />;
+const InnerApp = () => {
+  const setSettings = useSettingsStore(state => state.setSettings);
+  const { isLoading, data: config } = useConfig(setSettings);
+  if (isLoading || !config) {
+    return <div>Loading...</div>;
   }
-
   return (
-    <div>
-      <Switch>
-        <Route path={getUrl('discover/:id')} component={Details} />
-        <Route path={getUrl('dashboard')} component={ComingSoonPage} />
-        <Route path={getUrl('discover')} component={Discover} />
-        <Route path={getUrl('settings')} component={ComingSoonPage} />
-        <Route path={getUrl('reports')} component={Reports} />
-        <Route
-          path={getUrl()}
-          exact
-          children={<Redirect to={getUrl('discover')} />}
-        />
-      </Switch>
-    </div>
+    <Layouts.Root sideNav={<SideNav />}>
+      <Routes>
+        <Route path="/discover" element={<Discover config={config} />} />
+        <Route path="/discover/:id" element={<Details config={config} />} />
+        <Route path="/reports" element={<Reports config={config} />} />
+        <Route path="*" element={<Navigate to="discover" replace />} />
+      </Routes>
+    </Layouts.Root>
   );
 };
 
-const mapStateToProps = makeAppView();
+const App = () => {
+  return (
+    <CommonProviders>
+      <InnerApp />
+    </CommonProviders>
+  );
+};
 
-export function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ setConfig }, dispatch);
-}
-const withConnect = connect(mapStateToProps, mapDispatchToProps);
-
-export default compose(withConnect)(App);
+export default App;

@@ -1,5 +1,6 @@
 import { MutableRefObject } from 'react';
 
+// @ts-ignore
 import CodeMirror from 'codemirror5';
 
 export const replaceText = (markdownName: string, textToChange: string) => {
@@ -151,7 +152,7 @@ export const listHandler = (
     let remove: boolean | null = null;
 
     editor.current.operation(function () {
-      selections.forEach(function (selection) {
+      selections.forEach(function (selection: any) {
         const pos = [selection.head.line, selection.anchor.line].sort();
 
         // Remove if the first text starts with it

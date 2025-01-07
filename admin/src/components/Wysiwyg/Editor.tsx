@@ -1,10 +1,13 @@
 import * as React from 'react';
 
+// @ts-ignore
 import CodeMirror, { EditorFromTextArea } from 'codemirror5';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { PreviewWysiwyg } from './PreviewWysiwyg';
 import { newlineAndIndentContinueMarkdownList } from './utils/continueList';
+
+import type { FieldValue, InputProps } from '@strapi/admin/strapi-admin';
 
 import 'codemirror5/addon/display/placeholder';
 
@@ -13,17 +16,11 @@ interface EditorApi {
   scrollIntoView: (args?: Parameters<HTMLElement['scrollIntoView']>[0]) => void;
 }
 
-interface EditorProps {
-  disabled?: boolean;
+interface EditorProps extends Omit<FieldValue, 'initialValue'>, Omit<InputProps, 'type' | 'label'> {
   editorRef: React.MutableRefObject<EditorFromTextArea>;
-  error?: string;
   isPreviewMode?: boolean;
   isExpandMode?: boolean;
-  name: string;
-  onChange: (event: { target: { name: string; value: string; type: string } }) => void;
-  placeholder?: string;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
-  value?: string;
 }
 
 const Editor = React.forwardRef<EditorApi, EditorProps>(
@@ -45,6 +42,11 @@ const Editor = React.forwardRef<EditorApi, EditorProps>(
     const onChangeRef = React.useRef(onChange);
 
     React.useEffect(() => {
+      if (editorRef.current) {
+        // Ensure the editor and its wrapper are cleaned up whenever this view is re-rendered
+        // e.g. in case of re-ordering wysiwyg components in a DynamicZone
+        editorRef.current.toTextArea();
+      }
       editorRef.current = CodeMirror.fromTextArea(textareaRef.current!, {
         lineWrapping: true,
         extraKeys: {
@@ -59,17 +61,16 @@ const Editor = React.forwardRef<EditorApi, EditorProps>(
         inputStyle: 'contenteditable',
       });
 
-      // @ts-expect-error – doesn't think command exists?
       CodeMirror.commands.newlineAndIndentContinueMarkdownList =
         newlineAndIndentContinueMarkdownList;
-      editorRef.current.on('change', (doc) => {
-        onChangeRef.current({ target: { name, value: doc.getValue(), type: 'wysiwyg' } });
+      editorRef.current.on('change', (doc: any) => {
+        onChangeRef.current(name, doc.getValue());
       });
     }, [editorRef, textareaRef, name, placeholder]);
 
     React.useEffect(() => {
       if (value && !editorRef.current.hasFocus()) {
-        editorRef.current.setValue(value);
+        editorRef.current.setValue(value || '');
       }
     }, [editorRef, value]);
 
@@ -105,10 +106,10 @@ const Editor = React.forwardRef<EditorApi, EditorProps>(
 
     return (
       <EditorAndPreviewWrapper>
-        <EditorStylesContainer isExpandMode={isExpandMode} disabled={disabled || isPreviewMode}>
+        <EditorStylesContainer $isExpandMode={isExpandMode} $disabled={disabled || isPreviewMode}>
           <textarea ref={textareaRef} />
         </EditorStylesContainer>
-        {isPreviewMode && <PreviewWysiwyg data={value} />}
+        {isPreviewMode && <PreviewWysiwyg data={value || ''} />}
       </EditorAndPreviewWrapper>
     );
   }
@@ -119,8 +120,8 @@ const EditorAndPreviewWrapper = styled.div`
   height: calc(100% - 48px);
 `;
 
-const EditorStylesContainer = styled.div<{ disabled?: boolean; isExpandMode?: boolean }>`
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed !important' : 'auto')};
+const EditorStylesContainer = styled.div<{ $disabled?: boolean; $isExpandMode?: boolean }>`
+  cursor: ${({ $disabled }) => ($disabled ? 'not-allowed !important' : 'auto')};
   height: 100%;
   /* BASICS */
   .CodeMirror-placeholder {
@@ -129,9 +130,9 @@ const EditorStylesContainer = styled.div<{ disabled?: boolean; isExpandMode?: bo
 
   .CodeMirror {
     /* Set height, width, borders, and global font properties here */
-    font-size: ${14 / 16}rem;
-    height: ${({ isExpandMode }) =>
-      isExpandMode
+    font-size: 1.4rem;
+    height: ${({ $isExpandMode }) =>
+      $isExpandMode
         ? '100%'
         : '410px'}; //  512px(total height) - 48px (header) - 52px(footer) - 2px border
     color: ${({ theme }) => theme.colors.neutral800};

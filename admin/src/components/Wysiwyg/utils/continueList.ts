@@ -1,3 +1,4 @@
+// @ts-ignore
 import CodeMirror from 'codemirror5';
 
 // Disabling eslint on purpose
@@ -17,7 +18,6 @@ var listRE = /^(\s*)(>[> ]*|[*+-] \[[x ]\]\s|[*+-]\s|(\d+)([.)]))(\s*)/,
 */
 
 function newlineAndIndentContinueMarkdownList(cm: CodeMirror.Editor) {
-  // @ts-expect-error - cm does not recognize disableInput.
   if (cm.getOption('disableInput')) return CodeMirror.Pass;
   var ranges = cm.listSelections(),
     replacements = [];

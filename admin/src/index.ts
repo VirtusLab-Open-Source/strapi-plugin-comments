@@ -1,20 +1,14 @@
-// @ts-ignore
-import { prefixPluginTranslations } from "@strapi/helper-plugin";
-import { get } from 'lodash';
-import { StrapiAdminInstance } from "strapi-typed";
-import * as pluginPkg from "../../package.json";
-import { pluginId } from "./pluginId";
-import Initializer from "./components/Initializer";
-import PluginIcon from "./components/PluginIcon";
-import pluginPermissions from "./permissions";
-import reducers from "./reducers";
-import { registerCustomFields } from "./custom-fields";
-import trads, { TranslationKey, Translations } from "./translations";
+import { flattenObject, prefixPluginTranslations } from '@sensinum/strapi-utils';
+import * as pluginPkg from '../../package.json';
+import PluginIcon from './components/PluginIcon';
+import pluginPermissions from './permissions';
+import { pluginId } from './pluginId';
+import trads from './translations';
 
 const { name, displayName } = pluginPkg.strapi;
 
 export default {
-  register(app: StrapiAdminInstance) {
+  register(app: any) {
     app.addMenuLink({
       to: `/plugins/${pluginId}`,
       badgeContent: 1,
@@ -23,13 +17,7 @@ export default {
         id: `${pluginId}.plugin.name`,
         defaultMessage: displayName,
       },
-      Component: async () => {
-        const component = await import(
-          /* webpackChunkName: "[request]" */ './pages/App'
-        );
-
-        return component;
-      },
+      Component: () => import('./pages/App'),
       permissions: pluginPermissions.access,
     });
 
@@ -45,41 +33,34 @@ export default {
         {
           intlLabel: {
             id: `${pluginId}.plugin.section.item`,
-            defaultMessage: "Configuration",
+            defaultMessage: 'Configuration',
           },
-          id: "comments",
+          id: 'comments',
           to: `/settings/${pluginId}`,
-          Component: async () => {
-            const component = await import(
-              /* webpackChunkName: "documentation-settings" */ "./pages/Settings"
-            );
-
-            return component;
-          },
+          Component: () => import('./pages/Settings'),
           permissions: pluginPermissions.settings,
         },
-      ]
+      ],
     );
-
-    app.addReducers(reducers);
-    app.registerPlugin({
-      id: pluginId,
-      initializer: Initializer,
-      isReady: false,
-      name,
-    });
-
-    registerCustomFields(app);
   },
 
-  registerTrads({ locales = [] }: { locales: Array<TranslationKey>}) {
-    return locales
-    .filter((locale: string) => Object.keys(trads).includes(locale))
-    .map((locale: string) => {
-      return {
-        data: prefixPluginTranslations(get<Translations, TranslationKey>(trads, locale as TranslationKey, trads.en), pluginId),
-        locale,
-      };
-    });
+  registerTrads: async function ({ locales = [] }: { locales: string[] }) {
+    return Promise.all(
+      locales.map(async (locale: string) => {
+        if (locale in trads) {
+          const typedLocale = locale as keyof typeof trads;
+          return trads[typedLocale]().then(({ default: trad }) => {
+            return {
+              data: prefixPluginTranslations(flattenObject(trad), pluginId),
+              locale,
+            };
+          });
+        }
+        return {
+          data: prefixPluginTranslations(flattenObject({}), pluginId),
+          locale,
+        };
+      }),
+    );
   },
 };

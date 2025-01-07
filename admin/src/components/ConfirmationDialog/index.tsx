@@ -1,89 +1,72 @@
-/**
- *
- * Entity Details
- *
- */
+import { Button, Dialog, Flex, Typography } from '@strapi/design-system';
+import { WarningCircle } from '@strapi/icons';
+import React, { FC, ReactNode, useState } from 'react';
 
-// TODO
-// @ts-nocheck
-
-import React from "react";
-import PropTypes from "prop-types";
-import { Button } from "@strapi/design-system/Button";
-import { Dialog, DialogBody, DialogFooter } from "@strapi/design-system/Dialog";
-import { Flex } from "@strapi/design-system/Flex";
-import { Stack } from "@strapi/design-system/Stack";
-import { Typography } from "@strapi/design-system/Typography";
-import { exclamationMarkCircle, check } from "../icons";
-import { getMessage } from "../../utils";
-
-const ConfirmationDialog = ({
-  isVisible = false,
-  isActionAsync = false,
-  children,
+type ConfirmationDialogProps = {
+  Trigger: FC<{ onClick: () => void }>;
+  title: string;
+  labelCancel?: string;
+  labelConfirm: string;
+  iconConfirm?: ReactNode;
+  onConfirm: () => void | Promise<void>;
+  children?: ReactNode;
+};
+export const ConfirmationDialog: FC<ConfirmationDialogProps> = ({
+  title,
   onConfirm,
-  onCancel,
-  header,
-  labelCancel,
+  Trigger,
   labelConfirm,
   iconConfirm,
-}) => (
-  <Dialog
-    onClose={onCancel}
-    title={
-      header ||
-      getMessage("compontents.confirmation.dialog.header", "Confirmation")
-    }
-    isOpen={isVisible}
-  >
-    <DialogBody icon={exclamationMarkCircle}>
-      <Stack size={2}>
-        <Flex justifyContent="center">
-          <Typography id="dialog-confirm-description">
-            {children ||
-              getMessage("compontents.confirmation.dialog.description")}
-          </Typography>
-        </Flex>
-      </Stack>
-    </DialogBody>
-    <DialogFooter
-      startAction={
-        <Button onClick={onCancel} variant="tertiary" disabled={isActionAsync}>
-          {labelCancel ||
-            getMessage(
-              "compontents.confirmation.dialog.button.cancel",
-              "Cancel"
-            )}
-        </Button>
-      }
-      endAction={
-        <Button
-          onClick={onConfirm}
-          variant="danger-light"
-          startIcon={iconConfirm || check}
-          disabled={isActionAsync}
-        >
-          {labelConfirm ||
-            getMessage(
-              "compontents.confirmation.dialog.button.confirm",
-              "Confirm"
-            )}
-        </Button>
-      }
-    />
-  </Dialog>
-);
+  labelCancel,
+  children,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const onToggleModal = () => setIsOpen((prev) => !prev);
+  const internalOnConfirm = async () => {
+    setIsLoading(true);
+    await onConfirm();
+    setIsLoading(false);
+    onToggleModal();
+  };
 
-ConfirmationDialog.propTypes = {
-  isVisible: PropTypes.bool,
-  isActionAsync: PropTypes.bool,
-  children: PropTypes.array.isRequired,
-  header: PropTypes.string,
-  labelCancel: PropTypes.string,
-  labelConfirm: PropTypes.string,
-  iconConfirm: PropTypes.object,
-  onConfirm: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
+  return (
+    <Dialog.Root open={isOpen}>
+      <Dialog.Trigger>
+        <Trigger onClick={onToggleModal} />
+      </Dialog.Trigger>
+      <Dialog.Content>
+        <Dialog.Header>{title}</Dialog.Header>
+        <Dialog.Body>
+          <Flex justifyContent="center" direction="column">
+            <WarningCircle fill="danger500" stroke="danger500" height="24" width="24" />
+            <Typography id="confirm-description">
+              {children}
+            </Typography>
+          </Flex>
+        </Dialog.Body>
+        <Dialog.Footer>
+          <Dialog.Cancel>
+            <Button
+              onClick={onToggleModal}
+              disabled={isLoading}
+              variant="tertiary">
+              {labelCancel || 'Cancel'}
+            </Button>
+          </Dialog.Cancel>
+          <Dialog.Action>
+            <Button
+              onClick={internalOnConfirm}
+              variant="danger-light"
+              loading={isLoading}
+              disabled={isLoading}
+              startIcon={iconConfirm}
+            >
+              {labelConfirm}
+            </Button>
+          </Dialog.Action>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog.Root>
+  );
 };
-
-export default ConfirmationDialog;

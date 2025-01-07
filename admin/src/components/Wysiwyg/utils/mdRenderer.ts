@@ -1,11 +1,15 @@
 import { getLanguage, highlight, highlightAuto } from 'highlight.js';
+// @ts-ignore
 import Markdown from 'markdown-it';
 // @ts-expect-error - library does not export types
 import abbr from 'markdown-it-abbr';
+// @ts-ignore
 import container from 'markdown-it-container';
 // @ts-expect-error - library does not export types
 import deflist from 'markdown-it-deflist';
+// @ts-ignore
 import emoji from 'markdown-it-emoji';
+// @ts-ignore
 import footnote from 'markdown-it-footnote';
 // @ts-expect-error - library does not export types
 import ins from 'markdown-it-ins';
@@ -26,7 +30,7 @@ const md: Markdown = new Markdown({
   linkify: true,
   typographer: true,
   // Code from: https://github.com/markdown-it/markdown-it/blob/master/support/demo_template/index.js#L83
-  highlight(str, lang) {
+  highlight(str: string, lang: string) {
     if (lang && lang !== 'auto' && getLanguage(lang)) {
       return (
         '<pre class="hljs language-' +
@@ -52,19 +56,19 @@ const md: Markdown = new Markdown({
     return '<pre class="hljs"><code>' + md.utils.escapeHtml(str) + '</code></pre>';
   },
 })
-  .use(abbr)
-  .use(container, 'warning')
-  .use(container, 'tip')
-  .use(deflist)
-  .use(emoji)
-  .use(footnote)
-  .use(ins)
-  .use(mark)
-  .use(sub)
-  .use(sup);
+.use(abbr)
+.use(container, 'warning')
+.use(container, 'tip')
+.use(deflist)
+.use(emoji)
+.use(footnote)
+.use(ins)
+.use(mark)
+.use(sub)
+.use(sup);
 
 // Code from: https://github.com/markdown-it/markdown-it-footnote/blob/master/index.js#L29
-md.renderer.rules.footnote_ref = (tokens, idx, options, env, slf) => {
+md.renderer.rules.footnote_ref = (tokens: string, idx: string, options: string, env: string, slf: any) => {
   const caption = slf.rules.footnote_caption?.(tokens, idx, options, env, slf);
 
   return '<sup class="footnote-ref"><span>' + caption + '</span></sup>';

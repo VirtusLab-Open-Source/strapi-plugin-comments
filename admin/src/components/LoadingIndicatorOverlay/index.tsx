@@ -1,20 +1,23 @@
-/**
- *
- * Entity Details
- *
- */
+import { Box, Loader } from '@strapi/design-system';
+import styled from 'styled-components';
 
-// TODO
-// @ts-nocheck
-
-import React from "react";
-import { LoadingIndicatorPage } from "@strapi/helper-plugin";
-import { LoadingIndicatorOverlayWrapper } from "./styles";
-
-const LoadingIndicatorOverlay = () => (
+const LoadingIndicatorOverlayWrapper = styled(Box)(() => {
+  return {
+    alignItems: 'center',
+    background: 'rgba(255, 255, 255, 0.7)',
+    bottom: 0,
+    display: 'flex',
+    height: '100%',
+    justifyContent: 'center',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 1,
+  };
+});
+export const LoadingIndicatorOverlay = () => (
   <LoadingIndicatorOverlayWrapper>
-    <LoadingIndicatorPage />
+    <Loader />
   </LoadingIndicatorOverlayWrapper>
 );
-
-export default LoadingIndicatorOverlay;

@@ -1,11 +1,17 @@
+import { SyntheticEvent } from 'react';
 import * as React from 'react';
 
-// @ts-ignore
-import { BaseButton, Box, Flex, FocusTrap, Portal, Typography } from '@strapi/design-system';
-import { pxToRem, useLockScroll } from '@strapi/helper-plugin';
+import {
+  Button,
+  Box,
+  Flex,
+  FocusTrap,
+  Portal,
+  Typography,
+} from '@strapi/design-system';
 import { Collapse } from '@strapi/icons';
 import { useIntl } from 'react-intl';
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 
 import { PreviewWysiwyg } from './PreviewWysiwyg';
 
@@ -26,7 +32,15 @@ const EditorLayout = ({
 }: EditorLayoutProps) => {
   const { formatMessage } = useIntl();
 
-  useLockScroll({ lockScroll: isExpandMode });
+  React.useEffect(() => {
+    if (isExpandMode) {
+      document.body.classList.add('lock-body-scroll');
+    }
+
+    return () => {
+      document.body.classList.remove('lock-body-scroll');
+    };
+  }, [isExpandMode]);
 
   if (isExpandMode) {
     return (
@@ -42,14 +56,14 @@ const EditorLayout = ({
             justifyContent="center"
             onClick={onCollapse}
           >
-            <Box
+            <Box<'div'>
               background="neutral0"
               hasRadius
               shadow="popupShadow"
               overflow="hidden"
               width="90%"
               height="90%"
-              onClick={(e: any) => e.stopPropagation()}
+              onClick={(e: SyntheticEvent) => e.stopPropagation()}
             >
               <Flex height="100%" alignItems="flex-start">
                 <BoxWithBorder flex="1" height="100%">
@@ -57,13 +71,13 @@ const EditorLayout = ({
                 </BoxWithBorder>
                 <Flex alignItems="start" direction="column" flex={1} height="100%" width="100%">
                   <Flex
-                    height={pxToRem(48)}
+                    height="4.8rem"
                     background="neutral100"
                     justifyContent="flex-end"
                     shrink={0}
                     width="100%"
                   >
-                    <ExpandButton onClick={onCollapse}>
+                    <ExpandButton onClick={onCollapse} variant="tertiary" size="M">
                       <Typography>
                         {formatMessage({
                           id: 'components.Wysiwyg.collapse',
@@ -87,14 +101,16 @@ const EditorLayout = ({
   }
 
   return (
-    <Box
+    <Flex
       borderColor={error ? 'danger600' : 'neutral200'}
       borderStyle="solid"
       borderWidth="1px"
       hasRadius
+      direction="column"
+      alignItems="stretch"
     >
       {children}
-    </Box>
+    </Flex>
   );
 };
 
@@ -109,18 +125,26 @@ const BoxWithBorder = styled(Box)`
   border-right: 1px solid ${({ theme }) => theme.colors.neutral200};
 `;
 
-const ExpandButton = styled(BaseButton)`
+const ExpandButton = styled(Button)`
   background-color: transparent;
   border: none;
   align-items: center;
+
+  & > span {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    font-weight: ${({ theme }) => theme.fontWeights.regular};
+  }
 
   svg {
     margin-left: ${({ theme }) => `${theme.spaces[2]}`};
 
     path {
       fill: ${({ theme }) => theme.colors.neutral700};
-      width: ${12 / 16}rem;
-      height: ${12 / 16}rem;
+      width: 1.2rem;
+      height: 1.2rem;
     }
   }
 `;

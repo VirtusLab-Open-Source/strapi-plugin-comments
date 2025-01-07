@@ -1,9 +1,8 @@
 import { useIntl } from "react-intl";
 import { pluginId } from "../pluginId";
-import { ToBeFixed } from "../../../types";
 
 const getMessage = (
-  input: ToBeFixed,
+  input: any,
   defaultMessage = "",
   inPluginScope = true,
 ) => {

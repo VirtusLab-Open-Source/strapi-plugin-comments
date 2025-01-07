@@ -1,4 +1,4 @@
-import { get, set, pick, isEmpty } from "lodash";
+import { get, isEmpty, pick, set } from 'lodash';
 
 
 // @ts-ignore
@@ -88,17 +88,17 @@ const mockStrapi = (config: any = {}, toStore: boolean = false, database: any = 
         },
         package: require("../package.json"),
         services: {
-          common: require("../server/services/common"),
-          client: require("../server/services/client"),
-          admin: require("../server/services/admin"),
+          common: require("../server/src/services/common.service"),
+          client: require("../server/src/services/client.service"),
+          admin: require("../server/src/services/admin/admin.service"),
         },
         contentTypes: {
           comment: {
-            ...require("../content-types/comment"),
+            ...require("../server/src/content-types/comments/schema"),
             uid: "plugins::comments.comment",
           },
           "comment-report": {
-            ...require("../content-types/report"),
+            ...require("../server/src/content-types/report/schema"),
             uid: "plugins::comments.comment-report",
           },
         },

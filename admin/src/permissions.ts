@@ -1,4 +1,4 @@
-import permissions from "./../../permissions";
+import permissions from "../../server/src/permissions";
 
 export default {
   access: [
@@ -18,7 +18,7 @@ export default {
     { action: permissions.render(permissions.reports.read), subject: null },
   ],
   reportsReview: [
-    { action: permissions.render(permissions.reports.action), subject: null },
+    { action: permissions.render(permissions.reports.review), subject: null },
   ],
   settings: [
     { action: permissions.render(permissions.settings.read), subject: null },

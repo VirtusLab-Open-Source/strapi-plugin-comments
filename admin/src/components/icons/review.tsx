@@ -1,17 +1,18 @@
 // TODO
 // @ts-nocheck
 
-import React from "react";
+import React, { FC } from 'react';
 
 const initSize = 16;
 
-const ReviewIcon = ({ width, height, size = 16 }) => (
+const ReviewIcon: FC<{ width?: number; height?: number, size?: number }> = ({ width, height, size = 16 }) => (
   <svg
     width={width || size}
     height={height || size}
     viewBox={`0 0 ${width || size} ${height || size}`}
     style={{ width: `${width || size}px`, height: `${height || size}px` }}
     xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
   >
     <g style={{ transform: `scale(${(width || size) / initSize})` }}>
       <path

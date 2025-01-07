@@ -1,22 +1,26 @@
-/**
- *
- * Status badge
- *
- */
+import { Typography, Badge } from '@strapi/design-system';
+import styled from 'styled-components';
 
-// TODO
-// @ts-nocheck
 
-import React from "react";
-import { Typography } from "@strapi/design-system/Typography";
-import { StatusBadge as StatusBadgeStyled } from "./styles";
+export const StatusBadgeStyled = styled(Badge)`
+  padding: 5px 8px;
+  border: 1px ${({ theme, color }) => theme.colors[`${color}200`]} solid;
 
-const StatusBadge = ({ children, textColor, ...rest }) => (
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  cursor: default;
+
+  span {
+    text-transform: none;
+  }
+`;
+
+export const StatusBadge = ({ children, textColor, ...rest }: any) => (
   <StatusBadgeStyled {...rest}>
     <Typography variant="omega" fontWeight="semibold" textColor={textColor}>
       {children}
     </Typography>
   </StatusBadgeStyled>
 );
-
-export default StatusBadge;

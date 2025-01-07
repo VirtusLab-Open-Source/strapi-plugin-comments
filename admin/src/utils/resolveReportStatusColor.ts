@@ -1,6 +1,6 @@
 import { REPORT_STATUS } from "./constants";
 
-const resolveReportStatusColor = (status: keyof typeof REPORT_STATUS) => {
+const resolveReportStatusColor = (status: typeof REPORT_STATUS[keyof typeof REPORT_STATUS]) => {
   switch (status) {
     case REPORT_STATUS.PENDING:
       return "primary";

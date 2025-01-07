@@ -1,65 +1,66 @@
-<div align="center" width="150px">
-  <img style="width: 150px; height: auto;" src="public/assets/logo.png" alt="Logo - Strapi Comments plugin" />
+<div align="center" style="max-width: 10rem; margin: 0 auto">
+  <img style="width: 150px; height: auto;" src="https://www.sensinum.com/img/open-source/strapi-plugin-comments/logo.png" alt="Logo - Strapi Comments plugin" />
 </div>
 <div align="center">
-  <h1>Strapi v4 - Comments plugin</h1>
+  <h1>Strapi v5 - Comments plugin - Beta</h1>
   <p>Powerful Strapi based comments moderation tool for you and your users</p>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
-    <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/VirtusLab-Open-Source/strapi-plugin-comments?label=npm&logo=npm">
+    <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/VirtusLab-Open-Source/strapi-plugin-comments/v5?label=npm&logo=npm">
   </a>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
     <img src="https://img.shields.io/npm/dm/strapi-plugin-comments.svg" alt="Monthly download on NPM" />
   </a>
   <a href="https://circleci.com/gh/VirtusLab-Open-Source/strapi-plugin-comments">
-    <img src="https://circleci.com/gh/VirtusLab-Open-Source/strapi-plugin-comments.svg?style=shield" alt="CircleCI" />
+    <img src="https://circleci.com/gh/VirtusLab-Open-Source/strapi-plugin-comments/tree/v5.svg?style=shield" alt="CircleCI" />
   </a>
   <a href="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments">
-    <img src="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments/coverage.svg?branch=master" alt="codecov.io" />
-  </a>
-  <a href="https://sharing.clickup.com/tl/xhcmx-83/strapiv-4-comments-roadmap">
-    <img src="https://img.shields.io/website?down_message=roadmap&label=product&up_message=roadmap&url=https%3A%2F%2Fsharing.clickup.com%2Ftl%2Fxhcmx-83%2Fstrapiv-4-comments-roadmap" />
-  </a>
-  <a href="https://sharing.clickup.com/b/xhcmx-63/strapiv-4-comments-board">
-    <img src="https://img.shields.io/website?down_message=board&label=product&up_color=blue&up_message=board&url=https%3A%2F%2Fsharing.clickup.com%2Fb%2Fxhcmx-63%2Fstrapiv-4-comments-board" />
+    <img src="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments/coverage.svg?branch=v5" alt="codecov.io" />
   </a>
 </div>
+
+## ⚠️ This is the beta version for Strapi v5
 
 ---
 
 <div style="margin: 20px 0" align="center">
-  <img style="width: 100%; height: auto;" src="public/assets/preview.png" alt="UI preview" />
+  <img style="width: 100%; height: auto;" src="https://www.sensinum.com/img/open-source/strapi-plugin-comments/preview.png" alt="UI preview" />
 </div>
 
 A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provides end to end comments feature with their moderation panel, bad words filtering, abuse reporting and much more.
 
 ### Table of Contents
 
-1. [✨ Features](#-features)
-2. [⏳ Installation](#-installation)
-3. [🖐 Requirements](#-requirements)
-4. [🔧 Configuration](#-configuration)
+1. [💎 Versions](#-versions)
+2. [✨ Features](#-features)
+3. [⏳ Installation](#-installation)
+4. [🖐 Requirements](#-requirements)
+5. [🔧 Configuration](#-configuration)
    - [Settings page](#in-v203-and-newer)
    - [Plugin file](#in-v202-and-older--default-configuration-state-for-v203-and-newer)
-5. [🕸️ Public API - REST](#%EF%B8%8F-public-rest-api-specification)
-6. [🕸️ Public API - GraphQL](#%EF%B8%8F-public-graphql-specification)
-7. [⚗️ Custom fields](#-custom-fields)
-8. [🤝 Contributing](#-contributing)
-9. [👨‍💻 Community support](#-community-support)
+6. [🕸️ Public API - REST](#%EF%B8%8F-public-rest-api-specification)
+7. [🕸️ Public API - GraphQL](#%EF%B8%8F-public-graphql-specification)
+8. [🌿 Model lifecycle hooks](#model-life-cycle-hooks)
+9. [⚗️ Custom fields](#-custom-fields)
+10. [🧩 Examples](#-examples)
+11. [💬 FAQ](#-faq)
+12. [🤝 Contributing](#-contributing)
+13. [👨‍💻 Community support](#-community-support)
+
+## 💎 Versions
+
+- **Strapi v5** - (current) [v3.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
+- **Strapi v4** - [v2.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v4)
+- **Strapi v3** - [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3)
 
 ## ✨ Features
 
 - **Comments Public REST + GraphQL API:** Elegant, entirely customizable and a fully extensible admin panel.
 - **Strapi &amp; generic users:** Support for built-in &amp; also generic non-Strapi users that might be the comments authors.
-- **Strapi Custom Fields support:** Improve an experience of your Content Types by using [dedicated set of custom fields](https://docs-next.strapi.io/user-docs/latest/plugins/introduction-to-plugins.html#custom-fields) for each of them and automate client side processing of Comments.
+- **Strapi Custom Fields support:** Improve an experience of your Content Types by using [dedicated set of custom fields](https://docs-next.strapi.io/dev-docs/custom-fields) for each of them and automate client side processing of Comments.
 - **Any Content Type relation:** Comments can be linked to any of your Content Types by default. Simply, you're controlling it.
 - **Moderation Panel:** Search & Filter through the bucket with your auditory comments. Manage them by blocking single ones or full threads. All in combined list &amp; hierarchical tree view of threads.
 - **Automated Bad Words filtering:** By default end users are not allowed to post abusing comments where bad words have been used.
 - **Abuse Reporting & Reviewing:** Don't allow inferior language, react to reports from your community, send email notifications about issued reports
-
-## ⚙️ Versions
-
-- **Strapi v4** - (current) - [v2.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
-- **Strapi v3** - [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3)
 
 ## ⏳ Installation
 
@@ -68,7 +69,7 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 As a ✅ **verified** plugin by Strapi team we're available on the [**Strapi Marketplace**](https://market.strapi.io/plugins/strapi-plugin-comments) as well as **In-App Marketplace** where you can follow the installation instructions.
 
 <div style="margin: 20px 0" align="center">
-  <img style="width: 100%; height: auto;" src="public/assets/marketplace.png" alt="Strapi In-App Marketplace" />
+  <img style="width: 100%; height: auto;" src="https://www.sensinum.com/img/open-source/strapi-plugin-comments/marketplace.png" alt="Strapi In-App Marketplace" />
 </div>
 
 ### Via command line
@@ -86,85 +87,56 @@ yarn build
 yarn develop
 ```
 
-or just run Strapi in the development mode with `--watch-admin` option:
-
-```bash
-yarn develop --watch-admin
-```
-
 The **Comments** plugin should appear in the **Plugins** section of Strapi sidebar after you run app again.
 
 As a next step you must configure your the plugin by the way you want to. See [**Configuration**](#🔧-configuration) section.
 
 All done. Enjoy 🎉
 
-### Working in development mode
-
-1. Clone repository
-
-   ```
-   git clone git@github.com:VirtusLab-Open-Source/strapi-plugin-comments.git
-   ```
-
-2. Create a soft link in your strapi project to plugin build folder
-
-   ```sh
-   ln -s <your path>/strapi-plugin-comments/build <your path>/strapi-project/src/plugins/comments
-   ```
-
-3. Run develop or build command
-
-   ```ts
-   // Watch for file changes
-   yarn develop
-   // or run build without nodemon
-   yarn build:dev
-   ```
-
 ## 🖐 Requirements
 
-Complete installation requirements are exact same as for Strapi itself and can be found in the documentation under [Installation Requirements](https://docs.strapi.io/developer-docs/latest/getting-started/introduction.html).
+Complete installation requirements are exact same as for Strapi itself and can be found in the documentation under [Installation Requirements](https://docs.strapi.io/dev-docs/intro).
 
 **Minimum environment requirements**
 
-- Node.js `>=18.0.0 <=20.x.x`
+- Node.js `>=18.0.0 <=22.x.x`
 - NPM `>=6.x.x`
 
 In our minimum support we're following [official Node.js releases timelines](https://nodejs.org/en/about/releases/).
 
 **Supported Strapi versions**:
 
-- Strapi v4.24.x (recently tested)
-- Strapi v4.x
+- Strapi v5.6.0 (recently tested)
+- Strapi v5.x
 
-> This plugin is designed for **Strapi v4** and is not working with v3.x. To get version for **Strapi v3** install version [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3).
+> This plugin is designed for **Strapi v5**. To get support for other Strapi versions, please follow the [versions](#-versions) section.
 
 **Plugin dependencies**
-- `@strapi/plugin-graphql` - required to run because built-in support for GraphQL handled by this plugin 
+- `@strapi/plugin-graphql` - required to run GraphQL handled by this plugin 
 
 **We recommend always using the latest version of Strapi to start your new projects**.
 
 ## 🔧 Configuration
 
-To start your journey with **Comments plugin** you must first setup it using the dedicated Settings page (`v2.0.3` and newer) or for any version, put your configuration in `config/plugins.js`. Anyway we're recommending the click-through option where your configuration is going to be properly validated.
+To start your journey with **Comments plugin** you must first setup it using the dedicated Settings page or for any version, put your configuration in `config/plugins.{js|ts}`. Anyway we're recommending the click-through option where your configuration is going to be properly validated.
 
-### In `v2.0.3` and newer
+### Settings page
 
-Version `2.0.3` introduce the intuitive **Settings** page which you can easly access via `Strapi Settings -> Section: Comments Plugin -> Configuration`. On dedicated page you will be able to setup all crucial properties which drives the plugin and customize each individual collection for which **Comments plugin** should be enabled.
+On the dedicated page, you will be able to set up all crucial properties which drive the plugin and customize each individual collection for which **Comments plugin** should be enabled.
 
 <div style="margin: 20px 0" align="center">
-  <img style="width: 100%; height: auto;" src="public/assets/configuration.png" alt="Plugin configuration" />
+  <img style="width: 100%; height: auto;" src="https://www.sensinum.com/img/open-source/strapi-plugin-comments/configuration.png" alt="Plugin configuration" />
 </div>
 
 > _Note_
-> Default configuration for your plugin is fetched from `config/plugins.js` or directly from the plugin itself. If you would like to customize the default state to which you might revert, please follow the next section.
+> Default configuration for your plugin is fetched from `config/plugins.{js|ts}` or directly from the plugin itself. If you would like to customize the default state to which you might revert, please follow the next section.
 
-### In `v2.0.2` and older + default configuration state for `v2.0.3` and newer
+### File
 
-To setup amend default plugin configuration we recommend to put following snippet as part of `config/plugins.js` or `config/<env>/plugins.js` file. If the file does not exist yet, you have to create it manually. If you've got already configurations for other plugins stores by this way, use just the `comments` part within exising `plugins` item.
+To setup amend default plugin configuration we recommend to put following snippet as part of `config/plugins.{js|ts}` or `config/<env>/plugins.{js|ts}` file. If the file does not exist yet, you have to create it manually. If you've got already configurations for other plugins stores by this way, use just the `comments` part within exising `plugins` item.
 
-```js
-module.exports = ({ env }) => ({
+```ts
+  module.exports = ({ env }) => ({
   //...
   comments: {
     enabled: true,
@@ -193,7 +165,7 @@ module.exports = ({ env }) => ({
 
 - `enabledCollections` - list of Collection and Single Types for which plugin should be enabled in format like `'api::<collection name>.<content type name>'`. By default it's empty and none comments are not enabled for any of type in Strapi.
 - `no-profanity` - Enabled support for [profanity filtering](https://www.npmjs.com/package/no-profanity). Can be turned off or altered using the [options reference](https://www.npmjs.com/package/no-profanity?activeTab=readme#options). Default value: `true`.
-- `moderatorRoles` - Optional list of names of roles. Users with those roles will be notified by email when a new abuse report is created. This feature requires a built-in [Strapi email plugin](https://docs.strapi.io/developer-docs/latest/plugins/email.html) configured.
+- `moderatorRoles` - Optional list of names of roles. Users with those roles will be notified by email when a new abuse report is created. This feature requires a built-in [Strapi email plugin](https://docs.strapi.io/dev-docs/plugins/email) configured.
 - `approvalFlow` - list of Content Types which are supporting approval flow. Values must be in format like `'api::<collection name>.<content type name>'`. For not included, posted comments are going to be immediately visible.
 - `entryLabel` - ordered list of property names per Content Type to generate related entity label. Keys must be in format like `'api::<collection name>.<content type name>'`. Default formatting set as `*`.
 - `reportReasons` - set of enums you would like to use for issuing abuse reports. Provided by default `'BAD_LANGUAGE'`, `'DISCRIMINATION'` and `'OTHER'`.
@@ -202,10 +174,10 @@ module.exports = ({ env }) => ({
 
 ## Additional GQL Configuration
 
-All you need to do is to install and enable `@strapi/plugin-graphql` for you instance based on the **[official Strapi v4 docs](https://docs.strapi.io/developer-docs/latest/plugins/graphql.html#configurations)** and decide if you would like to call it by anyone (open for world) or only by authenticated users (Strapi users).
+All you need to do is to install and enable `@strapi/plugin-graphql` for you instance based on the **[official Strapi v4 docs](https://docs.strapi.io/dev-docs/plugins/graphql#configurations)** and decide if you would like to call it by anyone (open for world) or only by authenticated users (Strapi users).
 
 > **Important!**
-> If you're using `config/plugins.js` to configure your plugins , please put `comments` property before `graphql`. Otherwise types are not going to be properly added to GraphQL Schema. That's because of dynamic types which base on plugin configuration which are added on `boostrap` stage, not `register`. This is not valid if you're using `graphql` plugin without any custom configuration, so most of cases in real.
+> If you're using `config/plugins.{js|ts}` to configure your plugins , please put `comments` property before `graphql`. Otherwise types are not going to be properly added to GraphQL Schema. That's because of dynamic types which base on plugin configuration which are added on `boostrap` stage, not `register`. This is not valid if you're using `graphql` plugin without any custom configuration, so most of cases in real.
 
 ```json
 {
@@ -256,7 +228,7 @@ Feature / Capability focused permissions:
 
 ```json
 {
-  "id": 1,
+  "documentId": "njx99iv4p4txuqp307ye8625",
   "content": "My comment content",
   "blocked": null,
   "blockedThread": true,
@@ -287,11 +259,11 @@ Feature / Capability focused permissions:
 
 _GraphQL equivalent: [Public GraphQL API -> Get Comments](#get-comments-1)_
 
-`GET <host>/api/comments/api::<collection name>.<content type name>:<entity id>`
+`GET <host>/api/comments/api::<collection name>.<content type name>:<entity document id>`
 
-Return a hierarchical tree structure of comments for specified instance of Content Type like for example `Page` with `ID: 1`.
+Return a hierarchical tree structure of comments for specified instance of Content Type like for example `Page` with `documentId: njx99iv4p4txuqp307ye8625`.
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:1`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625`
 
 **Example response body**
 
@@ -315,18 +287,18 @@ Return a hierarchical tree structure of comments for specified instance of Conte
 
 #### Strapi REST API properties support:
 
-- [field selection](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/populating-fields.html#field-selection)
-- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
+- [field selection](https://docs.strapi.io/dev-docs/api/rest/populate-select#field-selection)
+- [sorting](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
 
 ### Get Comments (flat structure)
 
 _GraphQL equivalent: [Public GraphQL API -> Get Comments (flat structure)](#get-comments-flat-structure-1)_
 
-`GET <host>/api/comments/api::<collection name>.<content type name>:<entity id>/flat`
+`GET <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/flat`
 
-Return a flat structure of comments for specified instance of Content Type like for example `Page` with `ID: 1`
+Return a flat structure of comments for specified instance of Content Type like for example `Page` with `documentId: njx99iv4p4txuqp307ye8625`
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:1/flat`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/flat`
 
 **Example response body**
 
@@ -356,10 +328,10 @@ Return a flat structure of comments for specified instance of Content Type like 
 
 #### Strapi REST API properties support:
 
-- [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/filtering-locale-publication.html#filtering)
-- [field selection](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/populating-fields.html#field-selection)
-- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
-- [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#pagination)
+- [filtering](https://docs.strapi.io/dev-docs/api/rest/filters-locale-publication#filtering)
+- [field selection](https://docs.strapi.io/dev-docs/api/rest/populate-select#field-selection)
+- [sorting](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
+- [pagination](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#pagination)
 
 ### Get Comments (by Author)
 
@@ -369,8 +341,8 @@ _GraphQL equivalent: [Public GraphQL API -> Get Comments (by Author)](#get-comme
 
 Return a flat structure of comments by specified Author for example `Author` with `ID: 1`
 
-**Example URL**: `https://localhost:1337/api/comments/author/1` - get comments by `ID:1` of Strapi User
-**Example URL**: `https://localhost:1337/api/comments/author/1/generic` - get comments by `ID:1` of Generic User
+**Example URL**: `https://localhost:1337/api/comments/author/1` - get comments by `ID: 1` of Strapi User
+**Example URL**: `https://localhost:1337/api/comments/author/1/generic` - get comments by `ID: 1` of Generic User
 
 #### Skipping fields
 
@@ -406,20 +378,20 @@ To skip a field from the response you can use a query param called `omit`. It is
 
 #### Strapi REST API properties support:
 
-- [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/filtering-locale-publication.html#filtering)
-- [field selection](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/populating-fields.html#field-selection)
-- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#sorting)
-- [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/rest/sort-pagination.html#pagination)
+- [filtering](https://docs.strapi.io/dev-docs/api/rest/filters-locale-publication#filtering)
+- [field selection](https://docs.strapi.io/dev-docs/api/rest/populate-select#field-selection)
+- [sorting](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
+- [pagination](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#pagination)
 
 ### Post a Comment
 
 _GraphQL equivalent: [Public GraphQL API -> Post a Comments](#post-a-comment-1)_
 
-`POST <host>/api/comments/api::<collection name>.<content type name>:<entity id>`
+`POST <host>/api/comments/api::<collection name>.<content type name>:<entity document id>`
 
-Posts a Comment related to specified instance of Content Type like for example `Page` with `ID: 1`
+Posts a Comment related to specified instance of Content Type like for example `Page` with `documentId: njx99iv4p4txuqp307ye8625`
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:1`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625`
 
 **Example request body**
 
@@ -466,11 +438,11 @@ _Strapi user_
 
 _GraphQL equivalent: [Public GraphQL API -> Update Comments](#update-comment-1)_
 
-`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>`
 
-Updates a specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1`
+Updates a specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `documentId: njx99iv4p4txuqp307ye8625`
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:1/comment/2`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2`
 
 **Example request body**
 
@@ -513,11 +485,11 @@ _Strapi user_
 
 _GraphQL equivalent: [Public GraphQL API -> Delete Comment](#delete-comment-1)_
 
-`DELETE <host>/api/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>?authorId=<authorId>`
+`DELETE <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>?authorId=<authorId>`
 
-Deletes a specified Comment based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1`.
+Deletes a specified Comment based on it `commentId` and related to specified instance of Content Type like for example `Page` with `documentId: njx99iv4p4txuqp307ye8625`.
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:1/comment/1?authorId=1`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/1?authorId=1`
 
 **Example response body**
 
@@ -536,11 +508,11 @@ Deletes a specified Comment based on it `commentId` and related to specified ins
 
 _GraphQL equivalent: [Public GraphQL API -> Issue Abuse Report against specified Comment](#issue-abuse-report-against-specified-comment-1)_
 
-`POST <host>/api/comments/api::<collection name>.<content type name>:<entity id>/comment/<commentId>/report-abuse`
+`POST <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>/report-abuse`
 
-Reports abuse in specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `ID: 1` and requests moderator attention.
+Reports abuse in specified Comment content based on it `commentId` and related to specified instance of Content Type like for example `Page` with `documentId: njx99iv4p4txuqp307ye8625` and requests moderator attention.
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:1/comment/2/report-abuse`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2/report-abuse`
 
 **Example request body**
 
@@ -584,7 +556,7 @@ _REST API equivalent: [Public REST API -> Get Comments](#get-comments)_
 
 ```graphql
 query {
-  findAllInHierarchy(relation: "api::page.page:1") {
+  findAllInHierarchy(relation: "api::page.page:njx99iv4p4txuqp307ye8625") {
     id
     content
     blocked
@@ -634,7 +606,7 @@ query {
 
 #### Strapi GraphQL API properties support:
 
-- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#sorting)
+- [sorting](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
 
 ### Get Comments (flat structure)
 
@@ -645,7 +617,7 @@ _REST API equivalent: [Public REST API -> Get Comments (flat structure)](#get-co
 ```graphql
 query {
   findAllFlat(
-    relation: "api::page.page:1"
+    relation: "api::page.page:njx99iv4p4txuqp307ye8625"
     filters: { content: { contains: "Test" } }
   ) {
     id
@@ -681,13 +653,14 @@ query {
       // ...
     ]
   }
+}
 ```
 
 #### Strapi GraphQL API properties support:
 
-- [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#filters)
-- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#sorting)
-- [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#pagination)
+- [filtering](https://docs.strapi.io/dev-docs/api/rest/filters-locale-publication#filtering)
+- [sorting](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
+- [pagination](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#pagination)
 
 ### Get Comments (by Author)
 
@@ -734,9 +707,9 @@ query {
 
 #### Strapi GraphQL API properties support:
 
-- [filtering](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#filters)
-- [sorting](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#sorting)
-- [pagination](https://docs.strapi.io/developer-docs/latest/developer-resources/database-apis-reference/graphql-api.html#pagination)
+- [filtering](https://docs.strapi.io/dev-docs/api/rest/filters-locale-publication#filtering)
+- [sorting](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
+- [pagination](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#pagination)
 
 ### Post a Comment
 
@@ -748,7 +721,7 @@ _REST API equivalent: [Public REST API -> Post a Comment](#post-a-comment)_
 mutation createComment {
   createComment(
     input: {
-      relation: "api::page.page:1"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
       content: "Hello World!"
       threadOf: 3
       author: { id: "12345678", name: "John Wick", email: "test@test.pl" } # Optional if using auth / authz requests
@@ -798,7 +771,7 @@ mutation updateComment {
   updateComment(
     input: {
       id: 34
-      relation: "api::page.page:1"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
       content: "I've changed it!"
       author: { id: "12345678" } # Optional if using auth / authz requests
     }
@@ -851,7 +824,7 @@ mutation removeComment {
   removeComment(
     input: {
       id: 33
-      relation: "api::page.page:1"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
       author: { id: "12345678" } # Optional if using auth / authz requests
     }
   ) {
@@ -885,7 +858,7 @@ mutation createAbuseReport {
   createAbuseReport(
     input: {
       commentId: 34
-      relation: "api::page.page:1"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
       reason: BAD_LANGUAGE
       content: "Rude language"
     }
@@ -929,13 +902,13 @@ _Available reason enums:_ `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See
 
 ## 🧩 Examples
 
-Live example of plugin usage can be found in the [VirtusLab Strapi Examples](https://github.com/VirtusLab/strapi-examples/tree/master/strapi-v4-plugin-comments) repository.
+Live example of plugin usage can be found in the [VirtusLab Strapi Examples](https://github.com/VirtusLab/strapi-examples/tree/master/strapi-plugin-comments) repository.
 
 ## ⚗️ Custom fields
 
 For developers who upgrades their Strapi instance custom field from Comments plugin is available. Custom field can be picked from content types' edit page or added in definition file.
 
-Read more about this feature in [Strapi's docs](https://docs-next.strapi.io/user-docs/latest/plugins/introduction-to-plugins.html#custom-fields).
+Read more about this feature in [Strapi's docs](https://docs-next.strapi.io/dev-docs/custom-fields).
 
 ## Model lifecycle hooks
 
@@ -978,15 +951,6 @@ Example:
 ```
 
 ## 🤝 Contributing
-
-<div>
-  <a href="https://sharing.clickup.com/tl/xhcmx-83/strapiv-4-comments-roadmap">
-    <img src="https://img.shields.io/website?down_message=roadmap&label=product&up_message=roadmap&url=https%3A%2F%2Fsharing.clickup.com%2Ftl%2Fxhcmx-83%2Fstrapiv-4-comments-roadmap" />
-  </a>
-  <a href="https://sharing.clickup.com/b/xhcmx-63/strapiv-4-comments-board">
-    <img src="https://img.shields.io/website?down_message=board&label=product&up_color=blue&up_message=board&url=https%3A%2F%2Fsharing.clickup.com%2Fb%2Fxhcmx-63%2Fstrapiv-4-comments-board" />
-  </a>
-</div>
 
 Feel free to fork and make a Pull Request to this plugin project. All the input is warmly welcome!
 

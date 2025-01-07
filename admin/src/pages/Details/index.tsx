@@ -1,179 +1,89 @@
-/*
- *
- * Details
- *
- */
+import { Box, Grid } from '@strapi/design-system';
+import { Layouts, Page } from '@strapi/strapi/admin';
+import { useQuery } from '@tanstack/react-query';
+import { FC, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Config } from '../../api/schemas';
+import { useAPI } from '../../hooks/useAPI';
+import { usePermissions } from '../../hooks/usePermissions';
+import { parseRegExp } from '../../utils';
+import { DetailsEntry } from './DetailsEntry';
+import { DiscussionThread } from './DiscussionThread';
 
-// TODO
-// @ts-nocheck
-import React, { memo, useRef, useMemo, useState } from "react";
-import { connect } from "react-redux";
-import { bindActionCreators, compose } from "redux";
-import isEqual from "react-fast-compare";
-import { useQuery } from "react-query";
-import { useRouteMatch } from "react-router-dom";
-import {
-  Layout,
-  HeaderLayout,
-  TwoColsLayout,
-  ContentLayout,
-} from "@strapi/design-system/Layout";
-import { Box } from "@strapi/design-system/Box";
-import { Link } from "@strapi/design-system/Link";
-import { Loader } from "@strapi/design-system/Loader";
-import { useNotifyAT } from "@strapi/design-system/LiveRegions";
-import { arrowLeft } from "../../components/icons";
 
-import { isEmpty } from "lodash";
-import {
-  LoadingIndicatorPage,
-  useTracking,
-  useNotification,
-  useRBAC,
-  useFocusWhenNavigate,
-} from "@strapi/helper-plugin";
-import getMessage from "../../utils/getMessage";
-import { fetchDetailsData, fetchContentTypeData } from "../utils/api";
-import pluginPermissions from "../../permissions";
-import { getUrl, parseRegExp } from "../../utils";
-import Nav from "../../components/Nav";
-import DetailsEntity from "./components/DetailsEntity";
-import DiscussionThread from "../../components/DiscussionThread";
-import makeAppView from "../App/reducer/selectors";
-import ModeratorResponse from "../../components/ModeratorResponse";
-import Nav from '../../components/Nav';
-
-const Details = ({ config }) => {
-  useFocusWhenNavigate();
-
-  const {
-    params: { id },
-  } = useRouteMatch(getUrl(`discover/:id`));
-
-  const { notifyStatus } = useNotifyAT();
-  const { trackUsage } = useTracking();
-  const trackUsageRef = useRef(trackUsage);
-  const toggleNotification = useNotification();
-
-  const viewPermissions = useMemo(
-    () => ({
-      access: pluginPermissions.access,
-      moderate: pluginPermissions.moderate,
-      accessReports: pluginPermissions.reports,
-      reviewReports: pluginPermissions.reportsReview,
-    }),
-    []
-  );
-
-  const {
-    isLoading: isLoadingForPermissions,
-    allowedActions: {
-      canAccess,
-      canModerate,
-      canAccessReports,
-      canReviewReports,
-    },
-  } = useRBAC(viewPermissions);
-
+export const Details: FC<{ config: Config }> = ({ config }) => {
+  const api = useAPI();
+  const { id } = useParams<{ id: string }>();
   const [filters, setFilters] = useState({});
-
+  const {
+    isLoadingForPermissions,
+    canAccess,
+    canModerate,
+    canAccessReports,
+    canReviewReports,
+  } = usePermissions();
   const regexUID = new RegExp(
     parseRegExp(config.regex.uid).value,
-    parseRegExp(config.regex.uid).flags
+    parseRegExp(config.regex.uid).flags,
   );
 
-  const {
-    isLoading: isLoadingForData,
-    data,
-    isFetching,
-  } = useQuery(
-    ["get-details-data", id, filters, canAccess],
-    () => fetchDetailsData(id, filters, toggleNotification),
-    {
-      initialData: {},
-    }
-  );
-
-  const { entity, level, selected } = data;
+  const { data: { entity, level, selected }, isLoading: isLoadingForData, isFetching } = useQuery({
+    queryKey: api.comments.findOne.getKey(id!, filters),
+    queryFn: () => api.comments.findOne.query(id!, filters),
+    initialData: {
+      level: [],
+      selected: {} as any,
+      entity: {} as any,
+    },
+  });
   const entityUidValid = entity?.uid && regexUID.test(entity.uid);
 
-  const { data: contentTypeData } = useQuery(
-    ["get-additional-data", entity?.uid, canAccess],
-    () => fetchContentTypeData(entity?.uid, toggleNotification),
-    {
-      enabled: !!entity?.uid,
-      suspense: !entityUidValid,
-    }
-  );
-
-  const handleChangeFilters = (props) => setFilters(props);
+  const { data: contentTypeData } = useQuery({
+    queryKey: api.contentTypeBuilder.single.getKey(entity?.uid, canAccess),
+    queryFn: () => api.contentTypeBuilder.single.query(entity?.uid),
+    enabled: !!entityUidValid,
+  });
 
   const isLoading = isLoadingForData || isFetching;
 
-  if (canAccess) {
+  if (!isLoading && canAccess) {
     return (
       <Box background="neutral100">
-        <Layout sideNav={<Nav visible />}>
-          {(isLoading || isLoadingForPermissions) && isEmpty(data) ? (
-            <LoadingIndicatorPage />
-          ) : (
-            <>
-              <HeaderLayout
-                navigationAction={
-                    <Link startIcon={arrowLeft} to={getUrl(`discover`)}>
-                      {getMessage("HeaderLayout.link.go-back", "Back", false)}
-                    </Link>
-                }
-                title={getMessage("page.details.header")}
-                subtitle={getMessage("page.details.header.description")}
-                as="h2"
-              />
-              <ContentLayout>
-                <TwoColsLayout
-                  startCol={
-                    <>
-                      <DiscussionThread
-                        level={level}
-                        selected={selected}
-                        isReloading={isLoading}
-                        allowedActions={{
-                          canModerate,
-                          canAccessReports,
-                          canReviewReports,
-                        }}
-                      />
-                      {selected?.threadOf && (
-                        <ModeratorResponse
-                          rootThread={{ ...selected.threadOf }}
-                        />
-                      )}
-                    </>
-                  }
-                  endCol={
-                    <DetailsEntity
-                      data={entity}
-                      schema={contentTypeData?.schema}
-                      config={config}
-                      filters={filters}
-                      onFiltersChange={handleChangeFilters}
-                    />
-                  }
+        <Page.Title children={'Comments - details'} />
+        <Page.Main>
+          <Layouts.Header
+            title="Discussion panel"
+            subtitle="Drilldown and manage discussion related to the entity"
+            as="h2"
+          />
+          <Layouts.Content>
+            <Grid.Root gap={4}>
+              <Grid.Item col={9} s={12}>
+                <DiscussionThread
+                  level={level}
+                  selected={selected}
+                  isReloading={isLoading}
+                  allowedActions={{
+                    canModerate,
+                    canAccessReports,
+                    canReviewReports,
+                  }}
                 />
-              </ContentLayout>
-            </>
-          )}
-        </Layout>
+              </Grid.Item>
+              <Grid.Item col={3} s={12} alignItems="flex-start">
+                <DetailsEntry
+                  config={config}
+                  entity={entity}
+                  filters={filters}
+                  onChangeFilters={setFilters}
+                  schema={contentTypeData?.schema || ({ attributes: {} } as any)}
+                />
+              </Grid.Item>
+            </Grid.Root>
+          </Layouts.Content>
+        </Page.Main>
       </Box>
     );
   }
   return null;
 };
-
-const mapStateToProps = makeAppView();
-
-export function mapDispatchToProps(dispatch) {
-  return bindActionCreators({}, dispatch);
-}
-const withConnect = connect(mapStateToProps, mapDispatchToProps);
-
-export default compose(withConnect)(memo(Details, isEqual));

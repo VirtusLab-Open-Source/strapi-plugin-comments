@@ -1,670 +1,422 @@
-// TODO
-// @ts-nocheck
+import { Accordion, Alert, Box, Button, Field, Flex, Grid, MultiSelect, MultiSelectOption, Switch, Toggle, Typography } from '@strapi/design-system';
+import { ArrowClockwise, Check, Play } from '@strapi/icons';
+import { Form, Layouts, Page, useNotification, useTracking } from '@strapi/strapi/admin';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 
-import React, { useRef, useMemo, useState } from "react";
-import { useQuery } from "react-query";
-// @ts-ignore
-import { Formik } from "formik";
-import { capitalize, first, orderBy, isEmpty, isEqual, isNil } from "lodash";
-// @ts-ignore
-import {
-  CheckPermissions,
-  LoadingIndicatorPage,
-  Form,
-  useTracking,
-  useNotification,
-  useRBAC,
-  useFocusWhenNavigate,
-  useOverlayBlocker,
-} from "@strapi/helper-plugin";
-import {
-  Accordion,
-  AccordionToggle,
-  AccordionContent,
-  AccordionGroup,
-} from "@strapi/design-system/Accordion";
-import { Main } from "@strapi/design-system/Main";
-import { ContentLayout, HeaderLayout } from "@strapi/design-system/Layout";
-import { Button } from "@strapi/design-system/Button";
-import { Box } from "@strapi/design-system/Box";
-import { Stack } from "@strapi/design-system/Stack";
-import { Switch } from "@strapi/design-system/Switch";
-import { Typography } from "@strapi/design-system/Typography";
-import { Grid, GridItem } from "@strapi/design-system/Grid";
-import { TextInput } from "@strapi/design-system/TextInput";
-import { ToggleInput } from "@strapi/design-system/ToggleInput";
-import { Select, Option } from "@strapi/design-system/Select";
-import { useNotifyAT } from "@strapi/design-system/LiveRegions";
-import { Tooltip } from "@strapi/design-system/Tooltip";
-import { check, refresh, play, information } from "../../components/icons";
+import { isNil, orderBy } from 'lodash';
+import { useCallback, useRef, useState } from 'react';
+import styled from 'styled-components';
+import { ConfirmationDialog } from '../../components/ConfirmationDialog';
+import { RenderIf } from '../../components/RenderIf';
+import { useAPI } from '../../hooks/useAPI';
+import { usePermissions } from '../../hooks/usePermissions';
+import { CommonProviders } from '../../providers/CommonProviders';
+import { getMessage } from '../../utils';
+import { useSettingsAPI } from './hooks/useSettingsAPI';
 
-import pluginPermissions from "../../permissions";
-import useConfig from "../../hooks/useConfig";
-import { fetchAllContentTypes, fetchRoles } from "./utils/api";
-import { getMessage, parseRegExp } from "../../utils";
-import ConfirmationDialog from "../../components/ConfirmationDialog";
-import { RestartAlert } from "./components/RestartAlert/styles";
-import FormSwitch from "../../components/FormSwitch";
-import { ToBeFixed } from "../../../../types";
+const boxDefaultProps = {
+  background: 'neutral0',
+  hasRadius: true,
+  shadow: 'filterShadow',
+  padding: 6,
+  width: '100%',
+};
+
+const StyledAlert = styled(Alert)(() => ({
+  '[role]': {
+    flexDirection: 'column',
+  },
+}));
 
 const Settings = () => {
-  useFocusWhenNavigate();
-
-  const { notifyStatus } = useNotifyAT();
   const { trackUsage } = useTracking();
-  const trackUsageRef = useRef(trackUsage);
-  const toggleNotification = useNotification();
-  const { lockApp, unlockApp } = useOverlayBlocker();
+  const formRef = useRef<HTMLFormElement>(null);
+  const { toggleNotification } = useNotification();
+  const [isRestartRequired, setIsRestartRequired] = useState(false);
+  const { isLoadingForPermissions, canSettingsChange } = usePermissions();
+  const queryClient = useQueryClient();
+  const api = useAPI();
 
   const {
-    isLoading: isLoadingForPermissions,
-    allowedActions
-  } = useRBAC(pluginPermissions);
-
-  const { 
-    canSettings: canAccess, 
-    canSettingsChange: canChange 
-  } = allowedActions;
-
-  const [restoreConfigmationVisible, setRestoreConfigmationVisible] =
-    useState(false);
-  const [restartRequired, setRestartRequired] = useState(false);
-  const [contentTypeExpanded, setContentTypeExpanded] = useState(undefined);
-
-  const { fetch, restartMutation, submitMutation, restoreMutation } =
-    useConfig(toggleNotification);
-  const {
-    data: configData,
-    isLoading: isConfigLoading,
-    err: configErr,
-  }: ToBeFixed = fetch;
-
-  const {
-    data: allCollectionsData,
-    isLoading: areCollectionsLoading,
-    err: collectionsErr,
-  }: ToBeFixed = useQuery(["get-all-content-types", canAccess], () =>
-    fetchAllContentTypes(toggleNotification)
-  );
-
-  const {
-    data: allRolesData,
-    isLoading: areRolesLoading,
-    err: rolesErr,
-  }: ToBeFixed = useQuery(["get-all-roles", canAccess], () =>
-    fetchRoles(toggleNotification)
-  );
-
-  const isLoading =
-    isLoadingForPermissions ||
-    isConfigLoading ||
-    areCollectionsLoading ||
-    areRolesLoading;
-  const isError = configErr || collectionsErr || rolesErr;
-
-  const preparePayload = ({
-    enabledCollections,
-    gqlAuthEnabled,
-    approvalFlow,
-    entryLabel,
-    clientUrl,
-    clientEmail,
-    blockedAuthorProps,
-    ...rest
-  }: ToBeFixed) => ({
-    ...rest,
-    blockedAuthorProps: blockedAuthorProps.split(",").map(x => x.trim()).filter(x => x),
-    enabledCollections,
-    approvalFlow: approvalFlow.filter((_) => enabledCollections.includes(_)),
-    entryLabel: {
-      ...Object.keys(entryLabel).reduce(
-        (prev, curr) => ({
-          ...prev,
-          [curr]: enabledCollections.includes(curr)
-            ? entryLabel[curr]
-            : undefined,
-        }),
-        {}
-      ),
-      "*": entryLabel["*"],
+    config,
+    collectionTypes,
+    roles,
+    restoreSettingsMutation,
+    updateSettingsMutation,
+    restartStrapiMutation,
+  } = useSettingsAPI({
+    restoreSettingsMutationSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: api.config.getKey(),
+        exact: false,
+      });
+      setIsRestartRequired(true);
+      toggleNotification({
+        message: getMessage('page.settings.actions.restore.success'),
+        type: 'success',
+      });
     },
-    reportReasons: configData?.reportReasons,
-    client: clientEmail || clientUrl ? {
-      contactEmail: clientEmail,
-      url: clientUrl,
-    } : undefined,
-    gql: gqlAuthEnabled ? { auth: true } : undefined,
+    restartStrapiMutationSuccess: () => {
+      setIsRestartRequired(false);
+    },
+    updateSettingsMutationSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: api.config.getKey(),
+        exact: false,
+      });
+      setIsRestartRequired(true);
+    },
   });
 
-  if (isLoading || isError) {
-    return (
-      <LoadingIndicatorPage>
-        {getMessage("page.settings.loading")}
-      </LoadingIndicatorPage>
-    );
+  const onTriggerSubmit = useCallback(() => {
+    formRef.current?.requestSubmit();
+  }, []);
+
+  const onSubmit = useCallback((values: any) => {
+    updateSettingsMutation.mutate({
+      ...values,
+      blockedAuthorProps: values.blockedAuthorProps.split(',').map((prop: string) => prop.trim()),
+    });
+  }, [updateSettingsMutation]);
+
+
+  if (
+    config.status !== 'success' ||
+    collectionTypes.status !== 'success' ||
+    roles.status !== 'success' ||
+    isLoadingForPermissions
+  ) {
+    // TODO
+    return getMessage('page.settings.loading');
   }
 
-  const regexUID = !isLoading
-    ? new RegExp(
-        parseRegExp(fetch.data.regex?.uid).value,
-        parseRegExp(fetch.data.regex?.uid).flags
-      )
-    : null;
-
-  const allRoles = allRolesData?.data || [];
-  const allCollections =
-    !isLoading &&
-    allCollectionsData.filter(
-      ({ uid }: ToBeFixed) =>
-        first(uid.split(regexUID).filter((s) => s && s.length > 0)) === "api"
-    );
-  const enabledCollections =
-    configData?.enabledCollections
-      ?.map((uid: ToBeFixed) =>
-        allCollections.find((_) => _.uid === uid) ? uid : undefined
-      )
-      .filter((_: ToBeFixed) => _) || [];
-  const entryLabel = configData?.entryLabel || {};
-  const approvalFlow = configData?.approvalFlow || [];
-  const badWords = isNil(configData?.badWords) ? true : configData?.badWords;
-  const isGQLPluginEnabled = configData?.isGQLPluginEnabled;
-  const gqlAuthEnabled = configData?.gql?.auth || undefined;
-  const moderatorRoles =
-    configData?.moderatorRoles?.filter((code: ToBeFixed) =>
-      allRoles.find((_: ToBeFixed) => _.code === code)
-    ) || [];
-  const clientUrl = configData?.client?.url;
-  const clientEmail = configData?.client?.contactEmail;
-  const blockedAuthorProps = configData?.blockedAuthorProps ?? [];
-
-  const changeApprovalFlowFor = (
-    uid: ToBeFixed,
-    current: ToBeFixed,
-    value: ToBeFixed
-  ) => {
-    const currentSet = new Set(current);
-    if (value) {
-      currentSet.add(uid);
-    } else {
-      currentSet.delete(uid);
-    }
-    return Array.from(currentSet);
-  };
-
-  const changeEntryLabelFor = (
-    uid: ToBeFixed,
-    current: ToBeFixed,
-    value: ToBeFixed
-  ) => ({
-    ...current,
-    [uid]: value && !isEmpty(value) ? [...value] : undefined,
-  });
-
-  const handleUpdateConfiguration = async (form: ToBeFixed) => {
-    if (canChange) {
-      lockApp();
-      const payload = preparePayload(form);
-      await submitMutation.mutateAsync(payload);
-      const enabledCollectionsChanged = !isEqual(
-        payload.enabledCollections,
-        configData?.enabledCollections
-      );
-      const gqlAuthChanged = !isEqual(payload.gql?.auth, configData?.gql?.auth);
-      if (enabledCollectionsChanged || gqlAuthChanged) {
-        setRestartRequired(true);
-      }
-      unlockApp();
-    }
-  };
-
-  const handleRestoreConfirmation = () => setRestoreConfigmationVisible(true);
-  const handleRestoreConfiguration = async () => {
-    if (canChange) {
-      lockApp();
-      await restoreMutation.mutateAsync();
-      unlockApp();
-      setRestartRequired(true);
-      setRestoreConfigmationVisible(false);
-    }
-  };
-  const handleRestoreCancel = () => setRestoreConfigmationVisible(false);
-
-  const handleRestart = async () => {
-    if (canChange) {
-      lockApp();
-      await restartMutation.mutateAsync();
-      setRestartRequired(false);
-      unlockApp();
-    }
-  };
-  const handleRestartDiscard = () => setRestartRequired(false);
-
-  const handleSetContentTypeExpanded = (key: ToBeFixed) =>
-    setContentTypeExpanded(key === contentTypeExpanded ? undefined : key);
-
-  const boxDefaultProps = {
-    background: "neutral0",
-    hasRadius: true,
-    shadow: "filterShadow",
-    padding: 6,
-  };
+  const allCollections = collectionTypes.data.filter(ct => ct.uid.includes('api::'));
+  const enabledCollections = config.data.enabledCollections
+                                   .filter((uid: string) => allCollections.some(ct => ct.uid === uid));
+  const badWords = isNil(config.data.badWords) ? true : config.data?.badWords;
+  const gqlAuthEnabled = Boolean(config.data.gql?.auth || null);
+  const moderatorRoles = config.data.moderatorRoles
+                               .filter((role: string) => roles.data.filter((r) => r.code === role));
+  const clientUrl = config.data.client?.url;
+  const clientEmail = config.data.client?.contactEmail;
+  const blockedAuthorProps = config.data.blockedAuthorProps ?? [];
+  const onDiscardRestart = () => setIsRestartRequired(false);
 
   return (
-    <Main>
-      <Formik
-        initialValues={{
-          enabledCollections,
-          moderatorRoles,
-          badWords,
-          approvalFlow,
-          entryLabel,
-          clientEmail,
-          clientUrl,
-          gqlAuthEnabled,
-          blockedAuthorProps: blockedAuthorProps.join(", "),
-        }}
-        enableReinitialize={true}
-        onSubmit={handleUpdateConfiguration}
-      >
-        {({ handleSubmit, setFieldValue, values }: ToBeFixed) => (
-          <Form noValidate onSubmit={handleSubmit}>
-            <HeaderLayout
-              title={getMessage("page.settings.header.title")}
-              subtitle={getMessage("page.settings.header.description")}
-              primaryAction={
-                <CheckPermissions
-                  permissions={pluginPermissions.settingsChange}
-                >
-                  <Button
-                    type="submit"
-                    startIcon={check}
-                    disabled={restartRequired}
-                  >
-                    {getMessage("page.settings.actions.submit")}
-                  </Button>
-                </CheckPermissions>
-              }
-            />
-            <ContentLayout>
-              <Stack size={4}>
-                {restartRequired && (
-                  <RestartAlert
-                    closeLabel={getMessage(
-                      "page.settings.actions.restart.alert.cancel"
-                    )}
-                    title={getMessage(
-                      "page.settings.actions.restart.alert.title"
-                    )}
-                    action={
-                      <Box>
-                        <Button onClick={handleRestart} startIcon={play}>
-                          {getMessage("page.settings.actions.restart")}
-                        </Button>
-                      </Box>
-                    }
-                    onClose={handleRestartDiscard}
-                  >
-                    {getMessage(
-                      "page.settings.actions.restart.alert.description"
-                    )}
-                  </RestartAlert>
-                )}
-
+    <>
+      <Page.Title children={'Comments - settings'} />
+      <Page.Main>
+        <Layouts.Header
+          title={getMessage('page.settings.header.title')}
+          subtitle={getMessage('page.settings.header.description')}
+          as="h2"
+          primaryAction={(
+            <RenderIf condition={canSettingsChange}>
+              <Button type="submit" startIcon={<Check />} onClick={onTriggerSubmit}>
+                {getMessage('page.settings.actions.submit')}
+              </Button>
+            </RenderIf>
+          )}
+        />
+        <Layouts.Content>
+          {isRestartRequired && (
+            <Box marginBottom={4}>
+              <StyledAlert
+                closeLabel={getMessage('page.settings.actions.restart.alert.cancel')}
+                title={getMessage('page.settings.actions.restart.alert.title')}
+                onClose={onDiscardRestart}
+                action={
+                  <Box>
+                    <Button onClick={restartStrapiMutation.mutate} startIcon={<Play />}>
+                      {getMessage('page.settings.actions.restart')}
+                    </Button>
+                  </Box>
+                }
+              >
+                <Box marginTop={4}>
+                  {getMessage('page.settings.actions.restart.alert.description')}
+                </Box>
+              </StyledAlert>
+            </Box>
+          )}
+          <Form
+            method="POST"
+            ref={formRef}
+            onSubmit={onSubmit}
+            initialValues={{
+              enabledCollections,
+              moderatorRoles,
+              badWords,
+              clientEmail,
+              clientUrl,
+              gqlAuthEnabled,
+              approvalFlow: config.data.approvalFlow,
+              entryLabel: config.data.entryLabel,
+              blockedAuthorProps: blockedAuthorProps.join(', '),
+            }}
+          >
+            {({ values, onChange }) => (
+              <Flex gap={4} direction="column">
                 <Box {...boxDefaultProps}>
-                  <Stack size={4}>
-                    <Typography variant="delta" as="h2">
-                      {getMessage("page.settings.section.general")}
-                    </Typography>
-                    <Grid gap={4}>
-                      <GridItem col={12}>
-                        <Select
+                  <Typography variant="delta" as="h2">
+                    {getMessage('page.settings.section.general')}
+                  </Typography>
+                  <Grid.Root gap={4} marginTop={4} width="100%">
+                    <Grid.Item xs={12}>
+                      <Field.Root width="100%" hint={getMessage('page.settings.form.enabledCollections.hint')}>
+                        <Field.Label htmlFor="enabledCollections">
+                          {getMessage('page.settings.form.enabledCollections.label')}
+                        </Field.Label>
+                        <MultiSelect
+                          withTags
                           name="enabledCollections"
-                          label={getMessage(
-                            "page.settings.form.enabledCollections.label"
-                          )}
-                          placeholder={getMessage(
-                            "page.settings.form.enabledCollections.placeholder"
-                          )}
-                          hint={getMessage(
-                            "page.settings.form.enabledCollections.hint"
-                          )}
-                          onClear={() =>
-                            setFieldValue("enabledCollections", [], false)
-                          }
                           value={values.enabledCollections}
-                          onChange={(value: ToBeFixed) =>
-                            setFieldValue("enabledCollections", value, false)
-                          }
-                          disabled={restartRequired}
-                          multi
-                          withTags
+                          onChange={(value: string[]) => {
+                            onChange('enabledCollections', value);
+                          }}
                         >
-                          {allCollections.map(
-                            ({ uid, schema: { displayName } }: ToBeFixed) => (
-                              <Option key={uid} value={uid}>
-                                {displayName}
-                              </Option>
-                            )
-                          )}
-                        </Select>
-                      </GridItem>
-                      {!isEmpty(values.enabledCollections) && (
-                        <GridItem col={12}>
-                          <AccordionGroup
-                            label={getMessage(
-                              "page.settings.form.contentTypesSettings.label"
-                            )}
-                            labelAction={
-                              <Tooltip
-                                description={getMessage(
-                                  "page.settings.form.contentTypesSettings.tooltip"
-                                )}
-                              >
-                                {information}
-                              </Tooltip>
-                            }
-                          >
-                            {orderBy(values.enabledCollections).map((uid) => {
-                              const {
-                                schema: { displayName, attributes = {} },
-                              } = allCollections.find((_) => _.uid === uid);
-                              const stringAttributes = Object.keys(
-                                attributes
-                              ).filter((_) => attributes[_].type === "string");
-                              const key = `collectionSettings-${uid}`;
-                              return (
-                                <Accordion
-                                  expanded={contentTypeExpanded === key}
-                                  toggle={() =>
-                                    handleSetContentTypeExpanded(key)
-                                  }
-                                  key={key}
-                                  id={key}
-                                  size="S"
-                                >
-                                  <AccordionToggle
-                                    title={displayName}
-                                    togglePosition="left"
-                                  />
-                                  <AccordionContent>
-                                    <Box padding={6}>
-                                      <Stack size={4}>
-                                        <FormSwitch
-                                          name={`collectionSettings-${uid}-approvalFlow`}
-                                          label={getMessage(
-                                            "page.settings.form.approvalFlow.label"
-                                          )}
-                                          hint={getMessage({
-                                            id: "page.settings.form.approvalFlow.hint",
-                                            props: { name: displayName },
-                                          })}
-                                          selected={values.approvalFlow.includes(
-                                            uid
-                                          )}
-                                          onChange={() =>
-                                            setFieldValue(
-                                              "approvalFlow",
-                                              changeApprovalFlowFor(
-                                                uid,
-                                                values.approvalFlow,
-                                                !values.approvalFlow.includes(
-                                                  uid
-                                                )
-                                              ),
-                                              []
-                                            )
-                                          }
-                                          onLabel={getMessage(
-                                            "compontents.toogle.enabled"
-                                          )}
-                                          offLabel={getMessage(
-                                            "compontents.toogle.disabled"
-                                          )}
-                                          disabled={restartRequired}
-                                          visibleLabels
-                                        />
-                                        {!isEmpty(stringAttributes) && (
-                                          <Select
-                                            name={`collectionSettings-${uid}-entryLabel`}
-                                            label={getMessage(
-                                              "page.settings.form.entryLabel.label"
-                                            )}
-                                            placeholder={getMessage(
-                                              "page.settings.form.entryLabel.placeholder"
-                                            )}
-                                            hint={getMessage(
-                                              "page.settings.form.entryLabel.hint"
-                                            )}
-                                            onClear={() =>
-                                              setFieldValue(
-                                                "entryLabel",
-                                                changeEntryLabelFor(
-                                                  uid,
-                                                  values.entryLabel
-                                                )
-                                              )
-                                            }
-                                            value={values.entryLabel[uid] || []}
-                                            onChange={(value: ToBeFixed) =>
-                                              setFieldValue(
-                                                "entryLabel",
-                                                changeEntryLabelFor(
-                                                  uid,
-                                                  values.entryLabel,
-                                                  value
-                                                )
-                                              )
-                                            }
-                                            multi
-                                            withTags
-                                            disabled={restartRequired}
-                                          >
-                                            {stringAttributes.map((key) => (
-                                              <Option
-                                                key={`collectionSettings-${uid}-entryLabel-${key}`}
-                                                value={key}
-                                              >
-                                                {capitalize(
-                                                  key.split("_").join(" ")
-                                                )}
-                                              </Option>
-                                            ))}
-                                          </Select>
-                                        )}
-                                      </Stack>
-                                    </Box>
-                                  </AccordionContent>
-                                </Accordion>
-                              );
-                            })}
-                          </AccordionGroup>
-                        </GridItem>
-                      )}
-                    </Grid>
-                  </Stack>
-                </Box>
-
-                <Box {...boxDefaultProps}>
-                  <Stack size={4}>
-                    <Typography variant="delta" as="h2">
-                      {getMessage("page.settings.section.additional")}
-                    </Typography>
-                    <Grid gap={4}>
-                      <GridItem col={4} xs={12}>
-                        <ToggleInput
-                          name="badWords"
-                          label={getMessage(
-                            "page.settings.form.badWords.label"
-                          )}
-                          hint={getMessage("page.settings.form.badWords.hint")}
-                          checked={values.badWords}
-                          onChange={({ target: { checked } }: ToBeFixed) =>
-                            setFieldValue("badWords", checked, false)
-                          }
-                          onLabel={getMessage("compontents.toogle.enabled")}
-                          offLabel={getMessage("compontents.toogle.disabled")}
-                          disabled={restartRequired}
-                        />
-                      </GridItem>
-                      <GridItem col={4} xs={12}>
-                        <TextInput
-                          type="text"
-                          name="blockedAuthorProps"
-                          label={getMessage(
-                            "page.settings.form.author.blockedProps.label"
-                          )}
-                          hint={getMessage("page.settings.form.author.blockedProps.hint")}
-                          value={values.blockedAuthorProps}
-                          onChange={({ target: { value } }: ToBeFixed) =>
-                            setFieldValue("blockedAuthorProps", value, false)
-                          }
-                          disabled={restartRequired}
-                        />
-                      </GridItem>
-                      {isGQLPluginEnabled && (
-                        <GridItem col={4} xs={12}>
-                          <ToggleInput
-                            name="gqlAuthEnabled"
-                            label={getMessage(
-                              "page.settings.form.gqlAuth.label"
-                            )}
-                            hint={getMessage("page.settings.form.gqlAuth.hint")}
-                            checked={values.gqlAuthEnabled}
-                            onChange={({ target: { checked } }: ToBeFixed) =>
-                              setFieldValue("gqlAuthEnabled", checked, false)
-                            }
-                            onLabel={getMessage("compontents.toogle.enabled")}
-                            offLabel={getMessage("compontents.toogle.disabled")}
-                            disabled={restartRequired}
-                          />
-                        </GridItem>
-                      )}
-                    </Grid>
-                  </Stack>
-                </Box>
-
-                <Box {...boxDefaultProps}>
-                  <Stack size={4}>
-                    <Typography variant="delta" as="h2">
-                      {getMessage("page.settings.section.client")}
-                    </Typography>
-                    <Grid gap={4}>
-                      <GridItem col={3} xs={12}>
-                        <TextInput
-                          type="url"
-                          name="clientUrl"
-                          label={getMessage(
-                            "page.settings.form.client.url.label"
-                          )}
-                          hint={getMessage("page.settings.form.client.url.hint")}
-                          value={values.clientUrl}
-                          onChange={({ target: { value } }: ToBeFixed) =>
-                            setFieldValue("clientUrl", value, false)
-                          }
-                          disabled={restartRequired}
-                        />
-                      </GridItem>
-                      <GridItem col={3} xs={12}>
-                        <TextInput
-                          type="email"
-                          name="clientEmail"
-                          label={getMessage(
-                            "page.settings.form.client.email.label"
-                          )}
-                          hint={getMessage("page.settings.form.client.email.hint")}
-                          value={values.clientEmail}
-                          onChange={({ target: { value } }: ToBeFixed) =>
-                            setFieldValue("clientEmail", value, false)
-                          }
-                          disabled={restartRequired}
-                        />
-                      </GridItem>
-                      <GridItem col={6} xs={12}>
-                        <Select
-                          name="moderatorRoles"
-                          label={getMessage(
-                            "page.settings.form.moderatorRoles.label"
-                          )}
-                          placeholder={getMessage(
-                            "page.settings.form.moderatorRoles.placeholder"
-                          )}
-                          hint={getMessage(
-                            "page.settings.form.moderatorRoles.hint"
-                          )}
-                          onClear={() =>
-                            setFieldValue("moderatorRoles", [], false)
-                          }
-                          value={values.moderatorRoles}
-                          onChange={(value: ToBeFixed) =>
-                            setFieldValue("moderatorRoles", value, false)
-                          }
-                          disabled={restartRequired}
-                          multi
-                          withTags
-                        >
-                          {allRoles.map(({ code, name }: ToBeFixed) => (
-                            <Option key={code} value={code}>
-                              {name}
-                            </Option>
+                          {allCollections.map((collection) => (
+                            <MultiSelectOption key={collection.uid} value={collection.uid}>
+                              {collection.schema.displayName}
+                            </MultiSelectOption>
                           ))}
-                        </Select>
-                      </GridItem>
-                    </Grid>
-                  </Stack>
+                        </MultiSelect>
+                        <Field.Hint />
+                      </Field.Root>
+                    </Grid.Item>
+                    {values.enabledCollections.length > 0 && (
+                      <Grid.Item>
+                        <Grid.Root gap={4} width="100%">
+                          <Grid.Item>
+                            <Typography>
+                              {getMessage('page.settings.form.contentTypesSettings.label')}
+                            </Typography>
+                          </Grid.Item>
+                          <Grid.Item>
+                            <Accordion.Root style={{ width: '100%' }}>
+                              {orderBy(values.enabledCollections).map(uid => {
+                                const collection = allCollections.find(ct => ct.uid === uid);
+                                if (collection) {
+                                  const { schema: { displayName, attributes } } = collection;
+                                  const stringAttributes = Object.keys(attributes).filter((key) => attributes[key].type === 'string');
+                                  return (
+                                    <Accordion.Item key={uid} value={uid}>
+                                      <Accordion.Header>
+                                        <Accordion.Trigger>
+                                          <Typography variant="epsilon" as="h3">
+                                            {displayName}
+                                          </Typography>
+                                        </Accordion.Trigger>
+                                      </Accordion.Header>
+                                      <Accordion.Content>
+                                        <Grid.Root padding={6} gap={4}>
+                                          <Grid.Item>
+                                            <Field.Root
+                                              width="100%"
+                                              hint={getMessage({
+                                                id: 'page.settings.form.approvalFlow.hint',
+                                                props: { name: displayName },
+                                              })}
+                                            >
+                                              <Field.Label>
+                                                {getMessage('page.settings.form.approvalFlow.label')}
+                                              </Field.Label>
+                                              <Switch
+                                                visibleLabels
+                                                onLabel={getMessage('components.toogle.enabled')}
+                                                offLabel={getMessage('components.toogle.disabled')}
+                                                checked={values.approvalFlow.includes(uid)}
+                                                onCheckedChange={(checked: boolean) => {
+                                                  onChange('approvalFlow', checked ? [...values.approvalFlow, uid] : values.approvalFlow.filter((c) => c !== uid));
+                                                }}
+                                              />
+                                              <Field.Hint />
+                                            </Field.Root>
+                                          </Grid.Item>
+                                          <RenderIf condition={stringAttributes.length > 0}>
+                                            <Grid.Item>
+                                              <Field.Root
+                                                width="100%"
+                                                hint={getMessage('page.settings.form.entryLabel.hint')}
+                                              >
+                                                <Field.Label>
+                                                  {getMessage('page.settings.form.entryLabel.label')}
+                                                </Field.Label>
+                                                <MultiSelect
+                                                  withTags
+                                                  placeholder={getMessage('page.settings.form.entryLabel.placeholder')}
+                                                  name="enabledCollections"
+                                                  value={values.entryLabel[uid] ?? []}
+                                                  onChange={(value: string[]) => {
+                                                    onChange('entryLabel', { ...values.entryLabel, [uid]: value });
+                                                  }}
+                                                >
+                                                  {stringAttributes.map((attr) => (
+                                                    <MultiSelectOption key={attr} value={attr}>
+                                                      {attr}
+                                                    </MultiSelectOption>
+                                                  ))}
+                                                </MultiSelect>
+                                                <Field.Hint />
+                                              </Field.Root>
+                                            </Grid.Item>
+                                          </RenderIf>
+                                        </Grid.Root>
+                                      </Accordion.Content>
+                                    </Accordion.Item>
+                                  );
+                                }
+                                return null;
+                              })}
+                            </Accordion.Root>
+                          </Grid.Item>
+                        </Grid.Root>
+                      </Grid.Item>
+                    )}
+                  </Grid.Root>
                 </Box>
-
-                <CheckPermissions
-                  permissions={pluginPermissions.settingsChange}
-                >
+                <Box {...boxDefaultProps}>
+                  <Typography variant="delta" as="h2">
+                    {getMessage('page.settings.section.additional')}
+                  </Typography>
+                  <Grid.Root gap={4} marginTop={4} width="100%">
+                    <Grid.Item xs={4}>
+                      <Field.Root width="100%" hint={getMessage('page.settings.form.enabledCollections.hint')}>
+                        <Field.Label htmlFor="enabledCollections">
+                          {getMessage('page.settings.form.enabledCollections.label')}
+                        </Field.Label>
+                        <Toggle
+                          name="badWords"
+                          checked={values.badWords}
+                          onChange={onChange}
+                          onLabel={getMessage('components.toogle.enabled')}
+                          offLabel={getMessage('components.toogle.disabled')}
+                          width="100%"
+                        />
+                        <Field.Hint />
+                      </Field.Root>
+                    </Grid.Item>
+                    <Grid.Item xs={4}>
+                      <Field.Root width="100%" hint={getMessage('page.settings.form.author.blockedProps.hint')}>
+                        <Field.Label htmlFor="enabledCollections">
+                          {getMessage('page.settings.form.author.blockedProps.label')}
+                        </Field.Label>
+                        <Field.Input name="blockedProps" onChange={onChange} />
+                        <Field.Hint />
+                      </Field.Root>
+                    </Grid.Item>
+                    <Grid.Item xs={4}>
+                      <Field.Root width="100%" hint={getMessage('page.settings.form.gqlAuth.hint')}>
+                        <Field.Label>
+                          {getMessage('page.settings.form.gqlAuth.label')}
+                        </Field.Label>
+                        <Toggle
+                          name="gqlAuthEnabled"
+                          checked={values.gqlAuthEnabled}
+                          onChange={onChange}
+                          onLabel={getMessage('components.toogle.enabled')}
+                          offLabel={getMessage('components.toogle.disabled')}
+                          width="100%"
+                        />
+                        <Field.Hint />
+                      </Field.Root>
+                    </Grid.Item>
+                  </Grid.Root>
+                </Box>
+                <Box {...boxDefaultProps}>
+                  <Typography variant="delta" as="h2">
+                    {getMessage('page.settings.section.client')}
+                  </Typography>
+                  <Grid.Root gap={4} marginTop={4} width="100%">
+                    <Grid.Item xs={4}>
+                      <Field.Root width="100%" hint={getMessage('page.settings.form.client.url.hint')}>
+                        <Field.Label>
+                          {getMessage('page.settings.form.client.url.label')}
+                        </Field.Label>
+                        <Field.Input name="clientUrl" onChange={onChange} />
+                        <Field.Hint />
+                      </Field.Root>
+                    </Grid.Item>
+                    <Grid.Item xs={4}>
+                      <Field.Root width="100%" hint={getMessage('page.settings.form.client.email.hint')}>
+                        <Field.Label>
+                          {getMessage('page.settings.form.client.email.label')}
+                        </Field.Label>
+                        <Field.Input name="clientEmail" onChange={onChange} />
+                        <Field.Hint />
+                      </Field.Root>
+                    </Grid.Item>
+                    <Grid.Item xs={4}>
+                      <Field.Root
+                        width="100%"
+                        hint={getMessage('page.settings.form.moderatorRoles.hint')}
+                      >
+                        <Field.Label>
+                          {getMessage('page.settings.form.moderatorRoles.label')}
+                        </Field.Label>
+                        <MultiSelect
+                          withTags
+                          placeholder={getMessage('page.settings.form.moderatorRoles.placeholder')}
+                          name="enabledCollections"
+                          value={values.moderatorRoles}
+                          onChange={(value: string[]) => {
+                            onChange('moderatorRoles', value);
+                          }}
+                        >
+                          {roles.data.map((role) => (
+                            <MultiSelectOption key={role.code} value={role.code}>
+                              {role.name}
+                            </MultiSelectOption>
+                          ))}
+                        </MultiSelect>
+                        <Field.Hint />
+                      </Field.Root>
+                    </Grid.Item>
+                  </Grid.Root>
+                </Box>
+                <RenderIf condition={canSettingsChange}>
                   <Box {...boxDefaultProps}>
-                    <Stack size={4}>
-                      <Stack size={2}>
+                    <Flex gap={4} direction="column" alignItems="flex-start">
+                      <Flex gap={2} direction="column" alignItems="flex-start">
                         <Typography variant="delta" as="h2">
-                          {getMessage("page.settings.section.restore")}
+                          {getMessage('page.settings.section.restore')}
                         </Typography>
                         <Typography variant="pi" as="h4">
-                          {getMessage("page.settings.section.restore.subtitle")}
+                          {getMessage('page.settings.section.restore.subtitle')}
                         </Typography>
-                      </Stack>
-                      <Grid gap={4}>
-                        <GridItem col={6}>
+                      </Flex>
+                      <ConfirmationDialog
+                        Trigger={({ onClick }) => (
                           <Button
                             variant="danger-light"
-                            startIcon={refresh}
-                            onClick={handleRestoreConfirmation}
+                            startIcon={<ArrowClockwise />}
+                            onClick={onClick}
                           >
-                            {getMessage("page.settings.actions.restore")}
+                            {getMessage('page.settings.actions.restore')}
                           </Button>
-
-                          <ConfirmationDialog
-                            isVisible={restoreConfigmationVisible}
-                            isActionAsync={restoreMutation.isLoading}
-                            header={getMessage(
-                              "page.settings.actions.restore.confirmation.header"
-                            )}
-                            labelConfirm={getMessage(
-                              "page.settings.actions.restore.confirmation.button.confirm"
-                            )}
-                            iconConfirm={refresh}
-                            onConfirm={handleRestoreConfiguration}
-                            onCancel={handleRestoreCancel}
-                          >
-                            {getMessage(
-                              "page.settings.actions.restore.confirmation.description"
-                            )}
-                          </ConfirmationDialog>
-                        </GridItem>
-                      </Grid>
-                    </Stack>
+                        )}
+                        onConfirm={restoreSettingsMutation.mutate}
+                        title={getMessage('page.settings.actions.restore.confirmation.header')}
+                        labelConfirm={getMessage('page.settings.actions.restore.confirmation.button.confirm')}
+                        iconConfirm={<ArrowClockwise />}>
+                        {getMessage('page.settings.actions.restore.confirmation.description')}
+                      </ConfirmationDialog>
+                    </Flex>
                   </Box>
-                </CheckPermissions>
-              </Stack>
-            </ContentLayout>
+                </RenderIf>
+              </Flex>
+            )}
           </Form>
-        )}
-      </Formik>
-    </Main>
+        </Layouts.Content>
+      </Page.Main>
+    </>
   );
 };
 
-export default Settings;
+const queryClient = new QueryClient();
+
+export default () => (
+  <CommonProviders>
+    <Settings />
+  </CommonProviders>
+);
