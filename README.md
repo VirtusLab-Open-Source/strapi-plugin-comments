@@ -2,23 +2,21 @@
   <img style="width: 150px; height: auto;" src="https://www.sensinum.com/img/open-source/strapi-plugin-comments/logo.png" alt="Logo - Strapi Comments plugin" />
 </div>
 <div align="center">
-  <h1>Strapi v5 - Comments plugin - Beta</h1>
+  <h1>Strapi v5 - Comments plugin</h1>
   <p>Powerful Strapi based comments moderation tool for you and your users</p>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
-    <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/VirtusLab-Open-Source/strapi-plugin-comments/v5?label=npm&logo=npm">
+    <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/VirtusLab-Open-Source/strapi-plugin-comments?label=npm&logo=npm">
   </a>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
     <img src="https://img.shields.io/npm/dm/strapi-plugin-comments.svg" alt="Monthly download on NPM" />
   </a>
   <a href="https://circleci.com/gh/VirtusLab-Open-Source/strapi-plugin-comments">
-    <img src="https://circleci.com/gh/VirtusLab-Open-Source/strapi-plugin-comments/tree/v5.svg?style=shield" alt="CircleCI" />
+    <img src="https://circleci.com/gh/VirtusLab-Open-Source/strapi-plugin-comments.svg?style=shield" alt="CircleCI" />
   </a>
   <a href="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments">
-    <img src="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments/coverage.svg?branch=v5" alt="codecov.io" />
+    <img src="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments/coverage.svg?branch=master" alt="codecov.io" />
   </a>
 </div>
-
-## ⚠️ This is the beta version for Strapi v5
 
 ---
 
