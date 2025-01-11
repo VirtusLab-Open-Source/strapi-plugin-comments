@@ -185,12 +185,10 @@ const commonService = ({ strapi }: StrapiContext) => ({
         authorUser: true,
       },
     });
-    console.log('findOne::entity', entity);
     if (!entity) {
       throw new PluginError(400, 'Comment does not exist. Check your payload please.');
     }
     const doNotPopulateAuthor: Array<string> = await this.getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
-    console.log('doNotPopulateAuthor', doNotPopulateAuthor);
     const item = this.sanitizeCommentEntity(entity, doNotPopulateAuthor);
     return filterOurResolvedReports(item);
   },

@@ -254,7 +254,7 @@ describe('Client controller', () => {
         query: {},
         state: { user: { id: 1 } },
         request: { body: { content: 'Updated content' } }
-      } as RequestContext;
+      } as RequestContext<{ content: string; author: unknown }>;
       const config = { enabledCollections: ['test'] };
       const validatedData = { id: '1', content: 'Updated content' };
       const expectedResult = { id: 1, content: 'Updated content' };
@@ -267,6 +267,81 @@ describe('Client controller', () => {
 
       expect(result).toEqual(expectedResult);
       expect(mockClientService.update).toHaveBeenCalledWith(validatedData, { id: 1 });
+    });
+
+    it('should throw error when store config validation fails', async () => {
+      const ctx = {
+        params: { id: '1' },
+        query: {},
+        state: { user: { id: 1 } },
+        request: { body: { content: 'Updated content' } }
+      } as RequestContext<{ content: string; author: unknown }>;
+      const error = new Error('Config validation failed');
+
+      mockStoreRepository.get.mockResolvedValue({ left: error });
+
+      await expect(getController(getStrapi()).put(ctx)).rejects.toThrow();
+    });
+
+    it('should throw error when comment validation fails', async () => {
+      const ctx = {
+        params: { id: '1' },
+        query: {},
+        state: { user: { id: 1 } },
+        request: { body: { content: '' } }
+      } as RequestContext<{ content: string; author: unknown }>;
+      const config = { enabledCollections: ['test'] };
+      const validationError = new Error('Content cannot be empty');
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.updateCommentValidator).mockReturnValue({ left: validationError });
+
+      await expect(getController(getStrapi()).put(ctx)).rejects.toThrow();
+    });
+
+    it('should update comment with custom author when provided', async () => {
+      const ctx = {
+        params: { id: '1' },
+        query: {},
+        state: { user: { id: 1 } },
+        request: { body: { content: 'Updated content', author: { name: 'Custom Author' } } }
+      } as RequestContext<{ content: string; author: unknown }>;
+      const config = { enabledCollections: ['test'] };
+      const validatedData = { 
+        id: '1', 
+        content: 'Updated content',
+        author: { name: 'Custom Author' }
+      };
+      const expectedResult = { 
+        id: 1, 
+        content: 'Updated content',
+        author: { name: 'Custom Author' }
+      };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.updateCommentValidator).mockReturnValue({ right: validatedData });
+      mockClientService.update.mockResolvedValue(expectedResult);
+
+      const result = await getController(getStrapi()).put(ctx);
+
+      expect(result).toEqual(expectedResult);
+      expect(mockClientService.update).toHaveBeenCalledWith(validatedData, { id: 1 });
+    });
+
+    it('should handle update with empty request body', async () => {
+      const ctx = {
+        params: { id: '1' },
+        query: {},
+        state: { user: { id: 1 } },
+        request: { body: {} }
+      } as RequestContext<{ content: string; author: unknown }>;
+      const config = { enabledCollections: ['test'] };
+      const validationError = new Error('Content is required');
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.updateCommentValidator).mockReturnValue({ left: validationError });
+
+      await expect(getController(getStrapi()).put(ctx)).rejects.toThrow();
     });
   });
 

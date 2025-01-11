@@ -142,9 +142,13 @@ describe('client.service', () => {
     const mockPayload = {
       commentId: 1,
       content: 'Updated comment',
+      relation: 'api::test.test:1' as const,
+      author: {
+        id: 1,
+      }
     };
 
-    it('should update a comment when all validations pass', async () => {
+    it('should update a comment when all validations pass with user context', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
       const mockEntity = { id: 1, content: 'Updated comment' };
@@ -152,6 +156,8 @@ describe('client.service', () => {
 
       mockCommonService.isValidUserContext.mockReturnValue(true);
       mockCommonService.checkBadWords.mockResolvedValue(true);
+      mockCommonService.getConfig.mockResolvedValue([]);
+      mockCommonService.findOne.mockResolvedValue({ id: 1, author: { id: 1 } });
       mockCommentRepository.update.mockResolvedValue(mockEntity);
       mockCommonService.sanitizeCommentEntity.mockReturnValue(mockSanitizedEntity);
 
@@ -165,13 +171,68 @@ describe('client.service', () => {
       });
     });
 
-    it('should throw error when user context is invalid', async () => {
+    it('should update a comment when all validations pass with author context', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockEntity = { id: 1, content: 'Updated comment' };
+      const mockSanitizedEntity = { id: 1, content: 'Clean updated comment' };
+
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.checkBadWords.mockResolvedValue(true);
+      mockCommonService.getConfig.mockResolvedValue([]);
+      mockCommonService.findOne.mockResolvedValue({ id: 1, author: { id: 1 } });
+      mockCommentRepository.update.mockResolvedValue(mockEntity);
+      mockCommonService.sanitizeCommentEntity.mockReturnValue(mockSanitizedEntity);
+
+      const result = await service.update(mockPayload, undefined);
+
+      expect(result).toEqual(mockSanitizedEntity);
+      expect(mockCommentRepository.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: { content: 'Updated comment' },
+        populate: { threadOf: true, authorUser: true },
+      });
+    });
+
+    it('should throw error when user context is invalid and no author provided', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
 
       mockCommonService.isValidUserContext.mockReturnValue(false);
 
-      await expect(service.update(mockPayload, mockUser)).rejects.toThrow(PluginError);
+      await expect(service.update({ ...mockPayload, author: null }, undefined)).rejects.toThrow(PluginError);
+    });
+
+    it('should throw error when comment does not exist', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.checkBadWords.mockResolvedValue(true);
+      mockCommonService.findOne.mockResolvedValue(null);
+
+      await expect(service.update(mockPayload, mockUser)).resolves.toBeUndefined();
+    });
+
+    it('should throw error when author id does not match comment author', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.checkBadWords.mockResolvedValue(true);
+      mockCommonService.findOne.mockResolvedValue({ id: 1, author: { id: 2 } });
+
+      await expect(service.update(mockPayload, mockUser)).resolves.toBeUndefined();
+    });
+
+    it('should throw error when bad words check fails', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.checkBadWords.mockResolvedValue(false);
+
+      await expect(service.update(mockPayload, mockUser)).resolves.toBeUndefined();
     });
   });
 

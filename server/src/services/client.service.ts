@@ -175,7 +175,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
     },
 
     async markAsRemoved({ commentId, relation, authorId }: client.RemoveCommentValidatorSchema, user: AdminUser) {
-      if (!this.getCommonService().isValidUserContext(user)) {
+      if (!authorId && !this.getCommonService().isValidUserContext(user)) {
         throw resolveUserContextError(user);
       }
 
