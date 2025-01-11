@@ -104,7 +104,7 @@ In our minimum support we're following [official Node.js releases timelines](htt
 
 **Supported Strapi versions**:
 
-- Strapi v5.6.0 (recently tested)
+- Strapi v5.7.0 (recently tested)
 - Strapi v5.x
 
 > This plugin is designed for **Strapi v5**. To get support for other Strapi versions, please follow the [versions](#-versions) section.

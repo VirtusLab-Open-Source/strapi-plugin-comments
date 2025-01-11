@@ -34,7 +34,7 @@ export const updateCommentValidator = (
   payload: object,
 ) => {
   return validate(
-    getCommentSchema(enabledCollections).pick({ content: true, relation: true })
+    getCommentSchema(enabledCollections).pick({ content: true, relation: true, author: true })
                                         .merge(getStringToNumberValidator({ commentId: AVAILABLE_OPERATORS.single }))
                                         .safeParse(payload),
   );

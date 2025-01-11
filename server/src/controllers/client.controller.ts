@@ -27,7 +27,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
     }
     throw throwError(ctx, unwrapEither(configResult));
   },
-  
+
   async findAllFlat(ctx: RequestContext<object, Pick<clientValidator.FindAllFlatSchema, 'relation'>>) {
     const configResult = await this.getStoreRepository().get(true);
     if (isRight(configResult)) {
@@ -35,7 +35,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
       const result = clientValidator.findAllFlatValidator(config.enabledCollections, ctx.params.relation, ctx.query);
       if (isRight(result)) {
         return this.getService('common').findAllFlat(
-          flatInput<clientValidator.FindAllFlatSchema>(result.right)
+          flatInput<clientValidator.FindAllFlatSchema>(result.right),
         );
       }
       throw throwError(ctx, unwrapEither(result));
@@ -50,7 +50,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
       const result = clientValidator.findAllInHierarchyValidator(config.enabledCollections, ctx.params.relation, ctx.query);
       if (isRight(result)) {
         return this.getService('common').findAllInHierarchy(
-          flatInput<clientValidator.FindAllInHierarchyValidatorSchema>(result.right)
+          flatInput<clientValidator.FindAllInHierarchyValidatorSchema>(result.right),
         );
       }
       throw throwError(ctx, unwrapEither(result));
@@ -69,14 +69,15 @@ const controllers = ({ strapi }: StrapiContext) => ({
     throw throwError(ctx, unwrapEither(result));
   },
 
-  async put(ctx: RequestContext) {
+  async put(ctx: RequestContext<{ content: string, author: unknown }>) {
     const { user } = ctx.state;
     const configResult = await this.getStoreRepository().get(true);
     if (isRight(configResult)) {
       const config = unwrapEither(configResult);
       const result = clientValidator.updateCommentValidator(config.enabledCollections, {
-        ...ctx.query,
         ...ctx.params,
+        content: ctx.request.body.content,
+        author: ctx.request.body.author,
       });
       if (isRight(result)) {
         return await this.getService('client').update(

@@ -18,7 +18,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
   const createAuthor = (author: client.NewCommentValidatorSchema['author'], user?: AdminUser) => {
     if (user) {
       return {
-        authorUser: user.id, 
+        authorUser: user.id,
       };
     } else if (author) {
       return {
@@ -61,8 +61,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
         throw unwrapEither(threadData);
       }
       const linkToThread = unwrapEither(threadData);
-      const isValidContext = this.getCommonService().isValidUserContext(user);
-      if (!isValidContext) {
+      if (!author && !this.getCommonService().isValidUserContext(user)) {
         throw resolveUserContextError(user);
       }
 
@@ -103,21 +102,23 @@ export const clientService = ({ strapi }: StrapiContext) => {
     },
 
     // Update a comment
-    async update({ commentId, content }: client.UpdateCommentValidatorSchema, user?: AdminUser) {
-      const validContext = this.getCommonService().isValidUserContext(user);
-
-      if (!validContext) {
+    async update({ commentId, content, author, relation }: client.UpdateCommentValidatorSchema, user?: AdminUser) {
+      if (!author && !this.getCommonService().isValidUserContext(user)) {
         throw resolveUserContextError(user);
       }
-      // TODO: check if user is allowed to update this comment
+      const authorId = user?.id || author?.id;
       if (await this.getCommonService().checkBadWords(content)) {
         const blockedAuthorProps = await this.getCommonService().getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
-        const entity = await getCommentRepository(strapi).update({
-          where: { id: commentId },
-          data: { content },
-          populate: { threadOf: true, authorUser: true },
-        });
-        return this.getCommonService().sanitizeCommentEntity(entity, blockedAuthorProps);
+        const existingComment = await this.getCommonService().findOne({ id: commentId, related: relation });
+        
+        if (existingComment && existingComment.author?.id?.toString() === authorId?.toString()) {
+          const entity = await getCommentRepository(strapi).update({
+            where: { id: commentId },
+            data: { content },
+            populate: { threadOf: true, authorUser: true },
+          });
+          return this.getCommonService().sanitizeCommentEntity(entity, blockedAuthorProps);
+        }
       }
     },
 
@@ -174,7 +175,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
     },
 
     async markAsRemoved({ commentId, relation, authorId }: client.RemoveCommentValidatorSchema, user: AdminUser) {
-      if (!this.getCommonService().isValidUserContext(user)) {
+      if (!authorId && !this.getCommonService().isValidUserContext(user)) {
         throw resolveUserContextError(user);
       }
 
