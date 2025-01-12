@@ -39,6 +39,7 @@ describe('common.service', () => {
     getLocalConfig: jest.fn(),
   };
 
+  const mockFindOne = jest.fn();
   const mockFindMany = jest.fn();
 
   beforeEach(() => {
@@ -50,6 +51,7 @@ describe('common.service', () => {
   const getStrapi = () => caster<StrapiContext>({ 
     strapi: { 
       documents: () => ({
+        findOne: mockFindOne,
         findMany: mockFindMany,
       }),
     } 
@@ -561,19 +563,16 @@ describe('common.service', () => {
       const service = getService(strapi);
       const mockComments = [
         { id: 1, related: 'api::test.test:1', locale: 'en' },
-        { id: 2, related: 'api::test.test:2', locale: 'en' },
+        { id: 1, related: 'api::test.test:1', locale: 'en' }
       ];
-      const mockRelatedEntities = [
-        { uid: 'api::test.test', documentId: '1', locale: 'en', title: 'Test Title 1' },
-        { uid: 'api::test.test', documentId: '2', locale: 'en', title: 'Test Title 2' },
-      ];
+      const mockRelatedEntities = { uid: 'api::test.test', documentId: '1', locale: 'en', title: 'Test Title 1' };
 
-      mockFindMany.mockResolvedValue(mockRelatedEntities);
+      mockFindOne.mockResolvedValue(mockRelatedEntities);
 
       const result = await service.findRelatedEntitiesFor(mockComments);
 
-      expect(result).toHaveLength(2);
-      expect(result).toEqual(expect.arrayContaining(mockRelatedEntities));
+      expect(result).toHaveLength(mockComments.length);
+      expect(result).toEqual(expect.arrayContaining([mockRelatedEntities]));
     });
 
     it('should return an empty array if no related entities are found', async () => {
@@ -583,7 +582,7 @@ describe('common.service', () => {
         { id: 1, related: 'api::test.test:1', locale: 'en' },
       ];
 
-      mockFindMany.mockResolvedValue([]);
+      mockFindOne.mockResolvedValue(undefined);
 
       const result = await service.findRelatedEntitiesFor(mockComments);
 

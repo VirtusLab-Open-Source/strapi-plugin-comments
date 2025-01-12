@@ -106,11 +106,11 @@ const commonService = ({ strapi }: StrapiContext) => ({
     const entriesWithThreads = await Promise.all(
       entries.map(async (_) => {
         const { results, pagination: { total } } = await getCommentRepository(strapi)
-        .findWithCount({
-          where: {
-            threadOf: _.id,
-          },
-        });
+          .findWithCount({
+            where: {
+              threadOf: _.id,
+            },
+          });
         return {
           id: _.id,
           itemsInTread: total,
@@ -203,14 +203,14 @@ const commonService = ({ strapi }: StrapiContext) => ({
 
   // Find all for author
   async findAllPerAuthor({
-      filters = {},
-      populate = {},
-      pagination,
-      sort,
-      fields,
-      isAdmin = false,
-      authorId,
-    }: clientValidator.FindAllPerAuthorValidatorSchema,
+    filters = {},
+    populate = {},
+    pagination,
+    sort,
+    fields,
+    isAdmin = false,
+    authorId,
+  }: clientValidator.FindAllPerAuthorValidatorSchema,
     isStrapiAuthor: boolean = false,
   ) {
     {
@@ -268,19 +268,18 @@ const commonService = ({ strapi }: StrapiContext) => ({
       Object.entries(data).map(
         async ([relatedUid, { documentIds, locale }]) => {
           return Promise.all(
-            documentIds.map((documentId, index) => {
-              const documentLocale = locale[index];
-              return strapi.documents(relatedUid as ContentTypesUUIDs).findOne({
+            documentIds.map((documentId, index) =>
+              strapi.documents(relatedUid as ContentTypesUUIDs).findOne({
                 documentId: documentId.toString(),
                 locale: !isNil(locale[index]) ? locale[index] : undefined,
                 status: 'published',
               })
-            })
-          ).then((relatedEntities) =>
-            relatedEntities.map((_) => ({
+            )
+          ).then((relatedEntities) => relatedEntities
+            .filter(_ => _).map((_) => ({
               ..._,
               uid: relatedUid,
-            })),
+            }))
           )
         }
       ),
@@ -293,7 +292,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
       ...entity,
       related: relatedEntities.find(
         (relatedEntity) => {
-          if(relatedEntity.locale && entity.locale) {
+          if (relatedEntity.locale && entity.locale) {
             return entity.related === `${relatedEntity.uid}:${relatedEntity.documentId}` && entity.locale === relatedEntity.locale;
           }
           return entity.related === `${relatedEntity.uid}:${relatedEntity.documentId}`;
