@@ -252,7 +252,6 @@ const commonService = ({ strapi }: StrapiContext) => ({
     const data = entries.reduce(
       (acc: { [key: string]: { documentIds: Array<string | number>, locale?: Array<string> } }, curr: Comment) => {
         const [relatedUid, relatedStringId] = getRelatedGroups(curr.related);
-
         return {
           ...acc,
           [relatedUid]: {
@@ -267,26 +266,23 @@ const commonService = ({ strapi }: StrapiContext) => ({
 
     return Promise.all(
       Object.entries(data).map(
-        async ([relatedUid, { documentIds, locale }]) =>
-          strapi.documents(relatedUid as ContentTypesUUIDs)
-                .findMany({
-                  filters: {
-                    documentId: {
-                      $in: Array.from(new Set(documentIds)),
-                    },
-                    locale: {
-                      $in: Array.from(new Set(locale)),
-                    },
-                  },
-                  // ? TBD: do we want fetch draft entities?
-                  status: 'published',
-                })
-                .then((relatedEntities) =>
-                  relatedEntities.map((_) => ({
-                    ..._,
-                    uid: relatedUid,
-                  })),
-                ),
+        async ([relatedUid, { documentIds, locale }]) => {
+          return Promise.all(
+            documentIds.map((documentId, index) => {
+              const documentLocale = locale[index];
+              return strapi.documents(relatedUid as ContentTypesUUIDs).findOne({
+                documentId: documentId.toString(),
+                locale: !isNil(locale[index]) ? locale[index] : undefined,
+                status: 'published',
+              })
+            })
+          ).then((relatedEntities) =>
+            relatedEntities.map((_) => ({
+              ..._,
+              uid: relatedUid,
+            })),
+          )
+        }
       ),
     ).then((result) => result.flat(2));
   },

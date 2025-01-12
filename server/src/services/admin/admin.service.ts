@@ -39,7 +39,7 @@ export default ({ strapi }: StrapiContext) => {
       return {
         pagination,
         result: results.map((_) => this.getCommonService().sanitizeCommentEntity(_, [], []))
-                       .map(_ => this.getCommonService().mergeRelatedEntityTo(_, relatedEntities)),
+          .map(_ => this.getCommonService().mergeRelatedEntityTo(_, relatedEntities)),
       };
     },
 
@@ -117,19 +117,19 @@ export default ({ strapi }: StrapiContext) => {
 
       const { relatedId, uid } = this.getCommonService().parseRelationString(entity.related);
       const relatedEntity = await strapi.documents(uid)
-                                        .findOne({ documentId: relatedId })
-                                        .then((_) => {
-                                          if (!_) {
-                                            throw new PluginError(404, 'Relation not found');
-                                          }
-                                          return { ..._, uid };
-                                        });
-      const levelThreadId = entity.threadOf && typeof entity.threadOf === 'object' ? entity.threadOf.documentId : null;
+        .findOne({ documentId: relatedId })
+        .then((_) => {
+          if (!_) {
+            throw new PluginError(404, 'Relation not found');
+          }
+          return { ..._, uid };
+        });
+      const levelThreadId = entity.threadOf && typeof entity.threadOf === 'object' ? entity.threadOf.id : null;
 
       const entitiesOnSameLevel =
         await this.getCommonService().findAllInHierarchy(
           {
-            query: {
+            filters: {
               ...defaultWhere,
               ...query,
               threadOf: levelThreadId,

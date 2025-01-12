@@ -1,4 +1,4 @@
-import { Flex, IconButton, Link, Td, Tr } from '@strapi/design-system';
+import { Flex, IconButton, Link, Td, Tooltip, Tr, Typography } from '@strapi/design-system';
 import { Eye } from '@strapi/icons';
 import { isEmpty, isNil } from 'lodash';
 import { FC, SyntheticEvent, useMemo } from 'react';
@@ -12,6 +12,7 @@ import { ApproveFlow } from '../ApproveFlow';
 import { CommentStatusBadge } from '../CommentStatusBadge';
 import { IconButtonGroup } from '../IconButtonGroup';
 import { ReviewFlow } from '../ReviewFlow';
+import { UserAvatar } from '../UserAvatar';
 
 type Props = {
   readonly item: Comment;
@@ -42,9 +43,9 @@ export const CommentRow: FC<Props> = ({ item }) => {
   const contentTypeLink = useMemo(() => {
     const related = item.related;
     if (typeof related === 'string') return null;
-    
+
     const localeParam = related.locale ? `?plugins[i18n][locale]=${related.locale}` : '';
-    
+
     return (
       <Link href={`/admin/content-manager/collection-types/${related.uid}/${related.documentId}${localeParam}`}>
         {related.title}
@@ -52,11 +53,31 @@ export const CommentRow: FC<Props> = ({ item }) => {
     );
   }, [item.related]);
 
+  const { name, email, avatar } = item.author || {};
+
   return (
     <Tr>
-      <Td>{item.id}</Td>
-      <Td>{item.author.name}</Td>
-      <Td>{item.content}</Td>
+      <Td>
+        <Typography>{item.id}</Typography>
+      </Td>
+      <Td>
+        <Tooltip
+          open={item.isAdminComment ? false : undefined}
+          label={!item.isAdminComment ? email : undefined}
+          align="start"
+          side="left">
+          <Flex gap={2} style={{ cursor: item.isAdminComment ? "default" : "help" }}>
+            {item.author && (<UserAvatar
+              name={name}
+              avatar={avatar}
+              isAdminComment={item.isAdminComment} />)}
+            <Typography>{name || getMessage('components.author.unknown')}</Typography>
+          </Flex>
+        </Tooltip>
+      </Td>
+      <Td>
+        <Typography ellipsis>{item.content}</Typography>
+      </Td>
       <Td>
         {item.threadOf ? (
           <Link href={`discover/${item.threadOf.id}`} onClick={onClickDetails(item.threadOf.id)}>
@@ -74,10 +95,12 @@ export const CommentRow: FC<Props> = ({ item }) => {
         {contentTypeLink}
       </Td>
       <Td>
-        {formatDate(item.updatedAt || item.createdAt, {
-          dateStyle: 'long',
-          timeStyle: 'short',
-        })}
+        <Typography>
+          {formatDate(item.updatedAt || item.createdAt, {
+            dateStyle: 'long',
+            timeStyle: 'short',
+          })}
+        </Typography>
       </Td>
       <Td>
         <CommentStatusBadge
