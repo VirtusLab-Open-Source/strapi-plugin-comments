@@ -3,9 +3,12 @@ import styled from 'styled-components';
 
 export const IconButtonGroup = styled(IconButtonGroupBase)<{ isSingle?: boolean; withMargin?: boolean }>(({ isSingle, withMargin }) => {
   const isSingleStyle = {
-    span: {
-      '&:first-child button': {
-        borderRadius: '4px',
+    button: {
+      '&:first-child': {
+        borderRadius: '4px !important',
+      },
+      '&:last-child': {
+        borderRadius: '4px !important',
       },
     },
   };

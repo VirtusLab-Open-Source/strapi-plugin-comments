@@ -8,10 +8,11 @@ export const AdminAvatar: FC<PropsWithChildren> = ({ children }) => (
   <Box position="relative">
     {children}
     <Flex
+      padding="2px"
       alignItems="middle"
       position="absolute"
-      right="-35%"
-      top="-35%"
+      right="-30%"
+      top="-30%"
       borderRadius="50%"
       border="2px #ffffff solid"
       background="#ffffff"

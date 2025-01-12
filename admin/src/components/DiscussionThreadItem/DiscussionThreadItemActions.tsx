@@ -197,6 +197,7 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
                       <IconButton
                         onClick={onClick}
                         loading={commentMutation.block.isPending}
+                        label={getMessage('page.details.actions.comment.block')}
                       >
                         <Lock />
                       </IconButton>
@@ -211,6 +212,7 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
                   <IconButton
                     onClick={handleUnblockClick}
                     loading={commentMutation.block.isPending}
+                    label={getMessage('page.details.actions.comment.unblock')}
                   >
                     <UnlockIcon />
                   </IconButton>
@@ -238,6 +240,7 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
               <IconButton
                 onClick={handleDeleteClick}
                 loading={commentMutation.delete.isPending}
+                label={getMessage('page.details.actions.comment.delete')}
               >
                 <Trash />
               </IconButton>
@@ -251,6 +254,7 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
           <IconButtonGroup isSingle withMargin>
             <IconButton
               onClick={handleDrillDownClick}
+              label={getMessage('page.details.panel.discussion.nav.drilldown')}
               style={
                 blocked && !blockedThread
                   ? { marginTop: '1px', marginRight: '.5rem' }

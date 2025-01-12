@@ -1,4 +1,4 @@
-import { Flex, Typography } from '@strapi/design-system';
+import { Flex, Tooltip, Typography } from '@strapi/design-system';
 
 import { FC, PropsWithChildren } from 'react';
 import { useIntl } from 'react-intl';
@@ -20,15 +20,23 @@ export const DiscussionThreadItemFooter: FC<PropsWithChildren<DiscussionThreadIt
     dateStyle: 'medium',
     timeStyle: 'short',
   });
-  const { name, avatar } = item.author || {};
+  const { name, avatar, email } = item.author || {};
 
   return (
     <Flex direction="row" paddingTop={2}>
       <DiscussionThreadItemFooterMeta>
-        {item.author && <UserAvatar avatar={avatar} name={name} isAdminComment={item.isAdminComment} />}
-        <Typography variant="pi" fontWeight="bold" textColor="neutral800">
-          {name || getMessage('components.author.unknown')}
-        </Typography>
+        <Tooltip
+          open={item.isAdminComment ? false : undefined}
+          label={!item.isAdminComment ? email : undefined}
+          align="start"
+          side="left">
+          <Flex style={{ cursor: item.isAdminComment ? "default" : "help" }}>
+            {item.author && <UserAvatar avatar={avatar} name={name} isAdminComment={item.isAdminComment} />}
+            <Typography variant="pi" fontWeight="bold" textColor="neutral800">
+              {name || getMessage('components.author.unknown')}
+            </Typography>
+          </Flex>
+        </Tooltip>
         <Typography variant="pi" textColor="neutral600">
           {dateTime}
         </Typography>

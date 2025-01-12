@@ -74,7 +74,7 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
   return (
     <Modal.Root open={isModalVisible} onOpenChange={onToggleModal}>
       <Modal.Trigger>
-        <IconButton>
+        <IconButton label={getMessage('page.details.actions.thread.modal.start.thread')}>
           <Icon />
         </IconButton>
       </Modal.Trigger>
