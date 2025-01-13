@@ -62,6 +62,7 @@ const authorSchema = z.object({
         }).nullable(),
       }),
     }),
+    z.string(),
   ]).nullable().optional(),
 });
 

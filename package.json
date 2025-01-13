@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
@@ -34,7 +34,6 @@
     "publish:beta": "npm publish --tag beta",
     "build": "yarn clean && strapi-plugin build",
     "clean": "rm -rf build",
-    "develop": "nodemon --exec \"yarn build:dev\"",
     "test:unit": "jest --verbose --coverage",
     "test:unit:watch": "jest --verbose --watch",
     "test:unit:ci": "CI=true jest --ci --runInBand --verbose --coverage",
