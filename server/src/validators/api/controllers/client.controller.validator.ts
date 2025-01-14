@@ -156,7 +156,7 @@ export type ReportAbuseValidatorSchema = ExtractRightEither<ReturnType<typeof re
 const getRemoveCommentSchema = (enabledCollections: string[]) => {
   return z.object({
     relation: getRelationValidator(enabledCollections),
-    commentId: z.number(),
+    commentId: z.union([z.string(), z.number()]),
     authorId: z.union([z.string(), z.number()]),
   });
 };

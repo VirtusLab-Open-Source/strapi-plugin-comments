@@ -44,7 +44,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     return { uid: uid as UID.ContentType, relatedId: relatedStringId };
   },
   isValidUserContext<T extends { id?: string | number }>(user?: T): boolean {
-    return !!(user?.id);
+    return user ? user.id != undefined : true;
   },
 
   sanitizeCommentEntity(entity: Comment | CommentWithRelated, blockedAuthors: string[], omitProps: Array<keyof Comment> = [], populate: any = {}): Comment {
@@ -88,29 +88,27 @@ const commonService = ({ strapi }: StrapiContext) => ({
       select: Array.isArray(fields) ? uniq([...fields, defaultSelect].flat()) : fields,
     };
 
-    const entries = await getCommentRepository(strapi).findMany({
+    const params = {
       where: {
         ...filters,
         ...(locale ? { locale } : {}),
       },
       populate: populateClause,
       ...fieldsQuery,
-      limit: limit || PAGE_SIZE,
-      offset: skip || 0,
-    });
+      pageSize: pagination?.pageSize || limit || PAGE_SIZE,
+      page: pagination?.page || (skip ? Math.floor(skip / limit) : 1) || 1,
+    };
 
-    let paginationData: Pagination = undefined;
-    if (pagination?.withCount) {
-      paginationData = await getCommentRepository(strapi).findWithCount({ where: { ...filters, ...(locale ? { locale } : {}) } }).then((result) => result.pagination);
-    }
+    const { results: entries, pagination: resultPaginationData } = await getCommentRepository(strapi).findWithCount(params);
+
     const entriesWithThreads = await Promise.all(
       entries.map(async (_) => {
         const { results, pagination: { total } } = await getCommentRepository(strapi)
-          .findWithCount({
-            where: {
-              threadOf: _.id,
-            },
-          });
+        .findWithCount({
+          where: {
+            threadOf: _.id,
+          },
+        });
         return {
           id: _.id,
           itemsInTread: total,
@@ -147,7 +145,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
 
     return {
       data: hasRelatedEntitiesToMap ? result.map((_) => this.mergeRelatedEntityTo(_, relatedEntities)) : result,
-      pagination: paginationData,
+      pagination: resultPaginationData,
     };
   },
 
@@ -203,14 +201,14 @@ const commonService = ({ strapi }: StrapiContext) => ({
 
   // Find all for author
   async findAllPerAuthor({
-    filters = {},
-    populate = {},
-    pagination,
-    sort,
-    fields,
-    isAdmin = false,
-    authorId,
-  }: clientValidator.FindAllPerAuthorValidatorSchema,
+      filters = {},
+      populate = {},
+      pagination,
+      sort,
+      fields,
+      isAdmin = false,
+      authorId,
+    }: clientValidator.FindAllPerAuthorValidatorSchema,
     isStrapiAuthor: boolean = false,
   ) {
     {
@@ -258,7 +256,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
             ...(acc[relatedUid] || {}),
             documentIds: [...(acc[relatedUid]?.documentIds || []), relatedStringId],
             locale: [...(acc[relatedUid]?.locale || []), curr.locale],
-          }
+          },
         };
       },
       {},
@@ -273,15 +271,15 @@ const commonService = ({ strapi }: StrapiContext) => ({
                 documentId: documentId.toString(),
                 locale: !isNil(locale[index]) ? locale[index] : undefined,
                 status: 'published',
-              })
-            )
+              }),
+            ),
           ).then((relatedEntities) => relatedEntities
             .filter(_ => _).map((_) => ({
               ..._,
               uid: relatedUid,
-            }))
-          )
-        }
+            })),
+          );
+        },
       ),
     ).then((result) => result.flat(2));
   },
