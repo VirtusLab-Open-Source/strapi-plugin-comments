@@ -206,12 +206,12 @@ describe('common.service', () => {
         { id: 2, content: 'Comment 2' },
       ];
 
-      mockCommentRepository.findMany.mockResolvedValue(mockComments);
-      caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
       mockCommentRepository.findWithCount.mockResolvedValue({
-        results: [],
-        pagination: { total: 0 },
+        results: mockComments,
+        pagination: { total: 2 },
       });
+      caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
+      
       mockStoreRepository.getConfig.mockResolvedValue([]);
 
       const result = await service.findAllFlat({
@@ -221,7 +221,7 @@ describe('common.service', () => {
       });
 
       expect(result.data).toHaveLength(2);
-      expect(mockCommentRepository.findMany).toHaveBeenCalled();
+      expect(mockCommentRepository.findWithCount).toHaveBeenCalled();
     });
   });
 
@@ -481,10 +481,9 @@ describe('common.service', () => {
         { id: 2, content: 'Comment 2', authorId: 1 },
       ];
 
-      mockCommentRepository.findMany.mockResolvedValue(mockComments);
       mockCommentRepository.findWithCount.mockResolvedValue({
-        results: [],
-        pagination: { total: 0 },
+        results: mockComments,
+        pagination: { total: 2 },
       });
       mockStoreRepository.getConfig.mockResolvedValue([]);
 
@@ -498,15 +497,13 @@ describe('common.service', () => {
 
       expect(result.data).toHaveLength(2);
       expect(result.data.every(item => !item.authorUser)).toBeTruthy();
-      expect(mockCommentRepository.findMany).toHaveBeenCalledWith({
-        where: { authorId: 1 },
-        limit: 10,
-        offset: 0,
-        select: ['id', 'content', 'related'],
-        sort: { createdAt: 'desc' },
-        populate: {
-          authorUser: true,
-        },
+      expect(mockCommentRepository.findWithCount).toHaveBeenCalledWith({
+        pageSize: 10, 
+        page: 1,
+        populate: { authorUser: true }, 
+        select: ["id", "content", "related"],
+        sort: { createdAt: "desc" }, 
+        where: { authorId: 1 }
       });
     });
 
@@ -530,11 +527,10 @@ describe('common.service', () => {
       ];
 
       mockCommentRepository.findWithCount.mockResolvedValue({
-        results: [],
-        pagination: { total: 0 },
+        results: mockComments,
+        pagination: { total: 2 },
       });
 
-      mockCommentRepository.findMany.mockResolvedValue(mockComments);
       mockStoreRepository.getConfig.mockResolvedValue([]);
 
       const result = await service.findAllPerAuthor({
@@ -544,10 +540,10 @@ describe('common.service', () => {
 
       expect(result.data).toHaveLength(2);
       expect(result.data.every(item => !item.authorUser)).toBeTruthy();
-      expect(mockCommentRepository.findMany).toHaveBeenCalledWith({
+      expect(mockCommentRepository.findWithCount).toHaveBeenCalledWith({
         where: { authorUser: { id: 1 } },
-        limit: 10,
-        offset: 0,
+        pageSize: 10,
+        page: 1,
         select: ['id', 'content', 'related'],
         sort: { createdAt: 'desc' },
         populate: {
