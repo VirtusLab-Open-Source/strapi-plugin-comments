@@ -32,7 +32,11 @@ export const getAdminServiceUtils = once((strapi: CoreStrapi) => {
       getPopulate() {
         return {
           authorUser: getDefaultAuthorPopulate(strapi),
-          threadOf: true,
+          threadOf: {
+            populate: {
+              authorUser: getDefaultAuthorPopulate(strapi),
+            },
+          },
           reports: {
             where: {
               resolved: false,

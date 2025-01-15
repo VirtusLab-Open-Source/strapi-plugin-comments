@@ -48,22 +48,27 @@ const relatedSchema = z.intersection(
 
 const authorSchema = z.object({
   id: z.union([z.number(), z.string()]),
-  name: z.string().optional(),
+  name: z.string().optional().nullable(),
   email: z.string(),
-  avatar: z.union([
-    z.object({
-      url: z.string(),
-    }),
-    z.object({
-      url: z.string(),
-      formats: z.object({
-        thumbnail: z.object({
-          url: z.string(),
-        }).nullable(),
+  avatar: z
+    .union([
+      z.object({
+        url: z.string(),
       }),
-    }),
-    z.string(),
-  ]).nullable().optional(),
+      z.object({
+        url: z.string(),
+        formats: z.object({
+          thumbnail: z
+            .object({
+              url: z.string(),
+            })
+            .nullable(),
+        }),
+      }),
+      z.string(),
+    ])
+    .nullable()
+    .optional(),
 });
 
 export type Author = z.infer<typeof authorSchema>;
@@ -118,7 +123,6 @@ const paginationSchema = z.object({
 });
 
 // const threadOfSchema = baseCommentSchema.omit({ related: true }).merge(z.object({ related: z.string(), threadOf: commentSchema.nullable().optional() }));
-
 export type CommentReport = z.infer<typeof commentReportSchema>;
 
 function getCommentSchema() {
@@ -148,7 +152,18 @@ export const commentsSchema = z.object({
 
 export const commentDetailsSchema = z.object({
   entity: relatedSchema,
-  selected: baseCommentSchema.merge(z.object({ related: z.string(), threadOf: getCommentSchema().omit({ related: true }).merge(z.object({ related: z.string() })).nullable().optional() })).nullable(),
+  selected: baseCommentSchema
+    .merge(
+      z.object({
+        related: z.string(),
+        threadOf: getCommentSchema()
+          .omit({ related: true })
+          .merge(z.object({ related: z.string() }))
+          .nullable()
+          .optional(),
+      })
+    )
+    .nullable(),
   level: z.array(getCommentSchema().omit({ threadOf: true, related: true })),
 });
 
