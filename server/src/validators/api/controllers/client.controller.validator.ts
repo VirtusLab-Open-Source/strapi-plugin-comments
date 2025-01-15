@@ -10,7 +10,7 @@ const getCommentSchema = (enabledCollections: string[]) => {
     relation: getRelationValidator(enabledCollections),
     content: z.string().min(1),
     author: externalAuthorSchema.optional(),
-    threadOf: z.string().optional(),
+    threadOf: z.union([z.string(), z.number()]).optional(),
     approvalStatus: z.nativeEnum(APPROVAL_STATUS).optional(),
     locale: z.string().optional(),
   });
@@ -60,7 +60,7 @@ const getBaseFindSchema = (enabledCollections: string[]) => {
     sort: orderByValidator.optional().nullable().default('createdAt:desc'),
     fields: z.string().array().optional(),
     omit: z.string().array().optional(),
-    filters: getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true, id: true }).optional(),
+    filters: getFiltersOperators({ content: true, authorName: true, createdAt: true, updatedAt: true, id: true, removed: true }).optional(),
     isAdmin: z.boolean().optional().default(false),
     populate: z.record(z.union([z.boolean(), z.object({ populate: z.boolean() })])).optional(),
     limit: stringToNumberValidator.optional(),
