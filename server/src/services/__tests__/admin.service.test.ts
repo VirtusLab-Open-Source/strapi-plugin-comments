@@ -101,7 +101,11 @@ describe('admin.service', () => {
         pageSize: 10,
         populate: {
           authorUser: true,
-          threadOf: true,
+          threadOf: {
+            populate: {
+              authorUser: true,
+            },
+          },
           reports: {
             where: {
               resolved: false,
