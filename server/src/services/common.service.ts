@@ -163,10 +163,11 @@ const commonService = ({ strapi }: StrapiContext) => ({
       isAdmin = false,
       omit = [],
       locale,
+      limit
     }: clientValidator.FindAllInHierarchyValidatorSchema,
     relatedEntity?: any,
   ) {
-    const entities = await this.findAllFlat({ filters, populate, sort, fields, isAdmin, omit, locale }, relatedEntity);
+    const entities = await this.findAllFlat({ filters, populate, sort, fields, isAdmin, omit, locale, limit }, relatedEntity);
     return buildNestedStructure(
       entities?.data,
       startingFromId,
