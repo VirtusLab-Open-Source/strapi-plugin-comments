@@ -78,10 +78,11 @@ export const clientService = ({ strapi }: StrapiContext) => {
       const comment = await getCommentRepository(strapi).create({
         data: {
           ...authorData,
+          threadOf,
+          locale,
           content: clearContent,
           related: relation,
           approvalStatus: isApprovalFlowEnabled ? APPROVAL_STATUS.PENDING : null,
-          locale,
         },
         populate: {
           authorUser: true,
