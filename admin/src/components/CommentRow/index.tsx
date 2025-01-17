@@ -66,16 +66,19 @@ export const CommentRow: FC<Props> = ({ item }) => {
           label={!item.isAdminComment ? email : undefined}
           align="start"
           side="left">
-          <Flex gap={2} style={{ cursor: item.isAdminComment ? "default" : "help" }}>
-            {item.author && (<UserAvatar
-              name={name}
-              avatar={avatar}
-              isAdminComment={item.isAdminComment} />)}
+          <Flex gap={2} style={{ cursor: item.isAdminComment ? 'default' : 'help' }}>
+            {item.author && (
+              <UserAvatar
+                name={name || ''}
+                avatar={avatar}
+                isAdminComment={item.isAdminComment}
+              />
+            )}
             <Typography>{name || getMessage('components.author.unknown')}</Typography>
           </Flex>
         </Tooltip>
       </Td>
-      <Td>
+      <Td maxWidth="200px">
         <Typography ellipsis>{item.content}</Typography>
       </Td>
       <Td>
@@ -91,7 +94,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
           </Link>
         ) : '-'}
       </Td>
-      <Td>
+      <Td maxWidth="200px">
         {contentTypeLink}
       </Td>
       <Td>

@@ -138,6 +138,7 @@ export default ({ strapi }: StrapiContext) => {
             ...defaultPopulate,
             startingFromId: levelThreadId,
             isAdmin: true,
+            limit: Number.MAX_SAFE_INTEGER,
           },
           false,
         );
