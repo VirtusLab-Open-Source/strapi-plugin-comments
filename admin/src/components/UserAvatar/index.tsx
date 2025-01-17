@@ -7,7 +7,7 @@ import { renderInitials } from '../../utils';
 import { AdminAvatar } from './AdminAvatar';
 
 type Props = Readonly<Pick<Author, 'avatar'> & {
-  readonly name?: string;
+  readonly name?: string | null;
   readonly isAdminComment: boolean | null;
 }>
 export const UserAvatar: FC<Props> = ({ avatar, isAdminComment, name }) => {
