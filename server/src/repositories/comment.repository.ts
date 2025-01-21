@@ -34,6 +34,9 @@ export const getCommentRepositorySource = (strapi: CoreStrapi) => {
       return strapi.query(modelUid).delete(params)
                    .then(result => (result ? shouldValidateObject(isValidationEnabled, commentResultValidator.findOne)(result) : null));
     },
+    async deleteMany(params: Params) {
+      return strapi.query(modelUid).deleteMany(params)
+    },
     updateMany(params: Params) {
       return strapi.query(modelUid).updateMany(params);
     },
