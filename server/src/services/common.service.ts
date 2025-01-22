@@ -161,7 +161,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
       isAdmin = false,
       omit = [],
       locale,
-      limit
+      limit,
     }: clientValidator.FindAllInHierarchyValidatorSchema,
     relatedEntity?: any,
   ) {
@@ -340,6 +340,17 @@ const commonService = ({ strapi }: StrapiContext) => ({
       }
     }
     return content;
+  },
+
+  async perRemove(related: string, locale?: string) {
+    const defaultLocale = await strapi.plugin('i18n')?.service('locales').getDefaultLocale() || null;
+    return getCommentRepository(strapi)
+    .deleteMany({
+      where: {
+        related,
+        $or: [{ locale }, defaultLocale === locale ? { locale: { $eq: null } } : null].filter(Boolean)
+      },
+    });
   },
 
 
