@@ -53,7 +53,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
       );
       const threadData = await tryCatch(
         async () => {
-          return threadOf ? await this.getCommonService().findOne({ id: threadOf, related: relation, locale }) : null;
+          return threadOf ? await this.getCommonService().findOne({ id: threadOf, related: relation, locale: locale || null }) : null;
         },
         new PluginError(400, 'Thread does not exist'),
       );
