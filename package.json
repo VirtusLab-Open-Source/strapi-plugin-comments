@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "3.0.6",
+  "version": "3.0.7-beta.1",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
@@ -32,7 +32,7 @@
     "prepare": "husky install",
     "publish:latest": "npm publish --tag latest",
     "publish:beta": "npm publish --tag beta",
-    "build": "yarn clean && strapi-plugin build",
+    "build": "yarn clean && strapi-plugin build --minify",
     "clean": "rm -rf build",
     "test:unit": "jest --verbose --coverage",
     "test:unit:watch": "jest --verbose --watch",
