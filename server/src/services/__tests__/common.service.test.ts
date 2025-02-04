@@ -1,12 +1,12 @@
-import { AdminUser, Id, StrapiContext } from '../../@types';
+import { isProfane, replaceProfanities } from 'no-profanity';
+import { StrapiContext } from '../../@types';
 import { CommentsPluginConfig } from '../../config';
 import { getCommentRepository, getStoreRepository } from '../../repositories';
 import { getOrderBy } from '../../repositories/utils';
 import { caster } from '../../test/utils';
 import PluginError from '../../utils/PluginError';
-import commonService from '../common.service';
 import { Comment } from '../../validators/repositories';
-import { isProfane, replaceProfanities } from 'no-profanity';
+import commonService from '../common.service';
 
 type CommentWithChildren = Comment & {
   children?: CommentWithChildren[];
@@ -502,7 +502,7 @@ describe('common.service', () => {
         page: 1,
         populate: { authorUser: true }, 
         select: ["id", "content", "related"],
-        sort: { createdAt: "desc" }, 
+        orderBy: { createdAt: "desc" },
         where: { authorId: 1 }
       });
     });
@@ -545,7 +545,7 @@ describe('common.service', () => {
         pageSize: 10,
         page: 1,
         select: ['id', 'content', 'related'],
-        sort: { createdAt: 'desc' },
+        orderBy: { createdAt: 'desc' },
         populate: {
           authorUser: true,
         },
