@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "3.0.7-beta.1",
+  "version": "3.0.7",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
@@ -65,13 +65,13 @@
   },
   "devDependencies": {
     "@jest/types": "29.5.x",
-    "@sensinum/strapi-utils": "^1.0.4",
-    "@strapi/plugin-cloud": "^5.8.1",
-    "@strapi/plugin-graphql": "5.8.1",
-    "@strapi/plugin-users-permissions": "^5.8.1",
+    "@sensinum/strapi-utils": "^1.0.6",
+    "@strapi/plugin-cloud": "^5.9.0",
+    "@strapi/plugin-graphql": "5.9.0",
+    "@strapi/plugin-users-permissions": "^5.9.0",
     "@strapi/sdk-plugin": "^5.3.0",
-    "@strapi/strapi": "^5.8.1",
-    "@strapi/types": "^5.8.1",
+    "@strapi/strapi": "^5.9.0",
+    "@strapi/types": "^5.9.0",
     "@types/jest": "^29.5.12",
     "@types/koa": "^2.15.0",
     "@types/react": "^18.3.8",
@@ -89,7 +89,7 @@
   },
   "peerDependencies": {
     "@strapi/sdk-plugin": "^5.3.0",
-    "@strapi/strapi": "^5.8.1",
+    "@strapi/strapi": "^5.9.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.22.3",
