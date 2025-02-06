@@ -1,6 +1,15 @@
 import { Params } from '@strapi/database/dist/entity-manager/types';
 import { UID } from '@strapi/strapi';
-import { first, get, isNil, isObject, isString, omit as filterItem, parseInt, uniq } from 'lodash';
+import {
+  first,
+  get,
+  isNil,
+  isObject,
+  isString,
+  omit as filterItem,
+  parseInt,
+  uniq,
+} from 'lodash';
 import { isProfane, replaceProfanities } from 'no-profanity';
 import { Id, PathTo, PathValue, RelatedEntity, StrapiContext } from '../@types';
 import { CommentsPluginConfig } from '../config';
@@ -84,8 +93,10 @@ const commonService = ({ strapi }: StrapiContext) => ({
     const doNotPopulateAuthor = isAdmin ? [] : await this.getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
     const [operator, direction] = getOrderBy(sort);
     const fieldsQuery = {
-      sort: { [operator]: direction },
-      select: Array.isArray(fields) ? uniq([...fields, defaultSelect].flat()) : fields,
+      orderBy: { [operator]: direction },
+      select: Array.isArray(fields)
+        ? uniq([...fields, defaultSelect].flat())
+        : fields,
     };
 
     const params = {

@@ -56,30 +56,33 @@ const paginationSchema = z.object({
 
 const getBaseFindSchema = (enabledCollections: string[]) => {
   return z
-  .object({
-    sort: orderByValidator.optional().nullable().default('createdAt:desc'),
-    fields: z.string().array().optional(),
-    omit: z.string().array().optional(),
-    filters: getFiltersOperators({
-      id: true,
-      content: true,
-      authorId: true,
-      authorName: true,
-      authorEmail: true,
-      createdAt: true,
-      updatedAt: true,
-      removed: true,
-      blocked: true,
-      blockedThread: true,
-    }).optional(),
-    isAdmin: z.boolean().optional().default(false),
-    populate: z.record(z.union([z.boolean(), z.object({ populate: z.boolean() })])).optional(),
-    limit: stringToNumberValidator.optional(),
-    skip: stringToNumberValidator.optional(),
-    locale: z.string().optional(),
-  })
-  .merge(getRelationSchema(enabledCollections))
-  .merge(paginationSchema);
+    .object({
+      sort: orderByValidator.optional().nullable().default('createdAt:desc'),
+      fields: z.string().array().optional(),
+      omit: z.string().array().optional(),
+      filters: getFiltersOperators({
+        id: true,
+        content: true,
+        authorId: true,
+        authorName: true,
+        authorEmail: true,
+        createdAt: true,
+        updatedAt: true,
+        removed: true,
+        blocked: true,
+        blockedThread: true,
+        approvalStatus: true,
+      }).optional(),
+      isAdmin: z.boolean().optional().default(false),
+      populate: z
+        .record(z.union([z.boolean(), z.object({ populate: z.boolean() })]))
+        .optional(),
+      limit: stringToNumberValidator.optional(),
+      skip: stringToNumberValidator.optional(),
+      locale: z.string().optional(),
+    })
+    .merge(getRelationSchema(enabledCollections))
+    .merge(paginationSchema);
 };
 export const findAllFlatValidator = (enabledCollections: string[], relation: string, payload: object) => {
 
