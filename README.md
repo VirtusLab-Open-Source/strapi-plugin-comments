@@ -41,7 +41,7 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 9. [⚗️ Custom fields](#-custom-fields)
 10. [🧩 Examples](#-examples)
 11. [💬 FAQ](#-faq)
-12. [🤝 Contributing](#-contributing)
+12. [🤝 Contributing](#-contributing-to-the-plugin)
 13. [👨‍💻 Community support](#-community-support)
 
 ## 💎 Versions
@@ -104,7 +104,7 @@ In our minimum support we're following [official Node.js releases timelines](htt
 
 **Supported Strapi versions**:
 
-- Strapi v5.9.0 (recently tested)
+- Strapi v5.10.3 (recently tested)
 - Strapi v5.x
 
 > This plugin is designed for **Strapi v5**. To get support for other Strapi versions, please follow the [versions](#-versions) section.
@@ -948,7 +948,25 @@ Example:
   });
 ```
 
-## 🤝 Contributing
+## 💬 FAQ
+
+### GraphQL tricks
+
+**Q:** I would like to use GraphQL schemas but I'm not getting any response, just 403 or 500 for every query or even proper types etc. What should I do?
+
+**A:** There is a one trick you might try. Strapi by default is ordering plugins by the way which takes `strapi-plugin-graphql` to initialize earlier than other plugins so types might not be injected. If you don't have it yet, please create `config/plugins.{js|ts}` file and put there following lines (put `graphql` at the end):
+
+```ts
+module.exports = {
+  'comments': { enabled: true },
+  'graphql': { enabled: true },
+};
+```
+
+If you already got it, make sure that `comments` plugin is inserted before `graphql`. That should do the job.
+
+
+## 🤝 Contributing to the plugin
 
 Feel free to fork and make a Pull Request to this plugin project. All the input is warmly welcome!
 

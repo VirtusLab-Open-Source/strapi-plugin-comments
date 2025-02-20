@@ -87,6 +87,8 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
         <Modal.Body>
           <Form
             ref={formRef}
+            width="auto"
+            height="auto"
             onSubmit={onSubmit}
             method="POST"
             initialValues={{

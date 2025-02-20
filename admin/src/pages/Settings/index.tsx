@@ -92,11 +92,11 @@ const Settings = () => {
 
   const allCollections = collectionTypes.data.filter(ct => ct.uid.includes('api::'));
   const enabledCollections = config.data.enabledCollections
-                                   .filter((uid: string) => allCollections.some(ct => ct.uid === uid));
+    .filter((uid: string) => allCollections.some(ct => ct.uid === uid));
   const badWords = isNil(config.data.badWords) ? true : config.data?.badWords;
   const gqlAuthEnabled = Boolean(config.data.gql?.auth || null);
   const moderatorRoles = config.data.moderatorRoles
-                               .filter((role: string) => roles.data.filter((r) => r.code === role));
+    .filter((role: string) => roles.data.filter((r) => r.code === role));
   const clientUrl = config.data.client?.url;
   const clientEmail = config.data.client?.contactEmail;
   const blockedAuthorProps = config.data.blockedAuthorProps ?? [];
@@ -141,6 +141,8 @@ const Settings = () => {
           )}
           <Form
             method="POST"
+            width="auto"
+            height="auto"
             ref={formRef}
             onSubmit={onSubmit}
             initialValues={{
@@ -227,7 +229,7 @@ const Settings = () => {
                                                 offLabel={getMessage('components.toogle.disabled')}
                                                 checked={values.approvalFlow.includes(uid)}
                                                 onCheckedChange={(checked: boolean) => {
-                                                  onChange('approvalFlow', checked ? [...values.approvalFlow, uid] : values.approvalFlow.filter((c) => c !== uid));
+                                                  onChange('approvalFlow', checked ? [...values.approvalFlow, uid] : values.approvalFlow.filter((c: string) => c !== uid));
                                                 }}
                                               />
                                               <Field.Hint />
@@ -280,7 +282,7 @@ const Settings = () => {
                     {getMessage('page.settings.section.additional')}
                   </Typography>
                   <Grid.Root gap={4} marginTop={4} width="100%">
-                    <Grid.Item xs={4}>
+                    <Grid.Item xs={4} alignItems="start">
                       <Field.Root width="100%" hint={getMessage('page.settings.form.enabledCollections.hint')}>
                         <Field.Label htmlFor="enabledCollections">
                           {getMessage('page.settings.form.enabledCollections.label')}
@@ -296,7 +298,7 @@ const Settings = () => {
                         <Field.Hint />
                       </Field.Root>
                     </Grid.Item>
-                    <Grid.Item xs={4}>
+                    <Grid.Item xs={4} alignItems="start">
                       <Field.Root width="100%" hint={getMessage('page.settings.form.author.blockedProps.hint')}>
                         <Field.Label htmlFor="enabledCollections">
                           {getMessage('page.settings.form.author.blockedProps.label')}
@@ -305,7 +307,7 @@ const Settings = () => {
                         <Field.Hint />
                       </Field.Root>
                     </Grid.Item>
-                    <Grid.Item xs={4}>
+                    <Grid.Item xs={4} alignItems="start">
                       <Field.Root width="100%" hint={getMessage('page.settings.form.gqlAuth.hint')}>
                         <Field.Label>
                           {getMessage('page.settings.form.gqlAuth.label')}
@@ -328,7 +330,7 @@ const Settings = () => {
                     {getMessage('page.settings.section.client')}
                   </Typography>
                   <Grid.Root gap={4} marginTop={4} width="100%">
-                    <Grid.Item xs={4}>
+                    <Grid.Item xs={4} alignItems="start">
                       <Field.Root width="100%" hint={getMessage('page.settings.form.client.url.hint')}>
                         <Field.Label>
                           {getMessage('page.settings.form.client.url.label')}
@@ -337,7 +339,7 @@ const Settings = () => {
                         <Field.Hint />
                       </Field.Root>
                     </Grid.Item>
-                    <Grid.Item xs={4}>
+                    <Grid.Item xs={4} alignItems="start">
                       <Field.Root width="100%" hint={getMessage('page.settings.form.client.email.hint')}>
                         <Field.Label>
                           {getMessage('page.settings.form.client.email.label')}
@@ -346,7 +348,7 @@ const Settings = () => {
                         <Field.Hint />
                       </Field.Root>
                     </Grid.Item>
-                    <Grid.Item xs={4}>
+                    <Grid.Item xs={4} alignItems="start">
                       <Field.Root
                         width="100%"
                         hint={getMessage('page.settings.form.moderatorRoles.hint')}
