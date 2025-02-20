@@ -46,6 +46,8 @@ export const ModeratorResponse: FC<ModeratorResponseProps> = ({ id, blockedThrea
       <Box hasRadius padding={4}>
         <Form
           ref={formRef}
+          width="auto"
+          height="auto"
           onSubmit={onSubmit}
           method="POST"
           initialValues={{
