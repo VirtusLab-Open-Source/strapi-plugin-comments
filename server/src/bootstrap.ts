@@ -58,18 +58,13 @@ export default async ({ strapi }: StrapiContext) => {
 
   const commonService = getPluginService(strapi, 'common');
   strapi.db.lifecycles.subscribe({
-    afterUpdate: async (event) => {
-      console.log("UPDATE")
-    },
     afterDelete: async (event) => {
-      console.log("DELETE")
       const uid = event.model.uid;
       const { documentId, locale } = event.result;
       const relation = [uid, documentId].join(':');
       await commonService.perRemove(relation, locale);
     },
     afterCreate: async (event) => {
-      console.log("CREATE")
       const uid = event.model.uid;
       const { documentId, locale } = event.result;
       const relation = [uid, documentId].join(':');
