@@ -356,11 +356,28 @@ const commonService = ({ strapi }: StrapiContext) => ({
   async perRemove(related: string, locale?: string) {
     const defaultLocale = await strapi.plugin('i18n')?.service('locales').getDefaultLocale() || null;
     return getCommentRepository(strapi)
-    .deleteMany({
+    .updateMany({
       where: {
         related,
         $or: [{ locale }, defaultLocale === locale ? { locale: { $eq: null } } : null].filter(Boolean)
       },
+      data: {
+        removed: true,
+      }
+    });
+  },
+
+  async perRestore(related: string, locale?: string) {
+    const defaultLocale = await strapi.plugin('i18n')?.service('locales').getDefaultLocale() || null;
+    return getCommentRepository(strapi)
+    .updateMany({
+      where: {
+        related,
+        $or: [{ locale }, defaultLocale === locale ? { locale: { $eq: null } } : null].filter(Boolean)
+      },
+      data: {
+        removed: false,
+      }
     });
   },
 

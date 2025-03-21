@@ -113,7 +113,6 @@ describe('admin.service', () => {
           },
         },
         where: {
-          $or: [{ removed: { $eq: false } }, { removed: { $eq: null } }],
           content: { $contains: 'test search' },
         },
       });

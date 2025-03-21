@@ -127,7 +127,7 @@ export type CommentReport = z.infer<typeof commentReportSchema>;
 
 function getCommentSchema() {
   return baseCommentSchema.extend({
-    related: relatedSchema,
+    related: relatedSchema.optional(),
     documentId: z.string(),
     threadOf: z.lazy(() =>
       baseCommentSchema.merge(z.object({ related: z.string(), threadOf: commentSchema.nullable().optional(), documentId: z.string().optional() })),
@@ -139,7 +139,7 @@ const commentSchema: z.ZodType<Comment> = getCommentSchema();
 
 export type Comment = BaseComment & {
   threadOf?: Comment | null
-  related: z.infer<typeof relatedSchema> | string
+  related?: z.infer<typeof relatedSchema> | string
   documentId?: string
 };
 

@@ -36,6 +36,7 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
       entity: {} as any,
     },
   });
+
   const entityUidValid = entity?.uid && regexUID.test(entity.uid);
 
   const { data: contentTypeData } = useQuery({
@@ -43,6 +44,21 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
     queryFn: () => api.contentTypeBuilder.single.query(entity?.uid),
     enabled: !!entityUidValid,
   });
+
+  if (!entity.uid) {
+    return (
+      <Box>
+        <Page.Title children={'Comments - details'} />
+        <Page.Main>
+          <Layouts.Header
+            title="Discussion panel"
+            subtitle="This entry has been deleted"
+            as="h2"
+          />
+        </Page.Main>
+      </Box>
+    )
+  }
 
   const isLoading = isLoadingForData || isFetching;
 
