@@ -42,14 +42,20 @@ export const CommentRow: FC<Props> = ({ item }) => {
 
   const contentTypeLink = useMemo(() => {
     const related = item.related;
-    if (typeof related === 'string') return null;
+    if (!related || typeof related === 'string') return null;
 
     const localeParam = related.locale ? `?plugins[i18n][locale]=${related.locale}` : '';
 
     return (
-      <Link href={`/admin/content-manager/collection-types/${related.uid}/${related.documentId}${localeParam}`}>
-        {related.title}
-      </Link>
+      <Tooltip label={related.title}>
+        <Link 
+          width="100%"
+          overflow="hidden"
+          href={`/admin/content-manager/collection-types/${related.uid}/${related.documentId}${localeParam}`}
+        >
+          {related.title}
+        </Link>
+      </Tooltip>
     );
   }, [item.related]);
 
@@ -95,7 +101,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
         ) : '-'}
       </Td>
       <Td maxWidth="200px">
-        {contentTypeLink}
+        {contentTypeLink ?? '-'}
       </Td>
       <Td>
         <Typography>

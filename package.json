@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "3.0.8",
+  "version": "3.0.9-beta.01",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
@@ -70,8 +70,7 @@
     "@strapi/plugin-graphql": "5.10.3",
     "@strapi/plugin-users-permissions": "^5.10.3",
     "@strapi/sdk-plugin": "^5.3.2",
-    "@strapi/strapi": "^5.10.3",
-    "@strapi/types": "^5.10.3",
+    "@strapi/types": "^5.11.2",
     "@types/jest": "^29.5.12",
     "@types/koa": "^2.15.0",
     "@types/react": "^18.3.8",

@@ -1,16 +1,15 @@
 import { Table, Tbody, Th, Thead, Tr, Typography } from '@strapi/design-system';
-import { Layouts, Page, Pagination, SearchInput, useNotification, useQueryParams, useTracking } from '@strapi/strapi/admin';
+import { Layouts, Page, Pagination, SearchInput, useQueryParams } from '@strapi/strapi/admin';
 import { FC } from 'react';
 import { Config } from '../../api/schemas';
 import { CommentRow } from '../../components/CommentRow';
+import { CommentsStatusFilters } from '../../components/CommentStatusFilters';
 import { useCommentsAll } from '../../hooks/useCommentsAll';
 import { getMessage } from '../../utils';
 
 
 export const Discover: FC<{ config: Config }> = ({ config }) => {
-  const { trackUsage } = useTracking();
-  const { toggleNotification } = useNotification();
-  const [{ query: queryParams }] = useQueryParams();
+  const [{ query: queryParams }, setQueryParams] = useQueryParams();
 
   const { data: { result, pagination } } = useCommentsAll(queryParams as Record<string, string>);
 
@@ -23,7 +22,12 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
           subtitle={`${pagination.total} entries found`}
           as="h2"
         />
-        <Layouts.Action startActions={<SearchInput label="Search" />} />
+        <Layouts.Action startActions={
+          <>
+            <SearchInput label="Search" />
+            <CommentsStatusFilters setQueryParams={setQueryParams}/>
+          </>
+        }/>
         <Layouts.Content>
           <Table>
             <Thead>
