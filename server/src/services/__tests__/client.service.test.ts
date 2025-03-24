@@ -88,15 +88,15 @@ describe('client.service', () => {
       expect(result).toEqual(mockSanitizedEntity);
       expect(mockCommentRepository.create).toHaveBeenCalledWith({
         data: {
-          authorUser: mockUser.id,
+          authorId: mockUser.id,
+          authorEmail: mockUser.email,
+          authorName: mockUser.username,
+          authorAvatar: mockUser.avatar,
           content: 'Test comment',
           related: 'api::test.test:1',
           approvalStatus: null,
           locale: 'en',
           threadOf: null,
-        },
-        populate: {
-          authorUser: true,
         },
       });
     });
@@ -140,15 +140,15 @@ describe('client.service', () => {
       expect(result).toEqual(mockSanitizedEntity);
       expect(mockCommentRepository.create).toHaveBeenCalledWith({
         data: {
-          authorUser: mockUser.id,
+          authorId: mockUser.id,
+          authorEmail: mockUser.email,
+          authorName: mockUser.username,
+          authorAvatar: mockUser.avatar,
           content: 'Test comment',
           related: 'api::test.test:1',
           approvalStatus: APPROVAL_STATUS.PENDING,
           locale: 'en',
           threadOf: null,
-        },
-        populate: {
-          authorUser: true,
         },
       });
     });
