@@ -18,7 +18,10 @@ export const clientService = ({ strapi }: StrapiContext) => {
   const createAuthor = (author: client.NewCommentValidatorSchema['author'], user?: AdminUser) => {
     if (user) {
       return {
-        authorUser: user.id,
+        authorId: user.id,
+        authorName: user.username,
+        authorEmail: user.email,
+        authorAvatar: user.avatar,
       };
     } else if (author) {
       return {
@@ -67,7 +70,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
 
       const clearContent = await this.getCommonService().checkBadWords(content);
       const authorData = createAuthor(author, user);
-      const authorNotProperlyProvided = !isEmpty(authorData) && !(authorData.authorId || authorData.authorUser);
+      const authorNotProperlyProvided = !isEmpty(authorData) && !(authorData.authorId);
       if (isEmpty(authorData) || authorNotProperlyProvided) {
         throw new PluginError(400, 'Not able to recognise author of a comment. Make sure you\'ve provided "author" property in a payload or authenticated your request properly.');
       }
@@ -83,9 +86,6 @@ export const clientService = ({ strapi }: StrapiContext) => {
           content: clearContent,
           related: relation,
           approvalStatus: isApprovalFlowEnabled ? APPROVAL_STATUS.PENDING : null,
-        },
-        populate: {
-          authorUser: true,
         },
       });
       const entity: Comment = {

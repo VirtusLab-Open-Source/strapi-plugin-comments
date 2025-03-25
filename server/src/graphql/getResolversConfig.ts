@@ -5,9 +5,9 @@ export const getResolversConfig = (config: CommentsPluginConfig) => {
   return {
     'Query.findAllFlat': { auth },
     'Query.findAllInHierarchy': { auth },
-    'Mutation.createComment': { auth },
-    'Mutation.updateComment': { auth },
-    'Mutation.removeComment': { auth },
-    'Mutation.createAbuseReport': { auth },
+    'Mutation.getCreateComment': { auth },
+    'Mutation.getUpdateComment': { auth },
+    'Mutation.getRemoveComment': { auth },
+    'Mutation.getCreateAbuseReport': { auth },
   };
 };
