@@ -57,18 +57,18 @@ export default async ({ strapi }: StrapiContext) => {
   await strapi.admin.services.permission.actionProvider.registerMany(actions);
 
   const commonService = getPluginService(strapi, 'common');
-  const enabledCollections = await commonService.getConfig(CONFIG_PARAMS.ENABLED_COLLECTIONS, []);
-
-  if (enabledCollections.length) {
-    strapi.db.lifecycles.subscribe({
-      models: enabledCollections,
-      afterDelete: async (event) => {
-        const uid = event.model.uid;
-        const { documentId, locale } = event.result;
-        const relation = [uid, documentId].join(':');
-        await commonService.perRemove(relation, locale);
-      },
-    });
-  }
-
+  strapi.db.lifecycles.subscribe({
+    afterDelete: async (event) => {
+      const uid = event.model.uid;
+      const { documentId, locale } = event.result;
+      const relation = [uid, documentId].join(':');
+      await commonService.perRemove(relation, locale);
+    },
+    afterCreate: async (event) => {
+      const uid = event.model.uid;
+      const { documentId, locale } = event.result;
+      const relation = [uid, documentId].join(':');
+      await commonService.perRestore(relation, locale);
+    }
+  });
 };

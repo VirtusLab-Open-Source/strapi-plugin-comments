@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import { Config } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
 import { usePermissions } from '../../hooks/usePermissions';
-import { parseRegExp } from '../../utils';
+import { parseRegExp, getMessage } from '../../utils';
 import { DetailsEntry } from './DetailsEntry';
 import { DiscussionThread } from './DiscussionThread';
 
@@ -36,6 +36,7 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
       entity: {} as any,
     },
   });
+
   const entityUidValid = entity?.uid && regexUID.test(entity.uid);
 
   const { data: contentTypeData } = useQuery({
@@ -43,6 +44,21 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
     queryFn: () => api.contentTypeBuilder.single.query(entity?.uid),
     enabled: !!entityUidValid,
   });
+
+  if (!entity.uid) {
+    return (
+      <Box>
+        <Page.Title children={'Comments - details'} />
+        <Page.Main>
+          <Layouts.Header
+            title={getMessage('page.details.header')}
+            subtitle={getMessage('page.details.header.description.empty')}
+            as="h2"
+          />
+        </Page.Main>
+      </Box>
+    )
+  }
 
   const isLoading = isLoadingForData || isFetching;
 
@@ -52,8 +68,8 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
         <Page.Title children={'Comments - details'} />
         <Page.Main>
           <Layouts.Header
-            title="Discussion panel"
-            subtitle="Drilldown and manage discussion related to the entity"
+            title={getMessage('page.details.header')}
+            subtitle={getMessage('page.details.header.description')}
             as="h2"
           />
           <Layouts.Content>

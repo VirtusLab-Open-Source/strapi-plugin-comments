@@ -18,12 +18,13 @@ export default ({ strapi }: StrapiContext) => {
     },
 
     // Find all comments
-    async findAll({ _q, orderBy, page, pageSize }: adminValidator.CommentFindAllSchema) {
+    async findAll({ _q, orderBy, page, pageSize, filters }: adminValidator.CommentFindAllSchema) {
       const params = utils.findAll.createParams(
         orderBy,
         page,
         pageSize,
         _q,
+        filters
       );
 
       const populate = utils.findAll.getPopulate();

@@ -68,6 +68,7 @@ export const filtersValidator = z.union([
   endWithValidators,
   containsValidators,
   notContainsValidators,
+  z.object({ $null: z.string().min(1) }),
   z.object({ $notNull: z.boolean() }),
 ]);
 
@@ -79,7 +80,6 @@ export const getFiltersOperators = <T extends Record<string, boolean>>(dictionar
     };
   }, {} as Record<string, typeof filtersValidator>)) as ZodObject<{ [key in keyof T]: typeof filtersValidator }>;
 };
-
 
 export const AVAILABLE_OPERATORS = {
   single: 'single',
@@ -103,7 +103,23 @@ export const queryPaginationSchema = z.object({ pageSize: stringToNumberValidato
                                       .merge(qOperatorValidator)
                                       .merge(z.object({
                                         orderBy: orderByValidator.optional().nullable(),
-                                      }));
+                                      }))
+                                      .merge(z.object({
+                                        filters: getFiltersOperators({
+                                          removed: true,
+                                          approvalStatus: true,
+                                        })
+                                        .merge(
+                                          z.object({
+                                            $or: z.array(
+                                              getFiltersOperators({
+                                                blocked: true,
+                                                blockedThread: true,
+                                              })
+                                            ).optional()
+                                          })
+                                        ).optional(),
+                                      }))
 
 export const validate = <I, O>(result: z.SafeParseReturnType<I, O>) => {
   if (!result.success) {

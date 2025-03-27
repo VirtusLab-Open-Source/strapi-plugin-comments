@@ -6,21 +6,17 @@ import { admin as adminValidator } from '../../validators/api';
 export const getAdminServiceUtils = once((strapi: CoreStrapi) => {
   return {
     findAll: {
-      getDefaultWhere() {
-        return {
-          $or: [{ removed: { $eq: false } }, { removed: { $eq: null } }],
-        };
-      },
       createParams(
         orderBy: adminValidator.CommentFindAllSchema['orderBy'],
         page: adminValidator.CommentFindAllSchema['page'],
         pageSize: adminValidator.CommentFindAllSchema['pageSize'],
         _q: adminValidator.CommentFindAllSchema['_q'],
+        filters: adminValidator.CommentFindAllSchema['filters'],
       ) {
         const [operator, direction] = getOrderBy(orderBy);
         const params: Partial<DBQuery> = {
           orderBy: orderBy ? { [operator]: direction } : undefined,
-          where: this.getDefaultWhere(),
+          where: filters as Where,
           page,
           pageSize,
         };
