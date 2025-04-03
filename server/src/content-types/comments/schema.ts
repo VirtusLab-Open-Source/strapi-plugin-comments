@@ -93,5 +93,11 @@ export default {
       target: "plugin::comments.comment",
       configurable: false,
     },
+    rating: {
+      type: "float",
+      min: "0",
+      max: "5",
+      step: "0.5",
+    }
   },
 };

@@ -13,6 +13,7 @@ const getCommentSchema = (enabledCollections: string[]) => {
     threadOf: z.union([z.string(), z.number()]).optional(),
     approvalStatus: z.nativeEnum(APPROVAL_STATUS).optional(),
     locale: z.string().optional(),
+    rating: z.number().min(0).max(5).step(0.5).optional(),
   });
 };
 
@@ -34,7 +35,7 @@ export const updateCommentValidator = (
   payload: object,
 ) => {
   return validate(
-    getCommentSchema(enabledCollections).pick({ content: true, relation: true, author: true })
+    getCommentSchema(enabledCollections).pick({ content: true, relation: true, author: true, rating: true })
                                         .merge(getStringToNumberValidator({ commentId: AVAILABLE_OPERATORS.single }))
                                         .safeParse(payload),
   );
@@ -72,6 +73,7 @@ const getBaseFindSchema = (enabledCollections: string[]) => {
         blocked: true,
         blockedThread: true,
         approvalStatus: true,
+        rating: true,
       }).optional(),
       isAdmin: z.boolean().optional().default(false),
       populate: z

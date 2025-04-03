@@ -59,6 +59,11 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
                 </Th>
                 <Th>
                   <Typography variant="sigma">
+                    {getMessage('page.discover.table.header.rating')}
+                  </Typography>
+                </Th>
+                <Th>
+                  <Typography variant="sigma">
                     {getMessage('page.discover.table.header.lastUpdate')}
                   </Typography>
                 </Th>

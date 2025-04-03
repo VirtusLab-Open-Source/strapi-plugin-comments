@@ -39,7 +39,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
     },
 
     // Create a comment
-    async create({ relation, content, threadOf, author, approvalStatus, locale }: client.NewCommentValidatorSchema, user?: AdminUser) {
+    async create({ relation, content, threadOf, author, approvalStatus, locale, rating}: client.NewCommentValidatorSchema, user?: AdminUser) {
       const { uid, relatedId } = this.getCommonService().parseRelationString(relation);
       const relatedEntity = await strapi.documents(uid).findOne({ documentId: relatedId, locale });
       if (!relatedEntity) {
@@ -86,6 +86,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
           content: clearContent,
           related: relation,
           approvalStatus: isApprovalFlowEnabled ? APPROVAL_STATUS.PENDING : null,
+          rating,
         },
       });
       const entity: Comment = {

@@ -28,6 +28,7 @@ const en = {
   'page.discover.table.header.message': 'Message',
   'page.discover.table.header.thread': 'Thread of',
   'page.discover.table.header.entry': 'Entry',
+  'page.discover.table.header.rating': 'Rating',
   'page.discover.table.header.lastUpdate': 'Last update',
   'page.discover.table.header.status': 'Status',
   'page.discover.table.header.actions': 'Actions',

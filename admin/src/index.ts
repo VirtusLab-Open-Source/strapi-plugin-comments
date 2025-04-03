@@ -4,8 +4,12 @@ import PluginIcon from './components/PluginIcon';
 import pluginPermissions from './permissions';
 import { pluginId } from './pluginId';
 import trads from './translations';
+import {library} from "@fortawesome/fontawesome-svg-core";
+import {fas} from "@fortawesome/free-solid-svg-icons";
 
 const { name, displayName } = pluginPkg.strapi;
+
+library.add(fas);
 
 export default {
   register(app: any) {

@@ -8,6 +8,7 @@ export const getCreateComment = (nexus: Nexus) => {
             t.nonNull.string("relation");
             t.id("threadOf");
             t.field("author", { type: "CreateCommentAuthor" });
+            t.float('rating');
         },
     });
 };

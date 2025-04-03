@@ -41,6 +41,7 @@ export type Comment<TAuthor = CommentAuthor> = {
   firstThreadItemId?: Id;
   threadFirstItemId?: Id;
   isAdminComment?: boolean;
+  rating?: number;
 } & CommentAuthorPartial;
 
 export type CommentAuthor = {

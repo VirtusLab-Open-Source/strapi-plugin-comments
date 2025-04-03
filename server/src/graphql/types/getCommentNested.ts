@@ -16,6 +16,7 @@ export const getCommentNested = (nexus: Nexus) => {
       t.field('author', { type: 'CommentAuthor' });
       t.string('createdAt');
       t.string('updatedAt');
+      t.float('rating');
     },
   });
 };
