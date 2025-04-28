@@ -28,7 +28,7 @@ export default {
   'page.discover.table.header.id': 'ID',
   'page.discover.table.header.author': 'Auteur',
   'page.discover.table.header.message': 'Message',
-  'page.discover.table.header.thread': 'File de discussion de',
+  'page.discover.table.header.thread': 'Fil de discussion de',
   'page.discover.table.header.entry': 'Entrée',
   'page.discover.table.header.lastUpdate': 'Dernière mise à jour',
   'page.discover.table.header.status': 'Statut',
