@@ -3763,7 +3763,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sensinum/strapi-utils@npm:^1.0.8":
+"@sensinum/strapi-utils@npm:^1.0.9":
   version: 1.0.9
   resolution: "@sensinum/strapi-utils@npm:1.0.9"
   peerDependencies:
@@ -16074,7 +16074,7 @@ __metadata:
   resolution: "strapi-plugin-comments@workspace:."
   dependencies:
     "@jest/types": "npm:29.5.x"
-    "@sensinum/strapi-utils": "npm:^1.0.8"
+    "@sensinum/strapi-utils": "npm:^1.0.9"
     "@strapi/plugin-cloud": "npm:^5.12.0"
     "@strapi/plugin-graphql": "npm:5.12.0"
     "@strapi/plugin-users-permissions": "npm:^5.12.0"
