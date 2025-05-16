@@ -335,7 +335,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
 
   async checkBadWords(content: string) {
-    const config = await this.getConfig(CONFIG_PARAMS.BAD_WORDS, true);
+    const config = await this.getConfig(CONFIG_PARAMS.BAD_WORDS, true, true);
     if (config) {
       if (content && isProfane({ testString: content })) {
         throw new PluginError(

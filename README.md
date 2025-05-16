@@ -2,7 +2,7 @@
   <img style="width: 150px; height: auto;" src="https://www.sensinum.com/img/open-source/strapi-plugin-comments/logo.png" alt="Logo - Strapi Comments plugin" />
 </div>
 <div align="center">
-  <h1>Strapi v5 - Comments plugin</h1>
+  <h1>Strapi - Comments plugin</h1>
   <p>Powerful Strapi based comments moderation tool for you and your users</p>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
     <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/VirtusLab-Open-Source/strapi-plugin-comments?label=npm&logo=npm">
