@@ -17,6 +17,7 @@ export const getCommentNested = (nexus: Nexus) => {
       t.string('createdAt');
       t.string('updatedAt');
       t.float('rating');
+      t.string('LastExperience');
     },
   });
 };

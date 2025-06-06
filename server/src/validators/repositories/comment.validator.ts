@@ -13,6 +13,7 @@ const reportSchema = z.object({
   publishedAt: z.string().nullable(),
   locale: z.string().nullable(),
   rating: z.number().nullable(),
+  lastExperience: z.string().nullable(),
 });
 
 const baseCommentSchema = dbBaseCommentSchema.merge(

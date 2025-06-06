@@ -16,6 +16,7 @@ export const getComment = (nexus: Nexus) => {
         t.string("createdAt");
         t.string("updatedAt");
         t.float('rating');
+        t.string('lastExperience');
     },
   });
 };

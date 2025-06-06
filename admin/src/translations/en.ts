@@ -39,6 +39,7 @@ const en = {
   'page.discover.table.empty.search': 'No comments match the search.',
   'page.discover.table.filters': 'Filtering',
   'page.discover.table.reports.review': 'Review reports',
+  'page.discover.footer.lastExperience': 'Last experience',
   'page.reports.header': 'Resolve reports',
   'page.reports.table.empty': 'You don\'t have any reports yet.',
   'page.reports.table.empty.search': 'No reports match the search.',

@@ -111,6 +111,7 @@ const baseCommentSchema = z.object({
   gotThread: z.boolean().nullable().optional(),
   threadFirstItemId: z.number().nullable().optional(),
   rating: z.number().nullable().optional(),
+  lastExperience: z.string(),
 });
 
 type BaseComment = z.infer<typeof baseCommentSchema>;

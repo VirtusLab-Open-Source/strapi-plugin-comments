@@ -7,6 +7,7 @@ import {getMessage} from '../../utils';
 import {UserAvatar} from '../UserAvatar';
 import {DiscussionThreadItemProps} from './props';
 import {Rating} from "../Rating";
+import {LastExperience} from "../LastExperience";
 
 export const DiscussionThreadItemFooterMeta = styled(Flex)(() => ({
     '* + *': {
@@ -46,6 +47,9 @@ export const DiscussionThreadItemFooter: FC<PropsWithChildren<DiscussionThreadIt
                             {dateTime}
                         </Typography>
                         {children}
+                    </Flex>
+                    <Flex width="50%" justifyContent={{initial: 'end'}}>
+                        <LastExperience item={item}></LastExperience>
                     </Flex>
                     <Flex width="20%" justifyContent={{initial: 'end'}}>
                         <Rating item={item}></Rating>

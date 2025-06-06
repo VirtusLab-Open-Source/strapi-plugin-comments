@@ -41,6 +41,7 @@ export default {
   'page.discover.table.empty.search': 'Aucun commentaire ne correspond à votre recherche.',
   'page.discover.table.filters': 'Filtrage',
   'page.discover.table.reports.review': 'Examen des signalements',
+  'page.discover.footer.lastExperience': 'Dernière expérience',
   'page.reports.header': 'Résoudre les signalements',
   'page.reports.table.empty': 'Vous n\'avez pas encore de signalements.',
   'page.reports.table.empty.search': 'Aucun signalement ne correspond à votre recherche.',
