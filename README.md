@@ -247,6 +247,8 @@ Feature / Capability focused permissions:
 }
 ```
 
+> _**Note:** If you want to use `plguin::user-permissions.user` as a comment's author with an avatar, you need to add an `avatar` field to its model. This field have to be of type `Media`._
+
 ## 🕸️ Public REST API specification
 
 **Strapi Users vs. Generic authors**
