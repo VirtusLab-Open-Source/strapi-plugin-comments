@@ -15,13 +15,22 @@ import { resolveUserContextError } from './utils/functions';
  */
 
 export const clientService = ({ strapi }: StrapiContext) => {
-  const createAuthor = (author: client.NewCommentValidatorSchema['author'], user?: AdminUser) => {
+  const createAuthor = async (
+    author: client.NewCommentValidatorSchema['author'],
+    user?: AdminUser
+  ) => {
     if (user) {
+      const dbUser = await strapi
+        .query('plugin::users-permissions.user')
+        .findOne({
+          where: { id: user.id },
+          populate: ['avatar'],
+        });
       return {
         authorId: user.id,
         authorName: user.username,
         authorEmail: user.email,
-        authorAvatar: user.avatar,
+        authorAvatar: dbUser?.avatar?.url || null,
       };
     } else if (author) {
       return {
@@ -31,7 +40,6 @@ export const clientService = ({ strapi }: StrapiContext) => {
         authorAvatar: author.avatar,
       };
     }
-
   };
   return ({
     getCommonService() {
@@ -67,9 +75,10 @@ export const clientService = ({ strapi }: StrapiContext) => {
       if (!author && !this.getCommonService().isValidUserContext(user)) {
         throw resolveUserContextError(user);
       }
-
-      const clearContent = await this.getCommonService().checkBadWords(content);
-      const authorData = createAuthor(author, user);
+      const [clearContent, authorData] = await Promise.all([
+        this.getCommonService().checkBadWords(content),
+        createAuthor(author, user),
+      ]);
       const authorNotProperlyProvided = !isEmpty(authorData) && !(authorData.authorId);
       if (isEmpty(authorData) || authorNotProperlyProvided) {
         throw new PluginError(400, 'Not able to recognise author of a comment. Make sure you\'ve provided "author" property in a payload or authenticated your request properly.');
@@ -85,7 +94,9 @@ export const clientService = ({ strapi }: StrapiContext) => {
           locale,
           content: clearContent,
           related: relation,
-          approvalStatus: isApprovalFlowEnabled ? APPROVAL_STATUS.PENDING : null,
+          approvalStatus: isApprovalFlowEnabled
+            ? APPROVAL_STATUS.PENDING
+            : APPROVAL_STATUS.APPROVED,
           rating,
           lastExperience,
         },
@@ -113,7 +124,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
       if (await this.getCommonService().checkBadWords(content)) {
         const blockedAuthorProps = await this.getCommonService().getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
         const existingComment = await this.getCommonService().findOne({ id: commentId, related: relation });
-        
+
         if (existingComment && existingComment.author?.id?.toString() === authorId?.toString()) {
           const entity = await getCommentRepository(strapi).update({
             where: { id: commentId },
