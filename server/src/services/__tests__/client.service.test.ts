@@ -35,26 +35,45 @@ describe('client.service', () => {
   };
 
   const mockFindOne = jest.fn();
+  const mockUserQuery = jest.fn().mockReturnValue({
+    findOne: jest.fn(),
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
     caster<jest.Mock>(getPluginService).mockReturnValue(mockCommonService);
-    caster<jest.Mock>(getCommentRepository).mockReturnValue(mockCommentRepository);
-    caster<jest.Mock>(getReportCommentRepository).mockReturnValue(mockReportCommentRepository);
+    caster<jest.Mock>(getCommentRepository).mockReturnValue(
+      mockCommentRepository
+    );
+    caster<jest.Mock>(getReportCommentRepository).mockReturnValue(
+      mockReportCommentRepository
+    );
     mockFindOne.mockReset();
+    mockUserQuery().findOne.mockReset();
   });
 
-  const getStrapi = () => caster<StrapiContext>({ 
-    strapi: { 
-      documents: () => ({
-        findOne: mockFindOne,
-      }),
-    } 
-  });
+  const getStrapi = () =>
+    caster<StrapiContext>({
+      strapi: {
+        documents: () => ({
+          findOne: mockFindOne,
+        }),
+        query: (model: string) => {
+          if (model === 'plugin::users-permissions.user') {
+            return mockUserQuery();
+          }
+          return { findOne: jest.fn() };
+        },
+      },
+    });
   const getService = (strapi: StrapiContext) => clientService(strapi);
 
   describe('create', () => {
-    const mockUser: AdminUser = { id: 1, email: 'test@test.com', username: 'test' };
+    const mockUser: AdminUser = {
+      id: 1,
+      email: 'test@test.com',
+      username: 'test',
+    };
     const mockPayload = {
       relation: 'api::test.test:1' as const,
       content: 'Test comment',
@@ -64,11 +83,12 @@ describe('client.service', () => {
       locale: 'en',
     };
 
-    it('should create a comment when all validations pass', async () => {
+    it('should create a comment with APPROVED status when approval flow is disabled', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
       const mockEntity = { id: 1, content: 'Test comment' };
       const mockSanitizedEntity = { id: 1, content: 'Clean comment' };
+      const mockDbUser = { id: 1, avatar: { url: 'avatar-url' } };
 
       mockCommonService.parseRelationString.mockReturnValue({
         uid: 'api::test.test',
@@ -82,6 +102,50 @@ describe('client.service', () => {
       mockCommonService.sanitizeCommentEntity.mockReturnValue(
         mockSanitizedEntity
       );
+      mockUserQuery().findOne.mockResolvedValue(mockDbUser);
+
+      const result = await service.create(mockPayload, mockUser);
+
+      expect(result).toEqual(mockSanitizedEntity);
+      expect(mockUserQuery().findOne).toHaveBeenCalledWith({
+        where: { id: mockUser.id },
+        populate: ['avatar'],
+      });
+      expect(mockCommentRepository.create).toHaveBeenCalledWith({
+        data: {
+          authorId: mockUser.id,
+          authorEmail: mockUser.email,
+          authorName: mockUser.username,
+          authorAvatar: 'avatar-url',
+          content: 'Test comment',
+          related: 'api::test.test:1',
+          approvalStatus: APPROVAL_STATUS.APPROVED,
+          locale: 'en',
+          threadOf: null,
+        },
+      });
+    });
+
+    it('should create a comment with PENDING status when approval flow is enabled', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockEntity = { id: 1, content: 'Test comment' };
+      const mockSanitizedEntity = { id: 1, content: 'Clean comment' };
+      const mockDbUser = { id: 1, avatar: { url: 'avatar-url' } };
+
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue({ id: 1 });
+      mockCommonService.getConfig.mockResolvedValue(['api::test.test']);
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.checkBadWords.mockResolvedValue('Test comment');
+      mockCommentRepository.create.mockResolvedValue(mockEntity);
+      mockCommonService.sanitizeCommentEntity.mockReturnValue(
+        mockSanitizedEntity
+      );
+      mockUserQuery().findOne.mockResolvedValue(mockDbUser);
 
       const result = await service.create(mockPayload, mockUser);
 
@@ -91,10 +155,98 @@ describe('client.service', () => {
           authorId: mockUser.id,
           authorEmail: mockUser.email,
           authorName: mockUser.username,
-          authorAvatar: mockUser.avatar,
+          authorAvatar: 'avatar-url',
           content: 'Test comment',
           related: 'api::test.test:1',
-          approvalStatus: null,
+          approvalStatus: APPROVAL_STATUS.PENDING,
+          locale: 'en',
+          threadOf: null,
+        },
+      });
+    });
+
+    it('should create a comment using author data when no user is provided', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockAuthor = {
+        id: 2,
+        name: 'Author Name',
+        email: 'author@test.com',
+        avatar: 'avatar-url',
+      };
+      const mockEntity = { id: 1, content: 'Test comment' };
+      const mockSanitizedEntity = { id: 1, content: 'Clean comment' };
+
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue({ id: 1 });
+      mockCommonService.getConfig.mockResolvedValue([]);
+      mockCommonService.isValidUserContext.mockReturnValue(false);
+      mockCommonService.checkBadWords.mockResolvedValue('Test comment');
+      mockCommentRepository.create.mockResolvedValue(mockEntity);
+      mockCommonService.sanitizeCommentEntity.mockReturnValue(
+        mockSanitizedEntity
+      );
+
+      const result = await service.create(
+        {
+          ...mockPayload,
+          author: mockAuthor,
+        },
+        undefined
+      );
+
+      expect(result).toEqual(mockSanitizedEntity);
+      expect(mockCommentRepository.create).toHaveBeenCalledWith({
+        data: {
+          authorId: mockAuthor.id,
+          authorName: mockAuthor.name,
+          authorEmail: mockAuthor.email,
+          authorAvatar: mockAuthor.avatar,
+          content: 'Test comment',
+          related: 'api::test.test:1',
+          approvalStatus: APPROVAL_STATUS.APPROVED,
+          locale: 'en',
+          threadOf: null,
+        },
+      });
+    });
+
+    it('should handle user with no avatar properly', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockEntity = { id: 1, content: 'Test comment' };
+      const mockSanitizedEntity = { id: 1, content: 'Clean comment' };
+      const mockDbUserNoAvatar = { id: 1 }; // User without avatar
+
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue({ id: 1 });
+      mockCommonService.getConfig.mockResolvedValue([]);
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.checkBadWords.mockResolvedValue('Test comment');
+      mockCommentRepository.create.mockResolvedValue(mockEntity);
+      mockCommonService.sanitizeCommentEntity.mockReturnValue(
+        mockSanitizedEntity
+      );
+      mockUserQuery().findOne.mockResolvedValue(mockDbUserNoAvatar);
+
+      const result = await service.create(mockPayload, mockUser);
+
+      expect(result).toEqual(mockSanitizedEntity);
+      expect(mockCommentRepository.create).toHaveBeenCalledWith({
+        data: {
+          authorId: mockUser.id,
+          authorEmail: mockUser.email,
+          authorName: mockUser.username,
+          authorAvatar: null,
+          content: 'Test comment',
+          related: 'api::test.test:1',
+          approvalStatus: APPROVAL_STATUS.APPROVED,
           locale: 'en',
           threadOf: null,
         },
@@ -114,43 +266,6 @@ describe('client.service', () => {
       await expect(service.create(mockPayload, mockUser)).rejects.toThrow(
         PluginError
       );
-    });
-
-    it('should create a comment with pending status when approval flow is enabled', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-      const mockEntity = { id: 1, content: 'Test comment' };
-      const mockSanitizedEntity = { id: 1, content: 'Clean comment' };
-
-      mockCommonService.parseRelationString.mockReturnValue({
-        uid: 'api::test.test',
-        relatedId: '1',
-      });
-      mockFindOne.mockResolvedValue({ id: 1 });
-      mockCommonService.getConfig.mockResolvedValue(['api::test.test']);
-      mockCommonService.isValidUserContext.mockReturnValue(true);
-      mockCommonService.checkBadWords.mockResolvedValue('Test comment');
-      mockCommentRepository.create.mockResolvedValue(mockEntity);
-      mockCommonService.sanitizeCommentEntity.mockReturnValue(
-        mockSanitizedEntity
-      );
-
-      const result = await service.create(mockPayload, mockUser);
-
-      expect(result).toEqual(mockSanitizedEntity);
-      expect(mockCommentRepository.create).toHaveBeenCalledWith({
-        data: {
-          authorId: mockUser.id,
-          authorEmail: mockUser.email,
-          authorName: mockUser.username,
-          authorAvatar: mockUser.avatar,
-          content: 'Test comment',
-          related: 'api::test.test:1',
-          approvalStatus: APPROVAL_STATUS.PENDING,
-          locale: 'en',
-          threadOf: null,
-        },
-      });
     });
   });
 
