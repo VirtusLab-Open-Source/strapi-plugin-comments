@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "3.0.11",
+  "version": "3.0.12-beta.1",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
@@ -67,7 +67,7 @@
     "@jest/types": "29.5.x",
     "@sensinum/strapi-utils": "^1.0.10",
     "@strapi/plugin-cloud": "^5.14.0",
-    "@strapi/plugin-graphql": "5.14.0",
+    "@strapi/plugin-graphql": "^5.14.0",
     "@strapi/plugin-users-permissions": "^5.14.0",
     "@strapi/sdk-plugin": "^5.3.2",
     "@strapi/strapi": "^5.14.0",
