@@ -72,6 +72,7 @@ const getBaseFindSchema = (enabledCollections: string[]) => {
         blocked: true,
         blockedThread: true,
         approvalStatus: true,
+        isAdminComment: true,
       }).optional(),
       isAdmin: z.boolean().optional().default(false),
       populate: z

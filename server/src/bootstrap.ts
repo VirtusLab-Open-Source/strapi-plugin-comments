@@ -1,7 +1,6 @@
 import { StrapiContext } from './@types';
 import { setupGQL } from './graphql';
 import permissions from './permissions';
-import { CONFIG_PARAMS } from './utils/constants';
 import { getPluginService } from './utils/getPluginService';
 
 export default async ({ strapi }: StrapiContext) => {
