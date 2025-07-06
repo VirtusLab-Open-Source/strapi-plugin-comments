@@ -421,6 +421,23 @@ _Strapi user_
 }
 ```
 
+_Multi-language entities_
+
+> When posting comments to entities with multiple locales, you must provide the `locale` field in the payload to match the entity's locale:
+
+```json
+{
+  "author": {
+    "id": 518,
+    "name": "Author",
+    "email": "author@example.com",
+    "avatar": "<Link to avatar file>"
+  },
+  "content": "Test",
+  "locale": "fr" // Locale must be the same as the provided entity
+}
+```
+
 **Example response body**
 
 ```json
