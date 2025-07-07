@@ -4,17 +4,17 @@ describe('handleAPIError()', () => {
   it('should re-throw error', () => {
     const err = new Error('Error');
 
-    expect(() => handleAPIError(null, jest.fn)).toThrowError(Error);
-    expect(() => handleAPIError(undefined, jest.fn)).toThrowError();
-    expect(() => handleAPIError(err, undefined)).toThrowError(Error);
-    expect(() => handleAPIError(err, jest.fn)).toThrowError(err);
+    expect(() => handleAPIError(null, jest.fn)).toThrow(Error);
+    expect(() => handleAPIError(undefined, jest.fn)).toThrow();
+    expect(() => handleAPIError(err, undefined)).toThrow(Error);
+    expect(() => handleAPIError(err, jest.fn)).toThrow(err);
   });
 
   it('should notify app', () => {
     const err = new Error('Error');
     const notify = jest.fn();
 
-    expect(() => handleAPIError(err, notify, 'message')).toThrowError(err);
+    expect(() => handleAPIError(err, notify, 'message')).toThrow(err);
     expect(notify).toHaveBeenCalledWith({
       message: "comments.message",
       type: "warning",

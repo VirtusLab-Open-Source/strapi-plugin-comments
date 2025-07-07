@@ -21,8 +21,8 @@ jobs:
       - restore_cache:
           keys:
             # when lock file changes, use increasingly general patterns to restore cache
-            - strapi-plugin-comments-v3-{{ checksum "yarn.lock" }}
-            - strapi-plugin-comments-
+            - strapi-plugin-comments-v3-1751402139-{{ checksum "yarn.lock" }}
+            - strapi-plugin-comments-1751402139
       - run:
           name: Echo versions
           command: |
@@ -35,7 +35,7 @@ jobs:
       - run:
           name: Install
           command: |
-            yarn install
+            yarn install --frozen-lockfile --non-interactive
       - run:
           name: Test
           command: |
@@ -50,7 +50,7 @@ jobs:
       - save_cache:
           paths:
             - ./node_modules
-          key: strapi-plugin-comments-v3-{{ checksum "yarn.lock" }}
+          key: strapi-plugin-comments-v3-1751402139-{{ checksum "yarn.lock" }}
       - persist_to_workspace:
           root: ~/repo
           paths: .
