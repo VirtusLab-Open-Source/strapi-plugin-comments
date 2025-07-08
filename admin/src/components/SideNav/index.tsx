@@ -7,11 +7,11 @@ export const SideNav = () => {
       <SubNavHeader label="Comments" />
       <SubNavSections>
         <SubNavSection label="Moderation">
-          <SubNavLink href="/admin/plugins/comments/discover">
+          <SubNavLink href="/admin/plugins/@alfanet-technologies/strapi-plugin-comments/discover">
             Discover
           </SubNavLink>
           <SubNavLink
-            href="/admin/plugins/comments/reports"
+            href="/admin/plugins/@alfanet-technologies/strapi-plugin-comments/reports"
             withBullet={false}
           >
             Reports

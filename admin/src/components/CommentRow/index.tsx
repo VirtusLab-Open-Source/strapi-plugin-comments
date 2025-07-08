@@ -111,7 +111,7 @@ export const CommentRow: FC<Props> = ({item}) => {
             </Td>
             <Td>
                 <Typography>
-                    {formatDate(item.updatedAt || item.createdAt, {
+                    {formatDate(item.createdAt , {
                         dateStyle: 'long',
                         timeStyle: 'short',
                     })}

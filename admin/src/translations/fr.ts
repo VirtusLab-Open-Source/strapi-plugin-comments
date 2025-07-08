@@ -32,6 +32,7 @@ export default {
   'page.discover.table.header.entry': 'Entrée',
   'page.discover.table.header.rating': 'Note',
   'page.discover.table.header.lastUpdate': 'Dernière mise à jour',
+  'page.discover.table.header.createdAt': 'Date de création',
   'page.discover.table.header.status': 'Statut',
   'page.discover.table.header.actions': 'Actions',
   'page.discover.table.cell.thread': 'Commentaire #{id}',
