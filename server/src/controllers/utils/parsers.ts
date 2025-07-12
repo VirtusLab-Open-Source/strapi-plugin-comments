@@ -79,6 +79,7 @@ export const flatInput = <T extends FlatInputParams>(payload: T): T => {
       filters: {
         ...omitLodash(filters, '$or'),
         $and: [
+          ...(filters.$and || []),
           { $or: orOperator },
           { $or: [{ removed: { $null: true } }, { removed: false }] },
         ],
