@@ -5,11 +5,7 @@ export const configSchema = z.object({
   entryLabel: z.record(z.array(z.string())),
   approvalFlow: z.array(z.string()),
   blockedAuthorProps: z.array(z.string()),
-  reportReasons: z.object({
-    BAD_LANGUAGE: z.literal('BAD_LANGUAGE'),
-    DISCRIMINATION: z.literal('DISCRIMINATION'),
-    OTHER: z.literal('OTHER'),
-  }),
+  reportReasons: z.record(z.string()),
   regex: z.object({
     uid: z.string(),
     relatedUid: z.string(),
@@ -20,13 +16,17 @@ export const configSchema = z.object({
   moderatorRoles: z.array(z.string()),
   isGQLPluginEnabled: z.boolean(),
   badWords: z.boolean().nullable().optional(),
-  gql: z.object({
-    auth: z.boolean().nullable(),
-  }).optional(),
-  client: z.object({
-    url: z.string().nullable(),
-    contactEmail: z.string().nullable(),
-  }).default({ url: null, contactEmail: null }),
+  gql: z
+    .object({
+      auth: z.boolean().nullable(),
+    })
+    .optional(),
+  client: z
+    .object({
+      url: z.string().nullable(),
+      contactEmail: z.string().nullable(),
+    })
+    .default({ url: null, contactEmail: null }),
 });
 
 

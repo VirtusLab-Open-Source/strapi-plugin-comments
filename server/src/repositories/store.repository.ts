@@ -37,16 +37,18 @@ export const getStoreRepositorySource = (strapi: CoreStrapi) => {
         ),
       };
       const isGQLPluginEnabled = !!strapi.plugin('graphql');
+      const reportReasons = this.getLocalConfig('reportReasons');
       if (config) {
+        // TODO: add report reasons to config page
         return makeRight({
           ...config,
           ...additionalConfiguration,
+          reportReasons,
           isGQLPluginEnabled: viaSettingsPage ? isGQLPluginEnabled : undefined,
         });
       }
       const entryLabel = this.getLocalConfig('entryLabel');
       const approvalFlow = this.getLocalConfig('approvalFlow');
-      const reportReasons = this.getLocalConfig('reportReasons');
       const blockedAuthorProps = this.getLocalConfig('blockedAuthorProps');
 
       const result = {
