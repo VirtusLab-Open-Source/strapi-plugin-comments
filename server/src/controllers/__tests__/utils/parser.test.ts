@@ -1,3 +1,4 @@
+import { omit } from 'lodash';
 describe('Parser', () => {
   describe('flatInput', () => {
     const { flatInput } = require('../../utils/parsers');
@@ -5,7 +6,7 @@ describe('Parser', () => {
     it('should handle basic input with default values', () => {
       const input = {};
       const result = flatInput(input);
-      
+
       expect(result).toEqual({
         filters: {
           $or: [{ removed: { $null: true } }, { removed: false }],
@@ -35,14 +36,31 @@ describe('Parser', () => {
 
       const result = flatInput(input);
 
+      // we expect comments not removed and with status pending
       expect(result).toEqual({
         ...input,
         filters: {
-          ...input.filters,
-          $or: [
-            { status: 'pending' },
-            { removed: { $null: true } },
-            { removed: false },
+          ...omit(input.filters, '$or'),
+          $and: [
+            {
+              $or: [
+                {
+                  status: 'pending',
+                },
+              ],
+            },
+            {
+              $or: [
+                {
+                  removed: {
+                    $null: true,
+                  },
+                },
+                {
+                  removed: false,
+                },
+              ],
+            },
           ],
           related: undefined,
         },
@@ -123,6 +141,116 @@ describe('Parser', () => {
             authorUser: { populate: true },
             comments: { populate: true },
             reactions: true,
+          },
+        },
+      });
+    });
+
+    it('should handle when removed is in $or array', () => {
+      const input = {
+        filters: {
+          content: 'test content',
+          $or: [
+            { status: 'pending' },
+            { removed: true },
+            { authorName: 'John' },
+          ],
+        },
+      };
+
+      const result = flatInput(input);
+
+      expect(result).toEqual({
+        ...input,
+        filters: {
+          ...omit(input.filters, '$or'),
+          $or: [
+            { status: 'pending' },
+            { authorName: 'John' },
+            { removed: { $null: true } },
+            { removed: false },
+          ],
+          related: undefined,
+        },
+        populate: {
+          threadOf: {
+            populate: {
+              authorUser: true,
+            },
+          },
+        },
+      });
+    });
+
+    it('should handle when removed is not in $or array', () => {
+      const input = {
+        filters: {
+          content: 'test content',
+          $or: [{ status: 'pending' }, { authorName: 'John' }],
+        },
+      };
+
+      const result = flatInput(input);
+
+      expect(result).toEqual({
+        ...input,
+        filters: {
+          ...omit(input.filters, '$or'),
+          $and: [
+            {
+              $or: [{ status: 'pending' }, { authorName: 'John' }],
+            },
+            {
+              $or: [{ removed: { $null: true } }, { removed: false }],
+            },
+          ],
+          related: undefined,
+        },
+        populate: {
+          threadOf: {
+            populate: {
+              authorUser: true,
+            },
+          },
+        },
+      });
+    });
+
+    it('should handle when both $and and $or exist in filters', () => {
+      const input = {
+        filters: {
+          content: 'test content',
+          $and: [
+            { createdAt: { $gte: '2023-01-01' } },
+            { approvalStatus: 'approved' },
+          ],
+          $or: [{ status: 'pending' }, { authorName: 'John' }],
+        },
+      };
+
+      const result = flatInput(input);
+
+      expect(result).toEqual({
+        ...input,
+        filters: {
+          ...omit(input.filters, '$or'),
+          $and: [
+            { createdAt: { $gte: '2023-01-01' } },
+            { approvalStatus: 'approved' },
+            {
+              $or: [{ status: 'pending' }, { authorName: 'John' }],
+            },
+            {
+              $or: [{ removed: { $null: true } }, { removed: false }],
+            },
+          ],
+          related: undefined,
+        },
+        populate: {
+          threadOf: {
+            populate: {
+              authorUser: true,
+            },
           },
         },
       });

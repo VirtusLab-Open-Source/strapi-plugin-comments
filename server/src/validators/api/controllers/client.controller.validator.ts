@@ -55,25 +55,34 @@ const paginationSchema = z.object({
 });
 
 const getBaseFindSchema = (enabledCollections: string[]) => {
+  //   $or: [{ approvalStatus: "APPROVED" }, { isAdminComment: true }],
+  const filters = getFiltersOperators({
+    id: true,
+    content: true,
+    authorId: true,
+    authorName: true,
+    authorEmail: true,
+    createdAt: true,
+    updatedAt: true,
+    removed: true,
+    blocked: true,
+    blockedThread: true,
+    approvalStatus: true,
+    isAdminComment: true,
+  });
   return z
     .object({
       sort: orderByValidator.optional().nullable().default('createdAt:desc'),
       fields: z.string().array().optional(),
       omit: z.string().array().optional(),
-      filters: getFiltersOperators({
-        id: true,
-        content: true,
-        authorId: true,
-        authorName: true,
-        authorEmail: true,
-        createdAt: true,
-        updatedAt: true,
-        removed: true,
-        blocked: true,
-        blockedThread: true,
-        approvalStatus: true,
-        isAdminComment: true,
-      }).optional(),
+      filters: filters
+        .merge(
+          z.object({
+            $and: filters.array().min(1).optional(),
+            $or: filters.array().min(1).optional(),
+          })
+        )
+        .optional(),
       isAdmin: z.boolean().optional().default(false),
       populate: z
         .record(z.union([z.boolean(), z.object({ populate: z.boolean() })]))

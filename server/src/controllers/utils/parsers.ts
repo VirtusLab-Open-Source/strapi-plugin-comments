@@ -1,4 +1,5 @@
 import { client } from '../../validators/api';
+import { omit as omitLodash } from 'lodash';
 
 // Define base interface for filters
 interface BaseFilters {
@@ -11,10 +12,13 @@ interface BaseFilters {
 }
 
 // Union type of all possible input types
-type FlatInputParams = client.FindAllFlatSchema | client.FindAllInHierarchyValidatorSchema | client.FindAllPerAuthorValidatorSchema;
+type FlatInputParams =
+  | client.FindAllFlatSchema
+  | client.FindAllInHierarchyValidatorSchema
+  | client.FindAllPerAuthorValidatorSchema;
 
 export const flatInput = <T extends FlatInputParams>(payload: T): T => {
-  const { 
+  const {
     sort,
     fields,
     omit,
@@ -28,10 +32,11 @@ export const flatInput = <T extends FlatInputParams>(payload: T): T => {
     pagination?: client.FindAllFlatSchema['pagination'];
     relation?: client.FindAllFlatSchema['relation'];
   };
-  
+
   const orOperator = (filters.$or || []).filter(
-    (item) => !Object.keys(item).includes('removed'),
+    (item) => !Object.keys(item).includes('removed')
   );
+  const hasRemoved = filters.$or?.some((item) => item.removed);
 
   let basePopulate = {
     ...populate,
@@ -42,7 +47,10 @@ export const flatInput = <T extends FlatInputParams>(payload: T): T => {
       populate: {
         authorUser: true,
         ...populate,
-      } as { authorUser: boolean | { populate: boolean }, [key: string]: boolean | { populate: boolean } },
+      } as {
+        authorUser: boolean | { populate: boolean };
+        [key: string]: boolean | { populate: boolean };
+      },
     },
   };
 
@@ -58,9 +66,34 @@ export const flatInput = <T extends FlatInputParams>(payload: T): T => {
         populate: {
           authorUser: author,
           ...restPopulate,
-        } as { authorUser: boolean | { populate: boolean }, [key: string]: boolean | { populate: boolean } },
+        } as {
+          authorUser: boolean | { populate: boolean };
+          [key: string]: boolean | { populate: boolean };
+        },
       },
     };
+  }
+  if (orOperator.length && !hasRemoved) {
+    return {
+      ...payload,
+      filters: {
+        ...omitLodash(filters, '$or'),
+        $and: [
+          ...(filters.$and || []),
+          { $or: orOperator },
+          { $or: [{ removed: { $null: true } }, { removed: false }] },
+        ],
+        related: relation,
+      },
+      populate: {
+        ...basePopulate,
+        ...threadOfPopulate,
+      },
+      pagination,
+      sort,
+      fields,
+      omit,
+    } as T;
   }
 
   return {
