@@ -131,7 +131,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
             {canReviewReports && <ReviewFlow item={item} />}
             <IconButton
               onClick={onClickDetails(item.id)}
-              label="View"
+              label={getMessage("page.details.filters.label", "View")}
             >
               <Eye />
             </IconButton>

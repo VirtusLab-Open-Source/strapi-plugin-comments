@@ -79,22 +79,22 @@ export const ReportReviewTable: FC<Props> = ({
           </Th>
           <Th>
             <Typography variant="sigma">
-              Reason
+              {getMessage('page.reports.table.header.reason', 'Reason')}
             </Typography>
           </Th>
           <Th>
             <Typography variant="sigma">
-              Content
+              {getMessage('page.reports.table.header.content', 'Content')}
             </Typography>
           </Th>
           <Th>
             <Typography variant="sigma">
-              CreateAt
+              {getMessage('page.reports.table.header.issueDate', 'Issue date')}
             </Typography>
           </Th>
           <Th>
             <Typography variant="sigma">
-              Status
+              {getMessage('page.reports.table.header.status', 'Status')}
             </Typography>
           </Th>
           <Th />

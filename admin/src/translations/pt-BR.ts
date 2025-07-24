@@ -21,7 +21,7 @@ export default {
   'page.common.item.status.setFilter': 'Definir status...',
   'page.updates.header': 'Atualizações recentes',
   'page.discover.header': 'Descubra tópicos',
-  'page.discover.header.count': 'entries found',
+  'page.discover.header.count': '{count} entries found',
   'page.discover.table.header.id': 'ID',
   'page.discover.table.header.author': 'Autor',
   'page.discover.table.header.message': 'Messagem',

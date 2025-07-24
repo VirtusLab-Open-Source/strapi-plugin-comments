@@ -19,12 +19,20 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
       <Page.Main>
         <Layouts.Header
           title={getMessage('page.discover.header')}
-          subtitle={`${pagination.total} entries found`}
+          subtitle={getMessage(
+            {
+              id: `page.discover.header.count`,
+              props: {
+                count: pagination.total,
+              },
+            },
+            `${pagination.total} entries found`
+          )}
           as="h2"
         />
         <Layouts.Action startActions={
           <>
-            <SearchInput label="Search" />
+            <SearchInput label={getMessage('common.search', "Search")} />
             <CommentsStatusFilters setQueryParams={setQueryParams}/>
           </>
         }/>
