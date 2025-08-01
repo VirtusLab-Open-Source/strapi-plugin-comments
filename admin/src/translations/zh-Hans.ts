@@ -24,7 +24,7 @@ export default {
   'page.common.item.status.setFilter': '设置状态...',
   'page.updates.header': '最近的更新',
   'page.discover.header': '发现线索',
-  'page.discover.header.count': '找到的条目',
+  'page.discover.header.count': '{count} 找到的条目',
   'page.discover.table.header.id': 'ID',
   'page.discover.table.header.author': '作者',
   'page.discover.table.header.message': '内容',

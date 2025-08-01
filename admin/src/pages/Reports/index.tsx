@@ -61,13 +61,21 @@ export const Reports: FC<{ config: Config }> = ({ config }) => {
       <Page.Title children={'Comments - reports'} />
       <Page.Main>
         <Layouts.Header
-          title="Resolve threads"
-          subtitle={`${pagination.total} entries found`}
+          title={getMessage('page.reports.header', 'Resolved reports')}
+          subtitle={getMessage(
+            {
+              id: `page.discover.header.count`,
+              props: {
+                count: pagination.total,
+              },
+            },
+            `${pagination.total} entries found`
+          )}
           as="h2"
         />
         <Layouts.Action startActions={(
           <Flex gap="2">
-            <SearchInput label="Search" />
+            <SearchInput label={getMessage('common.search', "Search")} />
             {selectedItems.length > 0 && (
               <Button
                 variant="success"
