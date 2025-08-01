@@ -28,6 +28,7 @@ import { EditorFromTextArea } from 'codemirror5';
 import { useIntl } from 'react-intl';
 
 import { IconButtonGroupMargin, MainButtons, MoreButton } from './WysiwygStyles';
+import { getMessage } from '../../utils';
 
 interface WysiwygNavProps {
   disabled?: boolean;
