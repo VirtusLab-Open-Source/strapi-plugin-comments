@@ -50,7 +50,9 @@ const controllers = ({ strapi }: StrapiContext) => ({
       const result = clientValidator.findAllInHierarchyValidator(config.enabledCollections, ctx.params.relation, ctx.query);
       if (isRight(result)) {
         return this.getService('common').findAllInHierarchy(
-          flatInput<clientValidator.FindAllInHierarchyValidatorSchema>(result.right),
+          flatInput<clientValidator.FindAllInHierarchyValidatorSchema>(
+            result.right
+          )
         );
       }
       throw throwError(ctx, unwrapEither(result));

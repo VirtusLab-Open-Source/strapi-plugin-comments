@@ -69,6 +69,7 @@ const getBaseFindSchema = (enabledCollections: string[]) => {
     blockedThread: true,
     approvalStatus: true,
     isAdminComment: true,
+    threadOf: true,
   });
   return z
     .object({
@@ -117,6 +118,7 @@ export const findAllInHierarchyValidator = (enabledCollections: string[], relati
     skip: true,
     relation: true,
     locale: true,
+    pagination: true,
   })
   .merge(z.object({
     startingFromId: z.number().optional(),
