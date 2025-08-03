@@ -82,14 +82,10 @@ const approvalStatusSchema = z.union([
   z.literal(COMMENT_STATUS.TO_REVIEW),
   z.literal(COMMENT_STATUS.UNKNOWN),
 ]);
-const reportReasonUnion = z.union([
-  z.literal('BAD_LANGUAGE'),
-  z.literal('DISCRIMINATION'),
-  z.literal('OTHER'),
-]);
+
 const commentReportSchema = z.object({
   id: z.number(),
-  reason: reportReasonUnion,
+  reason: z.string().optional().nullable(),
   content: z.string(),
   resolved: z.boolean(),
   createdAt: z.string(),
@@ -200,7 +196,7 @@ export const reportSchema = z.object({
   content: z.string(),
   id: z.number(),
   approvalStatus: approvalStatusSchema.nullable().optional(),
-  reason: reportReasonUnion,
+  reason: z.string().optional().nullable(),
   reports: z.array(z.unknown()),
   resolved: z.boolean().optional(),
   updatedAt: z.string().nullable(),
