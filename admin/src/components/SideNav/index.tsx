@@ -4,7 +4,7 @@ import { getMessage } from '../../utils';
 
 export const SideNav = () => {
   return (
-    <SubNav ariaLabel="Comments sub nav">
+    <SubNav aria-label="Comments sub nav">
       <SubNavHeader label={getMessage('plugin.name')} />
       <SubNavSections>
         <SubNavSection label={getMessage('nav.header.moderation')}>
