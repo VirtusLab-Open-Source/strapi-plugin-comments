@@ -68,7 +68,7 @@ export const filtersValidator = z.union([
   endWithValidators,
   containsValidators,
   notContainsValidators,
-  z.object({ $null: z.string().min(1) }),
+  z.object({ $null: z.boolean() }),
   z.object({ $notNull: z.boolean() }),
 ]);
 
@@ -115,11 +115,11 @@ export const queryPaginationSchema = z.object({ pageSize: stringToNumberValidato
                                               getFiltersOperators({
                                                 blocked: true,
                                                 blockedThread: true,
-                                              })
-                                            ).optional()
-                                          })
+                                              }),
+                                            ).optional(),
+                                          }),
                                         ).optional(),
-                                      }))
+                                      }));
 
 export const validate = <I, O>(result: z.SafeParseReturnType<I, O>) => {
   if (!result.success) {

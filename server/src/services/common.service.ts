@@ -1,15 +1,6 @@
 import { Params } from '@strapi/database/dist/entity-manager/types';
 import { UID } from '@strapi/strapi';
-import {
-  first,
-  get,
-  isNil,
-  isObject,
-  isString,
-  omit as filterItem,
-  parseInt,
-  uniq,
-} from 'lodash';
+import { first, get, isNil, isObject, isString, omit as filterItem, parseInt, uniq } from 'lodash';
 import { isProfane, replaceProfanities } from 'no-profanity';
 import { Id, PathTo, PathValue, RelatedEntity, StrapiContext } from '../@types';
 import { CommentsPluginConfig } from '../config';
@@ -56,7 +47,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     return user ? user.id != undefined : true;
   },
 
-  sanitizeCommentEntity(entity: Comment | CommentWithRelated, blockedAuthors: string[], omitProps: Array<keyof Comment> = [], populate: any = {}): Comment {
+  sanitizeCommentEntity(entity: (Comment | CommentWithRelated) & { children?: Comment | CommentWithRelated[] }, blockedAuthors: string[], omitProps: Array<keyof Comment> = [], populate: any = {}): Comment {
     const fieldsToPopulate = Array.isArray(populate) ? populate : Object.keys(populate || {});
     return filterItem({
       ...buildAuthorModel(
@@ -119,10 +110,12 @@ const commonService = ({ strapi }: StrapiContext) => ({
           where: {
             threadOf: _.id,
           },
+          pageSize: Infinity,
         });
         return {
           id: _.id,
           itemsInTread: total,
+          children: results,
           firstThreadItemId: first(results)?.id,
         };
       }),
@@ -144,6 +137,9 @@ const commonService = ({ strapi }: StrapiContext) => ({
       return this.sanitizeCommentEntity(
         {
           ..._,
+          // @ts-ignore
+          children: (threadedItem?.children || [])
+          .map((item) => this.sanitizeCommentEntity(item, doNotPopulateAuthor, omit as Array<keyof Comment>, authorUserPopulate)),
           threadOf: primitiveThreadOf || _.threadOf,
           gotThread: (threadedItem?.itemsInTread || 0) > 0,
           threadFirstItemId: threadedItem?.firstThreadItemId,
@@ -173,10 +169,25 @@ const commonService = ({ strapi }: StrapiContext) => ({
       omit = [],
       locale,
       limit,
+      pagination,
     }: clientValidator.FindAllInHierarchyValidatorSchema,
     relatedEntity?: any,
   ) {
-    const entities = await this.findAllFlat({ filters, populate, sort, fields, isAdmin, omit, locale, limit }, relatedEntity);
+    const entities = await this.findAllFlat({
+      filters: {
+        threadOf: { $null: true }, // Only root comments and the next query will be fetch children
+        ...filters,
+      },
+      pagination,
+      populate,
+      sort,
+      fields,
+      isAdmin,
+      omit,
+      locale,
+      limit,
+    }, relatedEntity);
+    // console.log('entities', entities);
     return buildNestedStructure(
       entities?.data,
       startingFromId,
@@ -359,11 +370,11 @@ const commonService = ({ strapi }: StrapiContext) => ({
     .updateMany({
       where: {
         related,
-        $or: [{ locale }, defaultLocale === locale ? { locale: { $eq: null } } : null].filter(Boolean)
+        $or: [{ locale }, defaultLocale === locale ? { locale: { $eq: null } } : null].filter(Boolean),
       },
       data: {
         removed: true,
-      }
+      },
     });
   },
 
@@ -373,11 +384,11 @@ const commonService = ({ strapi }: StrapiContext) => ({
     .updateMany({
       where: {
         related,
-        $or: [{ locale }, defaultLocale === locale ? { locale: { $eq: null } } : null].filter(Boolean)
+        $or: [{ locale }, defaultLocale === locale ? { locale: { $eq: null } } : null].filter(Boolean),
       },
       data: {
         removed: false,
-      }
+      },
     });
   },
 
