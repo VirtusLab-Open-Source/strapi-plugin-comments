@@ -7,7 +7,7 @@ const register = (context: StrapiContext) => {
 
   const commonService = getPluginService(context.strapi, 'common');
   context.strapi.documents.use(async (ctx, next) => {
-    if (ctx.action === 'delete') {
+    if (ctx.action === 'delete' && ctx.uid.startsWith('api::')) {
       const { params: { locale, documentId }, uid } = ctx;
       const relation = [uid, documentId].join(":");
       await commonService.perRemove(relation, locale);
