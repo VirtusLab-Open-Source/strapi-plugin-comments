@@ -17,11 +17,14 @@ const getFilter = (filterName: string | undefined) => {
   switch (filterName) {
     case COMMENT_STATUS.BLOCKED:
       return {
-        $or: [{ blocked: { $eq: true } }, { blockedThread: { $eq: true } }],
+        $or: [
+          { blocked: true },
+          { blockedThread: true },
+        ],
       };
     case COMMENT_STATUS.REMOVED:
       return {
-        $or: [{ blocked: { $eq: true } }, { blockedThread: { $eq: true } }],
+        removed: true,
       };
     case COMMENT_STATUS.OPEN:
       return {
@@ -31,9 +34,9 @@ const getFilter = (filterName: string | undefined) => {
       return {};
     default:
       return {
-        approvalStatus: { $eq: filterName },
+        approvalStatus: filterName,
       };
-  }
+  };
 };
 
 export const CommentsStatusFilters = () => {
