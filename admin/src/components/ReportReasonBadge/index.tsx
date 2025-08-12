@@ -25,7 +25,7 @@ export const ReportReasonBadge: FC<Pick<CommentReport, 'reason'>> = ({ reason })
     >
       {getMessage(
         `page.details.panel.discussion.warnings.reports.dialog.reason.${reason}`,
-        reason,
+        reason || '',
       )}
     </StatusBadge>
   );
