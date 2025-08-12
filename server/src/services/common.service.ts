@@ -367,21 +367,6 @@ const commonService = ({ strapi }: StrapiContext) => ({
     });
   },
 
-  async perRestore(related: string, locale?: string) {
-    const defaultLocale = await strapi.plugin('i18n')?.service('locales').getDefaultLocale() || null;
-    return getCommentRepository(strapi)
-    .updateMany({
-      where: {
-        related,
-        $or: [{ locale }, defaultLocale === locale ? { locale: { $eq: null } } : null].filter(Boolean)
-      },
-      data: {
-        removed: false,
-      }
-    });
-  },
-
-
   registerLifecycleHook(/*{ callback, contentTypeName, hookName }*/) {
   },
 

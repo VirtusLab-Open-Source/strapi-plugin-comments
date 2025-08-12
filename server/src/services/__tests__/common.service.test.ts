@@ -605,23 +605,5 @@ describe('common.service', () => {
       expect(result).toEqual({ count: 2});
       expect(mockCommentRepository.updateMany).toHaveBeenCalled();
     });
-
-    it('should resolve comments from deleted if related entry is restore', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-      const mockComments = [
-        { id: 1, related: 'api::test.test:1', locale: 'en' },
-        { id: 1, related: 'api::test.test:1', locale: 'en' }
-      ];
-      const mockRelatedEntities = { uid: 'api::test.test', documentId: '1', locale: 'en', title: 'Test Title 1' };
-
-      mockCommentRepository.findMany.mockResolvedValue(mockComments)
-      mockCommentRepository.updateMany.mockResolvedValue({ count: 2 });
-
-      const result = await service.perRestore([mockRelatedEntities.uid, mockRelatedEntities.documentId].join(':'));
-
-      expect(result).toEqual({ count: 2});
-      expect(mockCommentRepository.updateMany).toHaveBeenCalled();
-    });
   });
 });

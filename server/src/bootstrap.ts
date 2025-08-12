@@ -1,7 +1,6 @@
 import { StrapiContext } from './@types';
 import { setupGQL } from './graphql';
 import permissions from './permissions';
-import { getPluginService } from './utils/getPluginService';
 
 export default async ({ strapi }: StrapiContext) => {
   if (strapi.plugin('graphql')) {
@@ -54,20 +53,4 @@ export default async ({ strapi }: StrapiContext) => {
   ];
 
   await strapi.admin.services.permission.actionProvider.registerMany(actions);
-
-  const commonService = getPluginService(strapi, 'common');
-  strapi.db.lifecycles.subscribe({
-    afterDelete: async (event) => {
-      const uid = event.model.uid;
-      const { documentId, locale } = event.result;
-      const relation = [uid, documentId].join(':');
-      await commonService.perRemove(relation, locale);
-    },
-    afterCreate: async (event) => {
-      const uid = event.model.uid;
-      const { documentId, locale } = event.result;
-      const relation = [uid, documentId].join(':');
-      await commonService.perRestore(relation, locale);
-    }
-  });
 };
