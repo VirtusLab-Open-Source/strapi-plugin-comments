@@ -156,7 +156,9 @@ describe('common.service', () => {
         where: { id: 1 },
         populate: {
           reports: true,
-          authorUser: true,
+          authorUser: {
+            populate: ['avatar'],
+          },
         },
       });
     });
