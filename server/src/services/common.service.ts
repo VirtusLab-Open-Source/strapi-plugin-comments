@@ -86,8 +86,8 @@ const commonService = ({ strapi }: StrapiContext) => ({
     const omit = baseOmit.filter((field) => !REQUIRED_FIELDS.includes(field));
     const defaultSelect = (['id', 'related'] as const).filter((field) => !omit.includes(field));
 
-    const populateClause: clientValidator.FindAllFlatSchema['populate'] = {
-      authorUser: true,
+    const populateClause = {
+      authorUser: { populate: ['avatar'] },
       ...(isObject(populate) ? populate : {}),
     };
     const doNotPopulateAuthor = isAdmin ? [] : await this.getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
@@ -192,7 +192,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
       where: criteria,
       populate: {
         reports: true,
-        authorUser: true,
+        authorUser: { populate: ['avatar'] },
       },
     });
     if (!entity) {
