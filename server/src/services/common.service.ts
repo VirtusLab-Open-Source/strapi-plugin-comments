@@ -86,8 +86,11 @@ const commonService = ({ strapi }: StrapiContext) => ({
     const omit = baseOmit.filter((field) => !REQUIRED_FIELDS.includes(field));
     const defaultSelect = (['id', 'related'] as const).filter((field) => !omit.includes(field));
 
-    const populateClause = {
-      authorUser: { populate: ['avatar'] },
+    const populateClause: clientValidator.FindAllFlatSchema['populate'] = {
+      authorUser: { 
+        populate: true,
+        avatar: { populate: true } 
+      },
       ...(isObject(populate) ? populate : {}),
     };
     const doNotPopulateAuthor = isAdmin ? [] : await this.getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
@@ -136,7 +139,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
 
       let authorUserPopulate = {};
       if (isObject(populate?.authorUser)) {
-        authorUserPopulate = 'populate' in populateClause.authorUser ? (populateClause.authorUser.populate) : populateClause.authorUser;
+        authorUserPopulate = 'populate' in populate.authorUser ? (populate.authorUser.populate) : populateClause.authorUser;
       }
 
       const primitiveThreadOf = typeof parsedThreadOf === 'number' ? parsedThreadOf : null;

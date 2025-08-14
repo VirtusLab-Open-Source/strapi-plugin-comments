@@ -503,7 +503,12 @@ describe('common.service', () => {
       expect(mockCommentRepository.findWithCount).toHaveBeenCalledWith({
         pageSize: 10, 
         page: 1,
-        populate: { authorUser: { populate: ['avatar'] } }, 
+        populate: { 
+          authorUser: {
+            populate: true,
+            avatar: { populate: true },
+          }, 
+        }, 
         select: ["id", "content", "related"],
         orderBy: { createdAt: "desc" },
         where: { authorId: 1 }
@@ -550,7 +555,10 @@ describe('common.service', () => {
         select: ['id', 'content', 'related'],
         orderBy: { createdAt: 'desc' },
         populate: {
-          authorUser: { populate: ['avatar'] },
+          authorUser: {
+            populate: true,
+            avatar: { populate: true },
+          },
         },
       });
     });

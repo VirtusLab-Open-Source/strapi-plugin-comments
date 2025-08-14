@@ -85,7 +85,13 @@ const getBaseFindSchema = (enabledCollections: string[]) => {
         .optional(),
       isAdmin: z.boolean().optional().default(false),
       populate: z
-        .record(z.union([z.boolean(), z.object({ populate: z.boolean() })]))
+        .record(z.union([
+          z.boolean(), 
+          z.object({ 
+            populate: z.boolean(),
+            avatar: z.object({ populate: z.boolean() })
+          })
+        ]))
         .optional(),
       limit: stringToNumberValidator.optional(),
       skip: stringToNumberValidator.optional(),
