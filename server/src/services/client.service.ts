@@ -294,6 +294,10 @@ export const clientService = ({ strapi }: StrapiContext) => {
           const emailSender = await this.getCommonService().getConfig('client.contactEmail', superAdmin.email);
           const clientAppUrl = await this.getCommonService().getConfig('client.url', 'our site');
 
+          if (!emailSender) {
+            return;
+          }
+
           try {
             await strapi
             .plugin('email')

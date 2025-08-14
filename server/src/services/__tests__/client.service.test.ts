@@ -120,22 +120,16 @@ describe('client.service', () => {
       const result = await service.create(mockPayload, mockUser);
 
       expect(result).toEqual(mockSanitizedEntity);
-      expect(mockUserQuery().findOne).toHaveBeenCalledWith({
-        where: { id: mockUser.id },
-        populate: ['avatar'],
-      });
       expect(mockCommentRepository.create).toHaveBeenCalledWith({
         data: {
-          authorId: mockUser.id,
-          authorEmail: mockUser.email,
-          authorName: mockUser.username,
-          authorAvatar: 'avatar-url',
+          authorUser: mockUser.id,
           content: 'Test comment',
           related: 'api::test.test:1',
           approvalStatus: APPROVAL_STATUS.APPROVED,
           locale: 'en',
           threadOf: null,
         },
+        populate: defaultPopulate,
       });
     });
 
@@ -216,43 +210,6 @@ describe('client.service', () => {
           authorName: mockAuthor.name,
           authorEmail: mockAuthor.email,
           authorAvatar: mockAuthor.avatar,
-          content: 'Test comment',
-          related: 'api::test.test:1',
-          approvalStatus: APPROVAL_STATUS.APPROVED,
-          locale: 'en',
-          threadOf: null,
-        },
-        populate: defaultPopulate,
-      });
-    });
-
-    it('should handle user with no avatar properly', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-      const mockEntity = { id: 1, content: 'Test comment' };
-      const mockSanitizedEntity = { id: 1, content: 'Clean comment' };
-      const mockDbUserNoAvatar = { id: 1 }; // User without avatar
-
-      mockCommonService.parseRelationString.mockReturnValue({
-        uid: 'api::test.test',
-        relatedId: '1',
-      });
-      mockFindOne.mockResolvedValue({ id: 1 });
-      mockCommonService.getConfig.mockResolvedValue([]);
-      mockCommonService.isValidUserContext.mockReturnValue(true);
-      mockCommonService.checkBadWords.mockResolvedValue('Test comment');
-      mockCommentRepository.create.mockResolvedValue(mockEntity);
-      mockCommonService.sanitizeCommentEntity.mockReturnValue(
-        mockSanitizedEntity
-      );
-      mockUserQuery().findOne.mockResolvedValue(mockDbUserNoAvatar);
-
-      const result = await service.create(mockPayload, mockUser);
-
-      expect(result).toEqual(mockSanitizedEntity);
-      expect(mockCommentRepository.create).toHaveBeenCalledWith({
-        data: {
-          authorUser: mockUser.id,
           content: 'Test comment',
           related: 'api::test.test:1',
           approvalStatus: APPROVAL_STATUS.APPROVED,
