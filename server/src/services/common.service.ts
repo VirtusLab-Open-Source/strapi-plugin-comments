@@ -135,7 +135,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
       const parsedThreadOf = 'threadOf' in filters ? (isString(filters.threadOf) ? parseInt(filters.threadOf) : filters.threadOf) : null;
 
       let authorUserPopulate = {};
-      if (isObject(populateClause?.authorUser)) {
+      if (isObject(populate?.authorUser)) {
         authorUserPopulate = 'populate' in populateClause.authorUser ? (populateClause.authorUser.populate) : populateClause.authorUser;
       }
 
