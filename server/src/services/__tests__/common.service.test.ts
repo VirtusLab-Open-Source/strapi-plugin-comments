@@ -226,6 +226,38 @@ describe('common.service', () => {
       expect(result.data).toHaveLength(2);
       expect(mockCommentRepository.findWithCount).toHaveBeenCalled();
     });
+    it('should return flat list of comments with populated user properties', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComments = [
+        { id: 1, content: 'Comment 1', avatar: { url: 'avatar2.png' } },
+        { id: 2, content: 'Comment 2', avatar: { url: 'avatar2.png' } },
+      ];
+
+      mockCommentRepository.findWithCount.mockResolvedValue({
+        results: mockComments,
+        pagination: { total: 2 },
+      });
+      caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
+      
+      mockStoreRepository.getConfig.mockResolvedValue([]);
+
+      const result = await service.findAllFlat({
+        fields: ['id', 'content'],
+        limit: 10,
+        skip: 0,
+        populate: {
+          authorUser: {
+            avatar: {
+              populate: true
+            }
+          }
+        }
+      });
+
+      expect(result.data).toHaveLength(2);
+      expect(mockCommentRepository.findWithCount).toHaveBeenCalled();
+    });
   });
 
   describe('modifiedNestedNestedComments', () => {
