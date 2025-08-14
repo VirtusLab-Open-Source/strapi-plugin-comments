@@ -45,7 +45,12 @@ export const flatInput = <T extends FlatInputParams>(payload: T): T => {
   let threadOfPopulate = {
     threadOf: {
       populate: {
-        authorUser: true,
+        authorUser: {
+          populate: true,
+          avatar: {
+            populate: true,
+          },
+        },
         ...populate,
       } as {
         authorUser: boolean | { populate: boolean };
