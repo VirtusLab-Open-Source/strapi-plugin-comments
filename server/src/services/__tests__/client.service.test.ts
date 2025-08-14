@@ -52,6 +52,10 @@ describe('client.service', () => {
     findOne: jest.fn(),
   });
 
+  const mockEmailService = {
+    send: jest.fn(),
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     caster<jest.Mock>(getPluginService).mockReturnValue(mockCommonService);
@@ -218,6 +222,31 @@ describe('client.service', () => {
         },
         populate: defaultPopulate,
       });
+    });
+
+    it('should throw error when no user is provided', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      const mockEntity = { id: 1, content: 'Test comment' };
+      const mockSanitizedEntity = { id: 1, content: 'Clean comment' };
+
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue({ id: 1 });
+      mockCommonService.getConfig.mockResolvedValue([]);
+      mockCommonService.isValidUserContext.mockReturnValue(false);
+      mockCommonService.checkBadWords.mockResolvedValue('Test comment');
+      mockCommentRepository.create.mockResolvedValue(mockEntity);
+      mockCommonService.sanitizeCommentEntity.mockReturnValue(
+        mockSanitizedEntity
+      );
+
+      await expect(service.create(mockPayload)).rejects.toThrow(
+        PluginError
+      );
     });
 
     it('should throw error when relation does not exist', async () => {
