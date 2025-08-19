@@ -13,6 +13,11 @@ describe('Parser', () => {
           related: undefined,
         },
         populate: {
+          reports: {
+            where: {
+              resolved: false,
+            },
+          },
           threadOf: {
             populate: {
               authorUser: true,
@@ -65,6 +70,11 @@ describe('Parser', () => {
           related: undefined,
         },
         populate: {
+          reports: {
+            where: {
+              resolved: false,
+            },
+          },
           threadOf: {
             populate: {
               authorUser: true,
@@ -87,6 +97,11 @@ describe('Parser', () => {
       expect(result.populate).toEqual({
         authorUser: true,
         comments: true,
+        reports: {
+          where: {
+            resolved: false,
+          },
+        },
         threadOf: {
           populate: {
             authorUser: true,
@@ -112,6 +127,11 @@ describe('Parser', () => {
           related: 'some-relation',
         },
         populate: {
+          reports: {
+            where: {
+              resolved: false,
+            },
+          },
           threadOf: {
             populate: {
               authorUser: true,
@@ -124,6 +144,7 @@ describe('Parser', () => {
     it('should handle complex populate configuration', () => {
       const input = {
         populate: {
+          reports: { populate: true },
           author: { populate: true },
           comments: { populate: true },
           reactions: true,
@@ -133,11 +154,13 @@ describe('Parser', () => {
       const result = flatInput(input);
 
       expect(result.populate).toEqual({
+        reports: { populate: true },
         authorUser: { populate: true },
         comments: { populate: true },
         reactions: true,
         threadOf: {
           populate: {
+            reports: { populate: true },
             authorUser: { populate: true },
             comments: { populate: true },
             reactions: true,
@@ -173,6 +196,11 @@ describe('Parser', () => {
           related: undefined,
         },
         populate: {
+          reports: {
+            where: {
+              resolved: false,
+            },
+          },
           threadOf: {
             populate: {
               authorUser: true,
@@ -207,6 +235,11 @@ describe('Parser', () => {
           related: undefined,
         },
         populate: {
+          reports: {
+            where: {
+              resolved: false,
+            },
+          },
           threadOf: {
             populate: {
               authorUser: true,
@@ -247,6 +280,11 @@ describe('Parser', () => {
           related: undefined,
         },
         populate: {
+          reports: {
+            where: {
+              resolved: false,
+            },
+          },
           threadOf: {
             populate: {
               authorUser: true,

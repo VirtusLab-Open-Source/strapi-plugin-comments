@@ -1,3 +1,4 @@
+import { PopulateSchema } from '../../validators/api/controllers/client.controller.validator';
 import { client } from '../../validators/api';
 import { omit as omitLodash } from 'lodash';
 
@@ -38,7 +39,12 @@ export const flatInput = <T extends FlatInputParams>(payload: T): T => {
   );
   const hasRemoved = filters.$or?.some((item) => item.removed);
 
-  let basePopulate = {
+  let basePopulate: PopulateSchema = {
+    reports: {
+      where: {
+        resolved: false,
+      },
+    },
     ...populate,
   };
 
@@ -58,6 +64,11 @@ export const flatInput = <T extends FlatInputParams>(payload: T): T => {
   if ('author' in populate) {
     const { author, ...restPopulate } = populate;
     basePopulate = {
+      reports: {
+        where: {
+          resolved: false,
+        },
+      },
       ...restPopulate,
       authorUser: author,
     };

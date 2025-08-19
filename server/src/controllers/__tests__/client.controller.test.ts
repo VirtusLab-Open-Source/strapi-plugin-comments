@@ -123,6 +123,11 @@ describe('Client controller', () => {
       expect(mockCommonService.findAllFlat).toHaveBeenCalledWith({
         ...validatedData,
         populate: {
+          reports: {
+            where: {
+              resolved: false,
+            },
+          },
           threadOf: {
             populate: {
               authorUser: true
@@ -167,6 +172,11 @@ describe('Client controller', () => {
       expect(mockCommonService.findAllInHierarchy).toHaveBeenCalledWith({
         ...validatedData,
         populate: {
+          reports: {
+            where: {
+              resolved: false,
+            },
+          },
           threadOf: {
             populate: {
               authorUser: true
@@ -205,6 +215,11 @@ describe('Client controller', () => {
       expect(mockCommonService.findAllPerAuthor).toHaveBeenCalledWith({
         ...validatedData,
         populate: {
+          reports: {
+            where: {
+              resolved: false,
+            },
+          },
           threadOf: {
             populate: {
               authorUser: true
@@ -237,6 +252,11 @@ describe('Client controller', () => {
       expect(mockCommonService.findAllPerAuthor).toHaveBeenCalledWith({
         ...validatedData,
         populate: {
+          reports: {
+            where: {
+              resolved: false,
+            },
+          },
           threadOf: {
             populate: {
               authorUser: true
