@@ -54,6 +54,21 @@ const paginationSchema = z.object({
   }).optional(),
 });
 
+// TODO when Strapi will use zod v4 we can change it to the z.stringbool()
+const populateSchema = z
+  .record(z.union([
+    z.union([
+      z.boolean(),
+      z.literal("true").transform(() => true),
+      z.literal("false").transform(() => false),
+      z.literal("*")
+    ]),
+    z.record(z.any()),
+  ]))
+  .optional()
+
+export type PopulateSchema = z.infer<typeof populateSchema>;
+
 const getBaseFindSchema = (enabledCollections: string[]) => {
   //   $or: [{ approvalStatus: "APPROVED" }, { isAdminComment: true }],
   const filters = getFiltersOperators({
@@ -84,9 +99,7 @@ const getBaseFindSchema = (enabledCollections: string[]) => {
         )
         .optional(),
       isAdmin: z.boolean().optional().default(false),
-      populate: z
-        .record(z.union([z.boolean(), z.object({ populate: z.boolean() })]))
-        .optional(),
+      populate: populateSchema,
       limit: stringToNumberValidator.optional(),
       skip: stringToNumberValidator.optional(),
       locale: z.string().optional(),
