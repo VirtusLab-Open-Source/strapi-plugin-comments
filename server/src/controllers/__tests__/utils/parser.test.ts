@@ -20,7 +20,12 @@ describe('Parser', () => {
           },
           threadOf: {
             populate: {
-              authorUser: true,
+              authorUser: {
+                populate: true,
+                avatar: {
+                  populate: true,
+                }
+              },
             },
           },
         },
@@ -77,7 +82,10 @@ describe('Parser', () => {
           },
           threadOf: {
             populate: {
-              authorUser: true,
+              authorUser: {
+                populate: true,
+                avatar: { populate: true },
+              },
             },
           },
         },
@@ -134,7 +142,10 @@ describe('Parser', () => {
           },
           threadOf: {
             populate: {
-              authorUser: true,
+              authorUser: {
+                populate: true,
+                avatar: { populate: true },
+              },
             },
           },
         },
@@ -203,7 +214,10 @@ describe('Parser', () => {
           },
           threadOf: {
             populate: {
-              authorUser: true,
+              authorUser: {
+                populate: true,
+                avatar: { populate: true },
+              },
             },
           },
         },
@@ -242,7 +256,10 @@ describe('Parser', () => {
           },
           threadOf: {
             populate: {
-              authorUser: true,
+              authorUser: {
+                populate: true,
+                avatar: { populate: true },
+              },
             },
           },
         },
@@ -287,7 +304,10 @@ describe('Parser', () => {
           },
           threadOf: {
             populate: {
-              authorUser: true,
+              authorUser: {
+                populate: true,
+                avatar: { populate: true },
+              },
             },
           },
         },
