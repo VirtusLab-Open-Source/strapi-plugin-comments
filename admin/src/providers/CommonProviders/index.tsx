@@ -13,11 +13,11 @@ const queryClient = new QueryClient({
   },
 });
 export const CommonProviders: FC<{ children: ReactNode }> = ({ children }) => {
+  const { theme } = usePluginTheme();
 
-  const theme = usePluginTheme();
   return (
     <QueryClientProvider client={queryClient}>
-      <DesignSystemProvider theme={{ theme }}>
+      <DesignSystemProvider theme={theme}>
         <UserProvider>
           {children}
         </UserProvider>
