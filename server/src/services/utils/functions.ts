@@ -13,45 +13,6 @@ interface StrapiAuthorUser {
   [key: string]: unknown;
 }
 
-export const buildNestedStructure = (
-  entities: Array<Comment | CommentWithRelated>,
-  id: Id | null = null,
-  field: string = 'threadOf',
-  dropBlockedThreads = false,
-  blockNestedThreads = false,
-): Array<Comment> =>
-  entities
-  .filter((entity: Comment) => {
-    const entityField: any = get(entity, field);
-    if (entityField === null && id === null) {
-      return true;
-    }
-    let data = entityField;
-    if (data && typeof id === 'string') {
-      data = data.toString();
-    }
-    return (
-      (data && data == id) ||
-      (isObject(entityField) && (entityField as any).id === id)
-    );
-  })
-  .map((entity: Comment) => ({
-    ...entity,
-    [field]: undefined,
-    related: undefined,
-    blockedThread: blockNestedThreads || entity.blockedThread,
-    children:
-      entity.blockedThread && dropBlockedThreads
-        ? []
-        : buildNestedStructure(
-          entities,
-          entity.id,
-          field,
-          dropBlockedThreads,
-          entity.blockedThread,
-        ),
-  }));
-
 export const getRelatedGroups = (related: string): Array<string> =>
   related.split(REGEX.relatedUid).filter((s) => s && s.length > 0);
 
