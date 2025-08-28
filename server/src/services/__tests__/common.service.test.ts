@@ -156,7 +156,9 @@ describe('common.service', () => {
         where: { id: 1 },
         populate: {
           reports: true,
-          authorUser: true,
+          authorUser: {
+            populate: ['avatar'],
+          },
         },
       });
     });
@@ -219,6 +221,38 @@ describe('common.service', () => {
         fields: ['id', 'content'],
         limit: 10,
         skip: 0,
+      });
+
+      expect(result.data).toHaveLength(2);
+      expect(mockCommentRepository.findWithCount).toHaveBeenCalled();
+    });
+    it('should return flat list of comments with populated user properties', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComments = [
+        { id: 1, content: 'Comment 1', avatar: { url: 'avatar2.png' } },
+        { id: 2, content: 'Comment 2', avatar: { url: 'avatar2.png' } },
+      ];
+
+      mockCommentRepository.findWithCount.mockResolvedValue({
+        results: mockComments,
+        pagination: { total: 2 },
+      });
+      caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
+      
+      mockStoreRepository.getConfig.mockResolvedValue([]);
+
+      const result = await service.findAllFlat({
+        fields: ['id', 'content'],
+        limit: 10,
+        skip: 0,
+        populate: {
+          authorUser: {
+            avatar: {
+              populate: true
+            }
+          }
+        }
       });
 
       expect(result.data).toHaveLength(2);
@@ -516,7 +550,12 @@ describe('common.service', () => {
       expect(mockCommentRepository.findWithCount).toHaveBeenCalledWith({
         pageSize: 10, 
         page: 1,
-        populate: { authorUser: true }, 
+        populate: { 
+          authorUser: {
+            populate: true,
+            avatar: { populate: true },
+          }, 
+        }, 
         select: ["id", "content", "related"],
         orderBy: { createdAt: "desc" },
         where: { authorId: 1 }
@@ -563,7 +602,10 @@ describe('common.service', () => {
         select: ['id', 'content', 'related'],
         orderBy: { createdAt: 'desc' },
         populate: {
-          authorUser: true,
+          authorUser: {
+            populate: true,
+            avatar: { populate: true },
+          },
         },
       });
     });

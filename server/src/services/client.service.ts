@@ -20,17 +20,8 @@ export const clientService = ({ strapi }: StrapiContext) => {
     user?: AdminUser
   ) => {
     if (user) {
-      const dbUser = await strapi
-        .query('plugin::users-permissions.user')
-        .findOne({
-          where: { id: user.id },
-          populate: ['avatar'],
-        });
       return {
-        authorId: user.id,
-        authorName: user.username,
-        authorEmail: user.email,
-        authorAvatar: dbUser?.avatar?.url || null,
+        authorUser: user.id,
       };
     } else if (author) {
       return {
@@ -79,7 +70,8 @@ export const clientService = ({ strapi }: StrapiContext) => {
         this.getCommonService().checkBadWords(content),
         createAuthor(author, user),
       ]);
-      const authorNotProperlyProvided = !isEmpty(authorData) && !(authorData.authorId);
+      const authorNotProperlyProvided = !isEmpty(authorData) && !(authorData.authorId || authorData.authorUser);
+
       if (isEmpty(authorData) || authorNotProperlyProvided) {
         throw new PluginError(400, 'Not able to recognise author of a comment. Make sure you\'ve provided "author" property in a payload or authenticated your request properly.');
       }
@@ -97,6 +89,9 @@ export const clientService = ({ strapi }: StrapiContext) => {
           approvalStatus: isApprovalFlowEnabled
             ? APPROVAL_STATUS.PENDING
             : APPROVAL_STATUS.APPROVED,
+        },
+        populate: {
+          authorUser: { populate: ['avatar'] },
         },
       });
       const entity: Comment = {
@@ -127,7 +122,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
           const entity = await getCommentRepository(strapi).update({
             where: { id: commentId },
             data: { content },
-            populate: { threadOf: true, authorUser: true },
+            populate: { threadOf: true, authorUser: { populate: ['avatar'] }, },
           });
           return this.getCommonService().sanitizeCommentEntity(entity, blockedAuthorProps);
         }
@@ -221,7 +216,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
               related: relation,
             },
             data: { removed: true },
-            populate: { threadOf: true, authorUser: true },
+            populate: { threadOf: true, authorUser: { populate: ['avatar'] }, },
           });
 
           await this.markAsRemovedNested(commentId, true);

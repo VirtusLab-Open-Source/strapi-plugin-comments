@@ -5,11 +5,24 @@ import { REGEX } from '../../utils/constants';
 import PluginError from '../../utils/error';
 import { Comment, CommentWithRelated } from '../../validators/repositories';
 
+type Avatar = {
+  url: string;
+  name: string;
+  hash: string;
+}
+
 interface StrapiAuthorUser {
   id: Id;
   username: string;
   email: string;
-  avatar?: string | object;
+  avatar?: Avatar & {
+    formats: {
+      thumbnail?: Avatar;
+      small?: Avatar;
+      medium?: Avatar;
+      large?: Avatar;
+    }
+  };
   [key: string]: unknown;
 }
 
@@ -50,7 +63,7 @@ export const buildAuthorModel = (
         id: user.id,
         name: user.username,
         email: user.email,
-        avatar: user.avatar,
+        avatar: user.avatar?.formats?.thumbnail.url || user.avatar?.url,
       },
     );
   } else if (authorId) {

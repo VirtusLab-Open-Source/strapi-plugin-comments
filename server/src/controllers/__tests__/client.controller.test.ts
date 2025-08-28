@@ -130,7 +130,10 @@ describe('Client controller', () => {
           },
           threadOf: {
             populate: {
-              authorUser: true
+              authorUser: {
+                populate: true,
+                avatar: { populate: true },
+              },
             }
           }
         }
@@ -179,7 +182,10 @@ describe('Client controller', () => {
           },
           threadOf: {
             populate: {
-              authorUser: true
+              authorUser: {
+                populate: true,
+                avatar: { populate: true },
+              },
             }
           }
         }
@@ -222,7 +228,10 @@ describe('Client controller', () => {
           },
           threadOf: {
             populate: {
-              authorUser: true
+              authorUser: {
+                populate: true,
+                avatar: { populate: true },
+              },
             }
           }
         }
@@ -259,7 +268,10 @@ describe('Client controller', () => {
           },
           threadOf: {
             populate: {
-              authorUser: true
+              authorUser: {
+                populate: true,
+                avatar: { populate: true },
+              },
             }
           }
         }
