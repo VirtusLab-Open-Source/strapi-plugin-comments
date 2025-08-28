@@ -21,7 +21,7 @@ import PluginError from '../utils/PluginError';
 import { client as clientValidator } from '../validators/api';
 import { Comment, CommentRelated, CommentWithRelated } from '../validators/repositories';
 import { Pagination } from '../validators/repositories/utils';
-import { buildAuthorModel, buildNestedStructure, filterOurResolvedReports, getRelatedGroups } from './utils/functions';
+import { buildAuthorModel, filterOurResolvedReports, getRelatedGroups } from './utils/functions';
 
 
 const PAGE_SIZE = 10;
@@ -32,7 +32,6 @@ type ParsedRelation = {
   uid: UID.ContentType;
   relatedId: string;
 };
-
 
 type Created = PathTo<CommentsPluginConfig>;
 
@@ -71,18 +70,24 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
 
   // Find comments in the flat structure
-  async findAllFlat({
-    fields,
-    limit,
-    skip,
-    sort,
-    populate,
-    omit: baseOmit = [],
-    isAdmin = false,
-    pagination,
-    filters = {},
-    locale,
-  }: clientValidator.FindAllFlatSchema, relatedEntity?: any): Promise<{ data: Array<CommentWithRelated | Comment>, pagination?: Pagination }> {
+  async findAllFlat(
+    {
+      fields,
+      limit,
+      skip,
+      sort,
+      populate,
+      omit: baseOmit = [],
+      isAdmin = false,
+      pagination,
+      filters = {},
+      locale,
+    }: clientValidator.FindAllFlatSchema,
+    relatedEntity?: any,
+  ): Promise<{
+    data: Array<CommentWithRelated | Comment>;
+    pagination?: Pagination;
+  }> {
     const omit = baseOmit.filter((field) => !REQUIRED_FIELDS.includes(field));
     const defaultSelect = (['id', 'related'] as const).filter((field) => !omit.includes(field));
 
@@ -160,6 +165,81 @@ const commonService = ({ strapi }: StrapiContext) => ({
     };
   },
 
+  async getCommentsChildren(
+    {
+      filters,
+      populate,
+      sort,
+      fields,
+      isAdmin = false,
+      omit = [],
+      locale,
+      limit,
+    }: clientValidator.FindAllInHierarchyValidatorSchema,
+    entry: Comment | CommentWithRelated,
+    relatedEntity?: any,
+    dropBlockedThreads = false,
+    blockNestedThreads = false,
+  ) {
+    if (!entry.gotThread) {
+      return {
+        ...entry,
+        threadOf: undefined,
+        related: undefined,
+        blockedThread: blockNestedThreads || entry.blockedThread,
+        children: [],
+      };
+    }
+
+    const children = await this.findAllFlat(
+      {
+        filters: {
+          threadOf: { $eq: entry.id.toString() },
+          ...filters,
+        },
+        populate,
+        sort,
+        fields,
+        isAdmin,
+        omit,
+        locale,
+        limit: Infinity,
+      },
+      relatedEntity,
+    );
+
+    const allChildren =
+      entry.blockedThread && dropBlockedThreads
+        ? []
+        : await Promise.all(
+            children.data.map((child) =>
+              this.getCommentsChildren(
+                {
+                  filters,
+                  populate,
+                  sort,
+                  fields,
+                  isAdmin,
+                  omit,
+                  locale,
+                  limit,
+                },
+                child,
+                relatedEntity,
+                dropBlockedThreads,
+              ),
+            ),
+          );
+
+    return {
+      ...entry,
+      threadOf: undefined,
+      related: undefined,
+      blockedThread: blockNestedThreads || entry.blockedThread,
+      children: allChildren,
+    };
+  },
+
   // Find comments and create relations tree structure
   async findAllInHierarchy(
     {
@@ -173,17 +253,51 @@ const commonService = ({ strapi }: StrapiContext) => ({
       omit = [],
       locale,
       limit,
+      pagination,
     }: clientValidator.FindAllInHierarchyValidatorSchema,
     relatedEntity?: any,
   ) {
-    const entities = await this.findAllFlat({ filters, populate, sort, fields, isAdmin, omit, locale, limit }, relatedEntity);
-    return buildNestedStructure(
-      entities?.data,
-      startingFromId,
-      'threadOf',
-      dropBlockedThreads,
-      false,
+    const rootEntries = await this.findAllFlat(
+      {
+        filters: {
+          threadOf: startingFromId
+            ? { $eq: startingFromId.toString() }
+            : { $null: true },
+          ...filters,
+        },
+        pagination,
+        populate,
+        sort,
+        fields,
+        isAdmin,
+        omit,
+        locale,
+        limit,
+      },
+      relatedEntity,
     );
+
+    const rootEntriesWithChildren = await Promise.all(
+      rootEntries?.data.map((entry) =>
+        this.getCommentsChildren(
+          {
+            filters,
+            populate,
+            sort,
+            fields,
+            isAdmin,
+            omit,
+            locale,
+            limit,
+          },
+          entry,
+          relatedEntity,
+          dropBlockedThreads,
+        ),
+      ),
+    );
+
+    return rootEntriesWithChildren;
   },
 
   // Find single comment
@@ -340,7 +454,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
       if (content && isProfane({ testString: content })) {
         throw new PluginError(
           400,
-          'Bad language used! Please polite your comment...',
+          "Bad language used! Please polite your comment...",
           {
             content: {
               original: content,

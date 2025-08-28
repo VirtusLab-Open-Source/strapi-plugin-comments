@@ -68,7 +68,7 @@ export const filtersValidator = z.union([
   endWithValidators,
   containsValidators,
   notContainsValidators,
-  z.object({ $null: z.string().min(1) }),
+  z.object({ $null: z.boolean() }),
   z.object({ $notNull: z.boolean() }),
 ]);
 

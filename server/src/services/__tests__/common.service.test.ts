@@ -284,17 +284,21 @@ describe('common.service', () => {
       const strapi = getStrapi();
       const service = getService(strapi);
       const mockComments = [
-        { id: 1, content: 'Parent 1', threadOf: null },
-        { id: 2, content: 'Child 1', threadOf: 1 },
-        { id: 3, content: 'Child 2', threadOf: 1 },
-        { id: 4, content: 'Grandchild 1', threadOf: 2 },
+        { id: 1, content: "Parent 1", threadOf: null },
+        { id: 2, content: "Child 1", threadOf: "1" },
+        { id: 3, content: "Child 2", threadOf: "1" },
+        { id: 4, content: "Grandchild 1", threadOf: "2" },
       ];
 
       mockCommentRepository.findMany.mockResolvedValue(mockComments);
       caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
-      mockCommentRepository.findWithCount.mockResolvedValue({
-        results: mockComments,
-        pagination: { total: 4 },
+      mockCommentRepository.findWithCount.mockImplementation(async (args) => {
+        const threadOf = args?.where?.threadOf?.$eq ?? null;
+        const filtered = mockComments.filter((c) => c.threadOf === threadOf);
+        return {
+          results: filtered,
+          pagination: { total: filtered.length },
+        };
       });
       mockStoreRepository.getConfig.mockResolvedValue([]);
 
@@ -334,18 +338,25 @@ describe('common.service', () => {
       const strapi = getStrapi();
       const service = getService(strapi);
       const mockComments = [
-        { id: 2, content: 'Child 1', threadOf: 1 },
-        { id: 3, content: 'Child 2', threadOf: 1 },
-        { id: 4, content: 'Grandchild 1', threadOf: 2 },
-        { id: 5, content: 'Grandchild 2', threadOf: 2 },
-        { id: 6, content: 'Grandchild 3', threadOf: 4 },
+        { id: 2, content: "Child 1", threadOf: "1" },
+        { id: 3, content: "Child 2", threadOf: "1" },
+        { id: 4, content: "Grandchild 1", threadOf: "2" },
+        { id: 5, content: "Grandchild 2", threadOf: "2" },
+        { id: 6, content: "Grandchild 3", threadOf: "4" },
       ];
 
       mockCommentRepository.findMany.mockResolvedValue(mockComments);
       caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
-      mockCommentRepository.findWithCount.mockResolvedValue({
-        results: mockComments,
-        pagination: { total: 3 },
+      mockCommentRepository.findWithCount.mockImplementation(async (args) => {
+        const threadOf =
+          args?.where?.threadOf?.$eq ??
+          args?.where?.threadOf.toString() ??
+          null;
+        const filtered = mockComments.filter((c) => c.threadOf === threadOf);
+        return {
+          results: filtered,
+          pagination: { total: filtered.length },
+        };
       });
       mockStoreRepository.getConfig.mockResolvedValue([]);
 
@@ -365,16 +376,20 @@ describe('common.service', () => {
       const service = getService(strapi);
       const mockComments = [
         { id: 1, content: 'Parent 1', threadOf: null, dropBlockedThreads: true, blockedThread: true },
-        { id: 2, content: 'Child 1', threadOf: 1, dropBlockedThreads: false },
-        { id: 3, content: 'Child 2', threadOf: 1, dropBlockedThreads: false },
-        { id: 4, content: 'Grandchild 1', threadOf: 2, dropBlockedThreads: false },
+        { id: 2, content: 'Child 1', threadOf: '1', dropBlockedThreads: false },
+        { id: 3, content: 'Child 2', threadOf: '1', dropBlockedThreads: false },
+        { id: 4, content: 'Grandchild 1', threadOf: '2', dropBlockedThreads: false },
       ];
 
       mockCommentRepository.findMany.mockResolvedValue(mockComments);
       caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
-      mockCommentRepository.findWithCount.mockResolvedValue({
-        results: mockComments,
-        pagination: { total: 4 },
+      mockCommentRepository.findWithCount.mockImplementation(async (args) => {
+        const threadOf = args?.where?.threadOf?.$eq ?? null;
+        const filtered = mockComments.filter((c) => c.threadOf === threadOf);
+        return {
+          results: filtered,
+          pagination: { total: filtered.length },
+        };
       });
       mockStoreRepository.getConfig.mockResolvedValue([]);
 
