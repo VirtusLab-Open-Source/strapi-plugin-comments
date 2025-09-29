@@ -61,6 +61,14 @@ export const CommentRow: FC<Props> = ({ item }) => {
 
   const { name, email, avatar } = item.author || {};
 
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(email);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   return (
     <Tr>
       <Td>
@@ -83,6 +91,11 @@ export const CommentRow: FC<Props> = ({ item }) => {
             <Typography>{name || getMessage('components.author.unknown')}</Typography>
           </Flex>
         </Tooltip>
+      </Td>
+      <Td>
+        <Flex gap={2} onClick={copyEmail} style={{ cursor: 'copy' }}>
+          <Typography>{email || getMessage('components.author.unknown')}</Typography>
+        </Flex>
       </Td>
       <Td maxWidth="200px">
         <Typography ellipsis>{item.content}</Typography>

@@ -52,7 +52,7 @@ export const qOperatorValidator = z.object({
 });
 export const orderByValidator = z.string().regex(
   // TODO: check sort options
-  /^(content|createdAt|updatedAt|id):(desc|asc|ASC|DESC)$/,
+  /^(content|createdAt|updatedAt|id|rating):(desc|asc|ASC|DESC)$/,
   'Invalid orderBy options',
 );
 

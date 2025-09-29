@@ -61,7 +61,7 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
         return [URL_PREFIX, 'moderate', 'all', queryParams ? JSON.stringify(queryParams) : undefined].filter(Boolean) as string[];
       },
       async query(queryParams: Record<string, string>) {
-        const response = await fetch.get(`/${URL_PREFIX}/moderate/all?orderBy=createdAt:desc&${stringify(queryParams, { encode: false })}`);
+        const response = await fetch.get(`/${URL_PREFIX}/moderate/all?${stringify(queryParams, { encode: false })}`);
         return commentsSchema.parseAsync(response.data);
       },
     },

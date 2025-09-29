@@ -11,12 +11,13 @@ import { getMessage } from '../../utils';
 const tableHeaders = [
   { label: "page.discover.table.header.id" },
   { label: "page.discover.table.header.author" },
+  { label: "page.discover.table.header.email" },
   { label: "page.discover.table.header.message", orderBy: "content" },
   { label: "page.discover.table.header.thread" },
   { label: "page.discover.table.header.entry" },
+  { label: "page.discover.table.header.rating", orderBy: "rating" },
   { label: "page.discover.table.header.lastUpdate", orderBy: "updatedAt" },
   { label: "page.discover.table.header.status" },
-  { label: "page.discover.table.header.rating", orderBy: "rating" },
 ];
 
 export const Discover: FC<{ config: Config }> = ({ config }) => {
