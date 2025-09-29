@@ -6,7 +6,7 @@ import { FC } from 'react';
 import { useAPI } from '../../hooks/useAPI';
 import { pluginId } from '../../pluginId';
 import { AllowedActions } from '../../types';
-import { handleAPIError } from '../../utils';
+import { getMessage, handleAPIError } from '../../utils';
 
 export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModerate'], queryKey?: string[] }> = ({ id, canModerate, queryKey }) => {
   const { toggleNotification } = useNotification();
@@ -55,12 +55,12 @@ export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModer
       <>
         <IconButton
           onClick={handleApproveClick}
-          label="Approve"
+            label={getMessage("page.details.actions.comment.reports.approve", "Approve")}
         >
           <Check />
         </IconButton>
         <IconButton
-          label="Reject"
+          label={getMessage("page.details.actions.comment.reports.reject", "Reject")}
           onClick={handleRejectClick}
         >
           <Cross />

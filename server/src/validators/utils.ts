@@ -52,7 +52,7 @@ export const qOperatorValidator = z.object({
 });
 export const orderByValidator = z.string().regex(
   // TODO: check sort options
-  /^(createdAt|updatedAt|id):(desc|asc|ASC|DESC)$/,
+  /^(content|createdAt|updatedAt|id):(desc|asc|ASC|DESC)$/,
   'Invalid orderBy options',
 );
 
@@ -68,7 +68,7 @@ export const filtersValidator = z.union([
   endWithValidators,
   containsValidators,
   notContainsValidators,
-  z.object({ $null: z.string().min(1) }),
+  z.object({ $null: z.boolean() }),
   z.object({ $notNull: z.boolean() }),
 ]);
 

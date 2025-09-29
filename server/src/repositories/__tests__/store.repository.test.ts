@@ -108,12 +108,151 @@ describe('Store repository', () => {
       expect(result.right).toHaveProperty('enabledCollections');
       expect(result.right).toHaveProperty('moderatorRoles');
     });
+
+    describe('reportReasons functionality', () => {
+      it('always reads reportReasons from local config, even when store config exists', async () => {
+        const strapi = getStrapi();
+        const mockConfig = { entryLabel: 'test', approvalFlow: true };
+        mockStore.get.mockResolvedValue(mockConfig);
+
+        const localReportReasons = {
+          BAD_LANGUAGE: 'Inappropriate Language',
+          DISCRIMINATION: 'Discriminatory Content',
+          OTHER: 'Other Reason',
+        };
+
+        caster<jest.Mock>(strapi.config.get).mockImplementation((path) => {
+          if (path === `${PLUGIN_SELECTOR}.reportReasons`)
+            return localReportReasons;
+          return undefined;
+        });
+
+        const result = await getRepository(strapi).get();
+
+        expect(result.right).toEqual({
+          ...mockConfig,
+          reportReasons: localReportReasons, // Always from local config, not from stored config
+          regex: expect.any(Object),
+        });
+      });
+
+      it('reads reportReasons from local config when store config does not exist', async () => {
+        const strapi = getStrapi();
+        mockStore.get.mockResolvedValue(null);
+
+        const localReportReasons = {
+          BAD_LANGUAGE: 'Inappropriate Language',
+          DISCRIMINATION: 'Discriminatory Content',
+          OTHER: 'Other Reason',
+        };
+
+        caster<jest.Mock>(strapi.config.get).mockImplementation((path) => {
+          if (path === `${PLUGIN_SELECTOR}.entryLabel`) return 'local-label';
+          if (path === `${PLUGIN_SELECTOR}.approvalFlow`) return true;
+          if (path === `${PLUGIN_SELECTOR}.reportReasons`)
+            return localReportReasons;
+          return undefined;
+        });
+
+        const result = await getRepository(strapi).get();
+
+        expect(result.right).toEqual({
+          entryLabel: 'local-label',
+          approvalFlow: true,
+          blockedAuthorProps: undefined,
+          reportReasons: localReportReasons,
+          regex: expect.any(Object),
+        });
+      });
+
+      it('handles undefined reportReasons from local config', async () => {
+        const strapi = getStrapi();
+        const mockConfig = { entryLabel: 'test', approvalFlow: true };
+        mockStore.get.mockResolvedValue(mockConfig);
+
+        caster<jest.Mock>(strapi.config.get).mockImplementation((path) => {
+          if (path === `${PLUGIN_SELECTOR}.reportReasons`) return undefined;
+          return undefined;
+        });
+
+        const result = await getRepository(strapi).get();
+
+        expect(result.right).toEqual({
+          ...mockConfig,
+          reportReasons: undefined,
+          regex: expect.any(Object),
+        });
+      });
+
+      it('includes reportReasons when viaSettingsPage is true', async () => {
+        const strapi = getStrapi();
+        mockStore.get.mockResolvedValue(null);
+        caster<jest.Mock>(strapi.plugin).mockReturnValue(true);
+
+        const localReportReasons = {
+          BAD_LANGUAGE: 'Inappropriate Language',
+          DISCRIMINATION: 'Discriminatory Content',
+          OTHER: 'Other Reason',
+        };
+
+        caster<jest.Mock>(strapi.config.get).mockImplementation((path) => {
+          if (path === `${PLUGIN_SELECTOR}.entryLabel`) return 'local-label';
+          if (path === `${PLUGIN_SELECTOR}.approvalFlow`) return true;
+          if (path === `${PLUGIN_SELECTOR}.reportReasons`)
+            return localReportReasons;
+          if (path === `${PLUGIN_SELECTOR}.enabledCollections`)
+            return ['api::article.article'];
+          if (path === `${PLUGIN_SELECTOR}.moderatorRoles`)
+            return ['authenticated'];
+          return undefined;
+        });
+
+        const result = await getRepository(strapi).get(true);
+
+        expect(result.right).toEqual({
+          entryLabel: 'local-label',
+          approvalFlow: true,
+          blockedAuthorProps: undefined,
+          reportReasons: localReportReasons,
+          enabledCollections: ['api::article.article'],
+          moderatorRoles: ['authenticated'],
+          isGQLPluginEnabled: true,
+          regex: expect.any(Object),
+        });
+      });
+    });
   });
 
   describe('update', () => {
     it('updates config in store', async () => {
       const strapi = getStrapi();
       const newConfig = { entryLabel: { test: ['test'] } };
+
+      await getRepository(strapi).update(newConfig);
+
+      expect(mockStore.set).toHaveBeenCalledWith({
+        key: 'config',
+        value: {
+          ...newConfig,
+          reportReasons: {
+            BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
+            DISCRIMINATION: REPORT_REASON.DISCRIMINATION,
+            OTHER: REPORT_REASON.OTHER,
+          },
+        },
+      });
+    });
+
+    it('always sets default reportReasons when updating config', async () => {
+      const strapi = getStrapi();
+      const newConfig = {
+        entryLabel: { test: ['test'] },
+        reportReasons: {
+          BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
+          DISCRIMINATION: REPORT_REASON.DISCRIMINATION,
+          OTHER: REPORT_REASON.OTHER,
+        },
+      } as any;
 
       await getRepository(strapi).update(newConfig);
 

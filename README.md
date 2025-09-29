@@ -110,7 +110,8 @@ In our minimum support we're following [official Node.js releases timelines](htt
 > This plugin is designed for **Strapi v5**. To get support for other Strapi versions, please follow the [versions](#-versions) section.
 
 **Plugin dependencies**
-- `@strapi/plugin-graphql` - required to run GraphQL handled by this plugin 
+
+- `@strapi/plugin-graphql` - required to run GraphQL handled by this plugin
 
 **We recommend always using the latest version of Strapi to start your new projects**.
 
@@ -134,7 +135,7 @@ On the dedicated page, you will be able to set up all crucial properties which d
 To setup amend default plugin configuration we recommend to put following snippet as part of `config/plugins.{js|ts}` or `config/<env>/plugins.{js|ts}` file. If the file does not exist yet, you have to create it manually. If you've got already configurations for other plugins stores by this way, use just the `comments` part within exising `plugins` item.
 
 ```ts
-  module.exports = ({ env }) => ({
+module.exports = ({ env }) => ({
   //...
   comments: {
     enabled: true,
@@ -289,6 +290,7 @@ Return a hierarchical tree structure of comments for specified instance of Conte
 
 - [field selection](https://docs.strapi.io/dev-docs/api/rest/populate-select#field-selection)
 - [sorting](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
+- [pagination](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#pagination)
 
 ### Get Comments (flat structure)
 
@@ -418,6 +420,23 @@ _Strapi user_
 {
   "content": "My sample response",
   "threadOf": 2 // id of comment we would like to start / continue the thread (Optional)
+}
+```
+
+_Multi-language entities_
+
+> When posting comments to entities with multiple locales, you must provide the `locale` field in the payload to match the entity's locale:
+
+```json
+{
+  "author": {
+    "id": 518,
+    "name": "Author",
+    "email": "author@example.com",
+    "avatar": "<Link to avatar file>"
+  },
+  "content": "Test",
+  "locale": "fr" // Locale must be the same as the provided entity
 }
 ```
 
@@ -649,7 +668,7 @@ query {
           "id": "123456",
           "name": "Joe Doe"
         }
-      },
+      }
       // ...
     ]
   }
@@ -920,34 +939,32 @@ Lifecycle hooks can be register either in `register()` or `bootstrap()` methods 
 
 Listeners can by sync and `async`.
 
->Be aware that lifecycle hooks registered in `register()` may be fired by plugin's bootstrapping. If you want listen to events triggered after server's startup use `bootstrap()`.
+> Be aware that lifecycle hooks registered in `register()` may be fired by plugin's bootstrapping. If you want listen to events triggered after server's startup use `bootstrap()`.
 
 Example:
 
 ```ts
-  const commentsCommonService = strapi
-    .plugin("comments")
-    .service("common");
+const commentsCommonService = strapi.plugin("comments").service("common");
 
-  commentsCommonService.registerLifecycleHook({
-    callback: async ({ action, result }) => {
-      const saveResult = await logIntoSystem(action, result);
+commentsCommonService.registerLifecycleHook({
+  callback: async ({ action, result }) => {
+    const saveResult = await logIntoSystem(action, result);
 
-      console.log(saveResult);
-    },
-    contentTypeName: "comment",
-    hookName: "afterCreate",
-  });
+    console.log(saveResult);
+  },
+  contentTypeName: "comment",
+  hookName: "afterCreate",
+});
 
-  commentsCommonService.registerLifecycleHook({
-    callback: async ({ action, result }) => {
-      const saveResult = await logIntoSystem(action, result);
+commentsCommonService.registerLifecycleHook({
+  callback: async ({ action, result }) => {
+    const saveResult = await logIntoSystem(action, result);
 
-      console.log(saveResult);
-    },
-    contentTypeName: "report",
-    hookName: "afterCreate",
-  });
+    console.log(saveResult);
+  },
+  contentTypeName: "report",
+  hookName: "afterCreate",
+});
 ```
 
 ## 💬 FAQ
@@ -960,13 +977,12 @@ Example:
 
 ```ts
 module.exports = {
-  'comments': { enabled: true },
-  'graphql': { enabled: true },
+  comments: { enabled: true },
+  graphql: { enabled: true },
 };
 ```
 
 If you already got it, make sure that `comments` plugin is inserted before `graphql`. That should do the job.
-
 
 ## 🤝 Contributing to the plugin
 

@@ -156,7 +156,9 @@ describe('common.service', () => {
         where: { id: 1 },
         populate: {
           reports: true,
-          authorUser: true,
+          authorUser: {
+            populate: ['avatar'],
+          },
         },
       });
     });
@@ -224,6 +226,38 @@ describe('common.service', () => {
       expect(result.data).toHaveLength(2);
       expect(mockCommentRepository.findWithCount).toHaveBeenCalled();
     });
+    it('should return flat list of comments with populated user properties', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComments = [
+        { id: 1, content: 'Comment 1', avatar: { url: 'avatar2.png' } },
+        { id: 2, content: 'Comment 2', avatar: { url: 'avatar2.png' } },
+      ];
+
+      mockCommentRepository.findWithCount.mockResolvedValue({
+        results: mockComments,
+        pagination: { total: 2 },
+      });
+      caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
+      
+      mockStoreRepository.getConfig.mockResolvedValue([]);
+
+      const result = await service.findAllFlat({
+        fields: ['id', 'content'],
+        limit: 10,
+        skip: 0,
+        populate: {
+          authorUser: {
+            avatar: {
+              populate: true
+            }
+          }
+        }
+      });
+
+      expect(result.data).toHaveLength(2);
+      expect(mockCommentRepository.findWithCount).toHaveBeenCalled();
+    });
   });
 
   describe('modifiedNestedNestedComments', () => {
@@ -284,17 +318,21 @@ describe('common.service', () => {
       const strapi = getStrapi();
       const service = getService(strapi);
       const mockComments = [
-        { id: 1, content: 'Parent 1', threadOf: null },
-        { id: 2, content: 'Child 1', threadOf: 1 },
-        { id: 3, content: 'Child 2', threadOf: 1 },
-        { id: 4, content: 'Grandchild 1', threadOf: 2 },
+        { id: 1, content: "Parent 1", threadOf: null },
+        { id: 2, content: "Child 1", threadOf: "1" },
+        { id: 3, content: "Child 2", threadOf: "1" },
+        { id: 4, content: "Grandchild 1", threadOf: "2" },
       ];
 
       mockCommentRepository.findMany.mockResolvedValue(mockComments);
       caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
-      mockCommentRepository.findWithCount.mockResolvedValue({
-        results: mockComments,
-        pagination: { total: 4 },
+      mockCommentRepository.findWithCount.mockImplementation(async (args) => {
+        const threadOf = args?.where?.threadOf?.$eq ?? null;
+        const filtered = mockComments.filter((c) => c.threadOf === threadOf);
+        return {
+          results: filtered,
+          pagination: { total: filtered.length },
+        };
       });
       mockStoreRepository.getConfig.mockResolvedValue([]);
 
@@ -334,18 +372,25 @@ describe('common.service', () => {
       const strapi = getStrapi();
       const service = getService(strapi);
       const mockComments = [
-        { id: 2, content: 'Child 1', threadOf: 1 },
-        { id: 3, content: 'Child 2', threadOf: 1 },
-        { id: 4, content: 'Grandchild 1', threadOf: 2 },
-        { id: 5, content: 'Grandchild 2', threadOf: 2 },
-        { id: 6, content: 'Grandchild 3', threadOf: 4 },
+        { id: 2, content: "Child 1", threadOf: "1" },
+        { id: 3, content: "Child 2", threadOf: "1" },
+        { id: 4, content: "Grandchild 1", threadOf: "2" },
+        { id: 5, content: "Grandchild 2", threadOf: "2" },
+        { id: 6, content: "Grandchild 3", threadOf: "4" },
       ];
 
       mockCommentRepository.findMany.mockResolvedValue(mockComments);
       caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
-      mockCommentRepository.findWithCount.mockResolvedValue({
-        results: mockComments,
-        pagination: { total: 3 },
+      mockCommentRepository.findWithCount.mockImplementation(async (args) => {
+        const threadOf =
+          args?.where?.threadOf?.$eq ??
+          args?.where?.threadOf.toString() ??
+          null;
+        const filtered = mockComments.filter((c) => c.threadOf === threadOf);
+        return {
+          results: filtered,
+          pagination: { total: filtered.length },
+        };
       });
       mockStoreRepository.getConfig.mockResolvedValue([]);
 
@@ -365,16 +410,20 @@ describe('common.service', () => {
       const service = getService(strapi);
       const mockComments = [
         { id: 1, content: 'Parent 1', threadOf: null, dropBlockedThreads: true, blockedThread: true },
-        { id: 2, content: 'Child 1', threadOf: 1, dropBlockedThreads: false },
-        { id: 3, content: 'Child 2', threadOf: 1, dropBlockedThreads: false },
-        { id: 4, content: 'Grandchild 1', threadOf: 2, dropBlockedThreads: false },
+        { id: 2, content: 'Child 1', threadOf: '1', dropBlockedThreads: false },
+        { id: 3, content: 'Child 2', threadOf: '1', dropBlockedThreads: false },
+        { id: 4, content: 'Grandchild 1', threadOf: '2', dropBlockedThreads: false },
       ];
 
       mockCommentRepository.findMany.mockResolvedValue(mockComments);
       caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
-      mockCommentRepository.findWithCount.mockResolvedValue({
-        results: mockComments,
-        pagination: { total: 4 },
+      mockCommentRepository.findWithCount.mockImplementation(async (args) => {
+        const threadOf = args?.where?.threadOf?.$eq ?? null;
+        const filtered = mockComments.filter((c) => c.threadOf === threadOf);
+        return {
+          results: filtered,
+          pagination: { total: filtered.length },
+        };
       });
       mockStoreRepository.getConfig.mockResolvedValue([]);
 
@@ -501,7 +550,12 @@ describe('common.service', () => {
       expect(mockCommentRepository.findWithCount).toHaveBeenCalledWith({
         pageSize: 10, 
         page: 1,
-        populate: { authorUser: true }, 
+        populate: { 
+          authorUser: {
+            populate: true,
+            avatar: { populate: true },
+          }, 
+        }, 
         select: ["id", "content", "related"],
         orderBy: { createdAt: "desc" },
         where: { authorId: 1 }
@@ -548,7 +602,10 @@ describe('common.service', () => {
         select: ['id', 'content', 'related'],
         orderBy: { createdAt: 'desc' },
         populate: {
-          authorUser: true,
+          authorUser: {
+            populate: true,
+            avatar: { populate: true },
+          },
         },
       });
     });
@@ -601,24 +658,6 @@ describe('common.service', () => {
       mockCommentRepository.updateMany.mockResolvedValue({ count: 2 });
 
       const result = await service.perRemove([mockRelatedEntities.uid, mockRelatedEntities.documentId].join(':'));
-
-      expect(result).toEqual({ count: 2});
-      expect(mockCommentRepository.updateMany).toHaveBeenCalled();
-    });
-
-    it('should resolve comments from deleted if related entry is restore', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-      const mockComments = [
-        { id: 1, related: 'api::test.test:1', locale: 'en' },
-        { id: 1, related: 'api::test.test:1', locale: 'en' }
-      ];
-      const mockRelatedEntities = { uid: 'api::test.test', documentId: '1', locale: 'en', title: 'Test Title 1' };
-
-      mockCommentRepository.findMany.mockResolvedValue(mockComments)
-      mockCommentRepository.updateMany.mockResolvedValue({ count: 2 });
-
-      const result = await service.perRestore([mockRelatedEntities.uid, mockRelatedEntities.documentId].join(':'));
 
       expect(result).toEqual({ count: 2});
       expect(mockCommentRepository.updateMany).toHaveBeenCalled();

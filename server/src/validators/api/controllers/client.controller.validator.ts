@@ -56,31 +56,55 @@ const paginationSchema = z.object({
   }).optional(),
 });
 
+// TODO when Strapi will use zod v4 we can change it to the z.stringbool()
+const populateSchema = z
+  .record(z.union([
+    z.union([
+      z.boolean(),
+      z.literal("true").transform(() => true),
+      z.literal("false").transform(() => false),
+      z.literal("*")
+    ]),
+    z.record(z.any()),
+  ]))
+  .optional()
+
+export type PopulateSchema = z.infer<typeof populateSchema>;
+
 const getBaseFindSchema = (enabledCollections: string[]) => {
+  //   $or: [{ approvalStatus: "APPROVED" }, { isAdminComment: true }],
+  const filters = getFiltersOperators({
+    id: true,
+    content: true,
+    authorId: true,
+    authorName: true,
+    authorEmail: true,
+    createdAt: true,
+    updatedAt: true,
+    removed: true,
+    blocked: true,
+    blockedThread: true,
+    approvalStatus: true,
+    isAdminComment: true,
+    threadOf: true,
+    rating: true,
+    lastExperience: true,
+  });
   return z
     .object({
       sort: orderByValidator.optional().nullable().default('createdAt:desc'),
       fields: z.string().array().optional(),
       omit: z.string().array().optional(),
-      filters: getFiltersOperators({
-        id: true,
-        content: true,
-        authorId: true,
-        authorName: true,
-        authorEmail: true,
-        createdAt: true,
-        updatedAt: true,
-        removed: true,
-        blocked: true,
-        blockedThread: true,
-        approvalStatus: true,
-        rating: true,
-        lastExperience: true,
-      }).optional(),
-      isAdmin: z.boolean().optional().default(false),
-      populate: z
-        .record(z.union([z.boolean(), z.object({ populate: z.boolean() })]))
+      filters: filters
+        .merge(
+          z.object({
+            $and: filters.array().min(1).optional(),
+            $or: filters.array().min(1).optional(),
+          })
+        )
         .optional(),
+      isAdmin: z.boolean().optional().default(false),
+      populate: populateSchema,
       limit: stringToNumberValidator.optional(),
       skip: stringToNumberValidator.optional(),
       locale: z.string().optional(),
@@ -111,6 +135,7 @@ export const findAllInHierarchyValidator = (enabledCollections: string[], relati
     skip: true,
     relation: true,
     locale: true,
+    pagination: true,
   })
   .merge(z.object({
     startingFromId: z.number().optional(),

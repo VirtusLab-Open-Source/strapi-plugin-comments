@@ -92,7 +92,7 @@ export const DetailsEntry: FC<DetailsEntryProps> = ({ config, entity, filters, o
             onCheckedChange={handleOnChange}
           >
             {getMessage(
-              "page.details.filters.removed.label",
+              "page.details.filters.removed.visibility",
               "Show removed comments"
             )}
           </Checkbox>

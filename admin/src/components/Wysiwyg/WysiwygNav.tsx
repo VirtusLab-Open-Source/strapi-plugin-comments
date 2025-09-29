@@ -28,6 +28,7 @@ import { EditorFromTextArea } from 'codemirror5';
 import { useIntl } from 'react-intl';
 
 import { IconButtonGroupMargin, MainButtons, MoreButton } from './WysiwygStyles';
+import { getMessage } from '../../utils';
 
 interface WysiwygNavProps {
   disabled?: boolean;
@@ -91,18 +92,18 @@ const WysiwygNav = ({
           </Field.Root>
 
           <MainButtons>
-            <IconButton disabled label="Bold" name="Bold">
+            <IconButton disabled label={getMessage('wysiwyg.bold', "Bold")}  name="Bold">
               <Bold />
             </IconButton>
-            <IconButton disabled label="Italic" name="Italic">
+            <IconButton disabled label={getMessage('wysiwyg.italic', "Italic")} name="Italic">
               <Italic />
             </IconButton>
-            <IconButton disabled label="Underline" name="Underline">
+            <IconButton disabled label={getMessage('wysiwyg.underline', "Underline")} name="Underline">
               <Underline />
             </IconButton>
           </MainButtons>
 
-          <MoreButton disabled label="More">
+          <MoreButton disabled label={getMessage('common.more', "More")}>
             <More />
           </MoreButton>
         </Flex>
@@ -145,19 +146,19 @@ const WysiwygNav = ({
         </Field.Root>
 
         <MainButtons>
-          <IconButton onClick={() => onActionClick('Bold', editorRef)} label="Bold" name="Bold">
+          <IconButton onClick={() => onActionClick('Bold', editorRef)} label={getMessage('wysiwyg.bold', "Bold")} name="Bold">
             <Bold />
           </IconButton>
           <IconButton
             onClick={() => onActionClick('Italic', editorRef)}
-            label="Italic"
+            label={getMessage('wysiwyg.italic', "Italic")}
             name="Italic"
           >
             <Italic />
           </IconButton>
           <IconButton
             onClick={() => onActionClick('Underline', editorRef)}
-            label="Underline"
+            label={getMessage('wysiwyg.underline', "Underline")}
             name="Underline"
           >
             <Underline />
@@ -165,7 +166,7 @@ const WysiwygNav = ({
         </MainButtons>
         <Popover.Root>
           <Popover.Trigger>
-            <MoreButton label="More">
+            <MoreButton label={getMessage('common.more', "More")}>
               <More />
             </MoreButton>
           </Popover.Trigger>
@@ -174,21 +175,21 @@ const WysiwygNav = ({
               <IconButtonGroupMargin>
                 <IconButton
                   onClick={() => onActionClick('Strikethrough', editorRef, handleTogglePopover)}
-                  label="Strikethrough"
+                  label={getMessage('wysiwyg.strikethrough', "Strikethrough")}
                   name="Strikethrough"
                 >
                   <StrikeThrough />
                 </IconButton>
                 <IconButton
                   onClick={() => onActionClick('BulletList', editorRef, handleTogglePopover)}
-                  label="BulletList"
+                  label={getMessage('wysiwyg.bulletList', "BulletList")}
                   name="BulletList"
                 >
                   <BulletList />
                 </IconButton>
                 <IconButton
                   onClick={() => onActionClick('NumberList', editorRef, handleTogglePopover)}
-                  label="NumberList"
+                  label={getMessage('wysiwyg.numberList', "NumberList")}
                   name="NumberList"
                 >
                   <NumberList />
@@ -197,21 +198,21 @@ const WysiwygNav = ({
               <IconButtonGroup>
                 <IconButton
                   onClick={() => onActionClick('Code', editorRef, handleTogglePopover)}
-                  label="Code"
+                  label={getMessage('wysiwyg.code', "Code")}
                   name="Code"
                 >
                   <Code />
                 </IconButton>
                 <IconButton
                   onClick={() => onActionClick('Link', editorRef, handleTogglePopover)}
-                  label="Link"
+                  label={getMessage('wysiwyg.link', "Link")}
                   name="Link"
                 >
                   <Link />
                 </IconButton>
                 <IconButton
                   onClick={() => onActionClick('Quote', editorRef, handleTogglePopover)}
-                  label="Quote"
+                  label={getMessage('wysiwyg.quote', "Quote")}
                   name="Quote"
                 >
                   <Quotes />

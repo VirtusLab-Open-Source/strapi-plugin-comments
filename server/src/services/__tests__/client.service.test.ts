@@ -15,6 +15,19 @@ jest.mock('../../utils/getPluginService', () => ({
   getPluginService: jest.fn(),
 }));
 
+const defaultPopulate = {
+  authorUser: {
+    populate: ['avatar'],
+  },
+};
+
+const defaultThreadOfPopulate = {
+  threadOf: true,
+  authorUser: {
+    populate: ['avatar'],
+  },
+};
+
 describe('client.service', () => {
   const mockCommonService = {
     parseRelationString: jest.fn(),
@@ -38,6 +51,10 @@ describe('client.service', () => {
   const mockUserQuery = jest.fn().mockReturnValue({
     findOne: jest.fn(),
   });
+
+  const mockEmailService = {
+    send: jest.fn(),
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -107,22 +124,16 @@ describe('client.service', () => {
       const result = await service.create(mockPayload, mockUser);
 
       expect(result).toEqual(mockSanitizedEntity);
-      expect(mockUserQuery().findOne).toHaveBeenCalledWith({
-        where: { id: mockUser.id },
-        populate: ['avatar'],
-      });
       expect(mockCommentRepository.create).toHaveBeenCalledWith({
         data: {
-          authorId: mockUser.id,
-          authorEmail: mockUser.email,
-          authorName: mockUser.username,
-          authorAvatar: 'avatar-url',
+          authorUser: mockUser.id,
           content: 'Test comment',
           related: 'api::test.test:1',
           approvalStatus: APPROVAL_STATUS.APPROVED,
           locale: 'en',
           threadOf: null,
         },
+        populate: defaultPopulate,
       });
     });
 
@@ -152,16 +163,14 @@ describe('client.service', () => {
       expect(result).toEqual(mockSanitizedEntity);
       expect(mockCommentRepository.create).toHaveBeenCalledWith({
         data: {
-          authorId: mockUser.id,
-          authorEmail: mockUser.email,
-          authorName: mockUser.username,
-          authorAvatar: 'avatar-url',
+          authorUser: mockUser.id,
           content: 'Test comment',
           related: 'api::test.test:1',
           approvalStatus: APPROVAL_STATUS.PENDING,
           locale: 'en',
           threadOf: null,
         },
+        populate: defaultPopulate,
       });
     });
 
@@ -211,15 +220,16 @@ describe('client.service', () => {
           locale: 'en',
           threadOf: null,
         },
+        populate: defaultPopulate,
       });
     });
 
-    it('should handle user with no avatar properly', async () => {
+    it('should throw error when no user is provided', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
+
       const mockEntity = { id: 1, content: 'Test comment' };
       const mockSanitizedEntity = { id: 1, content: 'Clean comment' };
-      const mockDbUserNoAvatar = { id: 1 }; // User without avatar
 
       mockCommonService.parseRelationString.mockReturnValue({
         uid: 'api::test.test',
@@ -227,30 +237,16 @@ describe('client.service', () => {
       });
       mockFindOne.mockResolvedValue({ id: 1 });
       mockCommonService.getConfig.mockResolvedValue([]);
-      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.isValidUserContext.mockReturnValue(false);
       mockCommonService.checkBadWords.mockResolvedValue('Test comment');
       mockCommentRepository.create.mockResolvedValue(mockEntity);
       mockCommonService.sanitizeCommentEntity.mockReturnValue(
         mockSanitizedEntity
       );
-      mockUserQuery().findOne.mockResolvedValue(mockDbUserNoAvatar);
 
-      const result = await service.create(mockPayload, mockUser);
-
-      expect(result).toEqual(mockSanitizedEntity);
-      expect(mockCommentRepository.create).toHaveBeenCalledWith({
-        data: {
-          authorId: mockUser.id,
-          authorEmail: mockUser.email,
-          authorName: mockUser.username,
-          authorAvatar: null,
-          content: 'Test comment',
-          related: 'api::test.test:1',
-          approvalStatus: APPROVAL_STATUS.APPROVED,
-          locale: 'en',
-          threadOf: null,
-        },
-      });
+      await expect(service.create(mockPayload)).rejects.toThrow(
+        PluginError
+      );
     });
 
     it('should throw error when relation does not exist', async () => {
@@ -299,7 +295,7 @@ describe('client.service', () => {
       expect(mockCommentRepository.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: { content: 'Updated comment' },
-        populate: { threadOf: true, authorUser: true },
+        populate: defaultThreadOfPopulate,
       });
     });
 
@@ -322,7 +318,7 @@ describe('client.service', () => {
       expect(mockCommentRepository.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: { content: 'Updated comment' },
-        populate: { threadOf: true, authorUser: true },
+        populate: defaultThreadOfPopulate,
       });
     });
 
@@ -446,7 +442,7 @@ describe('client.service', () => {
           related: 'api::test.test:1',
         },
         data: { removed: true },
-        populate: { threadOf: true, authorUser: true },
+        populate: defaultThreadOfPopulate,
       });
     });
 

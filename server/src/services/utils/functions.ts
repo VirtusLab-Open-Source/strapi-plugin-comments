@@ -5,52 +5,26 @@ import { REGEX } from '../../utils/constants';
 import PluginError from '../../utils/error';
 import { Comment, CommentWithRelated } from '../../validators/repositories';
 
+type Avatar = {
+  url: string;
+  name: string;
+  hash: string;
+}
+
 interface StrapiAuthorUser {
   id: Id;
   username: string;
   email: string;
-  avatar?: string | object;
+  avatar?: Avatar & {
+    formats: {
+      thumbnail?: Avatar;
+      small?: Avatar;
+      medium?: Avatar;
+      large?: Avatar;
+    }
+  };
   [key: string]: unknown;
 }
-
-export const buildNestedStructure = (
-  entities: Array<Comment | CommentWithRelated>,
-  id: Id | null = null,
-  field: string = 'threadOf',
-  dropBlockedThreads = false,
-  blockNestedThreads = false,
-): Array<Comment> =>
-  entities
-  .filter((entity: Comment) => {
-    const entityField: any = get(entity, field);
-    if (entityField === null && id === null) {
-      return true;
-    }
-    let data = entityField;
-    if (data && typeof id === 'string') {
-      data = data.toString();
-    }
-    return (
-      (data && data == id) ||
-      (isObject(entityField) && (entityField as any).id === id)
-    );
-  })
-  .map((entity: Comment) => ({
-    ...entity,
-    [field]: undefined,
-    related: undefined,
-    blockedThread: blockNestedThreads || entity.blockedThread,
-    children:
-      entity.blockedThread && dropBlockedThreads
-        ? []
-        : buildNestedStructure(
-          entities,
-          entity.id,
-          field,
-          dropBlockedThreads,
-          entity.blockedThread,
-        ),
-  }));
 
 export const getRelatedGroups = (related: string): Array<string> =>
   related.split(REGEX.relatedUid).filter((s) => s && s.length > 0);
@@ -89,7 +63,7 @@ export const buildAuthorModel = (
         id: user.id,
         name: user.username,
         email: user.email,
-        avatar: user.avatar,
+        avatar: user.avatar?.formats?.thumbnail.url || user.avatar?.url,
       },
     );
   } else if (authorId) {

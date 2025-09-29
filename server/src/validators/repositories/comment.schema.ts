@@ -1,5 +1,24 @@
 import { z } from 'zod';
 
+const fileInfoSchema = z.object({
+  url: z.string(),
+  name: z.string(),
+  hash: z.string(),
+});
+
+const avatarSchema = z.object({
+  id: z.number(),
+  ...fileInfoSchema.shape,
+  formats: z
+    .object({
+      thumbnail: fileInfoSchema.optional(),
+      small: fileInfoSchema.optional(),
+      medium: fileInfoSchema.optional(),
+      large: fileInfoSchema.optional(),
+    })
+    .optional(),
+}).nullable().optional();
+
 export const dbBaseCommentSchema = z.object({
   id: z.number(),
   documentId: z.string().nullable(),
@@ -18,7 +37,15 @@ export const dbBaseCommentSchema = z.object({
   authorName: z.string().nullable(),
   authorEmail: z.string().email().nullable(),
   authorAvatar: z.string().nullable(),
-  authorUser: z.union([z.string(), z.object({ id: z.number(), email: z.string().email() })]).optional().nullable(),
+  authorUser: z.union([
+    z.string(), 
+    z.object({ 
+      id: z.number(), 
+      username: z.string(), 
+      email: z.string().email(),
+      avatar: avatarSchema,
+    })
+  ]).optional().nullable(),
   locale: z.string().nullable(),
   rating: z.number().nullable(),
   lastExperience: z.string().nullable(),

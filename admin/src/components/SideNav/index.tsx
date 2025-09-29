@@ -1,20 +1,21 @@
 import { SubNav, SubNavHeader, SubNavLink, SubNavSection, SubNavSections } from '@strapi/design-system';
 
+import { getMessage } from '../../utils';
+
 export const SideNav = () => {
-  // TODO: add translations
   return (
-    <SubNav ariaLabel="Comments sub nav">
-      <SubNavHeader label="Comments" />
+    <SubNav aria-label="Comments sub nav">
+      <SubNavHeader label={getMessage('plugin.name')} />
       <SubNavSections>
-        <SubNavSection label="Moderation">
+        <SubNavSection label={getMessage('nav.header.moderation')}>
           <SubNavLink href="/admin/plugins/@alfanet-technologies/strapi-plugin-comments/discover">
-            Discover
+            {getMessage('nav.item.discover')}
           </SubNavLink>
           <SubNavLink
             href="/admin/plugins/@alfanet-technologies/strapi-plugin-comments/reports"
             withBullet={false}
           >
-            Reports
+            {getMessage('nav.item.reports')}
           </SubNavLink>
         </SubNavSection>
       </SubNavSections>

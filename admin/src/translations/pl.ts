@@ -24,7 +24,7 @@ export default {
   'page.common.item.status.setFilter': 'Wybierz status...',
   "page.updates.header": "Ostatnie aktualizacje",
   "page.discover.header": "Odkryj wątki",
-  "page.discover.header.count": "znalezionych wpisów",
+  "page.discover.header.count": "{count} znalezionych wpisów",
   "page.discover.table.header.id": "ID",
   "page.discover.table.header.author": "Autor",
   "page.discover.table.header.message": "Wiadomość",

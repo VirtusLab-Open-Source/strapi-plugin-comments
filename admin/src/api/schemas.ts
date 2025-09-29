@@ -5,11 +5,7 @@ export const configSchema = z.object({
   entryLabel: z.record(z.array(z.string())),
   approvalFlow: z.array(z.string()),
   blockedAuthorProps: z.array(z.string()),
-  reportReasons: z.object({
-    BAD_LANGUAGE: z.literal('BAD_LANGUAGE'),
-    DISCRIMINATION: z.literal('DISCRIMINATION'),
-    OTHER: z.literal('OTHER'),
-  }),
+  reportReasons: z.record(z.string()),
   regex: z.object({
     uid: z.string(),
     relatedUid: z.string(),
@@ -20,13 +16,17 @@ export const configSchema = z.object({
   moderatorRoles: z.array(z.string()),
   isGQLPluginEnabled: z.boolean(),
   badWords: z.boolean().nullable().optional(),
-  gql: z.object({
-    auth: z.boolean().nullable(),
-  }).optional(),
-  client: z.object({
-    url: z.string().nullable(),
-    contactEmail: z.string().nullable(),
-  }).default({ url: null, contactEmail: null }),
+  gql: z
+    .object({
+      auth: z.boolean().nullable(),
+    })
+    .optional(),
+  client: z
+    .object({
+      url: z.string().nullable(),
+      contactEmail: z.string().nullable(),
+    })
+    .default({ url: null, contactEmail: null }),
 });
 
 
@@ -82,14 +82,10 @@ const approvalStatusSchema = z.union([
   z.literal(COMMENT_STATUS.TO_REVIEW),
   z.literal(COMMENT_STATUS.UNKNOWN),
 ]);
-const reportReasonUnion = z.union([
-  z.literal('BAD_LANGUAGE'),
-  z.literal('DISCRIMINATION'),
-  z.literal('OTHER'),
-]);
+
 const commentReportSchema = z.object({
   id: z.number(),
-  reason: reportReasonUnion,
+  reason: z.string().optional().nullable(),
   content: z.string(),
   resolved: z.boolean(),
   createdAt: z.string(),
@@ -202,7 +198,7 @@ export const reportSchema = z.object({
   content: z.string(),
   id: z.number(),
   approvalStatus: approvalStatusSchema.nullable().optional(),
-  reason: reportReasonUnion,
+  reason: z.string().optional().nullable(),
   reports: z.array(z.unknown()),
   resolved: z.boolean().optional(),
   updatedAt: z.string().nullable(),
