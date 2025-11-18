@@ -197,8 +197,8 @@ const commonService = ({ strapi }: StrapiContext) => ({
     const children = await this.findAllFlat(
       {
         filters: {
-          threadOf: { $eq: entry.id.toString() },
           ...filters,
+          threadOf: { $eq: entry.id.toString() },
         },
         populate,
         sort,
@@ -206,11 +206,10 @@ const commonService = ({ strapi }: StrapiContext) => ({
         isAdmin,
         omit,
         locale,
-        limit: Infinity,
+        limit: Number.MAX_SAFE_INTEGER,
       },
       relatedEntity,
     );
-
     const allChildren =
       entry.blockedThread && dropBlockedThreads
         ? []
