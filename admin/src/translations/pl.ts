@@ -27,6 +27,7 @@ export default {
   "page.discover.header.count": "{count} znalezionych wpisów",
   "page.discover.table.header.id": "ID",
   "page.discover.table.header.author": "Autor",
+  'page.discover.table.header.author.email': 'Adres e-mail nie podany',
   "page.discover.table.header.message": "Wiadomość",
   "page.discover.table.header.thread": "Wątek",
   "page.discover.table.header.entry": "Wpis",

@@ -48,7 +48,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
 
     return (
       <Tooltip label={related.title}>
-        <Link 
+        <Link
           width="100%"
           overflow="hidden"
           href={`/admin/content-manager/collection-types/${related.uid}/${related.documentId}${localeParam}`}
@@ -69,7 +69,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
       <Td>
         <Tooltip
           open={item.isAdminComment ? false : undefined}
-          label={!item.isAdminComment ? email : undefined}
+          label={!item.isAdminComment ? email || getMessage('page.discover.table.header.author.email') : undefined}
           align="start"
           side="left">
           <Flex gap={2} style={{ cursor: item.isAdminComment ? 'default' : 'help' }}>
