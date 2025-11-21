@@ -29,6 +29,7 @@ export default {
   'page.discover.header.count': '{count} entrées trouvées',
   'page.discover.table.header.id': 'ID',
   'page.discover.table.header.author': 'Auteur',
+  'page.discover.table.header.author.email': 'E-mail non fourni',
   'page.discover.table.header.message': 'Message',
   'page.discover.table.header.thread': 'Fil de discussion de',
   'page.discover.table.header.entry': 'Entrée',

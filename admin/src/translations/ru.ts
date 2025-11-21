@@ -27,6 +27,7 @@ export default {
   'page.discover.header.count': '{count} записей найдено',
   'page.discover.table.header.id': 'ID',
   'page.discover.table.header.author': 'Автор',
+  'page.discover.table.header.author.email': 'E‑mail не указан',
   'page.discover.table.header.message': 'Сообщение',
   'page.discover.table.header.thread': 'Тема',
   'page.discover.table.header.entry': 'Запись',
@@ -193,4 +194,4 @@ export default {
   'customField.comments.input.populate.label': 'Заполнить',
   'customField.comments.input.populate.author.label': 'Заполнить поле автора',
   'customField.comments.input.populate.avatar.label': 'Заполнить поле аватар',
-}satisfies CommentsPluginTranslations;
+} satisfies CommentsPluginTranslations;

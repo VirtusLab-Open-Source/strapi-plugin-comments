@@ -27,6 +27,7 @@ const en = {
   'page.discover.header.count': '{count} entries found',
   'page.discover.table.header.id': 'ID',
   'page.discover.table.header.author': 'Author',
+  'page.discover.table.header.author.email': 'E-mail not provided',
   'page.discover.table.header.message': 'Message',
   'page.discover.table.header.thread': 'Thread of',
   'page.discover.table.header.entry': 'Entry',

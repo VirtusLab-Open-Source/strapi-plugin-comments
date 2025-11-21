@@ -24,6 +24,7 @@ export default {
   'page.discover.header.count': '{count} entries found',
   'page.discover.table.header.id': 'ID',
   'page.discover.table.header.author': 'Autor',
+  'page.discover.table.header.author.email': 'E-mail não fornecido',
   'page.discover.table.header.message': 'Messagem',
   'page.discover.table.header.thread': 'Thread of',
   'page.discover.table.header.entry': 'Entry',
@@ -143,4 +144,4 @@ export default {
   'components.toogle.enabled': 'Habilitado',
   'components.toogle.disabled': 'Desabilitado',
   'components.author.unknown': 'Autor removido',
-} satisfies  CommentsPluginTranslations;
+} satisfies CommentsPluginTranslations;

@@ -49,7 +49,7 @@ const relatedSchema = z.intersection(
 const authorSchema = z.object({
   id: z.union([z.number(), z.string()]),
   name: z.string().optional().nullable(),
-  email: z.string(),
+  email: z.string().nullable(),
   avatar: z
     .union([
       z.object({
