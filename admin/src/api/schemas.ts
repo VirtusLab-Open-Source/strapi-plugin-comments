@@ -235,7 +235,7 @@ export const userSchema = z.object({
     id: z.number(),
     documentId: z.string(),
     firstname: z.string(),
-    lastname: z.string(),
+    lastname: z.string().nullable(),
     username: z.string().nullable(),
     email: z.string(),
     isActive: z.boolean(),
