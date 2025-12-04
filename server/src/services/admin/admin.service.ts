@@ -1,4 +1,4 @@
-import { isNil } from 'lodash';
+import { isEmpty, isNil } from 'lodash';
 import { Id, StrapiContext } from '../../@types';
 import { APPROVAL_STATUS } from '../../const';
 import { getCommentRepository, getReportCommentRepository } from '../../repositories';
@@ -36,14 +36,22 @@ export default ({ strapi }: StrapiContext) => {
       });
 
       const relatedEntities = await this.getCommonService().findRelatedEntitiesFor(results);
+      const filteredResults = results
+        .filter((_) => _.authorUser !== null || _.authorId !== null)
+        .map((_) => {
+          const sanitized = this.getCommonService().sanitizeCommentEntity(_, [], []);
+          if (sanitized.threadOf && typeof sanitized.threadOf === 'object' && isEmpty(sanitized.threadOf.author)) {
+            sanitized.threadOf = null;
+          }
+          return sanitized;
+        })
 
       return {
         pagination,
-        result: results.map((_) => this.getCommonService().sanitizeCommentEntity(_, [], []))
+        result: filteredResults
           .map(_ => this.getCommonService().mergeRelatedEntityTo(_, relatedEntities)),
       };
     },
-
     async findReports({ _q, orderBy, page, pageSize }: adminValidator.ReportFindReportsValidator) {
       const params = utils.findReports.createParams(
         orderBy,
@@ -77,7 +85,7 @@ export default ({ strapi }: StrapiContext) => {
         .map(({ threadOf }) => typeof threadOf === 'object' ? threadOf.id : null)
         .filter(Boolean)),
       );
-      const result = results.map((_) => {
+      const result = results.filter((_) => _.related.authorId !== null).map((_) => {
         const isCommentWithThread = commentWithThreadIds.includes(_.related.id);
         const commonService = this.getCommonService();
 
