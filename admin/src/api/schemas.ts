@@ -47,9 +47,9 @@ const relatedSchema = z.intersection(
 );
 
 const authorSchema = z.object({
-  id: z.union([z.number(), z.string()]),
+  id: z.union([z.number(), z.string()]).optional().nullable(),
   name: z.string().optional().nullable(),
-  email: z.string().nullable(),
+  email: z.string().optional().nullable(),
   avatar: z
     .union([
       z.object({
@@ -103,7 +103,7 @@ const baseCommentSchema = z.object({
   createdAt: z.string(),
   updatedAt: z.string(),
   reports: z.array(commentReportSchema).nullable().optional(),
-  author: authorSchema,
+  author: authorSchema.nullable().optional(),
   gotThread: z.boolean().nullable().optional(),
   threadFirstItemId: z.number().nullable().optional(),
 });
