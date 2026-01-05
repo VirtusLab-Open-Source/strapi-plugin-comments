@@ -63,7 +63,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
 
   const copyEmail = async () => {
     try {
-      await navigator.clipboard.writeText(email);
+      await navigator.clipboard.writeText(email ?? '');
     } catch (e) {
       console.log(e);
     }
