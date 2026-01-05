@@ -30,6 +30,7 @@ const en = {
   'page.discover.table.header.email': 'Email',
   'page.discover.table.header.email.copy.success': 'Email successfully copied into the clipboard',
   'page.discover.table.header.email.copy.failure': 'Error during the copy',
+  'page.discover.table.header.author.email': 'E-mail not provided',
   'page.discover.table.header.message': 'Message',
   'page.discover.table.header.thread': 'Thread of',
   'page.discover.table.header.entry': 'Entry',

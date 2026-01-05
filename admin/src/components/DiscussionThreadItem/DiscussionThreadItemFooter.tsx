@@ -31,7 +31,7 @@ export const DiscussionThreadItemFooter: FC<PropsWithChildren<DiscussionThreadIt
                     <Flex width="100%">
                         <Tooltip
                             open={item.isAdminComment ? false : undefined}
-                            label={!item.isAdminComment ? email : undefined}
+                            label={!item.isAdminComment ? email || getMessage('page.discover.table.header.author.email') : undefined}
                             align="start"
                             side="left">
                             <Flex style={{cursor: item.isAdminComment ? "default" : "help"}}

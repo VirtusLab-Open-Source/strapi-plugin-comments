@@ -51,14 +51,21 @@ export default ({ strapi }: StrapiContext) => {
         pageSize,
         _q,
       );
+      const defaultAuthorUserPopulate = getDefaultAuthorPopulate(strapi);
       const { pagination, results } = await getReportCommentRepository(strapi).findPage({
         ...params,
-        populate: ['related'],
+        populate:
+        {
+          related: {
+            populate: {
+              authorUser: defaultAuthorUserPopulate,
+            }
+          }
+        },
       });
 
       const reportCommentsIds = results.map((entity) => typeof entity.related === 'object' ? entity.related.id : null).filter(Boolean);
 
-      const defaultAuthorUserPopulate = getDefaultAuthorPopulate(strapi);
       const commentsThreads = await getCommentRepository(strapi).findMany({
         where: {
           threadOf: reportCommentsIds,

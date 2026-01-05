@@ -18,11 +18,11 @@ const reportSchema = z.object({
 
 const baseCommentSchema = dbBaseCommentSchema.merge(
   z.object({
-      gotThread: z.boolean().nullable().optional(),
-      threadFirstItemId: z.number().nullable().optional(),
-      reports: z.array(reportSchema).default([]),
-      author: z.any(),
-    },
+    gotThread: z.boolean().nullable().optional(),
+    threadFirstItemId: z.number().nullable().optional(),
+    reports: z.array(reportSchema).default([]),
+    author: z.any().nullable().optional(),
+  },
   ),
 );
 
