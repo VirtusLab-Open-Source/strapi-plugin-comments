@@ -6,7 +6,7 @@ const fileInfoSchema = z.object({
   hash: z.string(),
 });
 
-const avatarSchema = z.object({
+export const avatarSchema = z.object({
   id: z.number(),
   ...fileInfoSchema.shape,
   formats: z
@@ -38,10 +38,10 @@ export const dbBaseCommentSchema = z.object({
   authorEmail: z.string().email().nullable(),
   authorAvatar: z.string().nullable(),
   authorUser: z.union([
-    z.string(), 
-    z.object({ 
-      id: z.number(), 
-      username: z.string(), 
+    z.string(),
+    z.object({
+      id: z.number(),
+      username: z.string(),
       email: z.string().email(),
       avatar: avatarSchema,
     })

@@ -27,6 +27,7 @@ export default {
   'page.discover.header.count': '{count} 找到的条目',
   'page.discover.table.header.id': 'ID',
   'page.discover.table.header.author': '作者',
+  'page.discover.table.header.author.email': '未填写电子邮件',
   'page.discover.table.header.message': '内容',
   'page.discover.table.header.thread': '线索的',
   'page.discover.table.header.entry': '入口',

@@ -27,6 +27,7 @@ export default {
   'page.discover.header.count': '{count} giriş bulundu',
   'page.discover.table.header.id': 'ID',
   'page.discover.table.header.author': 'Yazar',
+  'page.discover.table.header.author.email': 'E‑posta girilmedi',
   'page.discover.table.header.message': 'İleti',
   'page.discover.table.header.thread': 'Başlığı',
   'page.discover.table.header.entry': 'Giriş',

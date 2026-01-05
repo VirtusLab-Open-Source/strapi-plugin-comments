@@ -32,6 +32,7 @@ export default {
   'page.discover.table.header.email': 'Email',
   'page.discover.table.header.email.copy.success': 'Email copié dans le presse papier',
   'page.discover.table.header.email.copy.failure': 'Erreur lors de la copie',
+  'page.discover.table.header.author.email': 'E-mail non fourni',
   'page.discover.table.header.message': 'Message',
   'page.discover.table.header.thread': 'Fil de discussion de',
   'page.discover.table.header.entry': 'Entrée',

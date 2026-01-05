@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { dbBaseCommentSchema } from './comment.schema';
-
+import { dbBaseCommentSchema, avatarSchema } from './comment.schema';
 import { paginationSchema } from './utils';
 
 const relatedSchema = z.object({
@@ -10,10 +9,19 @@ const relatedSchema = z.object({
   blocked: z.boolean(),
   blockedThread: z.boolean(),
   blockReason: z.string().nullable(),
-  authorId: z.string(),
-  authorName: z.string(),
-  authorEmail: z.string(),
+  authorId: z.string().nullable(),
+  authorName: z.string().nullable(),
+  authorEmail: z.string().nullable(),
   authorAvatar: z.string().nullable(),
+  authorUser: z.union([
+    z.string(),
+    z.object({
+      id: z.number(),
+      username: z.string(),
+      email: z.string().email(),
+      avatar: avatarSchema,
+    })
+  ]).optional().nullable(),
   isAdminComment: z.boolean().nullable(),
   removed: z.boolean().nullable(),
   approvalStatus: z.string().nullable(),
