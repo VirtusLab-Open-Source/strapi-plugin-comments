@@ -4,6 +4,9 @@ import { useAPI } from './useAPI';
 
 export const useCommentsAll = (queryParams: Record<string, string>) => {
   const api = useAPI();
+  if (!queryParams.orderBy) {
+    queryParams.orderBy = 'createdAt:desc';
+  }
   return useQuery({
     queryKey: api.comments.findAll.getKey(queryParams),
     queryFn: () => api.comments.findAll.query(queryParams).then(res => ({

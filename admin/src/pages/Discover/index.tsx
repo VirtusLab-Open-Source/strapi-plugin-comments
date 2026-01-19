@@ -1,12 +1,12 @@
-import { Table, Tbody, Th, Thead, Tr, Typography } from '@strapi/design-system';
-import { Layouts, Page, Pagination, SearchInput, useQueryParams } from '@strapi/strapi/admin';
-import { FC } from 'react';
-import { Config } from '../../api/schemas';
-import { CommentRow } from '../../components/CommentRow';
-import { CommentsStatusFilters } from '../../components/CommentStatusFilters';
-import { SortableTh } from '../../components/SortableTh';
-import { useCommentsAll } from '../../hooks/useCommentsAll';
-import { getMessage } from '../../utils';
+import {Table, Tbody, Th, Thead, Tr, Typography} from '@strapi/design-system';
+import {Layouts, Page, Pagination, SearchInput, useQueryParams} from '@strapi/strapi/admin';
+import {FC} from 'react';
+import {Config} from '../../api/schemas';
+import {CommentRow} from '../../components/CommentRow';
+import {CommentsStatusFilters} from '../../components/CommentStatusFilters';
+import {SortableTh} from '../../components/SortableTh';
+import {useCommentsAll} from '../../hooks/useCommentsAll';
+import {getMessage} from '../../utils';
 
 const tableHeaders = [
   { label: "page.discover.table.header.id" },
@@ -16,7 +16,7 @@ const tableHeaders = [
   { label: "page.discover.table.header.thread" },
   { label: "page.discover.table.header.entry" },
   { label: "page.discover.table.header.rating", orderBy: "rating" },
-  { label: "page.discover.table.header.lastUpdate", orderBy: "updatedAt" },
+  { label: "page.discover.table.header.createdAt", orderBy: "createdAt" },
   { label: "page.discover.table.header.status" },
 ];
 
