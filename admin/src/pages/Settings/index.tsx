@@ -303,7 +303,7 @@ const Settings = () => {
                         <Field.Label htmlFor="enabledCollections">
                           {getMessage('page.settings.form.author.blockedProps.label')}
                         </Field.Label>
-                        <Field.Input name="blockedProps" onChange={onChange} />
+                        <Field.Input name="blockedAuthorProps" value={values.blockedAuthorProps} onChange={onChange} />
                         <Field.Hint />
                       </Field.Root>
                     </Grid.Item>
