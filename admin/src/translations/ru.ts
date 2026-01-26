@@ -194,4 +194,6 @@ export default {
   'customField.comments.input.populate.label': 'Заполнить',
   'customField.comments.input.populate.author.label': 'Заполнить поле автора',
   'customField.comments.input.populate.avatar.label': 'Заполнить поле аватар',
+  'success.approveItem': 'Комментарий разрешен',
+  'success.rejectItem': 'Комментарий отклонен',
 } satisfies CommentsPluginTranslations;

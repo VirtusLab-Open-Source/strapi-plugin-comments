@@ -207,4 +207,6 @@ export default {
   'wysiwyg.code': 'Code',
   'wysiwyg.link': 'Lien',
   'wysiwyg.quote': 'Citation',
+  'success.approveItem': 'Le commentaire a été approuvé',
+  'success.rejectItem': 'Le commentaire a été rejeté',
 } satisfies CommentsPluginTranslations;

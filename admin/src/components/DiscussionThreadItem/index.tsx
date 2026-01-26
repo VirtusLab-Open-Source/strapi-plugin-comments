@@ -49,6 +49,8 @@ export const DiscussionThreadItem: FC<PropsWithChildren<DiscussionThreadItemProp
           <Flex width="100%" justifyContent="space-between" marginTop="6px">
             <Flex grow={1} alignItems="center">
               <Typography variant="omega" textColor="neutral800">
+                {/* TODO dangerouslySetInnerHTML in case of comments created by users is not safe
+                and can cause XSS attacks. We need to sanitize the content before displaying it. */}
                 <DiscussionThreadItemContentTypographyRenderer dangerouslySetInnerHTML={{ __html: item.content }} />
               </Typography>
             </Flex>

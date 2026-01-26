@@ -144,4 +144,6 @@ export default {
   'components.toogle.enabled': 'Habilitado',
   'components.toogle.disabled': 'Desabilitado',
   'components.author.unknown': 'Autor removido',
+  'success.approveItem': 'O comentário foi aprovado',
+  'success.rejectItem': 'O comentário foi rejeitado',
 } satisfies CommentsPluginTranslations;

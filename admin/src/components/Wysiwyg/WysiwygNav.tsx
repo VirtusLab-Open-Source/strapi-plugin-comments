@@ -92,24 +92,24 @@ const WysiwygNav = ({
           </Field.Root>
 
           <MainButtons>
-            <IconButton disabled label={getMessage('wysiwyg.bold', "Bold")}  name="Bold">
+            <IconButton type="button" disabled label={getMessage('wysiwyg.bold', "Bold")} name="Bold">
               <Bold />
             </IconButton>
-            <IconButton disabled label={getMessage('wysiwyg.italic', "Italic")} name="Italic">
+            <IconButton type="button" disabled label={getMessage('wysiwyg.italic', "Italic")} name="Italic">
               <Italic />
             </IconButton>
-            <IconButton disabled label={getMessage('wysiwyg.underline', "Underline")} name="Underline">
+            <IconButton type="button" disabled label={getMessage('wysiwyg.underline', "Underline")} name="Underline">
               <Underline />
             </IconButton>
           </MainButtons>
 
-          <MoreButton disabled label={getMessage('common.more', "More")}>
+          <MoreButton type="button" disabled label={getMessage('common.more', "More")}>
             <More />
           </MoreButton>
         </Flex>
 
         {!isExpandMode && (
-          <Button onClick={onTogglePreviewMode} variant="tertiary">
+          <Button type="button" onClick={onTogglePreviewMode} variant="tertiary">
             {formatMessage({
               id: 'components.Wysiwyg.ToggleMode.markdown-mode',
               defaultMessage: 'Markdown mode',
@@ -146,10 +146,11 @@ const WysiwygNav = ({
         </Field.Root>
 
         <MainButtons>
-          <IconButton onClick={() => onActionClick('Bold', editorRef)} label={getMessage('wysiwyg.bold', "Bold")} name="Bold">
+          <IconButton type="button" onClick={() => onActionClick('Bold', editorRef)} label={getMessage('wysiwyg.bold', "Bold")} name="Bold">
             <Bold />
           </IconButton>
           <IconButton
+            type="button"
             onClick={() => onActionClick('Italic', editorRef)}
             label={getMessage('wysiwyg.italic', "Italic")}
             name="Italic"
@@ -157,6 +158,7 @@ const WysiwygNav = ({
             <Italic />
           </IconButton>
           <IconButton
+            type="button"
             onClick={() => onActionClick('Underline', editorRef)}
             label={getMessage('wysiwyg.underline', "Underline")}
             name="Underline"
@@ -166,7 +168,7 @@ const WysiwygNav = ({
         </MainButtons>
         <Popover.Root>
           <Popover.Trigger>
-            <MoreButton label={getMessage('common.more', "More")}>
+            <MoreButton type="button" label={getMessage('common.more', "More")}>
               <More />
             </MoreButton>
           </Popover.Trigger>
@@ -174,6 +176,7 @@ const WysiwygNav = ({
             <Flex padding={2}>
               <IconButtonGroupMargin>
                 <IconButton
+                  type="button"
                   onClick={() => onActionClick('Strikethrough', editorRef, handleTogglePopover)}
                   label={getMessage('wysiwyg.strikethrough', "Strikethrough")}
                   name="Strikethrough"
@@ -181,6 +184,7 @@ const WysiwygNav = ({
                   <StrikeThrough />
                 </IconButton>
                 <IconButton
+                  type="button"
                   onClick={() => onActionClick('BulletList', editorRef, handleTogglePopover)}
                   label={getMessage('wysiwyg.bulletList', "BulletList")}
                   name="BulletList"
@@ -188,6 +192,7 @@ const WysiwygNav = ({
                   <BulletList />
                 </IconButton>
                 <IconButton
+                  type="button"
                   onClick={() => onActionClick('NumberList', editorRef, handleTogglePopover)}
                   label={getMessage('wysiwyg.numberList', "NumberList")}
                   name="NumberList"
@@ -197,6 +202,7 @@ const WysiwygNav = ({
               </IconButtonGroupMargin>
               <IconButtonGroup>
                 <IconButton
+                  type="button"
                   onClick={() => onActionClick('Code', editorRef, handleTogglePopover)}
                   label={getMessage('wysiwyg.code', "Code")}
                   name="Code"
@@ -204,6 +210,7 @@ const WysiwygNav = ({
                   <Code />
                 </IconButton>
                 <IconButton
+                  type="button"
                   onClick={() => onActionClick('Link', editorRef, handleTogglePopover)}
                   label={getMessage('wysiwyg.link', "Link")}
                   name="Link"
@@ -211,6 +218,7 @@ const WysiwygNav = ({
                   <Link />
                 </IconButton>
                 <IconButton
+                  type="button"
                   onClick={() => onActionClick('Quote', editorRef, handleTogglePopover)}
                   label={getMessage('wysiwyg.quote', "Quote")}
                   name="Quote"
@@ -224,7 +232,7 @@ const WysiwygNav = ({
       </Flex>
 
       {onTogglePreviewMode && (
-        <Button onClick={onTogglePreviewMode} variant="tertiary">
+        <Button type="button" onClick={onTogglePreviewMode} variant="tertiary">
           {formatMessage({
             id: 'components.Wysiwyg.ToggleMode.preview-mode',
             defaultMessage: 'Preview mode',

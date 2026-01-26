@@ -192,4 +192,6 @@ export default {
   'customField.comments.input.populate.label': 'Doldur',
   'customField.comments.input.populate.author.label': 'Yazar alanını doldurun',
   'customField.comments.input.populate.avatar.label': 'Avatar alanını doldurun',
+  'success.approveItem': 'Yorum onaylandı',
+  'success.rejectItem': 'Yorum reddedildi',
 } satisfies CommentsPluginTranslations;
