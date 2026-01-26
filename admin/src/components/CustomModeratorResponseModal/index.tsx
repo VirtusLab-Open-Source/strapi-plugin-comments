@@ -1,0 +1,148 @@
+import { Button, Flex, IconButton, Modal, Textarea } from '@strapi/design-system';
+import { Form, useNotification } from '@strapi/strapi/admin';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { FC, useCallback, useRef, useState } from 'react';
+import { Comment } from '../../api/schemas';
+import { useAPI } from '../../hooks/useAPI';
+import { useUserContext } from '../../hooks/useUserContext';
+import { getMessage } from '../../utils';
+
+type ModeratorResponseModalProps = {
+  content: string;
+  id: string | number;
+  title: string;
+  Icon: FC;
+};
+
+export const CustomModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, content, title, Icon }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const { toggleNotification } = useNotification();
+  const queryClient = useQueryClient();
+  const api = useAPI();
+
+  const author = useUserContext();
+
+  const updateListCache = (nextContent: string | undefined) => {
+    if (typeof nextContent !== 'string') {
+      return;
+    }
+
+    queryClient.setQueriesData(
+      { queryKey: api.comments.findAll.getKey(), exact: false },
+      (data: { result: Comment[] } | undefined) => {
+        if (!data) {
+          return data;
+        }
+
+        return {
+          ...data,
+          result: data.result.map((item) => (
+            item.id === id ? { ...item, content: nextContent } : item
+          )),
+        };
+      }
+    );
+  };
+
+  const getOnSuccess = (message: string) => async (_data: unknown, variables?: { content?: string }) => {
+    updateListCache(variables?.content);
+    await queryClient.invalidateQueries({
+      queryKey: api.comments.findOne.getKey(),
+      exact: false,
+    });
+    setIsModalVisible(false);
+    toggleNotification({
+      message: getMessage(message),
+      type: 'success',
+    });
+  };
+
+  const postCommentMutation = useMutation({
+    mutationFn: api.comments.postComment,
+    onSuccess: getOnSuccess('page.details.actions.comment.post.confirmation'),
+  });
+
+  const updateCommentMutation = useMutation({
+    mutationFn: api.comments.updateComment,
+    onSuccess: getOnSuccess('page.details.actions.comment.update.confirmation'),
+  });
+
+  const onSubmit = async (values: { content: string }) => {
+    if (content.length) {
+      await updateCommentMutation.mutateAsync({
+        id,
+        content: values.content,
+      });
+    } else {
+      await postCommentMutation.mutateAsync({
+        id,
+        author,
+        content: values.content,
+      });
+    }
+  };
+
+  const onClickSubmit = () => {
+    if (formRef.current) {
+      formRef.current.requestSubmit();
+    }
+  };
+
+  const onToggleModal = useCallback(() => {
+    setIsModalVisible((prev) => !prev);
+  }, []);
+
+  return (
+    <Modal.Root open={isModalVisible} onOpenChange={onToggleModal}>
+      <Modal.Trigger>
+        <IconButton label={getMessage('page.details.actions.thread.modal.update.comment')}>
+          <Icon />
+        </IconButton>
+      </Modal.Trigger>
+      <Modal.Content>
+        <Modal.Header>
+          <Modal.Title>
+            {title}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form
+            ref={formRef}
+            width="auto"
+            height="auto"
+            onSubmit={onSubmit}
+            method="POST"
+            initialValues={{
+              content: content || '',
+            }}
+          >
+            {({ values, onChange }) => (
+              <Textarea
+                name="content"
+                id="content"
+                value={values.content ?? ''}
+                onKeyDown={(event: any) => {
+                  event.stopPropagation(); // Important to not been blocked by a parent listener
+                }}
+                onChange={(event: any) => onChange('content', event.target.value)}
+              />
+            )}
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Flex gap={2} justifyContent="space-between" width="100%">
+            <Button onClick={onToggleModal} variant="tertiary">
+              {getMessage('components.confirmation.dialog.button.cancel')}
+            </Button>
+            <Button onClick={onClickSubmit}>
+              {content.length ? getMessage('page.details.actions.thread.modal.update.comment') : getMessage('page.details.actions.thread.modal.start.thread')}
+            </Button>
+          </Flex>
+        </Modal.Footer>
+      </Modal.Content>
+    </Modal.Root>
+
+  );
+};

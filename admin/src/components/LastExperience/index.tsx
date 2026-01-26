@@ -18,7 +18,7 @@ export const LastExperience: FC<Props> = ({item}) => {
     });
 
     return (
-      <Flex justifyContent={'end'}>
+      <Flex justifyContent={'end'} direction="column" gap={2}>
         <Typography variant="pi" fontWeight="bold" textColor="neutral800">
           {getMessage('page.discover.footer.lastExperience')}:
         </Typography>

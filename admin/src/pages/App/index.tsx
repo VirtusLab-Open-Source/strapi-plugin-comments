@@ -7,6 +7,7 @@ import { useSettingsStore } from '../../store/settings.store';
 import { Details } from '../Details';
 import { Discover } from '../Discover';
 import { Reports } from '../Reports';
+import { CustomDiscover } from '../CustomDiscover';
 
 
 const InnerApp = () => {
@@ -18,7 +19,7 @@ const InnerApp = () => {
   return (
     <Layouts.Root sideNav={<SideNav />}>
       <Routes>
-        <Route path="/discover" element={<Discover config={config} />} />
+        <Route path="/discover" element={<CustomDiscover config={config} />} />
         <Route path="/discover/:id" element={<Details config={config} />} />
         <Route path="/reports" element={<Reports config={config} />} />
         <Route path="*" element={<Navigate to="discover" replace />} />

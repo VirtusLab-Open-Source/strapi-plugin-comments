@@ -134,6 +134,7 @@ export const queryPaginationSchema = z
       filters: getFiltersOperators({
         removed: true,
         approvalStatus: true,
+        related: true,
       })
         .merge(
           z.object({

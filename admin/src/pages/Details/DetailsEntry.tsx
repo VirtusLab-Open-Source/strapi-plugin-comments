@@ -57,14 +57,14 @@ export const DetailsEntry: FC<DetailsEntryProps> = ({ config, entity, filters, o
           <Box paddingTop={2} paddingBottom={4}>
             <Divider />
           </Box>
-          <Flex>
+          <Flex direction="column" alignItems="stretch">
             <Flex direction="column" alignItems="flex-start">
               <Typography fontWeight="bold">
                 {formatLabel(entityLabelKey)}
               </Typography>
               <Typography>{entity[entityLabelKey!]}</Typography>
             </Flex>
-            <Flex space={4}>
+            <Flex space={4} direction="column" alignItems="stretch">
               {itemKeys.map((key) => (
                 <Flex
                   key={`prop_${key}`}

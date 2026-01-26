@@ -36,7 +36,7 @@ const getFilter = (filterName: string | undefined) => {
       return {
         approvalStatus: filterName,
       };
-  };
+  }
 };
 
 export const CommentsStatusFilters = () => {
@@ -59,7 +59,7 @@ export const CommentsStatusFilters = () => {
       onChange={handleChange}
     >
       {COMMENT_OPTIONS.map((option) => (
-        <SingleSelectOption value={option}>
+        <SingleSelectOption key={option} value={option}>
           {getMessage(`page.common.item.status.${option}`)}
         </SingleSelectOption>
       ))}
