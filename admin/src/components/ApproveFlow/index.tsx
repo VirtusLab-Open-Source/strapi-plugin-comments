@@ -3,6 +3,7 @@ import { Check, Cross } from '@strapi/icons';
 import { useNotification } from '@strapi/strapi/admin';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { FC } from 'react';
+import { useIntl } from 'react-intl';
 import { useAPI } from '../../hooks/useAPI';
 import { pluginId } from '../../pluginId';
 import { AllowedActions } from '../../types';
@@ -10,6 +11,7 @@ import { getMessage, handleAPIError } from '../../utils';
 
 export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModerate'], queryKey?: string[] }> = ({ id, canModerate, queryKey }) => {
   const { toggleNotification } = useNotification();
+  const { formatMessage } = useIntl();
   const queryClient = useQueryClient();
   const apiClient = useAPI();
   const onSuccess = (message: string) => async () => {
@@ -19,7 +21,10 @@ export const ApproveFlow: FC<{ id: number, canModerate: AllowedActions['canModer
     });
     toggleNotification({
       type: 'success',
-      message: `${pluginId}.${message}`,
+      message: formatMessage({
+        id: `${pluginId}.${message}`,
+        defaultMessage: message,
+      }),
     });
   };
 

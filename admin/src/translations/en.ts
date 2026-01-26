@@ -205,6 +205,8 @@ const en = {
   'wysiwyg.code': 'Code',
   'wysiwyg.link': 'Link',
   'wysiwyg.quote': 'Quote',
+  'success.approveItem': 'Comment has been approved',
+  'success.rejectItem': 'Comment has been rejected',
 };
 
 export type CommentsPluginTranslations = Partial<typeof en>;

@@ -1,10 +1,9 @@
 import { Flex, IconButton } from '@strapi/design-system';
 import { Eye, Pencil, Plus, Trash } from '@strapi/icons';
-import { useNotification } from '@strapi/strapi/admin';
 import { useQueryClient } from '@tanstack/react-query';
 import { isEmpty, isNil } from 'lodash';
 import { FC, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAPI } from '../../hooks/useAPI';
 import { useCommentMutations } from '../../hooks/useCommentMutations';
 import { usePermissions } from '../../hooks/usePermissions';
@@ -38,26 +37,29 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
     isAdminComment,
   } = item;
   const user = useUserContext();
+  const { id: selectedEntityId } = useParams<{ id: string }>();
 
   const api = useAPI();
   const { canModerate, canAccessReports, canReviewReports } = usePermissions();
 
   const navigate = useNavigate();
-  const { toggleNotification } = useNotification();
   const queryClient = useQueryClient();
 
   const onSuccess = useCallback(() => {
-    const detailsCommentKey = api.comments.findOne.getKey(id);
+    const detailsCommentKey = api.comments.findOne.getKey(selectedEntityId);
+    console.log(detailsCommentKey)
     return queryClient.invalidateQueries({
       queryKey: detailsCommentKey,
       exact: false,
     });
-  }, [queryClient, api.comments.findOne, id]);
+  }, [queryClient, api.comments.findOne, selectedEntityId]);
 
   const { commentMutation, reportMutation } = useCommentMutations({
     comment: {
       blockSuccess: onSuccess,
       unBlockSuccess: onSuccess,
+      blockThreadSuccess: onSuccess,
+      unBlockThreadSuccess: onSuccess,
       deleteSuccess: onSuccess,
     },
   });

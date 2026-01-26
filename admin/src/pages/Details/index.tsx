@@ -16,7 +16,6 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
   const { id } = useParams<{ id: string }>();
   const [filters, setFilters] = useState({});
   const {
-    isLoadingForPermissions,
     canAccess,
     canModerate,
     canAccessReports,

@@ -193,5 +193,7 @@ export default {
   "customField.comments.input.filterBy.option.approvalStatus.option.rejected.label": "Odrzucony",
   "customField.comments.input.populate.label": "Uzupełnienie",
   "customField.comments.input.populate.author.label": "Uzupełnij pole autora",
-  "customField.comments.input.populate.avatar.label": "Uzupełnij pole awatara"
+  "customField.comments.input.populate.avatar.label": "Uzupełnij pole awatara",
+  "success.approveItem": "Komentarz został zatwierdzony",
+  "success.rejectItem": "Komentarz został odrzucony"
 } satisfies CommentsPluginTranslations;

@@ -194,4 +194,6 @@ export default {
   'customField.comments.input.populate.label': '填充',
   'customField.comments.input.populate.author.label': '填充作者字段',
   'customField.comments.input.populate.avatar.label': '填充头像字段',
+  'success.approveItem': '评论已通过',
+  'success.rejectItem': '评论已拒绝',
 } satisfies CommentsPluginTranslations;
