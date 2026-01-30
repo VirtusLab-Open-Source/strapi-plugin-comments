@@ -1,6 +1,7 @@
 import { Flex, Link, SubNav, SubNavHeader, SubNavLink, SubNavSection, SubNavSections } from '@strapi/design-system';
 
 import { getMessage } from '../../utils';
+import { Box } from '@strapi/design-system';
 
 export const SideNav = () => {
   return (
@@ -21,21 +22,24 @@ export const SideNav = () => {
           </SubNavSection>
         </SubNavSections>
       </SubNav>
-      <Flex 
+      <Box
         display={{ initial: 'flex', large: 'none' }}
-        direction="column"
-        gap={2}
         top="80px"
         right="20px"
         position="absolute"
       >
-        <Link href="/admin/plugins/comments/discover">
-          {getMessage('nav.item.discover')}
-        </Link>
-        <Link href="/admin/plugins/comments/reports">
-          {getMessage('nav.item.reports')}
-        </Link>
-      </Flex>
+        <Flex 
+          direction="column"
+          gap={2}
+        >
+          <Link href="/admin/plugins/comments/discover">
+            {getMessage('nav.item.discover')}
+          </Link>
+          <Link href="/admin/plugins/comments/reports">
+            {getMessage('nav.item.reports')}
+          </Link>
+        </Flex>
+      </Box>
     </>
   );
 };
