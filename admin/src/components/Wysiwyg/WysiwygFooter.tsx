@@ -3,6 +3,7 @@ import { Expand } from '@strapi/icons';
 import { useIntl } from 'react-intl';
 
 import { ExpandButton } from './WysiwygStyles';
+import { useIsMobile } from '@strapi/strapi/admin';
 
 interface WysiwygFooterProps {
   onToggleExpand: () => void;
@@ -11,9 +12,11 @@ interface WysiwygFooterProps {
 const WysiwygFooter = ({ onToggleExpand }: WysiwygFooterProps) => {
   const { formatMessage } = useIntl();
 
+  const isMobile = useIsMobile();
+
   return (
     <Box padding={2} background="neutral100" borderRadius={`0 0 0.4rem 0.4rem`}>
-      <Flex justifyContent="flex-end" alignItems="flex-end">
+      {!isMobile && <Flex justifyContent="flex-end" alignItems="flex-end">
         <ExpandButton id="expand" onClick={onToggleExpand} variant="tertiary" size="M">
           <Typography textColor="neutral800">
             {formatMessage({
@@ -23,7 +26,7 @@ const WysiwygFooter = ({ onToggleExpand }: WysiwygFooterProps) => {
           </Typography>
           <Expand />
         </ExpandButton>
-      </Flex>
+      </Flex>}
     </Box>
   );
 };

@@ -14,9 +14,9 @@ import { getMessage } from '../../utils';
 const tableHeaders = [
   { label: "page.reports.table.header.id" },
   { label: "page.reports.table.header.reason" },
-  { label: "page.reports.table.header.content", orderBy: "content" },
+  { label: "page.reports.table.header.content", orderByKey: "content" },
   { label: "page.reports.table.header.status" },
-  { label: "page.reports.table.header.issueDate", orderBy: "updatedAt" },
+  { label: "page.reports.table.header.issueDate", orderByKey: "updatedAt", display: { initial: 'none', large: 'table-cell' }  },
   { label: "page.reports.table.header.relatedComment" },
   { label: "page.reports.table.header.actions" },
 ];
@@ -106,21 +106,8 @@ export const Reports: FC<{ config: Config }> = ({ config }) => {
                     disabled={result.filter((report) => !report.resolved).length === 0}
                   />
                 </Th>
-                {tableHeaders.map(({ label, orderBy }) => (
-                  <>
-                    {!orderBy ? (
-                      <Th>
-                        <Typography variant="sigma">
-                          {getMessage(label)}
-                        </Typography>
-                      </Th>
-                    ) : (
-                      <SortableTh
-                        label={getMessage(label)}
-                        orderByKey={orderBy}
-                      />
-                    )}
-                  </>
+                {tableHeaders.map((header) => (
+                  <SortableTh {...header}/>
                 ))}
               </Tr>
             </Thead>

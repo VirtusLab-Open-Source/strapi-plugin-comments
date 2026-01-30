@@ -2,6 +2,8 @@ import { FC } from "react";
 import { Th, Typography } from "@strapi/design-system";
 import { ChevronDown, ChevronUp } from "@strapi/icons";
 import { useQueryParams } from "@strapi/strapi/admin";
+import { ThProps } from "@strapi/design-system/dist/components/Table/Cell";
+import { getMessage } from '../../utils';
 
 type SortQueryParams = {
   orderBy?: string;
@@ -23,12 +25,24 @@ const getChangedOrder = (orderByKey: string, order: string | undefined) => {
 
 type SortableThProps = {
   label: string;
-  orderByKey: string;
-};
+  orderByKey?: string;
+} & Omit<ThProps, 'children'>;
 
-export const SortableTh: FC<SortableThProps> = ({ label, orderByKey }) => {
+export const SortableTh: FC<SortableThProps> = ({ label, orderByKey, ...rest }) => {
   const [{ query: queryParams }, setQueryParams] =
     useQueryParams<SortQueryParams>();
+
+  const labelText = getMessage(label);
+
+  if(!orderByKey) {
+    return (
+      <Th {...rest}>
+        <Typography variant="sigma" style={{ marginRight: "8px" }}>
+          {labelText}
+        </Typography>
+      </Th>
+    );
+  }
 
   const { orderBy = ":" } = queryParams;
   const key = orderBy.split(":")[0];
@@ -42,9 +56,9 @@ export const SortableTh: FC<SortableThProps> = ({ label, orderByKey }) => {
   };
 
   return (
-    <Th onClick={handleSort} style={{ cursor: "pointer" }}>
+    <Th onClick={handleSort} style={{ cursor: "pointer" }} {...rest}>
       <Typography variant="sigma" style={{ marginRight: "8px" }}>
-        {label}
+        {labelText}
       </Typography>
       {`${key}:${order}` === `${orderByKey}:asc` && (
         <ChevronDown />

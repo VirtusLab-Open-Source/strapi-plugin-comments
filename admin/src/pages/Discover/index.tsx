@@ -1,7 +1,5 @@
-import { Table, Tbody, Th, Thead, Tr, Typography } from '@strapi/design-system';
+import { Table, Tbody, Th, Thead, Tr } from '@strapi/design-system';
 import { Layouts, Page, Pagination, SearchInput, useQueryParams } from '@strapi/strapi/admin';
-import { FC } from 'react';
-import { Config } from '../../api/schemas';
 import { CommentRow } from '../../components/CommentRow';
 import { CommentsStatusFilters } from '../../components/CommentStatusFilters';
 import { SortableTh } from '../../components/SortableTh';
@@ -10,16 +8,16 @@ import { getMessage } from '../../utils';
 
 const tableHeaders = [
   { label: "page.discover.table.header.id" },
-  { label: "page.discover.table.header.author" },
-  { label: "page.discover.table.header.message", orderBy: "content" },
-  { label: "page.discover.table.header.thread" },
+  { label: "page.discover.table.header.author", maxWidth: "200px" },
+  { label: "page.discover.table.header.message", orderByKey: "content" },
+  { label: "page.discover.table.header.thread", display: { initial: 'none', large : 'table-cell' } },
   { label: "page.discover.table.header.entry" },
-  { label: "page.discover.table.header.lastUpdate", orderBy: "updatedAt" },
+  { label: "page.discover.table.header.lastUpdate", orderByKey: "updatedAt", display: { initial: 'none', large: 'table-cell' } },
   { label: "page.discover.table.header.status" },
 ];
 
-export const Discover: FC<{ config: Config }> = ({ config }) => {
-  const [{ query: queryParams }, setQueryParams] = useQueryParams();
+export const Discover = () => {
+  const [{ query: queryParams }] = useQueryParams();
 
   const { data: { result, pagination } } = useCommentsAll(queryParams as Record<string, string>);
 
@@ -50,21 +48,8 @@ export const Discover: FC<{ config: Config }> = ({ config }) => {
           <Table>
             <Thead>
               <Tr>
-                {tableHeaders.map(({ label, orderBy }) => (
-                  <>
-                    {!orderBy ? (
-                      <Th>
-                        <Typography variant="sigma">
-                          {getMessage(label)}
-                        </Typography>
-                      </Th>
-                    ) : (
-                      <SortableTh
-                        label={getMessage(label)}
-                        orderByKey={orderBy}
-                      />
-                    )}
-                  </>
+                {tableHeaders.map((header) => (
+                  <SortableTh key={header.label} {...header} />
                 ))}
                 <Th />
               </Tr>

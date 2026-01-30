@@ -20,7 +20,7 @@ const en = {
   'page.common.item.status.RESOLVED': 'Resolved',
   'page.common.item.status.TO_REVIEW': 'To review ({count, number})',
   'page.common.item.status.REJECTED': 'Rejected',
-  'page.common.item.status.REMOVED': 'Removed by author',
+  'page.common.item.status.REMOVED': 'Removed',
   'page.common.item.status.setFilter': 'Set status...',
   'page.updates.header': 'Recent updates',
   'page.discover.header': 'Discover threads',

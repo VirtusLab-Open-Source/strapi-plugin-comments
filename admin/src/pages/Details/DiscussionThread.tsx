@@ -32,15 +32,14 @@ export const DiscussionThread: FC<DiscussionThreadProps> = ({ isReloading, level
         >
           {getMessage('page.details.panel.discussion', 'Discussion')}
         </Typography>
-        {
-          rootThread && (
-            <Link
-              href={rootThread.id}
-              startIcon={<ArrowUp />}
-            >
-              {getMessage('page.details.panel.discussion.nav.back', 'Go top')}
-            </Link>
-          )}
+        {rootThread && (
+          <Link
+            href={rootThread.id}
+            startIcon={<ArrowUp />}
+          >
+            {getMessage('page.details.panel.discussion.nav.back', 'Go top')}
+          </Link>
+        )}
       </Flex>
       <Flex as="ul" direction="column" alignItems="flex-start" marginBottom={4}>
         {level.map((item) => {

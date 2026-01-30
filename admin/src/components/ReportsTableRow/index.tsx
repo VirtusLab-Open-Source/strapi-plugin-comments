@@ -47,7 +47,7 @@ export const ReportsTableRow: FC<ReportsTableRowProps> = ({ item, isChecked, onS
          <ReportStatusBadge item={item} />
         </Typography>
       </Td>
-      <Td>
+      <Td display={{ initial: 'none', large: 'table-cell' }}>
         <Typography textColor="neutral800">
           {formatDate(item.updatedAt || item.createdAt, {
             dateStyle: 'long',

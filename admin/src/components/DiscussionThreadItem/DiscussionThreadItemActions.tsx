@@ -76,12 +76,6 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
   const hasActiveThread = gotThread && !(removed || preview || pinned || blockedThread);
   const isStatusBadgeVisible = isBlocked || reviewFlowEnabled;
 
-  const isLoading =
-    commentMutation.unBlock.isPending ||
-    commentMutation.block.isPending ||
-    commentMutation.blockThread.isPending ||
-    commentMutation.unBlockThread.isPending;
-
   const handleUnblockThreadClick = () => {
     commentMutation.unBlockThread.mutate(id);
   };
@@ -108,7 +102,7 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
 
   if (removed || isRejected || !canModerate) {
     return (
-      <Flex direction="row" marginLeft={1} alignItems="flex-start">
+      <Flex direction="row" alignItems="flex-start">
         <CommentStatusBadge
           item={item}
           canAccessReports={canAccessReports}
@@ -124,159 +118,157 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
   const isRemovable = !blockedThread && !blocked && isAdminAuthor;
   const isThreadStartEnabled = !hasActiveThread && !pinned && (!blockedThread && !blocked);
   return (
-    <>
-      <Flex direction="row" marginLeft={1} alignItems="flex-start">
-        {isStatusBadgeVisible && (
-          <CommentStatusBadge
-            item={item}
-            canAccessReports={canAccessReports}
-            hasReports={hasReports}
-          />
-        )}
-        {!blockedThread && (gotThread || pinned) && (
-          <ConfirmationDialog
-            title={getMessage(
-              'page.details.actions.thread.block.confirmation.header',
-            )}
-            labelConfirm={getMessage(
-              'page.details.actions.thread.block.confirmation.button.confirm',
-            )}
-            labelCancel={getMessage(
-              'components.confirmation.dialog.button.cancel',
-              'Cancel',
-            )}
-            iconConfirm={<Lock />}
-            onConfirm={handleOnConfirm}
-            Trigger={({ onClick }) => (
-              <ActionButton
-                onClick={onClick}
-                startIcon={<Lock />}
-                loading={commentMutation.unBlockThread.isPending}
-                variant="danger"
-              >
-                {getMessage(
-                  'page.details.actions.thread.block',
-                  'Block thread',
-                )}
-              </ActionButton>
-            )}>
-            {getMessage(
-              'page.details.actions.thread.block.confirmation.description',
-            )}
-          </ConfirmationDialog>
-        )}
-        {blockedThread && (gotThread || pinned) && (
-          <ActionButton
-            onClick={handleUnblockThreadClick}
-            startIcon={<UnlockIcon />}
-            loading={commentMutation.unBlockThread.isPending}
-            variant="success"
-          >
-            {getMessage(
-              'page.details.actions.thread.unblock',
-              'Unblock thread',
-            )}
-          </ActionButton>
-        )}
-        {anyGroupButtonsVisible && (
-          <IconButtonGroup isSingle withMargin>
-            {!isAdminComment && (
-              <>
-                {isBlockEnabled && (
-                  <ConfirmationDialog
-                    title={getMessage(
-                      'page.details.actions.comment.block.confirmation.header',
-                    )}
-                    labelConfirm={getMessage(
-                      'page.details.actions.comment.block.confirmation.button.confirm',
-                    )}
-                    labelCancel={getMessage(
-                      'components.confirmation.dialog.button.cancel',
-                      'Cancel',
-                    )}
-                    onConfirm={handleBlockConfirm}
-                    Trigger={({ onClick }) => (
-                      <IconButton
-                        onClick={onClick}
-                        loading={commentMutation.block.isPending}
-                        label={getMessage('page.details.actions.comment.block')}
-                      >
-                        <Lock />
-                      </IconButton>
-                    )}
-                  >
-                    {getMessage(
-                      'page.details.actions.comment.block.confirmation.description',
-                    )}
-                  </ConfirmationDialog>
-                )}
-                {isUnblockEnabled && (
-                  <IconButton
-                    onClick={handleUnblockClick}
-                    loading={commentMutation.block.isPending}
-                    label={getMessage('page.details.actions.comment.unblock')}
-                  >
-                    <UnlockIcon />
-                  </IconButton>
-                )}
-              </>
-            )}
-            {needsApproval && (
-              <ApproveFlow
-                id={id}
-                canModerate={canModerate}
-                queryKey={api.comments.findOne.getKey(id)}
-              />
-            )}
-            {isAdminAuthor && !isBlocked && (
-              <ModeratorResponseModal
-                content={content}
-                id={id}
-                Icon={Pencil}
-                title={getMessage(
-                  'page.details.actions.thread.modal.update.comment',
-                )}
-              />
-            )}
-            {isRemovable && (
-              <IconButton
-                onClick={handleDeleteClick}
-                loading={commentMutation.delete.isPending}
-                label={getMessage('page.details.actions.comment.delete')}
-              >
-                <Trash />
-              </IconButton>
-            )}
-            <ReviewFlow
-              item={item}
-            />
-          </IconButtonGroup>
-        )}
-        {hasActiveThread && (
-          <IconButtonGroup isSingle withMargin>
-            <IconButton
-              onClick={handleDrillDownClick}
-              label={getMessage('page.details.panel.discussion.nav.drilldown')}
-              style={
-                blocked && !blockedThread
-                  ? { marginTop: '1px', marginRight: '.5rem' }
-                  : {}
-              }>
-              <Eye />
-            </IconButton>
-          </IconButtonGroup>
-        )}
-        {isThreadStartEnabled && (
-          <IconButtonGroup isSingle withMargin>
-            <ModeratorResponseModal
-              content=""
+    <Flex direction="row" alignItems="flex-start" justifyContent="flex-end" width={{ initial: '100%', medium: 'auto' }}>
+      {isStatusBadgeVisible && (
+        <CommentStatusBadge
+          item={item}
+          canAccessReports={canAccessReports}
+          hasReports={hasReports}
+        />
+      )}
+      {!blockedThread && (gotThread || pinned) && (
+        <ConfirmationDialog
+          title={getMessage(
+            'page.details.actions.thread.block.confirmation.header',
+          )}
+          labelConfirm={getMessage(
+            'page.details.actions.thread.block.confirmation.button.confirm',
+          )}
+          labelCancel={getMessage(
+            'components.confirmation.dialog.button.cancel',
+            'Cancel',
+          )}
+          iconConfirm={<Lock />}
+          onConfirm={handleOnConfirm}
+          Trigger={({ onClick }) => (
+            <ActionButton
+              onClick={onClick}
+              startIcon={<Lock />}
+              loading={commentMutation.unBlockThread.isPending}
+              variant="danger"
+            >
+              {getMessage(
+                'page.details.actions.thread.block',
+                'Block thread',
+              )}
+            </ActionButton>
+          )}>
+          {getMessage(
+            'page.details.actions.thread.block.confirmation.description',
+          )}
+        </ConfirmationDialog>
+      )}
+      {blockedThread && (gotThread || pinned) && (
+        <ActionButton
+          onClick={handleUnblockThreadClick}
+          startIcon={<UnlockIcon />}
+          loading={commentMutation.unBlockThread.isPending}
+          variant="success"
+        >
+          {getMessage(
+            'page.details.actions.thread.unblock',
+            'Unblock thread',
+          )}
+        </ActionButton>
+      )}
+      {anyGroupButtonsVisible && (
+        <IconButtonGroup isSingle withMargin>
+          {!isAdminComment && (
+            <>
+              {isBlockEnabled && (
+                <ConfirmationDialog
+                  title={getMessage(
+                    'page.details.actions.comment.block.confirmation.header',
+                  )}
+                  labelConfirm={getMessage(
+                    'page.details.actions.comment.block.confirmation.button.confirm',
+                  )}
+                  labelCancel={getMessage(
+                    'components.confirmation.dialog.button.cancel',
+                    'Cancel',
+                  )}
+                  onConfirm={handleBlockConfirm}
+                  Trigger={({ onClick }) => (
+                    <IconButton
+                      onClick={onClick}
+                      loading={commentMutation.block.isPending}
+                      label={getMessage('page.details.actions.comment.block')}
+                    >
+                      <Lock />
+                    </IconButton>
+                  )}
+                >
+                  {getMessage(
+                    'page.details.actions.comment.block.confirmation.description',
+                  )}
+                </ConfirmationDialog>
+              )}
+              {isUnblockEnabled && (
+                <IconButton
+                  onClick={handleUnblockClick}
+                  loading={commentMutation.block.isPending}
+                  label={getMessage('page.details.actions.comment.unblock')}
+                >
+                  <UnlockIcon />
+                </IconButton>
+              )}
+            </>
+          )}
+          {needsApproval && (
+            <ApproveFlow
               id={id}
-              Icon={Plus}
-              title={getMessage('page.details.actions.thread.modal.start.thread')}
+              canModerate={canModerate}
+              queryKey={api.comments.findOne.getKey(id)}
             />
-          </IconButtonGroup>
-        )}
-      </Flex>
-    </>
+          )}
+          {isAdminAuthor && !isBlocked && (
+            <ModeratorResponseModal
+              content={content}
+              id={id}
+              Icon={Pencil}
+              title={getMessage(
+                'page.details.actions.thread.modal.update.comment',
+              )}
+            />
+          )}
+          {isRemovable && (
+            <IconButton
+              onClick={handleDeleteClick}
+              loading={commentMutation.delete.isPending}
+              label={getMessage('page.details.actions.comment.delete')}
+            >
+              <Trash />
+            </IconButton>
+          )}
+          <ReviewFlow
+            item={item}
+          />
+        </IconButtonGroup>
+      )}
+      {hasActiveThread && (
+        <IconButtonGroup isSingle withMargin>
+          <IconButton
+            onClick={handleDrillDownClick}
+            label={getMessage('page.details.panel.discussion.nav.drilldown')}
+            style={
+              blocked && !blockedThread
+                ? { marginTop: '1px', marginRight: '.5rem' }
+                : {}
+            }>
+            <Eye />
+          </IconButton>
+        </IconButtonGroup>
+      )}
+      {isThreadStartEnabled && (
+        <IconButtonGroup isSingle withMargin>
+          <ModeratorResponseModal
+            content=""
+            id={id}
+            Icon={Plus}
+            title={getMessage('page.details.actions.thread.modal.start.thread')}
+          />
+        </IconButtonGroup>
+      )}
+    </Flex>
   );
 };
