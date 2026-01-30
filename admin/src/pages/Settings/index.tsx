@@ -1,7 +1,7 @@
 import { Accordion, Alert, Box, Button, Field, Flex, Grid, MultiSelect, MultiSelectOption, Switch, Toggle, Typography } from '@strapi/design-system';
 import { ArrowClockwise, Check, Play } from '@strapi/icons';
-import { Form, Layouts, Page, useNotification, useTracking } from '@strapi/strapi/admin';
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { Form, Layouts, Page, useNotification } from '@strapi/strapi/admin';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { isNil, orderBy } from 'lodash';
 import { useCallback, useRef, useState } from 'react';
@@ -29,7 +29,6 @@ const StyledAlert = styled(Alert)(() => ({
 }));
 
 const Settings = () => {
-  const { trackUsage } = useTracking();
   const formRef = useRef<HTMLFormElement>(null);
   const { toggleNotification } = useNotification();
   const [isRestartRequired, setIsRestartRequired] = useState(false);
@@ -282,7 +281,7 @@ const Settings = () => {
                     {getMessage('page.settings.section.additional')}
                   </Typography>
                   <Grid.Root gap={4} marginTop={4} width="100%">
-                    <Grid.Item xs={4} alignItems="start">
+                    <Grid.Item col={4} xs={12} alignItems="start">
                       <Field.Root width="100%" hint={getMessage('page.settings.form.enabledCollections.hint')}>
                         <Field.Label htmlFor="enabledCollections">
                           {getMessage('page.settings.form.enabledCollections.label')}
@@ -298,7 +297,7 @@ const Settings = () => {
                         <Field.Hint />
                       </Field.Root>
                     </Grid.Item>
-                    <Grid.Item xs={4} alignItems="start">
+                    <Grid.Item col={4} xs={12} alignItems="start">
                       <Field.Root width="100%" hint={getMessage('page.settings.form.author.blockedProps.hint')}>
                         <Field.Label htmlFor="enabledCollections">
                           {getMessage('page.settings.form.author.blockedProps.label')}
@@ -307,7 +306,7 @@ const Settings = () => {
                         <Field.Hint />
                       </Field.Root>
                     </Grid.Item>
-                    <Grid.Item xs={4} alignItems="start">
+                    <Grid.Item col={4} xs={12} alignItems="start">
                       <Field.Root width="100%" hint={getMessage('page.settings.form.gqlAuth.hint')}>
                         <Field.Label>
                           {getMessage('page.settings.form.gqlAuth.label')}
@@ -330,7 +329,7 @@ const Settings = () => {
                     {getMessage('page.settings.section.client')}
                   </Typography>
                   <Grid.Root gap={4} marginTop={4} width="100%">
-                    <Grid.Item xs={4} alignItems="start">
+                    <Grid.Item col={4} xs={12} alignItems="start">
                       <Field.Root width="100%" hint={getMessage('page.settings.form.client.url.hint')}>
                         <Field.Label>
                           {getMessage('page.settings.form.client.url.label')}
@@ -339,7 +338,7 @@ const Settings = () => {
                         <Field.Hint />
                       </Field.Root>
                     </Grid.Item>
-                    <Grid.Item xs={4} alignItems="start">
+                    <Grid.Item col={4} xs={12} alignItems="start">
                       <Field.Root width="100%" hint={getMessage('page.settings.form.client.email.hint')}>
                         <Field.Label>
                           {getMessage('page.settings.form.client.email.label')}
@@ -348,7 +347,7 @@ const Settings = () => {
                         <Field.Hint />
                       </Field.Root>
                     </Grid.Item>
-                    <Grid.Item xs={4} alignItems="start">
+                    <Grid.Item col={4} xs={12} alignItems="start">
                       <Field.Root
                         width="100%"
                         hint={getMessage('page.settings.form.moderatorRoles.hint')}
@@ -414,8 +413,6 @@ const Settings = () => {
     </>
   );
 };
-
-const queryClient = new QueryClient();
 
 export default () => (
   <CommonProviders>

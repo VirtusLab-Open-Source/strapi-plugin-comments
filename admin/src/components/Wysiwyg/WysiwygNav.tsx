@@ -73,6 +73,8 @@ const WysiwygNav = ({
         background="neutral100"
         justifyContent="space-between"
         borderRadius={`0.4rem 0.4rem 0 0`}
+        wrap="wrap"
+        gap={2}
       >
         <Flex>
           <Field.Root>
@@ -126,6 +128,8 @@ const WysiwygNav = ({
       background="neutral100"
       justifyContent="space-between"
       borderRadius={`0.4rem 0.4rem 0 0`}
+      wrap="wrap"
+      gap={2}
     >
       <Flex>
         <Field.Root>

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { DiscussionThreadItemActions } from './DiscussionThreadItemActions';
 import { DiscussionThreadItemFooter } from './DiscussionThreadItemFooter';
 import { DiscussionThreadItemProps } from './props';
+import { Divider } from '@strapi/design-system';
 
 
 export const DiscussionThreadItemContentTypographyRenderer = styled('div')(() => {
@@ -46,7 +47,14 @@ export const DiscussionThreadItem: FC<PropsWithChildren<DiscussionThreadItemProp
           gap={2}
           width="100%"
         >
-          <Flex width="100%" justifyContent="space-between" marginTop="6px">
+          <Flex 
+            width="100%"
+            justifyContent="space-between"
+            marginTop={{ initial: 0, medium: 1.5}}
+            direction={{ initial: 'column-reverse', medium: 'row' }}
+            alignItems={{ initial: 'flex-start', medium: 'center' }}
+            gap={{ initial: 2, medium: 1}}
+          >
             <Flex grow={1} alignItems="center">
               <Typography variant="omega" textColor="neutral800">
                 {/* TODO dangerouslySetInnerHTML in case of comments created by users is not safe
@@ -65,6 +73,7 @@ export const DiscussionThreadItem: FC<PropsWithChildren<DiscussionThreadItemProp
           <DiscussionThreadItemFooter {...props} />
         </Flex>
       </Flex>
+      <Divider />
     </Box>
   );
 };

@@ -13,6 +13,7 @@ import { CommentStatusBadge } from '../CommentStatusBadge';
 import { IconButtonGroup } from '../IconButtonGroup';
 import { ReviewFlow } from '../ReviewFlow';
 import { UserAvatar } from '../UserAvatar';
+import { useIsMobile } from '@strapi/strapi/admin';
 
 type Props = {
   readonly item: Comment;
@@ -61,33 +62,37 @@ export const CommentRow: FC<Props> = ({ item }) => {
 
   const { name, email, avatar } = item.author || {};
 
+  const isMobile = useIsMobile()
+
   return (
     <Tr>
       <Td>
         <Typography>{item.id}</Typography>
       </Td>
-      <Td>
+      <Td maxWidth="200px">
         <Tooltip
           open={item.isAdminComment ? false : undefined}
           label={!item.isAdminComment ? email || getMessage('page.discover.table.header.author.email') : undefined}
           align="start"
           side="left">
           <Flex gap={2} style={{ cursor: item.isAdminComment ? 'default' : 'help' }}>
-            {item.author && (
+            {item.author && !isMobile && (
               <UserAvatar
                 name={name || ''}
                 avatar={avatar}
                 isAdminComment={item.isAdminComment}
               />
             )}
-            <Typography>{name || getMessage('components.author.unknown')}</Typography>
+            <Typography ellipsis>
+              {name || getMessage('components.author.unknown')}
+            </Typography>
           </Flex>
         </Tooltip>
       </Td>
       <Td maxWidth="200px">
         <Typography ellipsis>{item.content}</Typography>
       </Td>
-      <Td>
+      <Td display={{ initial: 'none', large: 'table-cell' }}>
         {item.threadOf ? (
           <Link href={`discover/${item.threadOf.id}`} onClick={onClickDetails(item.threadOf.id)}>
             {getMessage(
@@ -103,7 +108,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
       <Td maxWidth="200px">
         {contentTypeLink ?? '-'}
       </Td>
-      <Td>
+      <Td display={{ initial: 'none', large: 'table-cell' }}>
         <Typography>
           {formatDate(item.updatedAt || item.createdAt, {
             dateStyle: 'long',

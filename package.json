@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "3.1.4",
+  "version": "3.2.0",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
@@ -66,12 +66,12 @@
   "devDependencies": {
     "@jest/types": "29.5.x",
     "@sensinum/strapi-utils": "^1.0.10",
-    "@strapi/plugin-cloud": "^5.14.0",
-    "@strapi/plugin-graphql": "5.14.0",
-    "@strapi/plugin-users-permissions": "^5.14.0",
+    "@strapi/plugin-cloud": "^5.33.4",
+    "@strapi/plugin-graphql": "^5.33.4",
+    "@strapi/plugin-users-permissions": "^5.33.4",
     "@strapi/sdk-plugin": "^5.3.2",
-    "@strapi/strapi": "^5.14.0",
-    "@strapi/types": "^5.14.0",
+    "@strapi/strapi": "^5.33.4",
+    "@strapi/types": "^5.33.4",
     "@types/jest": "^30.0.0",
     "@types/koa": "^2.15.0",
     "@types/minimatch": "3.0.5",
@@ -89,6 +89,8 @@
     "typescript": "^5.6.2"
   },
   "peerDependencies": {
+    "@strapi/design-system": "^2.0.0",
+    "@strapi/icons": "^2.0.0",
     "@strapi/sdk-plugin": "^5.0.0",
     "@strapi/strapi": "^5.0.0",
     "react": "^17.0.0 || ^18.0.0",
@@ -127,7 +129,7 @@
     }
   ],
   "engines": {
-    "node": ">=18.0.0 <=22.x.x",
+    "node": ">=18.0.0 <=24.x.x",
     "npm": ">=6.0.0"
   },
   "keywords": [
