@@ -32,7 +32,6 @@ export const ModeratorResponse: FC<ModeratorResponseProps> = ({ id, blockedThrea
   });
 
   const onSubmit = async (values: { content: string }) => {
-    console.log(values);
     await commentMutation.postComment.mutateAsync({ id, ...values, author });
   };
 
