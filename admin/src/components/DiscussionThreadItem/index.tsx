@@ -5,7 +5,7 @@ import { DiscussionThreadItemActions } from './DiscussionThreadItemActions';
 import { DiscussionThreadItemFooter } from './DiscussionThreadItemFooter';
 import { DiscussionThreadItemProps } from './props';
 import { Divider } from '@strapi/design-system';
-
+import { useSanitizedHTML } from '../../hooks/useSanitizedHTML';
 
 export const DiscussionThreadItemContentTypographyRenderer = styled('div')(() => {
   return {
@@ -27,6 +27,9 @@ export const DiscussionThreadItemContentTypographyRenderer = styled('div')(() =>
 
 export const DiscussionThreadItem: FC<PropsWithChildren<DiscussionThreadItemProps>> = (props) => {
   const { root, preview, item, isSelected, pinned, as = 'li' } = props;
+
+  const html = useSanitizedHTML(item.content);
+
   return (
     <Box width="100%" as={as} marginBottom={preview ? 4 : 0}>
       <Flex
@@ -57,9 +60,7 @@ export const DiscussionThreadItem: FC<PropsWithChildren<DiscussionThreadItemProp
           >
             <Flex grow={1} alignItems="center">
               <Typography variant="omega" textColor="neutral800">
-                {/* TODO dangerouslySetInnerHTML in case of comments created by users is not safe
-                and can cause XSS attacks. We need to sanitize the content before displaying it. */}
-                <DiscussionThreadItemContentTypographyRenderer dangerouslySetInnerHTML={{ __html: item.content }} />
+                <DiscussionThreadItemContentTypographyRenderer dangerouslySetInnerHTML={{ __html: html }} />
               </Typography>
             </Flex>
             {!preview && (

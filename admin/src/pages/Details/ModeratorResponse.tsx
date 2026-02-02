@@ -32,6 +32,7 @@ export const ModeratorResponse: FC<ModeratorResponseProps> = ({ id, blockedThrea
   });
 
   const onSubmit = async (values: { content: string }) => {
+    console.log(values);
     await commentMutation.postComment.mutateAsync({ id, ...values, author });
   };
 
@@ -84,6 +85,7 @@ export const ModeratorResponse: FC<ModeratorResponseProps> = ({ id, blockedThrea
                   </Button>
                 )}
                 <Button
+                  type="submit"
                   variant="primary"
                   disabled={!values.content}
                 >

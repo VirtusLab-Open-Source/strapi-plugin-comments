@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
@@ -55,9 +55,6 @@
     "codemirror5": "npm:codemirror@^5.65.11",
     "match-sorter": "^6.3.4",
     "no-profanity": "^1.5.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.22.3",
     "sanitize-html": "^2.13.1",
     "styled-components": "6.1.8",
     "zod": "^3.23.8",
@@ -84,6 +81,7 @@
     "jest-styled-components": "^7.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^6.22.3",
     "ts-jest": "^29.1.4",
     "ts-node": "^10.9.1",
     "typescript": "^5.6.2"
