@@ -19,6 +19,7 @@ describe('admin.service', () => {
     findOne: jest.fn(),
     updateComment: jest.fn(),
     sanitizeCommentEntity: jest.fn(),
+    sanitizeCommentContent: jest.fn((content: string) => content),
     parseRelationString: jest.fn(),
     findAllInHierarchy: jest.fn(),
     findRelatedEntitiesFor: jest.fn(),

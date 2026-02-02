@@ -36,6 +36,7 @@ describe('client.service', () => {
     checkBadWords: jest.fn(),
     findOne: jest.fn(),
     sanitizeCommentEntity: jest.fn(),
+    sanitizeCommentContent: jest.fn((content: string) => content),
   };
 
   const mockCommentRepository = {
