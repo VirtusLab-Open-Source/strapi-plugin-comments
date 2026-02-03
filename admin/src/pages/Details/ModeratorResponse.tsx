@@ -84,6 +84,7 @@ export const ModeratorResponse: FC<ModeratorResponseProps> = ({ id, blockedThrea
                   </Button>
                 )}
                 <Button
+                  type="submit"
                   variant="primary"
                   disabled={!values.content}
                 >

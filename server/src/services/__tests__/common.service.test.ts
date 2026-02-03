@@ -118,6 +118,40 @@ describe('common.service', () => {
     });
   });
 
+  describe('sanitizeCommentContent', () => {
+    it('should return sanitized content preserving allowed HTML', () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const content = '<p>Hello <strong>world</strong></p>';
+
+      const result = service.sanitizeCommentContent(content);
+
+      expect(result).toBe('<p>Hello <strong>world</strong></p>');
+    });
+
+    it('should strip script tags to prevent XSS', () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const content = '<p>Safe</p><script>alert("xss")</script>';
+
+      const result = service.sanitizeCommentContent(content);
+
+      expect(result).not.toContain('<script>');
+      expect(result).not.toContain('alert');
+      expect(result).toContain('<p>Safe</p>');
+    });
+
+    it('should strip event handlers from elements', () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const content = '<p onclick="alert(1)">Click me</p>';
+
+      const result = service.sanitizeCommentContent(content);
+
+      expect(result).not.toContain('onclick');
+    });
+  });
+
   describe('isValidUserContext', () => {
     it('should return true for valid user context', () => {
       const strapi = getStrapi();
