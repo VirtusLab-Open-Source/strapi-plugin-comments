@@ -77,6 +77,22 @@ describe('Store repository', () => {
       });
     });
 
+    it('includes isGQLPluginEnabled when config exists and viaSettingsPage is true', async () => {
+      const strapi = getStrapi();
+      const mockConfig = { entryLabel: 'test', approvalFlow: true };
+      mockStore.get.mockResolvedValue(mockConfig);
+      caster<jest.Mock>(strapi.plugin).mockReturnValue({ kind: 'plugin' });
+
+      const result = await getRepository(strapi).get(true);
+
+      expect(strapi.plugin).toHaveBeenCalledWith('graphql');
+      expect(result.right).toHaveProperty('isGQLPluginEnabled', true);
+      expect(result.right).toMatchObject({
+        ...mockConfig,
+        regex: expect.any(Object),
+      });
+    });
+
     it('returns local config when store is empty', async () => {
       const strapi = getStrapi();
       mockStore.get.mockResolvedValue(null);
