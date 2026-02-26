@@ -91,6 +91,21 @@ describe('Client controller', () => {
 
       await expect(getController(getStrapi()).post(ctx)).rejects.toThrow();
     });
+
+    it('should throw error when newCommentValidator fails', async () => {
+      const ctx = {
+        params: { relation: 'test' },
+        request: { body: {} },
+        state: { user: { id: 1 } }
+      } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const error = new Error('Validation failed');
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.newCommentValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).post(ctx)).rejects.toThrow();
+    });
   });
 
   describe('findAllFlat', () => {
@@ -138,6 +153,32 @@ describe('Client controller', () => {
           }
         }
       });
+    });
+
+    it('should throw error when store config validation fails', async () => {
+      const ctx = {
+        params: { relation: 'test' },
+        query: { page: 1 }
+      } as RequestContext;
+      const error = new Error('Config validation failed');
+
+      mockStoreRepository.get.mockResolvedValue({ left: error });
+
+      await expect(getController(getStrapi()).findAllFlat(ctx)).rejects.toThrow();
+    });
+
+    it('should throw error when findAllFlatValidator fails', async () => {
+      const ctx = {
+        params: { relation: 'test' },
+        query: { page: 1 }
+      } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const error = new Error('Validation failed');
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.findAllFlatValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).findAllFlat(ctx)).rejects.toThrow();
     });
   });
 
@@ -190,6 +231,32 @@ describe('Client controller', () => {
           }
         }
       });
+    });
+
+    it('should throw error when store config validation fails', async () => {
+      const ctx = {
+        params: { relation: 'test' },
+        query: { page: 1 }
+      } as RequestContext;
+      const error = new Error('Config validation failed');
+
+      mockStoreRepository.get.mockResolvedValue({ left: error });
+
+      await expect(getController(getStrapi()).findAllInHierarchy(ctx)).rejects.toThrow();
+    });
+
+    it('should throw error when findAllInHierarchyValidator fails', async () => {
+      const ctx = {
+        params: { relation: 'test' },
+        query: { page: 1 }
+      } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const error = new Error('Validation failed');
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.findAllInHierarchyValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).findAllInHierarchy(ctx)).rejects.toThrow();
     });
   });
 
@@ -276,6 +343,18 @@ describe('Client controller', () => {
           }
         }
       }, false);
+    });
+
+    it('should throw error when findAllPerAuthorValidator fails', async () => {
+      const ctx = {
+        params: { authorId: '1', type: 'user' },
+        query: { page: 1 }
+      } as RequestContext;
+      const error = new Error('Validation failed');
+
+      caster<jest.Mock>(clientValidator.findAllPerAuthorValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).findAllPerAuthor(ctx)).rejects.toThrow();
     });
   });
 
@@ -397,6 +476,34 @@ describe('Client controller', () => {
       expect(result).toEqual(expectedResult);
       expect(mockClientService.reportAbuse).toHaveBeenCalledWith(validatedData, { id: 1 });
     });
+
+    it('should throw error when store config validation fails', async () => {
+      const ctx = {
+        params: { id: '1' },
+        request: { body: { reason: 'spam' } },
+        state: { user: { id: 1 } }
+      } as RequestContext;
+      const error = new Error('Config validation failed');
+
+      mockStoreRepository.get.mockResolvedValue({ left: error });
+
+      await expect(getController(getStrapi()).reportAbuse(ctx)).rejects.toThrow();
+    });
+
+    it('should throw error when reportAbuseValidator fails', async () => {
+      const ctx = {
+        params: { id: '1' },
+        request: { body: { reason: 'spam' } },
+        state: { user: { id: 1 } }
+      } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const error = new Error('Validation failed');
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.reportAbuseValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).reportAbuse(ctx)).rejects.toThrow();
+    });
   });
 
   describe('removeComment', () => {
@@ -418,6 +525,34 @@ describe('Client controller', () => {
 
       expect(result).toEqual(expectedResult);
       expect(mockClientService.markAsRemoved).toHaveBeenCalledWith(validatedData, { id: 1 });
+    });
+
+    it('should throw error when store config validation fails', async () => {
+      const ctx = {
+        params: { id: '1' },
+        query: {},
+        state: { user: { id: 1 } }
+      } as RequestContext;
+      const error = new Error('Config validation failed');
+
+      mockStoreRepository.get.mockResolvedValue({ left: error });
+
+      await expect(getController(getStrapi()).removeComment(ctx)).rejects.toThrow();
+    });
+
+    it('should throw error when removeCommentValidator fails', async () => {
+      const ctx = {
+        params: { id: '1' },
+        query: {},
+        state: { user: { id: 1 } }
+      } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const error = new Error('Validation failed');
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.removeCommentValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).removeComment(ctx)).rejects.toThrow();
     });
   });
 });

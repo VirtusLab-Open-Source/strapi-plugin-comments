@@ -33,6 +33,27 @@ describe("getMessage()", () => {
       id: "comments.message.key",
     });
   });
+  it("should handle config object with empty id (fallback to formattedId)", () => {
+    expect(getMessage({ id: "" })).toEqual({
+      defaultMessage: "",
+      id: "comments.",
+    });
+  });
+  it("should handle config object with props", () => {
+    expect(
+      getMessage(
+        {
+          id: "message.key",
+          props: { count: 5 },
+        },
+        "default"
+      )
+    ).toEqual({
+      defaultMessage: "default",
+      id: "comments.message.key",
+      count: 5,
+    });
+  });
   it("should allow out of scope translates", () => {
     expect(
       getMessage(

@@ -35,6 +35,7 @@ describe('Comment repository', () => {
       findOne: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      deleteMany: jest.fn(),
       updateMany: jest.fn(),
       create: jest.fn(),
     }),
@@ -153,6 +154,16 @@ describe('Comment repository', () => {
       await getRepository(strapi).updateMany(params);
 
       expect(strapi.query(UID).updateMany).toHaveBeenCalledWith(params);
+    });
+
+    it('deleteMany deletes multiple comments', async () => {
+      const params = { where: { id_in: [1, 2] } };
+      const strapi = getStrapi();
+      caster<jest.Mock>(strapi.query(UID).deleteMany).mockResolvedValue(undefined);
+
+      await getRepository(strapi).deleteMany(params);
+
+      expect(strapi.query(UID).deleteMany).toHaveBeenCalledWith(params);
     });
   });
   describe('when getConfig returns true', () => {

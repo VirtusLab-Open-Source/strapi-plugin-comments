@@ -1,6 +1,7 @@
 import { StrapiContext } from '../../@types';
 import { APPROVAL_STATUS } from '../../const';
 import { getCommentRepository, getReportCommentRepository } from '../../repositories';
+import { getDefaultAuthorPopulate } from '../../repositories/utils';
 import { caster } from '../../test/utils';
 import { getPluginService } from '../../utils/getPluginService';
 import adminService from '../admin/admin.service';
@@ -8,6 +9,12 @@ import adminService from '../admin/admin.service';
 jest.mock('../../repositories', () => ({
   getCommentRepository: jest.fn(),
   getReportCommentRepository: jest.fn(),
+}));
+
+jest.mock('../../repositories/utils', () => ({
+  getDefaultAuthorPopulate: jest.fn().mockReturnValue(true),
+  getOrderBy: (orderBy?: string | null) =>
+    typeof orderBy === 'string' ? orderBy.split(':') : ['createdAt', 'desc'],
 }));
 
 jest.mock('../../utils/getPluginService', () => ({
@@ -52,6 +59,7 @@ describe('admin.service', () => {
     caster<jest.Mock>(getPluginService).mockReturnValue(mockCommonService);
     caster<jest.Mock>(getCommentRepository).mockReturnValue(mockCommentRepository);
     caster<jest.Mock>(getReportCommentRepository).mockReturnValue(mockReportCommentRepository);
+    caster<jest.Mock>(getDefaultAuthorPopulate).mockReturnValue(true);
   });
 
   const getStrapi = () =>
@@ -202,6 +210,172 @@ describe('admin.service', () => {
         },
       });
     });
+
+    it('should handle threadOf as object when mapping comment threads', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockReports = [
+        { id: 1, related: { id: 10, content: 'Comment 1' } },
+      ];
+
+      mockReportCommentRepository.findPage.mockResolvedValue({
+        results: mockReports,
+        pagination: { page: 1, pageSize: 10, total: 1 },
+      });
+      mockCommentRepository.findMany.mockResolvedValue([
+        { threadOf: { id: 10 } },
+      ]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      const result = await service.findReports({
+        page: 1,
+        pageSize: 10,
+      });
+
+      expect(result.result).toHaveLength(1);
+      expect(mockCommentRepository.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { threadOf: [10] },
+        }),
+      );
+    });
+
+    it('should handle threadOf as non-object when mapping comment threads', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockReports = [
+        { id: 1, related: { id: 10, content: 'Comment 1' } },
+      ];
+
+      mockReportCommentRepository.findPage.mockResolvedValue({
+        results: mockReports,
+        pagination: { page: 1, pageSize: 10, total: 1 },
+      });
+      mockCommentRepository.findMany.mockResolvedValue([
+        { threadOf: 10 },
+      ]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      const result = await service.findReports({
+        page: 1,
+        pageSize: 10,
+      });
+
+      expect(result.result).toHaveLength(1);
+      expect(mockCommentRepository.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { threadOf: [10] },
+        })
+      );
+    });
+
+    it('should handle related as non-object when mapping report comment ids', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockReports = [
+        { id: 1, related: 'api::article.article:1' },
+      ];
+
+      mockReportCommentRepository.findPage.mockResolvedValue({
+        results: mockReports,
+        pagination: { page: 1, pageSize: 10, total: 1 },
+      });
+      mockCommentRepository.findMany.mockResolvedValue([]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      const result = await service.findReports({
+        page: 1,
+        pageSize: 10,
+      });
+
+      expect(result.result).toHaveLength(1);
+      expect(mockCommentRepository.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { threadOf: [] },
+        })
+      );
+    });
+
+    it('should use empty object when defaultAuthorUserPopulate is boolean', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      caster<jest.Mock>(getDefaultAuthorPopulate).mockReturnValue(true);
+      const mockReports = [
+        { id: 1, related: { id: 1, content: 'Comment 1' } },
+      ];
+
+      mockReportCommentRepository.findPage.mockResolvedValue({
+        results: mockReports,
+        pagination: { page: 1, pageSize: 10, total: 1 },
+      });
+      mockCommentRepository.findMany.mockResolvedValue([]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((c: any) => c);
+
+      const result = await service.findReports({
+        page: 1,
+        pageSize: 10,
+      });
+
+      expect(result.result).toHaveLength(1);
+      const entityCall = mockCommonService.sanitizeCommentEntity.mock.calls.find(
+        (call: any[]) => call.length === 4,
+      );
+      expect(entityCall?.[3]).toEqual({});
+    });
+
+    it('should use defaultAuthorUserPopulate?.populate when object with populate', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      caster<jest.Mock>(getDefaultAuthorPopulate).mockReturnValueOnce({ populate: { avatar: true } });
+      const mockReports = [
+        { id: 1, related: { id: 1, content: 'Comment 1' } },
+      ];
+
+      mockReportCommentRepository.findPage.mockResolvedValue({
+        results: mockReports,
+        pagination: { page: 1, pageSize: 10, total: 1 },
+      });
+      mockCommentRepository.findMany.mockResolvedValue([]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((c: any) => c);
+
+      const result = await service.findReports({
+        page: 1,
+        pageSize: 10,
+      });
+
+      expect(result.result).toHaveLength(1);
+      const entityCall = mockCommonService.sanitizeCommentEntity.mock.calls.find(
+        (call: any[]) => call.length === 4,
+      );
+      expect(entityCall?.[3]).toEqual({ avatar: true });
+    });
+
+    it('should use undefined when defaultAuthorUserPopulate is object without populate', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      caster<jest.Mock>(getDefaultAuthorPopulate).mockReturnValueOnce({});
+      const mockReports = [
+        { id: 1, related: { id: 1, content: 'Comment 1' } },
+      ];
+
+      mockReportCommentRepository.findPage.mockResolvedValue({
+        results: mockReports,
+        pagination: { page: 1, pageSize: 10, total: 1 },
+      });
+      mockCommentRepository.findMany.mockResolvedValue([]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((c: any) => c);
+
+      const result = await service.findReports({
+        page: 1,
+        pageSize: 10,
+      });
+
+      expect(result.result).toHaveLength(1);
+      const entityCall = mockCommonService.sanitizeCommentEntity.mock.calls.find(
+        (call: any[]) => call.length === 4,
+      );
+      expect(entityCall?.[3]).toEqual(undefined);
+    });
   });
 
   describe('findOneAndThread', () => {
@@ -239,6 +413,127 @@ describe('admin.service', () => {
       mockCommentRepository.findOne.mockResolvedValue(null);
 
       await expect(service.findOneAndThread({ id: 1 })).rejects.toThrow('Not found');
+    });
+
+    it('should throw error when related entity not found', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComment = {
+        id: 1,
+        content: 'Test comment',
+        related: 'api::test.test:1',
+        threadOf: null,
+      };
+
+      mockCommentRepository.findOne.mockResolvedValue(mockComment);
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue(null);
+
+      await expect(service.findOneAndThread({ id: 1 })).rejects.toThrow('Relation not found');
+    });
+
+    it('should use threadOf.id when threadOf is object', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComment = {
+        id: 1,
+        content: 'Test comment',
+        related: 'api::test.test:1',
+        threadOf: { id: 5 },
+      };
+      const mockRelatedEntity = { id: 1, title: 'Test', uid: 'api::test.test' };
+
+      mockCommentRepository.findOne.mockResolvedValue(mockComment);
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue(mockRelatedEntity);
+      mockCommonService.findAllInHierarchy.mockResolvedValue([{ id: 2, content: 'Reply' }]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      const result = await service.findOneAndThread({ id: 1 });
+
+      expect(result.entity).toBeDefined();
+      expect(result.selected).toBeDefined();
+      expect(result.level).toHaveLength(1);
+      expect(mockCommonService.findAllInHierarchy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          filters: expect.objectContaining({
+            threadOf: 5,
+          }),
+          startingFromId: 5,
+        }),
+        false,
+      );
+    });
+
+    it('should use empty object when defaultAuthorUserPopulate is boolean in findOneAndThread', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      caster<jest.Mock>(getDefaultAuthorPopulate).mockReturnValue(true);
+      const mockComment = {
+        id: 1,
+        content: 'Test comment',
+        related: 'api::test.test:1',
+        threadOf: null,
+      };
+      const mockRelatedEntity = { id: 1, title: 'Test', uid: 'api::test.test' };
+
+      mockCommentRepository.findOne.mockResolvedValue(mockComment);
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue(mockRelatedEntity);
+      mockCommonService.findAllInHierarchy.mockResolvedValue([]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      await service.findOneAndThread({ id: 1 });
+
+      expect(mockCommonService.sanitizeCommentEntity).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 1, threadOf: null }),
+        [],
+        [],
+        {},
+      );
+    });
+
+    it('should use defaultAuthorUserPopulate.populate in findOneAndThread when not boolean', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      caster<jest.Mock>(getDefaultAuthorPopulate).mockReturnValue({ populate: { avatar: true } });
+      const mockComment = {
+        id: 1,
+        content: 'Test comment',
+        related: 'api::test.test:1',
+        threadOf: null,
+      };
+      const mockRelatedEntity = { id: 1, title: 'Test', uid: 'api::test.test' };
+
+      mockCommentRepository.findOne.mockResolvedValue(mockComment);
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue(mockRelatedEntity);
+      mockCommonService.findAllInHierarchy.mockResolvedValue([]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      await service.findOneAndThread({ id: 1 });
+
+      expect(mockCommonService.sanitizeCommentEntity).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 1,
+          threadOf: null,
+        }),
+        [],
+        [],
+        { avatar: true },
+      );
     });
   });
 
@@ -278,6 +573,72 @@ describe('admin.service', () => {
       expect(result.blocked).toBe(true);
       expect(result.blockedThread).toBe(true);
       expect(mockCommonService.modifiedNestedNestedComments).toHaveBeenCalled();
+    });
+
+    it('should use forceStatus true when provided', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComment = { id: 1, blocked: false, blockedThread: false };
+
+      mockCommonService.findOne.mockResolvedValue(mockComment);
+      mockCommonService.updateComment.mockResolvedValue({
+        ...mockComment,
+        blocked: true,
+        blockedThread: true,
+      });
+      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      await service.blockCommentThread(1, true);
+
+      expect(mockCommonService.updateComment).toHaveBeenCalledWith(
+        { id: 1 },
+        { blocked: true, blockedThread: true },
+      );
+    });
+
+    it('should use forceStatus false when provided', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComment = { id: 1, blocked: true, blockedThread: true };
+
+      mockCommonService.findOne.mockResolvedValue(mockComment);
+      mockCommonService.updateComment.mockResolvedValue({
+        ...mockComment,
+        blocked: false,
+        blockedThread: false,
+      });
+      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      await service.blockCommentThread(1, false);
+
+      expect(mockCommonService.updateComment).toHaveBeenCalledWith(
+        { id: 1 },
+        { blocked: false, blockedThread: false },
+      );
+    });
+
+    it('should use !entry.blocked when forceStatus is undefined', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComment = { id: 1, blocked: true, blockedThread: true };
+
+      mockCommonService.findOne.mockResolvedValue(mockComment);
+      mockCommonService.updateComment.mockResolvedValue({
+        ...mockComment,
+        blocked: false,
+        blockedThread: false,
+      });
+      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      await service.blockCommentThread(1);
+
+      expect(mockCommonService.updateComment).toHaveBeenCalledWith(
+        { id: 1 },
+        { blocked: false, blockedThread: false },
+      );
     });
   });
 
