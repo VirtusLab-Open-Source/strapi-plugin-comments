@@ -37,6 +37,61 @@ describe('Test service functions utils', () => {
   });
 
   describe('buildAuthorModel', () => {
+    test('uses empty array fallback when fieldsToPopulate is not provided', () => {
+      const item = {
+        id: 1,
+        authorUser: {
+          id: 10,
+          username: 'john',
+          email: 'john@test.com',
+        },
+        content: 'test',
+      };
+      const result = buildAuthorModel(item, []);
+      expect(result.author).toMatchObject({
+        id: 10,
+        name: 'john',
+        email: 'john@test.com',
+      });
+    });
+
+    test('uses avatar.formats.thumbnail.url when available', () => {
+      const item = {
+        id: 1,
+        authorUser: {
+          id: 10,
+          username: 'john',
+          email: 'john@test.com',
+          avatar: {
+            url: '/uploads/large.png',
+            formats: {
+              thumbnail: { url: '/uploads/thumbnail.png' },
+            },
+          },
+        },
+        content: 'test',
+      };
+      const result = buildAuthorModel(item, []);
+      expect(result.author.avatar).toBe('/uploads/thumbnail.png');
+    });
+
+    test('falls back to avatar.url when formats.thumbnail is not available', () => {
+      const item = {
+        id: 1,
+        authorUser: {
+          id: 10,
+          username: 'john',
+          email: 'john@test.com',
+          avatar: {
+            url: '/uploads/avatar.png',
+          },
+        },
+        content: 'test',
+      };
+      const result = buildAuthorModel(item, []);
+      expect(result.author.avatar).toBe('/uploads/avatar.png');
+    });
+
     test('reduces authorUser with fieldsToPopulate', () => {
       const item = {
         id: 1,

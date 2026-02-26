@@ -125,6 +125,31 @@ describe('admin.service', () => {
         },
       });
     });
+
+    it('should not include orderBy when orderBy is not provided', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComments = [{ id: 1, content: 'Comment 1' }];
+
+      mockCommentRepository.findWithCount.mockResolvedValue({
+        results: mockComments,
+        pagination: { page: 1, pageSize: 10, total: 1 },
+      });
+      mockCommonService.findRelatedEntitiesFor.mockResolvedValue([]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((c: any) => c);
+      mockCommonService.mergeRelatedEntityTo.mockImplementation((c: any) => c);
+
+      await service.findAll({
+        page: 1,
+        pageSize: 10,
+      });
+
+      expect(mockCommentRepository.findWithCount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: undefined,
+        }),
+      );
+    });
   });
 
   describe('findReports', () => {
@@ -168,6 +193,64 @@ describe('admin.service', () => {
           },
         },
       });
+    });
+
+    it('should not include orderBy when orderBy is not provided', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockReports = [
+        { id: 1, related: { id: 1, content: 'Comment 1' } },
+      ];
+
+      mockReportCommentRepository.findPage.mockResolvedValue({
+        results: mockReports,
+        pagination: { page: 1, pageSize: 10, total: 1 },
+      });
+      mockCommentRepository.findMany.mockResolvedValue([]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      await service.findReports({
+        page: 1,
+        pageSize: 10,
+      });
+
+      expect(mockReportCommentRepository.findPage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: undefined,
+        }),
+      );
+    });
+
+    it('should add content search when _q is provided', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockReports = [
+        { id: 1, related: { id: 1, content: 'Comment 1' } },
+      ];
+
+      mockReportCommentRepository.findPage.mockResolvedValue({
+        results: mockReports,
+        pagination: { page: 1, pageSize: 10, total: 1 },
+      });
+      mockCommentRepository.findMany.mockResolvedValue([]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      const result = await service.findReports({
+        page: 1,
+        pageSize: 10,
+        _q: 'search term',
+      });
+
+      expect(result.result).toHaveLength(1);
+      expect(mockReportCommentRepository.findPage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          page: 1,
+          pageSize: 10,
+          where: expect.objectContaining({
+            content: { $contains: 'search term' },
+          }),
+        }),
+      );
     });
 
     it('should handle custom ordering', async () => {
@@ -433,6 +516,90 @@ describe('admin.service', () => {
       mockFindOne.mockResolvedValue(null);
 
       await expect(service.findOneAndThread({ id: 1 })).rejects.toThrow('Relation not found');
+    });
+
+    it('should pass $or filter when removed is true', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComment = {
+        id: 1,
+        content: 'Test comment',
+        related: 'api::test.test:1',
+        threadOf: null,
+      };
+      const mockRelatedEntity = { id: 1, title: 'Test', uid: 'api::test.test' };
+
+      mockCommentRepository.findOne.mockResolvedValue(mockComment);
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue(mockRelatedEntity);
+      mockCommonService.findAllInHierarchy.mockResolvedValue([]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      await service.findOneAndThread({ id: 1, removed: true });
+
+      expect(mockCommonService.findAllInHierarchy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          filters: expect.objectContaining({
+            $or: [{ removed: false }, { removed: { $notNull: false } }],
+          }),
+        }),
+        false,
+      );
+    });
+
+    it('should pass empty filters when removed is false', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComment = {
+        id: 1,
+        content: 'Test comment',
+        related: 'api::test.test:1',
+        threadOf: null,
+      };
+      const mockRelatedEntity = { id: 1, title: 'Test', uid: 'api::test.test' };
+
+      mockCommentRepository.findOne.mockResolvedValue(mockComment);
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue(mockRelatedEntity);
+      mockCommonService.findAllInHierarchy.mockResolvedValue([]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      await service.findOneAndThread({ id: 1, removed: false });
+
+      const filters = mockCommonService.findAllInHierarchy.mock.calls[0][0].filters;
+      expect(filters).not.toHaveProperty('$or');
+    });
+
+    it('should pass empty filters when removed is not provided', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComment = {
+        id: 1,
+        content: 'Test comment',
+        related: 'api::test.test:1',
+        threadOf: null,
+      };
+      const mockRelatedEntity = { id: 1, title: 'Test', uid: 'api::test.test' };
+
+      mockCommentRepository.findOne.mockResolvedValue(mockComment);
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue(mockRelatedEntity);
+      mockCommonService.findAllInHierarchy.mockResolvedValue([]);
+      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+
+      await service.findOneAndThread({ id: 1 });
+
+      const filters = mockCommonService.findAllInHierarchy.mock.calls[0][0].filters;
+      expect(filters).not.toHaveProperty('$or');
     });
 
     it('should use threadOf.id when threadOf is object', async () => {

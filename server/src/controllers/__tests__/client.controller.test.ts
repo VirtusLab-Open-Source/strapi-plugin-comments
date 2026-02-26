@@ -305,6 +305,61 @@ describe('Client controller', () => {
       }, true);
     });
 
+    it('should pass false when type is not provided', async () => {
+      const ctx = {
+        params: { authorId: '1' },
+        query: { page: 1 }
+      } as RequestContext;
+      const validatedData = {
+        authorId: '1',
+        page: 1,
+        filters: {
+          $or: [
+            { removed: { $null: true } },
+            { removed: false }
+          ],
+        },
+      };
+
+      caster<jest.Mock>(clientValidator.findAllPerAuthorValidator).mockReturnValue({ right: validatedData });
+      mockCommonService.findAllPerAuthor.mockResolvedValue([]);
+
+      await getController(getStrapi()).findAllPerAuthor(ctx);
+
+      expect(mockCommonService.findAllPerAuthor).toHaveBeenCalledWith(
+        expect.anything(),
+        false,
+      );
+    });
+
+    it('should pass false when type is generic (lowercase)', async () => {
+      const ctx = {
+        params: { authorId: '1', type: 'generic' },
+        query: { page: 1 }
+      } as RequestContext;
+      const validatedData = {
+        authorId: '1',
+        type: 'generic',
+        page: 1,
+        filters: {
+          $or: [
+            { removed: { $null: true } },
+            { removed: false }
+          ],
+        },
+      };
+
+      caster<jest.Mock>(clientValidator.findAllPerAuthorValidator).mockReturnValue({ right: validatedData });
+      mockCommonService.findAllPerAuthor.mockResolvedValue([]);
+
+      await getController(getStrapi()).findAllPerAuthor(ctx);
+
+      expect(mockCommonService.findAllPerAuthor).toHaveBeenCalledWith(
+        expect.anything(),
+        false,
+      );
+    });
+
     it('should handle generic author type correctly', async () => {
       const ctx = {
         params: { authorId: '1', type: AUTHOR_TYPE.GENERIC },
