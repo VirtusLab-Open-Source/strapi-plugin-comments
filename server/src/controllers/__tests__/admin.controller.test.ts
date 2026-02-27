@@ -8,10 +8,6 @@ jest.mock('../../utils/getPluginService', () => ({
   getPluginService: jest.fn(),
 }));
 
-const mockCommentRepository = {};
-jest.mock('../../repositories', () => ({
-  getCommentRepository: jest.fn(() => mockCommentRepository),
-}));
 
 jest.mock('../../validators/api', () => ({
   admin: {
@@ -66,7 +62,7 @@ describe('Admin controller', () => {
       const result = await getController(getStrapi()).findAll(ctx);
 
       expect(result).toEqual(expectedResult);
-      expect(mockAdminService.findAll).toHaveBeenCalledWith(validatedData, mockCommentRepository);
+      expect(mockAdminService.findAll).toHaveBeenCalledWith(validatedData);
     });
 
     it('should throw error when validation fails', async () => {
@@ -91,7 +87,7 @@ describe('Admin controller', () => {
       const result = await getController(getStrapi()).findReports(ctx);
 
       expect(result).toEqual(expectedResult);
-      expect(mockAdminService.findReports).toHaveBeenCalledWith(validatedData, mockCommentRepository);
+      expect(mockAdminService.findReports).toHaveBeenCalledWith(validatedData);
     });
 
     it('should throw error when validation fails', async () => {
@@ -125,7 +121,7 @@ describe('Admin controller', () => {
       const result = await getController(getStrapi()).findOne(ctx);
 
       expect(result).toEqual(expectedResult);
-      expect(mockAdminService.findOneAndThread).toHaveBeenCalledWith(validatedData, mockCommentRepository);
+      expect(mockAdminService.findOneAndThread).toHaveBeenCalledWith(validatedData);
     });
 
     it('should throw error when validation fails', async () => {
@@ -239,7 +235,7 @@ describe('Admin controller', () => {
       const result = await getController(getStrapi()).postCommentThread(ctx);
 
       expect(result).toEqual(expectedResult);
-      expect(mockAdminService.postCommentThread).toHaveBeenCalledWith(validatedData, mockCommentRepository);
+      expect(mockAdminService.postCommentThread).toHaveBeenCalledWith(validatedData);
     });
 
     it('should throw error when validation fails', async () => {
@@ -292,7 +288,7 @@ describe('Admin controller', () => {
       const result = await getController(getStrapi()).deleteComment(ctx);
 
       expect(result).toEqual(expectedResult);
-      expect(mockAdminService.deleteComment).toHaveBeenCalledWith('1', mockCommentRepository);
+      expect(mockAdminService.deleteComment).toHaveBeenCalledWith('1');
     });
 
     it('should throw error when validation fails', async () => {
@@ -392,7 +388,7 @@ describe('Admin controller', () => {
       const result = await getController(getStrapi()).resolveAllAbuseReportsForThread(ctx);
 
       expect(result).toEqual(expectedResult);
-      expect(mockAdminService.resolveAllAbuseReportsForThread).toHaveBeenCalledWith('1', mockCommentRepository);
+      expect(mockAdminService.resolveAllAbuseReportsForThread).toHaveBeenCalledWith('1');
     });
 
     it('should throw error when validation fails', async () => {
@@ -447,7 +443,7 @@ describe('Admin controller', () => {
       const result = await getController(getStrapi()).updateComment(ctx);
 
       expect(result).toEqual(expectedResult);
-      expect(mockAdminService.updateComment).toHaveBeenCalledWith(validatedData, mockCommentRepository);
+      expect(mockAdminService.updateComment).toHaveBeenCalledWith(validatedData);
     });
 
     it('should throw error when validation fails', async () => {
@@ -475,7 +471,7 @@ describe('Admin controller', () => {
       const result = await getController(getStrapi()).approveComment(ctx);
 
       expect(result).toEqual(expectedResult);
-      expect(mockAdminService.approveComment).toHaveBeenCalledWith('1', mockCommentRepository);
+      expect(mockAdminService.approveComment).toHaveBeenCalledWith('1');
     });
 
     it('should throw error when validation fails', async () => {
@@ -500,7 +496,7 @@ describe('Admin controller', () => {
       const result = await getController(getStrapi()).rejectComment(ctx);
 
       expect(result).toEqual(expectedResult);
-      expect(mockAdminService.rejectComment).toHaveBeenCalledWith('1', mockCommentRepository);
+      expect(mockAdminService.rejectComment).toHaveBeenCalledWith('1');
     });
 
     it('should throw error when validation fails', async () => {

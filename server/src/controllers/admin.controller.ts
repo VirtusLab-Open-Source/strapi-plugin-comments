@@ -1,5 +1,4 @@
 import { Id, RequestContext, StrapiContext } from '../@types';
-import { getCommentRepository } from '../repositories';
 import { PluginServices } from '../services';
 import { isRight, unwrapEither } from '../utils/Either';
 import { getPluginService } from '../utils/getPluginService';
@@ -14,8 +13,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
   async findAll(ctx: RequestContext) {
     const either = adminValidator.getCommentFindAllValidator(ctx.query);
     if (isRight(either)) {
-      const commentRepository = getCommentRepository(strapi);
-      return this.getService('admin').findAll(unwrapEither(either), commentRepository);
+      return this.getService('admin').findAll(unwrapEither(either));
     }
     throw throwError(ctx, unwrapEither(either));
   },
@@ -23,8 +21,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
   async findReports(ctx: RequestContext) {
     const either = adminValidator.getReportFindReportsValidator(ctx.query);
     if (isRight(either)) {
-      const commentRepository = getCommentRepository(strapi);
-      return this.getService('admin').findReports(unwrapEither(either), commentRepository);
+      return this.getService('admin').findReports(unwrapEither(either));
     }
     throw throwError(ctx, unwrapEither(either));
   },
@@ -32,8 +29,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
   async findOne(ctx: RequestContextWithId) {
     const either = adminValidator.getCommentFindOneValidator(ctx.params.id, ctx.query);
     if (isRight(either)) {
-      const commentRepository = getCommentRepository(strapi);
-      return this.getService('admin').findOneAndThread(unwrapEither(either), commentRepository);
+      return this.getService('admin').findOneAndThread(unwrapEither(either));
     }
     throw throwError(ctx, unwrapEither(either));
   },
@@ -57,8 +53,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
   async deleteComment(ctx: RequestContextWithId) {
     const either = adminValidator.getIdValidator(ctx.params);
     if (isRight(either)) {
-      const commentRepository = getCommentRepository(strapi);
-      return this.getService('admin').deleteComment(unwrapEither(either).id, commentRepository);
+      return this.getService('admin').deleteComment(unwrapEither(either).id);
     }
     throw throwError(ctx, unwrapEither(either));
   },
@@ -109,8 +104,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
   async resolveAllAbuseReportsForThread(ctx: RequestContextWithId) {
     const either = adminValidator.getIdValidator(ctx.params);
     if (isRight(either)) {
-      const commentRepository = getCommentRepository(strapi);
-      return this.getService('admin').resolveAllAbuseReportsForThread(unwrapEither(either).id, commentRepository);
+      return this.getService('admin').resolveAllAbuseReportsForThread(unwrapEither(either).id);
     }
     throw throwError(ctx, unwrapEither(either));
   },
@@ -130,8 +124,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
       author: ctx.request.body.author,
     });
     if (isRight(either)) {
-      const commentRepository = getCommentRepository(strapi);
-      return this.getService('admin').postCommentThread(unwrapEither(either), commentRepository);
+      return this.getService('admin').postCommentThread(unwrapEither(either));
     }
     throw throwError(ctx, unwrapEither(either));
   },
@@ -142,8 +135,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
       content: ctx.request.body.content,
     });
     if (isRight(either)) {
-      const commentRepository = getCommentRepository(strapi);
-      return this.getService('admin').updateComment(unwrapEither(either), commentRepository);
+      return this.getService('admin').updateComment(unwrapEither(either));
     }
     throw throwError(ctx, unwrapEither(either));
   },
@@ -151,8 +143,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
   async approveComment(ctx: RequestContext<object, adminValidator.IdValidatorSchema>) {
     const either = adminValidator.getIdValidator(ctx.params);
     if (isRight(either)) {
-      const commentRepository = getCommentRepository(strapi);
-      return this.getService('admin').approveComment(unwrapEither(either).id, commentRepository);
+      return this.getService('admin').approveComment(unwrapEither(either).id);
     }
     throw throwError(ctx, unwrapEither(either));
   },
@@ -160,8 +151,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
   async rejectComment(ctx: RequestContext<object, adminValidator.IdValidatorSchema>) {
     const either = adminValidator.getIdValidator(ctx.params);
     if (isRight(either)) {
-      const commentRepository = getCommentRepository(strapi);
-      return this.getService('admin').rejectComment(unwrapEither(either).id, commentRepository);
+      return this.getService('admin').rejectComment(unwrapEither(either).id);
     }
     throw throwError(ctx, unwrapEither(either));
   },
