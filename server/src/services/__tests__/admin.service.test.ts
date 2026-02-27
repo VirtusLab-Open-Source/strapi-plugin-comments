@@ -1,13 +1,12 @@
 import { StrapiContext } from '../../@types';
 import { APPROVAL_STATUS } from '../../const';
-import { getCommentRepository, getReportCommentRepository } from '../../repositories';
+import { getReportCommentRepository } from '../../repositories';
 import { getDefaultAuthorPopulate } from '../../repositories/utils';
 import { caster } from '../../test/utils';
 import { getPluginService } from '../../utils/getPluginService';
 import adminService from '../admin/admin.service';
 
 jest.mock('../../repositories', () => ({
-  getCommentRepository: jest.fn(),
   getReportCommentRepository: jest.fn(),
 }));
 
@@ -42,6 +41,7 @@ describe('admin.service', () => {
     findWithCount: jest.fn(),
     create: jest.fn(),
     delete: jest.fn(),
+    deleteMany: jest.fn(),
   };
 
   const mockReportCommentRepository = {
@@ -57,7 +57,6 @@ describe('admin.service', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     caster<jest.Mock>(getPluginService).mockReturnValue(mockCommonService);
-    caster<jest.Mock>(getCommentRepository).mockReturnValue(mockCommentRepository);
     caster<jest.Mock>(getReportCommentRepository).mockReturnValue(mockReportCommentRepository);
     caster<jest.Mock>(getDefaultAuthorPopulate).mockReturnValue(true);
   });
@@ -98,7 +97,7 @@ describe('admin.service', () => {
         pageSize: 10,
         orderBy: 'created:DESC',
         _q: 'test search',
-      });
+      }, mockCommentRepository);
 
       expect(result.result).toHaveLength(2);
       expect(result.pagination).toBeDefined();
@@ -142,7 +141,7 @@ describe('admin.service', () => {
       await service.findAll({
         page: 1,
         pageSize: 10,
-      });
+      }, mockCommentRepository);
 
       expect(mockCommentRepository.findWithCount).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -172,7 +171,7 @@ describe('admin.service', () => {
         page: 1,
         pageSize: 10,
         orderBy: 'custoOrder:DESC',
-      });
+      }, mockCommentRepository);
 
       expect(result.result).toHaveLength(2);
       expect(result.pagination).toBeDefined();
@@ -212,7 +211,7 @@ describe('admin.service', () => {
       await service.findReports({
         page: 1,
         pageSize: 10,
-      });
+      }, mockCommentRepository);
 
       expect(mockReportCommentRepository.findPage).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -239,7 +238,7 @@ describe('admin.service', () => {
         page: 1,
         pageSize: 10,
         _q: 'search term',
-      });
+      }, mockCommentRepository);
 
       expect(result.result).toHaveLength(1);
       expect(mockReportCommentRepository.findPage).toHaveBeenCalledWith(
@@ -272,7 +271,7 @@ describe('admin.service', () => {
         page: 1,
         pageSize: 10,
         orderBy: 'resolved:ASC',
-      });
+      }, mockCommentRepository);
 
       expect(result.result).toHaveLength(2);
       expect(mockReportCommentRepository.findPage).toHaveBeenCalledWith({
@@ -313,7 +312,7 @@ describe('admin.service', () => {
       const result = await service.findReports({
         page: 1,
         pageSize: 10,
-      });
+      }, mockCommentRepository);
 
       expect(result.result).toHaveLength(1);
       expect(mockCommentRepository.findMany).toHaveBeenCalledWith(
@@ -342,7 +341,7 @@ describe('admin.service', () => {
       const result = await service.findReports({
         page: 1,
         pageSize: 10,
-      });
+      }, mockCommentRepository);
 
       expect(result.result).toHaveLength(1);
       expect(mockCommentRepository.findMany).toHaveBeenCalledWith(
@@ -369,7 +368,7 @@ describe('admin.service', () => {
       const result = await service.findReports({
         page: 1,
         pageSize: 10,
-      });
+      }, mockCommentRepository);
 
       expect(result.result).toHaveLength(1);
       expect(mockCommentRepository.findMany).toHaveBeenCalledWith(
@@ -397,7 +396,7 @@ describe('admin.service', () => {
       const result = await service.findReports({
         page: 1,
         pageSize: 10,
-      });
+      }, mockCommentRepository);
 
       expect(result.result).toHaveLength(1);
       const entityCall = mockCommonService.sanitizeCommentEntity.mock.calls.find(
@@ -424,7 +423,7 @@ describe('admin.service', () => {
       const result = await service.findReports({
         page: 1,
         pageSize: 10,
-      });
+      }, mockCommentRepository);
 
       expect(result.result).toHaveLength(1);
       const entityCall = mockCommonService.sanitizeCommentEntity.mock.calls.find(
@@ -451,7 +450,7 @@ describe('admin.service', () => {
       const result = await service.findReports({
         page: 1,
         pageSize: 10,
-      });
+      }, mockCommentRepository);
 
       expect(result.result).toHaveLength(1);
       const entityCall = mockCommonService.sanitizeCommentEntity.mock.calls.find(
@@ -482,7 +481,7 @@ describe('admin.service', () => {
       mockCommonService.findAllInHierarchy.mockResolvedValue([]);
       mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
 
-      const result = await service.findOneAndThread({ id: 1 });
+      const result = await service.findOneAndThread({ id: 1 }, mockCommentRepository);
 
       expect(result.entity).toBeDefined();
       expect(result.selected).toBeDefined();
@@ -495,7 +494,7 @@ describe('admin.service', () => {
 
       mockCommentRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOneAndThread({ id: 1 })).rejects.toThrow('Not found');
+      await expect(service.findOneAndThread({ id: 1 }, mockCommentRepository)).rejects.toThrow('Not found');
     });
 
     it('should throw error when related entity not found', async () => {
@@ -515,7 +514,7 @@ describe('admin.service', () => {
       });
       mockFindOne.mockResolvedValue(null);
 
-      await expect(service.findOneAndThread({ id: 1 })).rejects.toThrow('Relation not found');
+      await expect(service.findOneAndThread({ id: 1 }, mockCommentRepository)).rejects.toThrow('Relation not found');
     });
 
     it('should pass $or filter when removed is true', async () => {
@@ -538,7 +537,7 @@ describe('admin.service', () => {
       mockCommonService.findAllInHierarchy.mockResolvedValue([]);
       mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
 
-      await service.findOneAndThread({ id: 1, removed: true });
+      await service.findOneAndThread({ id: 1, removed: true }, mockCommentRepository);
 
       expect(mockCommonService.findAllInHierarchy).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -570,7 +569,7 @@ describe('admin.service', () => {
       mockCommonService.findAllInHierarchy.mockResolvedValue([]);
       mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
 
-      await service.findOneAndThread({ id: 1, removed: false });
+      await service.findOneAndThread({ id: 1, removed: false }, mockCommentRepository);
 
       const filters = mockCommonService.findAllInHierarchy.mock.calls[0][0].filters;
       expect(filters).not.toHaveProperty('$or');
@@ -596,7 +595,7 @@ describe('admin.service', () => {
       mockCommonService.findAllInHierarchy.mockResolvedValue([]);
       mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
 
-      await service.findOneAndThread({ id: 1 });
+      await service.findOneAndThread({ id: 1 }, mockCommentRepository);
 
       const filters = mockCommonService.findAllInHierarchy.mock.calls[0][0].filters;
       expect(filters).not.toHaveProperty('$or');
@@ -622,7 +621,7 @@ describe('admin.service', () => {
       mockCommonService.findAllInHierarchy.mockResolvedValue([{ id: 2, content: 'Reply' }]);
       mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
 
-      const result = await service.findOneAndThread({ id: 1 });
+      const result = await service.findOneAndThread({ id: 1 }, mockCommentRepository);
 
       expect(result.entity).toBeDefined();
       expect(result.selected).toBeDefined();
@@ -659,7 +658,7 @@ describe('admin.service', () => {
       mockCommonService.findAllInHierarchy.mockResolvedValue([]);
       mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
 
-      await service.findOneAndThread({ id: 1 });
+      await service.findOneAndThread({ id: 1 }, mockCommentRepository);
 
       expect(mockCommonService.sanitizeCommentEntity).toHaveBeenCalledWith(
         expect.objectContaining({ id: 1, threadOf: null }),
@@ -690,7 +689,7 @@ describe('admin.service', () => {
       mockCommonService.findAllInHierarchy.mockResolvedValue([]);
       mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
 
-      await service.findOneAndThread({ id: 1 });
+      await service.findOneAndThread({ id: 1 }, mockCommentRepository);
 
       expect(mockCommonService.sanitizeCommentEntity).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -821,7 +820,7 @@ describe('admin.service', () => {
       });
       mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
 
-      const result = await service.approveComment(1);
+      const result = await service.approveComment(1, mockCommentRepository);
 
       expect(result.approvalStatus).toBe(APPROVAL_STATUS.APPROVED);
       expect(mockCommentRepository.update).toHaveBeenCalledWith({
@@ -836,7 +835,7 @@ describe('admin.service', () => {
 
       mockCommentRepository.update.mockResolvedValue(null);
 
-      await expect(service.approveComment(1)).rejects.toThrow('Not found');
+      await expect(service.approveComment(1, mockCommentRepository)).rejects.toThrow('Not found');
     });
   });
 
@@ -880,7 +879,7 @@ describe('admin.service', () => {
         id: 1,
         content: 'Admin reply',
         author: mockAuthor,
-      });
+      }, mockCommentRepository);
 
       expect(result.isAdminComment).toBe(true);
       expect(result.threadOf).toBe(1);
@@ -898,7 +897,7 @@ describe('admin.service', () => {
           id: 1,
           content: 'Admin reply',
           author: { id: 1, email: 'admin@test.com' },
-        })
+        }, mockCommentRepository)
       ).rejects.toThrow('Not found');
     });
   });
@@ -914,7 +913,7 @@ describe('admin.service', () => {
         removed: true,
       });
 
-      const result = await service.deleteComment(1);
+      const result = await service.deleteComment(1, mockCommentRepository);
 
       expect(result.removed).toBe(true);
       expect(mockCommentRepository.update).toHaveBeenCalledWith({
@@ -929,7 +928,7 @@ describe('admin.service', () => {
 
       mockCommentRepository.update.mockResolvedValue(null);
 
-      const result = await service.deleteComment(1);
+      const result = await service.deleteComment(1, mockCommentRepository);
 
       expect(result).toBeNull();
       expect(mockCommentRepository.update).toHaveBeenCalledWith({
@@ -951,7 +950,7 @@ describe('admin.service', () => {
       });
       mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
 
-      const result = await service.rejectComment(1);
+      const result = await service.rejectComment(1, mockCommentRepository);
 
       expect(result.approvalStatus).toBe(APPROVAL_STATUS.REJECTED);
       expect(mockCommentRepository.update).toHaveBeenCalledWith({
@@ -966,7 +965,7 @@ describe('admin.service', () => {
 
       mockCommentRepository.update.mockResolvedValue(null);
 
-      await expect(service.rejectComment(1)).rejects.toThrow('Not found');
+      await expect(service.rejectComment(1, mockCommentRepository)).rejects.toThrow('Not found');
     });
   });
 
@@ -985,7 +984,7 @@ describe('admin.service', () => {
       const result = await service.updateComment({
         id: 1,
         content: 'Updated content',
-      });
+      }, mockCommentRepository);
 
       expect(result.content).toBe('Updated content');
       expect(mockCommentRepository.update).toHaveBeenCalledWith({
@@ -1004,7 +1003,7 @@ describe('admin.service', () => {
         service.updateComment({
           id: 1,
           content: 'Updated content',
-        })
+        }, mockCommentRepository)
       ).rejects.toThrow('Not found');
     });
   });
@@ -1100,7 +1099,7 @@ describe('admin.service', () => {
       mockCommentRepository.findMany.mockResolvedValue(mockThreadComments);
       mockReportCommentRepository.updateMany.mockResolvedValue({ count: 3 });
 
-      const result = await service.resolveAllAbuseReportsForThread(1);
+      const result = await service.resolveAllAbuseReportsForThread(1, mockCommentRepository);
 
       expect(result.count).toBe(3);
       expect(mockCommentRepository.findMany).toHaveBeenCalledWith({
@@ -1124,7 +1123,7 @@ describe('admin.service', () => {
       const strapi = getStrapi();
       const service = getService(strapi);
 
-      await expect(service.resolveAllAbuseReportsForThread(null)).rejects.toThrow(
+      await expect(service.resolveAllAbuseReportsForThread(null, mockCommentRepository)).rejects.toThrow(
         'There is something wrong with comment Id'
       );
     });
@@ -1136,7 +1135,7 @@ describe('admin.service', () => {
       mockCommentRepository.findMany.mockResolvedValue([]);
       mockReportCommentRepository.updateMany.mockResolvedValue({ count: 1 });
 
-      const result = await service.resolveAllAbuseReportsForThread(1);
+      const result = await service.resolveAllAbuseReportsForThread(1, mockCommentRepository);
 
       expect(result.count).toBe(1);
       expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
