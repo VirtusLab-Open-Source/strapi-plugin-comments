@@ -309,7 +309,10 @@ const commonService = ({ strapi }: StrapiContext) => ({
       ),
     );
 
-    return rootEntriesWithChildren;
+    return {
+      pagination: rootEntries.pagination,
+      data: rootEntriesWithChildren,
+    };
   },
 
   // Find single comment

@@ -375,12 +375,13 @@ describe('common.service', () => {
         sort: 'createdAt:desc',
       });
 
-      const typedResult = result as CommentWithChildren[];
-
-      expect(typedResult).toHaveLength(1); // One root comment
-      expect(typedResult[0].id).toBe(1); // Parent comment
-      expect(typedResult[0].children).toHaveLength(2); // Two child comments
-      expect(typedResult[0].children![0].children).toHaveLength(1); // One grandchild
+      expect(result).toHaveProperty('data');
+      expect(result).toHaveProperty('pagination');
+      const typedData = result.data as CommentWithChildren[];
+      expect(typedData).toHaveLength(1); // One root comment
+      expect(typedData[0].id).toBe(1); // Parent comment
+      expect(typedData[0].children).toHaveLength(2); // Two child comments
+      expect(typedData[0].children![0].children).toHaveLength(1); // One grandchild
     });
 
     it('should handle empty comments list', async () => {
@@ -399,7 +400,7 @@ describe('common.service', () => {
         fields: ['id', 'content', 'threadOf'],
       });
 
-      expect(result).toHaveLength(0);
+      expect(result.data).toHaveLength(0);
     });
 
     it('should start from specific comment when startingFromId is provided', async () => {
@@ -433,10 +434,9 @@ describe('common.service', () => {
         startingFromId: 2,
       });
 
-      const typedResult = result as CommentWithChildren[];
-
-      expect(typedResult[0].id).toBe(4);
-      expect(typedResult[0].children).toHaveLength(1);
+      const typedData = result.data as CommentWithChildren[];
+      expect(typedData[0].id).toBe(4);
+      expect(typedData[0].children).toHaveLength(1);
     });
 
     it('should handle comments with dropBlockedThreads enabled', async () => {
@@ -466,9 +466,8 @@ describe('common.service', () => {
         dropBlockedThreads: true,
       });
 
-      const typedResult = result as CommentWithChildren[];
-
-      expect(typedResult[0].children).toHaveLength(0); // drop blocked threads
+      const typedData = result.data as CommentWithChildren[];
+      expect(typedData[0].children).toHaveLength(0); // drop blocked threads
     });
   });
 
