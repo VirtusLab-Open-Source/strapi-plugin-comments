@@ -7,7 +7,7 @@ import { Id, PathTo, PathValue, RelatedEntity, StrapiContext } from '../@types';
 import { CommentsPluginConfig } from '../config';
 import { APPROVAL_STATUS } from '../const';
 import { ContentTypesUUIDs } from '../content-types';
-import { getCommentRepository, getReportCommentRepository, getStoreRepository } from '../repositories';
+import { CommentRepository, getCommentRepository, getReportCommentRepository, getStoreRepository } from '../repositories';
 import { getOrderBy } from '../repositories/utils';
 import { CONFIG_PARAMS } from '../utils/constants';
 import PluginError from '../utils/PluginError';
@@ -417,8 +417,8 @@ const commonService = ({ strapi }: StrapiContext) => ({
     return this.sanitizeCommentEntity(updatedEntry, []);
   },
 
-  async approveComment(id: Id) {
-    const entity = await getCommentRepository(strapi).update({
+  async approveComment(id: Id, commentRepository: CommentRepository) {
+    const entity = await commentRepository.update({
       where: { id },
       data: { approvalStatus: APPROVAL_STATUS.APPROVED },
     });
@@ -428,8 +428,8 @@ const commonService = ({ strapi }: StrapiContext) => ({
     return this.sanitizeCommentEntity(entity, []);
   },
 
-  async rejectComment(id: Id) {
-    const entity = await getCommentRepository(strapi).update({
+  async rejectComment(id: Id, commentRepository: CommentRepository) {
+    const entity = await commentRepository.update({
       where: { id },
       data: { approvalStatus: APPROVAL_STATUS.REJECTED },
     });
@@ -502,14 +502,14 @@ const commonService = ({ strapi }: StrapiContext) => ({
     });
   },
 
-  async resolveAllAbuseReportsForThread(commentId: number) {
+  async resolveAllAbuseReportsForThread(commentId: number, commentRepository: CommentRepository) {
     if (!commentId) {
       throw new PluginError(
         400,
         'There is something wrong with comment Id. Try again.',
       );
     }
-    const commentsInThread = await getCommentRepository(strapi).findMany({
+    const commentsInThread = await commentRepository.findMany({
       where: {
         threadOf: commentId,
       },
