@@ -14,7 +14,7 @@ import { isProfane, replaceProfanities } from 'no-profanity';
 import { Id, PathTo, PathValue, RelatedEntity, StrapiContext } from '../@types';
 import { CommentsPluginConfig } from '../config';
 import { ContentTypesUUIDs } from '../content-types';
-import { getCommentRepository, getStoreRepository } from '../repositories';
+import { type CommentRepository, getCommentRepository, getStoreRepository } from '../repositories';
 import { getOrderBy } from '../repositories/utils';
 import { CONFIG_PARAMS } from '../utils/constants';
 import PluginError from '../utils/PluginError';
@@ -85,6 +85,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
       locale,
     }: clientValidator.FindAllFlatSchema,
     relatedEntity?: any,
+    commentRepository: CommentRepository = getCommentRepository(strapi),
   ): Promise<{
     data: Array<CommentWithRelated | Comment>;
     pagination?: Pagination;
@@ -119,11 +120,11 @@ const commonService = ({ strapi }: StrapiContext) => ({
       page: pagination?.page || (skip ? Math.floor(skip / limit) : 1) || 1,
     };
 
-    const { results: entries, pagination: resultPaginationData } = await getCommentRepository(strapi).findWithCount(params);
+    const { results: entries, pagination: resultPaginationData } = await commentRepository.findWithCount(params);
 
     const entriesWithThreads = await Promise.all(
       entries.map(async (_) => {
-        const { results, pagination: { total } } = await getCommentRepository(strapi)
+        const { results, pagination: { total } } = await commentRepository
         .findWithCount({
           where: {
             threadOf: _.id,
@@ -184,6 +185,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     relatedEntity?: any,
     dropBlockedThreads = false,
     blockNestedThreads = false,
+    commentRepository: CommentRepository = getCommentRepository(strapi),
   ) {
     if (!entry.gotThread) {
       return {
@@ -210,6 +212,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
         limit: Number.MAX_SAFE_INTEGER,
       },
       relatedEntity,
+      commentRepository,
     );
     const allChildren =
       entry.blockedThread && dropBlockedThreads
@@ -230,6 +233,8 @@ const commonService = ({ strapi }: StrapiContext) => ({
                 child,
                 relatedEntity,
                 dropBlockedThreads,
+                undefined,
+                commentRepository,
               ),
             ),
           );
@@ -259,6 +264,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
       pagination,
     }: clientValidator.FindAllInHierarchyValidatorSchema,
     relatedEntity?: any,
+    commentRepository: CommentRepository = getCommentRepository(strapi),
   ) {
     const rootEntries = await this.findAllFlat(
       {
@@ -278,6 +284,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
         limit,
       },
       relatedEntity,
+      commentRepository,
     );
 
     const rootEntriesWithChildren = await Promise.all(
@@ -296,6 +303,8 @@ const commonService = ({ strapi }: StrapiContext) => ({
           entry,
           relatedEntity,
           dropBlockedThreads,
+          undefined,
+          commentRepository,
         ),
       ),
     );
@@ -304,8 +313,8 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
 
   // Find single comment
-  async findOne(criteria: Partial<Params['where']>) {
-    const entity = await getCommentRepository(strapi).findOne({
+  async findOne(criteria: Partial<Params['where']>, commentRepository: CommentRepository = getCommentRepository(strapi)) {
+    const entity = await commentRepository.findOne({
       where: criteria,
       populate: {
         reports: true,
@@ -320,12 +329,12 @@ const commonService = ({ strapi }: StrapiContext) => ({
     return filterOurResolvedReports(item);
   },
 
-  async findMany(criteria: Params) {
-    return getCommentRepository(strapi).findMany(criteria);
+  async findMany(criteria: Params, commentRepository: CommentRepository = getCommentRepository(strapi)) {
+    return commentRepository.findMany(criteria);
   },
 
-  async updateComment(criteria: Partial<Params['where']>, data: Partial<Comment>) {
-    return getCommentRepository(strapi).update({ where: criteria, data });
+  async updateComment(criteria: Partial<Params['where']>, data: Partial<Comment>, commentRepository: CommentRepository = getCommentRepository(strapi)) {
+    return commentRepository.update({ where: criteria, data });
   },
 
   // Find all for author
@@ -428,20 +437,20 @@ const commonService = ({ strapi }: StrapiContext) => ({
     };
   },
   // TODO: we need to add deepLimit to the function to prevent infinite loops
-  async modifiedNestedNestedComments<T extends keyof Comment>(id: Id, fieldName: T, value: Comment[T], deepLimit: number = 10): Promise<boolean> {
+  async modifiedNestedNestedComments<T extends keyof Comment>(id: Id, fieldName: T, value: Comment[T], deepLimit: number = 10, commentRepository: CommentRepository = getCommentRepository(strapi)): Promise<boolean> {
     if (deepLimit === 0) {
       return true;
     }
     try {
-      const entities = await this.findMany({ where: { threadOf: id } });
-      const changedEntries = await getCommentRepository(strapi).updateMany({
+      const entities = await this.findMany({ where: { threadOf: id } }, commentRepository);
+      const changedEntries = await commentRepository.updateMany({
         where: { id: entities.map((entity) => entity.id) },
         data: { [fieldName]: value },
       });
       if (entities.length === changedEntries.count && changedEntries.count > 0) {
         const nestedTransactions = await Promise.all(
           entities.map((item) =>
-            this.modifiedNestedNestedComments(item.id, fieldName, value, deepLimit - 1)),
+            this.modifiedNestedNestedComments(item.id, fieldName, value, deepLimit - 1, commentRepository)),
         );
         return nestedTransactions.length === changedEntries.count;
       }
@@ -470,9 +479,9 @@ const commonService = ({ strapi }: StrapiContext) => ({
     return content;
   },
 
-  async perRemove(related: string, locale?: string) {
+  async perRemove(related: string, locale?: string, commentRepository: CommentRepository = getCommentRepository(strapi)) {
     const defaultLocale = await strapi.plugin('i18n')?.service('locales').getDefaultLocale() || null;
-    return getCommentRepository(strapi)
+    return commentRepository
     .updateMany({
       where: {
         related,

@@ -1,7 +1,7 @@
 import { isNil } from 'lodash';
 import { Id, StrapiContext } from '../../@types';
 import { APPROVAL_STATUS } from '../../const';
-import { type CommentRepository, getReportCommentRepository } from '../../repositories';
+import { type CommentRepository, getCommentRepository, getReportCommentRepository } from '../../repositories';
 import { getDefaultAuthorPopulate } from '../../repositories/utils';
 import { getPluginService } from '../../utils/getPluginService';
 import PluginError from '../../utils/PluginError';
@@ -18,7 +18,7 @@ export default ({ strapi }: StrapiContext) => {
     },
 
     // Find all comments
-    async findAll({ _q, orderBy, page, pageSize, filters }: adminValidator.CommentFindAllSchema, commentRepository: CommentRepository) {
+    async findAll({ _q, orderBy, page, pageSize, filters }: adminValidator.CommentFindAllSchema, commentRepository: CommentRepository = getCommentRepository(strapi)) {
       const params = utils.findAll.createParams(
         orderBy,
         page,
@@ -43,7 +43,7 @@ export default ({ strapi }: StrapiContext) => {
       };
     },
 
-    async findReports({ _q, orderBy, page, pageSize }: adminValidator.ReportFindReportsValidator, commentRepository: CommentRepository) {
+    async findReports({ _q, orderBy, page, pageSize }: adminValidator.ReportFindReportsValidator, commentRepository: CommentRepository = getCommentRepository(strapi)) {
       const params = utils.findReports.createParams(
         orderBy,
         page,
@@ -107,7 +107,7 @@ export default ({ strapi }: StrapiContext) => {
         pagination,
       };
     },
-    async findOneAndThread({ id, removed, ...query }: adminValidator.FindOneValidatorSchema, commentRepository: CommentRepository) {
+    async findOneAndThread({ id, removed, ...query }: adminValidator.FindOneValidatorSchema, commentRepository: CommentRepository = getCommentRepository(strapi)) {
       const defaultAuthorUserPopulate = getDefaultAuthorPopulate(strapi);
       const defaultWhere = utils.findOneAndThread.getDefaultWhere(removed);
 
@@ -174,7 +174,7 @@ export default ({ strapi }: StrapiContext) => {
         { blocked: !isNil(forceStatus) ? forceStatus : !entry.blocked },
       );
     },
-    async deleteComment(id: Id, commentRepository: CommentRepository) {
+    async deleteComment(id: Id, commentRepository: CommentRepository = getCommentRepository(strapi)) {
       return commentRepository.update({ where: { id }, data: { removed: true } });
     },
     async blockCommentThread(id: Id, forceStatus?: boolean) {
@@ -187,7 +187,7 @@ export default ({ strapi }: StrapiContext) => {
       await this.blockNestedThreads(id, status);
       return this.getCommonService().sanitizeCommentEntity(updatedEntry, []);
     },
-    async approveComment(id: Id, commentRepository: CommentRepository) {
+    async approveComment(id: Id, commentRepository: CommentRepository = getCommentRepository(strapi)) {
       const entity = await commentRepository.update({
         where: { id },
         data: { approvalStatus: APPROVAL_STATUS.APPROVED },
@@ -197,7 +197,7 @@ export default ({ strapi }: StrapiContext) => {
       }
       return this.getCommonService().sanitizeCommentEntity(entity, []);
     },
-    async rejectComment(id: Id, commentRepository: CommentRepository) {
+    async rejectComment(id: Id, commentRepository: CommentRepository = getCommentRepository(strapi)) {
       const entity = await commentRepository.update({
         where: { id },
         data: { approvalStatus: APPROVAL_STATUS.REJECTED },
@@ -272,7 +272,7 @@ export default ({ strapi }: StrapiContext) => {
         },
       });
     },
-    async resolveAllAbuseReportsForThread(commentId: number, commentRepository: CommentRepository) {
+    async resolveAllAbuseReportsForThread(commentId: number, commentRepository: CommentRepository = getCommentRepository(strapi)) {
       if (!commentId) {
         throw new PluginError(
           400,
@@ -307,7 +307,7 @@ export default ({ strapi }: StrapiContext) => {
         },
       });
     },
-    async postComment({ id, author, content }: adminValidator.CommentPostValidatorSchema, commentRepository: CommentRepository) {
+    async postComment({ id, author, content }: adminValidator.CommentPostValidatorSchema, commentRepository: CommentRepository = getCommentRepository(strapi)) {
       return commentRepository.create({
         data: {
           content: this.getCommonService().sanitizeCommentContent(content),
@@ -320,7 +320,7 @@ export default ({ strapi }: StrapiContext) => {
         },
       });
     },
-    async postCommentThread({ id, author, content }: adminValidator.CommentPostValidatorSchema, commentRepository: CommentRepository) {
+    async postCommentThread({ id, author, content }: adminValidator.CommentPostValidatorSchema, commentRepository: CommentRepository = getCommentRepository(strapi)) {
       const entity = await commentRepository.findOne({
         where: { id },
       });
@@ -339,7 +339,7 @@ export default ({ strapi }: StrapiContext) => {
         },
       });
     },
-    async updateComment({ id, content }: adminValidator.UpdateCommentValidatorSchema, commentRepository: CommentRepository) {
+    async updateComment({ id, content }: adminValidator.UpdateCommentValidatorSchema, commentRepository: CommentRepository = getCommentRepository(strapi)) {
       const entity = await commentRepository.update({
         where: { id },
         data: { content: this.getCommonService().sanitizeCommentContent(content) },
