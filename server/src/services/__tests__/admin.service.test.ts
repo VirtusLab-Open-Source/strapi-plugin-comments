@@ -814,7 +814,41 @@ describe('admin.service', () => {
   });
 
   describe('postComment', () => {
-    it('should post admin comment', async () => {
+    it('should post admin top-level comment', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockAuthor = { id: 1, email: 'admin@test.com' };
+      const relation = 'api::article.article:1';
+
+      mockCommentRepository.create.mockResolvedValue({
+        id: 1,
+        content: 'Admin comment',
+        threadOf: null,
+        related: relation,
+        isAdminComment: true,
+      });
+
+      const result = await service.postComment({
+        id: relation,
+        content: 'Admin comment',
+        author: mockAuthor,
+      }, mockCommentRepository);
+
+      expect(result.isAdminComment).toBe(true);
+      expect(result.threadOf).toBeNull();
+      expect(mockCommentRepository.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          content: 'Admin comment',
+          threadOf: null,
+          related: relation,
+          isAdminComment: true,
+        }),
+      });
+    });
+  });
+
+  describe('postCommentThread', () => {
+    it('should post admin reply to thread', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
       const mockComment = { id: 1, content: 'Test comment', related: 'api::test.test:1' };
@@ -828,7 +862,7 @@ describe('admin.service', () => {
         isAdminComment: true,
       });
 
-      const result = await service.postComment({
+      const result = await service.postCommentThread({
         id: 1,
         content: 'Admin reply',
         author: mockAuthor,
@@ -836,6 +870,7 @@ describe('admin.service', () => {
 
       expect(result.isAdminComment).toBe(true);
       expect(result.threadOf).toBe(1);
+      expect(mockCommentRepository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
       expect(mockCommentRepository.create).toHaveBeenCalled();
     });
 
@@ -846,7 +881,7 @@ describe('admin.service', () => {
       mockCommentRepository.findOne.mockResolvedValue(null);
 
       await expect(
-        service.postComment({
+        service.postCommentThread({
           id: 1,
           content: 'Admin reply',
           author: { id: 1, email: 'admin@test.com' },

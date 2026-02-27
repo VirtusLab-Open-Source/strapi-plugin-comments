@@ -132,7 +132,7 @@ const adminRoutes: StrapiRoute<'admin'>[] = [
   {
     method: 'POST',
     path: '/moderate/thread/:id/postComment',
-    handler: 'admin.postComment',
+    handler: 'admin.postCommentThread',
     config: {
       policies: [],
     },

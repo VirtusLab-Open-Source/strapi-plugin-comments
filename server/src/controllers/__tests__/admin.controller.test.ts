@@ -40,7 +40,7 @@ describe('Admin controller', () => {
     resolveAllAbuseReportsForComment: jest.fn(),
     resolveAllAbuseReportsForThread: jest.fn(),
     resolveMultipleAbuseReports: jest.fn(),
-    postComment: jest.fn(),
+    postCommentThread: jest.fn(),
     updateComment: jest.fn(),
     approveComment: jest.fn(),
     rejectComment: jest.fn(),
@@ -224,8 +224,8 @@ describe('Admin controller', () => {
     });
   });
 
-  describe('postComment', () => {
-    it('should post comment when validation passes', async () => {
+  describe('postCommentThread', () => {
+    it('should post comment to thread when validation passes', async () => {
       const ctx = {
         params: { id: '1' },
         request: { body: { content: 'Test content', author: 'Test author' } }
@@ -234,12 +234,12 @@ describe('Admin controller', () => {
       const expectedResult = { id: 1, content: 'Test content' };
 
       caster<jest.Mock>(adminValidator.getCommentPostValidator).mockReturnValue({ right: validatedData });
-      mockAdminService.postComment.mockResolvedValue(expectedResult);
+      mockAdminService.postCommentThread.mockResolvedValue(expectedResult);
 
-      const result = await getController(getStrapi()).postComment(ctx);
+      const result = await getController(getStrapi()).postCommentThread(ctx);
 
       expect(result).toEqual(expectedResult);
-      expect(mockAdminService.postComment).toHaveBeenCalledWith(validatedData, mockCommentRepository);
+      expect(mockAdminService.postCommentThread).toHaveBeenCalledWith(validatedData, mockCommentRepository);
     });
 
     it('should throw error when validation fails', async () => {
@@ -251,7 +251,7 @@ describe('Admin controller', () => {
 
       caster<jest.Mock>(adminValidator.getCommentPostValidator).mockReturnValue({ left: error });
 
-      await expect(getController(getStrapi()).postComment(ctx)).rejects.toThrow();
+      await expect(getController(getStrapi()).postCommentThread(ctx)).rejects.toThrow();
     });
   });
 

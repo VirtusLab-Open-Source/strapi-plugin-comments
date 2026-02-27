@@ -217,6 +217,19 @@ export default ({ strapi }: StrapiContext) => {
       return this.getCommonService().resolveMultipleAbuseReports(reportIds);
     },
     async postComment({ id, author, content }: adminValidator.CommentPostValidatorSchema, commentRepository: CommentRepository) {
+      return commentRepository.create({
+        data: {
+          content: this.getCommonService().sanitizeCommentContent(content),
+          threadOf: null,
+          authorId: author.id,
+          authorName: getAuthorName(author),
+          authorEmail: author.email,
+          related: id,
+          isAdminComment: true,
+        },
+      });
+    },
+    async postCommentThread({ id, author, content }: adminValidator.CommentPostValidatorSchema, commentRepository: CommentRepository) {
       const entity = await commentRepository.findOne({
         where: { id },
       });
