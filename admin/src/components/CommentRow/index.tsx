@@ -3,7 +3,7 @@ import { Eye } from '@strapi/icons';
 import { isEmpty, isNil } from 'lodash';
 import { FC, SyntheticEvent, useMemo } from 'react';
 import { useIntl } from 'react-intl';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Comment } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
 import { usePermissions } from '../../hooks/usePermissions';
@@ -52,7 +52,8 @@ export const CommentRow: FC<Props> = ({ item }) => {
         <Link
           width="100%"
           overflow="hidden"
-          href={`/admin/content-manager/collection-types/${related.uid}/${related.documentId}${localeParam}`}
+          tag={NavLink}
+          to={`/content-manager/collection-types/${related.uid}/${related.documentId}${localeParam}`}
         >
           {related.title}
         </Link>
