@@ -64,7 +64,7 @@ export default ({ strapi }: StrapiContext) => {
         },
       });
 
-      const reportCommentsIds = results.map((entity) => typeof entity.related === 'object' ? entity.related.id : null).filter(Boolean);
+      const reportCommentsIds = results.map((entity) => typeof entity.related === 'object' ? entity.related?.id : null).filter(Boolean);
 
       const commentsThreads = await getCommentRepository(strapi).findMany({
         where: {
@@ -74,11 +74,11 @@ export default ({ strapi }: StrapiContext) => {
         limit: Number.MAX_SAFE_INTEGER,
       });
       const commentWithThreadIds = Array.from(new Set(commentsThreads
-        .map(({ threadOf }) => typeof threadOf === 'object' ? threadOf.id : null)
+        .map(({ threadOf }) => typeof threadOf === 'object' ? threadOf?.id : null)
         .filter(Boolean)),
       );
       const result = results.map((_) => {
-        const isCommentWithThread = commentWithThreadIds.includes(_.related.id);
+        const isCommentWithThread = commentWithThreadIds.includes(_.related?.id);
         const commonService = this.getCommonService();
 
         const entity = {

@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-comments",
-  "version": "3.2.3",
+  "version": "3.2.3-beta.2",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
@@ -87,8 +87,8 @@
     "typescript": "^5.6.2"
   },
   "peerDependencies": {
-    "@strapi/design-system": "^2.0.0",
-    "@strapi/icons": "^2.0.0",
+    "@strapi/design-system": ">=2.0.0-rc.0 <3.0.0",
+    "@strapi/icons": ">=2.0.0-rc.0 <3.0.0",
     "@strapi/sdk-plugin": "^5.0.0",
     "@strapi/strapi": "^5.0.0",
     "react": "^17.0.0 || ^18.0.0",
