@@ -121,7 +121,7 @@ const Settings = () => {
           {isRestartRequired && (
             <Box marginBottom={4}>
               <StyledAlert
-                closeLabel={getMessage('page.settings.actions.restart.alert.cancel')}
+                closeLabel={getMessage('page.settings.actions.restart.alert.close')}
                 title={getMessage('page.settings.actions.restart.alert.title')}
                 onClose={onDiscardRestart}
                 action={

@@ -39,7 +39,7 @@ export const ReportsTableRow: FC<ReportsTableRowProps> = ({ item, isChecked, onS
       </Td>
       <Td style={cellMaxWidth}>
         <Typography textColor="neutral800" ellipsis>
-          {item.content || getMessage('compontents.content.unknown')}
+          {item.content || getMessage('components.content.unknown')}
         </Typography>
       </Td>
       <Td style={cellMaxWidth}>
