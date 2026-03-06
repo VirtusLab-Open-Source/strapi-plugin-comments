@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { isNil, orderBy } from 'lodash';
 import { useCallback, useRef, useState } from 'react';
 import styled from 'styled-components';
+import * as pluginPkg from '../../../../package.json';
 import { ConfirmationDialog } from '../../components/ConfirmationDialog';
 import { RenderIf } from '../../components/RenderIf';
 import { useAPI } from '../../hooks/useAPI';
@@ -13,6 +14,8 @@ import { usePermissions } from '../../hooks/usePermissions';
 import { CommonProviders } from '../../providers/CommonProviders';
 import { getMessage } from '../../utils';
 import { useSettingsAPI } from './hooks/useSettingsAPI';
+
+const pluginVersion = pluginPkg.version;
 
 const boxDefaultProps = {
   background: 'neutral0',
@@ -107,7 +110,7 @@ const Settings = () => {
       <Page.Main>
         <Layouts.Header
           title={getMessage('page.settings.header.title')}
-          subtitle={getMessage('page.settings.header.description')}
+          subtitle={`${getMessage('page.settings.header.description')} • v${pluginVersion}`}
           as="h2"
           primaryAction={(
             <RenderIf condition={canSettingsChange}>
