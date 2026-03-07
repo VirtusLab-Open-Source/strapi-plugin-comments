@@ -72,6 +72,7 @@ const en = {
   'page.details.panel.discussion.warnings.reports.dialog.content': 'Content',
   'page.details.panel.discussion.warnings.reports.dialog.createdAt': 'Issue date',
   'page.details.panel.discussion.warnings.reports.dialog.status': 'Status',
+  'page.details.panel.discussion.warnings.reports.dialog.status.PENDING': 'Pending',
   'page.details.panel.discussion.warnings.reports.dialog.status.OPEN': 'Open',
   'page.details.panel.discussion.warnings.reports.dialog.status.RESOLVED': 'Resolved',
   'page.details.panel.discussion.warnings.reports.dialog.actions': 'Actions',
