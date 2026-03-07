@@ -3,7 +3,17 @@ import { CommentsPluginConfig } from '../../../config';
 import { APPROVAL_STATUS } from '../../../const';
 import { AUTHOR_TYPE, CONFIG_PARAMS } from '../../../utils/constants';
 import { ExtractRightEither } from '../../../utils/Either';
-import { AVAILABLE_OPERATORS, externalAuthorSchema, getFiltersOperators, getRelationValidator, getStringToNumberValidator, orderByValidator, stringToBooleanValidator, stringToNumberValidator, validate } from '../../utils';
+import {
+  AVAILABLE_OPERATORS,
+  externalAuthorSchema,
+  getFiltersOperators,
+  getRelationValidator,
+  getStringToNumberValidator,
+  orderByValidator,
+  stringToBooleanValidator,
+  stringToNumberValidator,
+  validate,
+} from '../../utils';
 
 const getCommentSchema = (enabledCollections: string[]) => {
   return z.object({
@@ -19,53 +29,60 @@ const getCommentSchema = (enabledCollections: string[]) => {
 export const newCommentValidator = (
   enabledCollections: string[],
   relation: string,
-  payload: object,
+  payload: object
 ) => {
-  return validate(getCommentSchema(enabledCollections).safeParse({
-    ...payload,
-    relation,
-  }));
+  return validate(
+    getCommentSchema(enabledCollections).safeParse({
+      ...payload,
+      relation,
+    })
+  );
 };
 
 export type NewCommentValidatorSchema = ExtractRightEither<ReturnType<typeof newCommentValidator>>;
 
-export const updateCommentValidator = (
-  enabledCollections: string[],
-  payload: object,
-) => {
+export const updateCommentValidator = (enabledCollections: string[], payload: object) => {
   return validate(
-    getCommentSchema(enabledCollections).pick({ content: true, relation: true, author: true })
-                                        .merge(getStringToNumberValidator({ commentId: AVAILABLE_OPERATORS.single }))
-                                        .safeParse(payload),
+    getCommentSchema(enabledCollections)
+      .pick({ content: true, relation: true, author: true })
+      .merge(getStringToNumberValidator({ commentId: AVAILABLE_OPERATORS.single }))
+      .safeParse(payload)
   );
 };
 
-export type UpdateCommentValidatorSchema = ExtractRightEither<ReturnType<typeof updateCommentValidator>>;
+export type UpdateCommentValidatorSchema = ExtractRightEither<
+  ReturnType<typeof updateCommentValidator>
+>;
 
-const getRelationSchema = (enabledCollections: string[]) => z.object({
-  relation: getRelationValidator(enabledCollections),
-});
+const getRelationSchema = (enabledCollections: string[]) =>
+  z.object({
+    relation: getRelationValidator(enabledCollections),
+  });
 
 const paginationSchema = z.object({
-  pagination: z.object({
-    pageSize: stringToNumberValidator.default(10),
-    page: stringToNumberValidator.default(1),
-    withCount: stringToBooleanValidator.optional().default(false),
-  }).optional(),
+  pagination: z
+    .object({
+      pageSize: stringToNumberValidator.default(10),
+      page: stringToNumberValidator.default(1),
+      withCount: stringToBooleanValidator.optional().default(false),
+    })
+    .optional(),
 });
 
 // TODO when Strapi will use zod v4 we can change it to the z.stringbool()
 const populateSchema = z
-  .record(z.union([
+  .record(
     z.union([
-      z.boolean(),
-      z.literal("true").transform(() => true),
-      z.literal("false").transform(() => false),
-      z.literal("*")
-    ]),
-    z.record(z.any()),
-  ]))
-  .optional()
+      z.union([
+        z.boolean(),
+        z.literal('true').transform(() => true),
+        z.literal('false').transform(() => false),
+        z.literal('*'),
+      ]),
+      z.record(z.any()),
+    ])
+  )
+  .optional();
 
 export type PopulateSchema = z.infer<typeof populateSchema>;
 
@@ -108,71 +125,98 @@ const getBaseFindSchema = (enabledCollections: string[]) => {
     .merge(getRelationSchema(enabledCollections))
     .merge(paginationSchema);
 };
-export const findAllFlatValidator = (enabledCollections: string[], relation: string, payload: object) => {
-
-  return validate(getBaseFindSchema(enabledCollections).safeParse({
-    ...payload,
-    relation,
-  }));
+export const findAllFlatValidator = (
+  enabledCollections: string[],
+  relation: string,
+  payload: object
+) => {
+  return validate(
+    getBaseFindSchema(enabledCollections).safeParse({
+      ...payload,
+      relation,
+    })
+  );
 };
 
 export type FindAllFlatSchema = ExtractRightEither<ReturnType<typeof findAllFlatValidator>>;
 
-export const findAllInHierarchyValidator = (enabledCollections: string[], relation: string, payload: object) => {
+export const findAllInHierarchyValidator = (
+  enabledCollections: string[],
+  relation: string,
+  payload: object
+) => {
   const schema = getBaseFindSchema(enabledCollections)
-  .pick({
-    sort: true,
-    fields: true,
-    omit: true,
-    filters: true,
-    isAdmin: true,
-    populate: true,
-    limit: true,
-    skip: true,
-    relation: true,
-    locale: true,
-    pagination: true,
-  })
-  .merge(z.object({
-    startingFromId: z.number().optional(),
-    dropBlockedThreads: z.boolean().optional().default(false),
-  }));
+    .pick({
+      sort: true,
+      fields: true,
+      omit: true,
+      filters: true,
+      isAdmin: true,
+      populate: true,
+      limit: true,
+      skip: true,
+      relation: true,
+      locale: true,
+      pagination: true,
+    })
+    .merge(
+      z.object({
+        startingFromId: z.number().optional(),
+        dropBlockedThreads: z.boolean().optional().default(false),
+      })
+    );
 
-  return validate(schema.safeParse({
-    ...payload,
-    relation,
-  }));
+  return validate(
+    schema.safeParse({
+      ...payload,
+      relation,
+    })
+  );
 };
 
-export type FindAllInHierarchyValidatorSchema = ExtractRightEither<ReturnType<typeof findAllInHierarchyValidator>>;
+export type FindAllInHierarchyValidatorSchema = ExtractRightEither<
+  ReturnType<typeof findAllInHierarchyValidator>
+>;
 
 export const findAllPerAuthorValidator = (params: object, payload: object) => {
   const schema = getBaseFindSchema([])
-  .pick({
-    sort: true,
-    fields: true,
-    omit: true,
-    isAdmin: true,
-    populate: true,
-    limit: true,
-    skip: true,
-    pagination: true,
-    filters: true,
-    locale: true,
-  })
-  .merge(z.object({
-    type: z.union([z.literal(AUTHOR_TYPE.GENERIC), z.literal('generic')]).optional(),
-    authorId: z.union([z.string(), z.number()]),
-  }));
+    .pick({
+      sort: true,
+      fields: true,
+      omit: true,
+      isAdmin: true,
+      populate: true,
+      limit: true,
+      skip: true,
+      pagination: true,
+      filters: true,
+      locale: true,
+    })
+    .merge(
+      z.object({
+        type: z
+          .union([
+            z.literal(AUTHOR_TYPE.GENERIC),
+            z.literal('generic'),
+            z.literal(AUTHOR_TYPE.STRAPI),
+            z.literal('strapi'),
+          ])
+          .optional(),
+        authorId: z.union([z.string(), z.number()]),
+      })
+    );
 
-
-  return validate(schema.safeParse({
-    ...payload,
-    ...params,
-  }));
+  return validate(
+    schema.safeParse({
+      ...payload,
+      ...params,
+    })
+  );
 };
 
-export type FindAllPerAuthorValidatorSchema = ExtractRightEither<ReturnType<typeof findAllPerAuthorValidator>>;
+export type FindAllPerAuthorValidatorSchema = ExtractRightEither<
+  ReturnType<typeof findAllPerAuthorValidator>
+>;
 
 const getReportAbuseSchema = (config: CommentsPluginConfig) => {
   return z.object({
@@ -183,14 +227,13 @@ const getReportAbuseSchema = (config: CommentsPluginConfig) => {
   });
 };
 
-export const reportAbuseValidator = (
-  config: CommentsPluginConfig,
-  payload: object,
-) => {
+export const reportAbuseValidator = (config: CommentsPluginConfig, payload: object) => {
   return validate(getReportAbuseSchema(config).safeParse(payload));
 };
 
-export type ReportAbuseValidatorSchema = ExtractRightEither<ReturnType<typeof reportAbuseValidator>>;
+export type ReportAbuseValidatorSchema = ExtractRightEither<
+  ReturnType<typeof reportAbuseValidator>
+>;
 
 const getRemoveCommentSchema = (enabledCollections: string[]) => {
   return z.object({
@@ -200,11 +243,10 @@ const getRemoveCommentSchema = (enabledCollections: string[]) => {
   });
 };
 
-export const removeCommentValidator = (
-  enabledCollections: string[],
-  payload: object,
-) => {
+export const removeCommentValidator = (enabledCollections: string[], payload: object) => {
   return validate(getRemoveCommentSchema(enabledCollections).safeParse(payload));
 };
 
-export type RemoveCommentValidatorSchema = ExtractRightEither<ReturnType<typeof removeCommentValidator>>;
+export type RemoveCommentValidatorSchema = ExtractRightEither<
+  ReturnType<typeof removeCommentValidator>
+>;
