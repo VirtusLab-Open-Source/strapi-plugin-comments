@@ -28,7 +28,6 @@ import {SingleLineContent} from '../SingleLineComponent/SingleLineContent';
 import {MultiLineContent} from '../MultiLineContent/MultiLineContent';
 import {ModeratorResponseModal} from '../ModeratorResponseModal';
 import { pluginId } from '../../pluginId';
-import {TEXT_VARIANTS} from '@strapi/design-system/dist/styles/type';
 
 type Props = {
   readonly item: Comment;
