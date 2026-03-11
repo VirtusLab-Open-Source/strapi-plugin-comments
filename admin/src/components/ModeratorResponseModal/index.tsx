@@ -1,11 +1,11 @@
-import { Button, Flex, IconButton, Modal } from '@strapi/design-system';
+import { Button, Flex, IconButton, Modal, Textarea } from '@strapi/design-system';
 import { Form, useNotification } from '@strapi/strapi/admin';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { FC, useCallback, useRef, useState } from 'react';
+import { Comment } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
 import { useUserContext } from '../../hooks/useUserContext';
 import { getMessage } from '../../utils';
-import { Wysiwyg } from '../Wysiwyg';
 
 type ModeratorResponseModalProps = {
   content: string;
@@ -24,7 +24,30 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
 
   const author = useUserContext();
 
-  const getOnSuccess = (message: string) => async () => {
+  const updateListCache = (nextContent: string | undefined) => {
+    if (typeof nextContent !== 'string') {
+      return;
+    }
+
+    queryClient.setQueriesData(
+      { queryKey: api.comments.findAll.getKey(), exact: false },
+      (data: { result: Comment[] } | undefined) => {
+        if (!data) {
+          return data;
+        }
+
+        return {
+          ...data,
+          result: data.result.map((item) => (
+            item.id === id ? { ...item, content: nextContent } : item
+          )),
+        };
+      }
+    );
+  };
+
+  const getOnSuccess = (message: string) => async (_data: unknown, variables?: { content?: string }) => {
+    updateListCache(variables?.content);
     await queryClient.invalidateQueries({
       queryKey: api.comments.findOne.getKey(),
       exact: false,
@@ -74,7 +97,7 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
   return (
     <Modal.Root open={isModalVisible} onOpenChange={onToggleModal}>
       <Modal.Trigger>
-        <IconButton label={getMessage('page.details.actions.thread.modal.start.thread')}>
+        <IconButton label={getMessage('page.details.actions.thread.modal.update.comment')}>
           <Icon />
         </IconButton>
       </Modal.Trigger>
@@ -96,10 +119,14 @@ export const ModeratorResponseModal: FC<ModeratorResponseModalProps> = ({ id, co
             }}
           >
             {({ values, onChange }) => (
-              <Wysiwyg
+              <Textarea
                 name="content"
-                value={values.content}
-                onChange={onChange}
+                id="content"
+                value={values.content ?? ''}
+                onKeyDown={(event: any) => {
+                  event.stopPropagation(); // Important to not been blocked by a parent listener
+                }}
+                onChange={(event: any) => onChange('content', event.target.value)}
               />
             )}
           </Form>
