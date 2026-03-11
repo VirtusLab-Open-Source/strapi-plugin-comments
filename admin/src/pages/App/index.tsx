@@ -7,7 +7,6 @@ import { useSettingsStore } from '../../store/settings.store';
 import { Details } from '../Details';
 import { Discover } from '../Discover';
 import { Reports } from '../Reports';
-import { CustomDiscover } from '../CustomDiscover';
 
 
 const InnerApp = () => {

@@ -70,7 +70,6 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
   const hasReports = !isEmpty(openReports);
   const reviewFlowEnabled = (canAccessReports || canReviewReports) && hasReports;
   const hasActiveThread = gotThread && !(removed || preview || pinned || blockedThread);
-  const isStatusBadgeVisible = isBlocked || reviewFlowEnabled;
 
   const handleUnblockThreadClick = () => {
     commentMutation.unBlockThread.mutate(id);

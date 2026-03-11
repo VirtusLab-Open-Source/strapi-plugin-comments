@@ -219,8 +219,6 @@ export const CommentRow: FC<Props> = ({ item }) => {
                 id={item.id}
                 canModerate={canModerate}
                 queryKey={api.comments.findAll.getKey()}
-                canApprove={needsApproval || canApprove}
-                canReject={needsApproval || canReject}
               />
             )}
             <ModeratorResponseModal

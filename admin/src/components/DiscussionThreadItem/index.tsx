@@ -60,9 +60,6 @@ export const DiscussionThreadItem: FC<PropsWithChildren<DiscussionThreadItemProp
             gap={{ initial: 2, medium: 1}}
           >
             <Flex grow={1} alignItems="center">
-              <Typography variant="omega" textColor="neutral800">
-                <DiscussionThreadItemContentTypographyRenderer dangerouslySetInnerHTML={{ __html: html }} />
-              </Typography>
               <MultiLineContent>
                 { item.content }
               </MultiLineContent>
@@ -78,7 +75,6 @@ export const DiscussionThreadItem: FC<PropsWithChildren<DiscussionThreadItemProp
           <DiscussionThreadItemFooter {...props} />
         </Flex>
       </Flex>
-      <Divider />
     </Box>
   );
 };
