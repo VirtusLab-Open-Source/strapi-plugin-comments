@@ -47,7 +47,7 @@ export const BlockMenu: FC<BlockMenuProps> = ({ type, item }) => {
   };
   return (
     <SimpleMenu
-      label={isIconButton ? null : 'Block'}
+      label={isIconButton ? null : getMessage('page.reports.table.cell.action.block', 'Block')}
       variant={'danger-light'}
       style={isIconButton ? iconButtonStyle : null}>
       {!blockedComment ? (

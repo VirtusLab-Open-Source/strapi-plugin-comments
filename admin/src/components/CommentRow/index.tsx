@@ -11,7 +11,7 @@ import {Eye, Pencil} from '@strapi/icons';
 import { isEmpty, isNil } from 'lodash';
 import {FC, SyntheticEvent, useMemo} from 'react';
 import { useIntl } from 'react-intl';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Comment } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
 import { usePermissions } from '../../hooks/usePermissions';
@@ -20,8 +20,9 @@ import { CommentStatusBadge } from '../CommentStatusBadge';
 import { IconButtonGroup } from '../IconButtonGroup';
 import { ReviewFlow } from '../ReviewFlow';
 import { UserAvatar } from '../UserAvatar';
+import { useIsMobile } from '@strapi/strapi/admin';
 import { Rating } from "../Rating";
-import {CustomApproveFlow} from '../CustomApproveFlow';
+import {ApproveFlow} from '../ApproveFlow';
 import * as React from 'react';
 import {SingleLineContent} from '../SingleLineComponent/SingleLineContent';
 import {MultiLineContent} from '../MultiLineContent/MultiLineContent';
@@ -31,7 +32,6 @@ import { pluginId } from '../../pluginId';
 type Props = {
   readonly item: Comment;
 };
-
 export const CommentRow: FC<Props> = ({ item }) => {
   const {
     canAccessReports,
@@ -76,7 +76,8 @@ export const CommentRow: FC<Props> = ({ item }) => {
           overflow="hidden"
           style={{ justifyContent:"end" }}
           target="_blank"
-          href={`/admin/content-manager/collection-types/${related.uid}/${related.documentId}${localeParam}`}
+          tag={NavLink}
+          to={`/content-manager/collection-types/${related.uid}/${related.documentId}${localeParam}`}
         >
           <SingleLineContent>
             { relatedName() }
@@ -125,6 +126,8 @@ export const CommentRow: FC<Props> = ({ item }) => {
     }
   }
 
+  const isMobile = useIsMobile()
+
   return (
     <Tr key={item.id} width="100%" height="auto">
       <Td>
@@ -136,14 +139,9 @@ export const CommentRow: FC<Props> = ({ item }) => {
             open={item.isAdminComment ? false : undefined}
             label={!item.isAdminComment ? item.author?.name || getMessage('page.discover.table.header.author.name') : undefined}
             align="start"
-            side="left"
-          >
-            <Flex
-              gap={2}
-              style={{ cursor: item.isAdminComment ? 'default' : 'help' }}
-              onClick={copyEmail}
-            >
-              {item.author && (
+            side="left">
+            <Flex gap={2} style={{ cursor: item.isAdminComment ? 'default' : 'help' }} onClick={copyEmail}>
+              {item.author && !isMobile && (
                 <UserAvatar
                   name={name || ''}
                   avatar={avatar}
@@ -187,7 +185,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
           <MultiLineContent>{item.content}</MultiLineContent>
         </Flex>
       </Td>
-      <Td>
+      <Td display={{ initial: 'none', large: 'table-cell' }}>
         <Typography>
           {formatDate(item.updatedAt || item.createdAt, {
             dateStyle: 'long',
@@ -217,7 +215,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
         >
           <IconButtonGroup isSingle={!(reviewFlowEnabled || (canModerate && needsApproval))}>
             {canModerate && (
-              <CustomApproveFlow
+              <ApproveFlow
                 id={item.id}
                 canModerate={canModerate}
                 queryKey={api.comments.findAll.getKey()}
@@ -233,7 +231,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
             {canReviewReports && (<ReviewFlow item={item} />)}
             <IconButton
               onClick={onClickDetails(item.id)}
-              label={getMessage("page.details.filters.label", "View")}
+              label={getMessage("page.details.panel.discussion.nav.drilldown", "View")}
             >
               <Eye />
             </IconButton>

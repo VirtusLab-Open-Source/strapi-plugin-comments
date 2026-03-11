@@ -88,6 +88,15 @@ describe('Admin controller', () => {
       expect(result).toEqual(expectedResult);
       expect(mockAdminService.findReports).toHaveBeenCalledWith(validatedData);
     });
+
+    it('should throw error when validation fails', async () => {
+      const ctx = { query: {} } as RequestContext;
+      const error = new Error('Validation failed');
+
+      caster<jest.Mock>(adminValidator.getReportFindReportsValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).findReports(ctx)).rejects.toThrow();
+    });
   });
 
   describe('findOne', () => {
@@ -141,6 +150,15 @@ describe('Admin controller', () => {
       expect(result).toEqual(expectedResult);
       expect(mockAdminService.changeBlockedComment).toHaveBeenCalledWith('1', true);
     });
+
+    it('should throw error when validation fails', async () => {
+      const ctx = { params: { id: 'invalid' } } as RequestContext<object, { id: string }>;
+      const error = new Error('Validation failed');
+
+      caster<jest.Mock>(adminValidator.getIdValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).blockComment(ctx)).rejects.toThrow();
+    });
   });
 
   describe('resolveAbuseReport', () => {
@@ -156,6 +174,15 @@ describe('Admin controller', () => {
 
       expect(result).toEqual(expectedResult);
       expect(mockAdminService.resolveAbuseReport).toHaveBeenCalledWith(validatedData);
+    });
+
+    it('should throw error when validation fails', async () => {
+      const ctx = { params: { id: 'invalid', reportId: '2' } } as RequestContext<object, { id: string; reportId: string }>;
+      const error = new Error('Validation failed');
+
+      caster<jest.Mock>(adminValidator.getCommentResolveAbuseReportValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).resolveAbuseReport(ctx)).rejects.toThrow();
     });
   });
 
@@ -209,6 +236,18 @@ describe('Admin controller', () => {
       expect(result).toEqual(expectedResult);
       expect(mockAdminService.postComment).toHaveBeenCalledWith(validatedData);
     });
+
+    it('should throw error when validation fails', async () => {
+      const ctx = {
+        params: { id: '1' },
+        request: { body: { content: 'Test content', author: 'Test author' } }
+      } as RequestContext<any, any>;
+      const error = new Error('Validation failed');
+
+      caster<jest.Mock>(adminValidator.getCommentPostValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).postComment(ctx)).rejects.toThrow();
+    });
   });
 
   describe('unblockComment', () => {
@@ -224,6 +263,15 @@ describe('Admin controller', () => {
 
       expect(result).toEqual(expectedResult);
       expect(mockAdminService.changeBlockedComment).toHaveBeenCalledWith('1', false);
+    });
+
+    it('should throw error when validation fails', async () => {
+      const ctx = { params: { id: 'invalid' } } as RequestContext<object, { id: string }>;
+      const error = new Error('Validation failed');
+
+      caster<jest.Mock>(adminValidator.getIdValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).unblockComment(ctx)).rejects.toThrow();
     });
   });
 
@@ -241,6 +289,15 @@ describe('Admin controller', () => {
       expect(result).toEqual(expectedResult);
       expect(mockAdminService.deleteComment).toHaveBeenCalledWith('1');
     });
+
+    it('should throw error when validation fails', async () => {
+      const ctx = { params: { id: 'invalid' } } as RequestContext<object, { id: string }>;
+      const error = new Error('Validation failed');
+
+      caster<jest.Mock>(adminValidator.getIdValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).deleteComment(ctx)).rejects.toThrow();
+    });
   });
 
   describe('blockCommentThread', () => {
@@ -256,6 +313,15 @@ describe('Admin controller', () => {
 
       expect(result).toEqual(expectedResult);
       expect(mockAdminService.blockCommentThread).toHaveBeenCalledWith('1', true);
+    });
+
+    it('should throw error when validation fails', async () => {
+      const ctx = { params: { id: 'invalid' } } as RequestContext<object, { id: string }>;
+      const error = new Error('Validation failed');
+
+      caster<jest.Mock>(adminValidator.getIdValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).blockCommentThread(ctx)).rejects.toThrow();
     });
   });
 
@@ -297,6 +363,15 @@ describe('Admin controller', () => {
 
       expect(result).toEqual(expectedResult);
       expect(mockAdminService.resolveAllAbuseReportsForComment).toHaveBeenCalledWith('1');
+    });
+
+    it('should throw error when validation fails', async () => {
+      const ctx = { params: { id: 'invalid' } } as RequestContext<object, { id: string }>;
+      const error = new Error('Validation failed');
+
+      caster<jest.Mock>(adminValidator.getIdValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).resolveAllAbuseReportsForComment(ctx)).rejects.toThrow();
     });
   });
 
@@ -340,6 +415,16 @@ describe('Admin controller', () => {
       expect(result).toEqual(expectedResult);
       expect(mockAdminService.resolveMultipleAbuseReports).toHaveBeenCalledWith(reportIds);
     });
+
+    it('should throw error when validation fails', async () => {
+      const reportIds = ['invalid'];
+      const ctx = { request: { body: reportIds } } as RequestContext<Array<string>>;
+      const error = new Error('Validation failed');
+
+      caster<jest.Mock>(adminValidator.getReportsMultipleAbuseValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).resolveMultipleAbuseReports(ctx)).rejects.toThrow();
+    });
   });
 
   describe('updateComment', () => {
@@ -359,6 +444,18 @@ describe('Admin controller', () => {
       expect(result).toEqual(expectedResult);
       expect(mockAdminService.updateComment).toHaveBeenCalledWith(validatedData);
     });
+
+    it('should throw error when validation fails', async () => {
+      const ctx = {
+        params: { id: '1' },
+        request: { body: { content: '' } }
+      } as RequestContext<any, any>;
+      const error = new Error('Validation failed');
+
+      caster<jest.Mock>(adminValidator.getUpdateCommentValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).updateComment(ctx)).rejects.toThrow();
+    });
   });
 
   describe('approveComment', () => {
@@ -375,6 +472,15 @@ describe('Admin controller', () => {
       expect(result).toEqual(expectedResult);
       expect(mockAdminService.approveComment).toHaveBeenCalledWith('1');
     });
+
+    it('should throw error when validation fails', async () => {
+      const ctx = { params: { id: 'invalid' } } as RequestContext<any, any>;
+      const error = new Error('Validation failed');
+
+      caster<jest.Mock>(adminValidator.getIdValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).approveComment(ctx)).rejects.toThrow();
+    });
   });
 
   describe('rejectComment', () => {
@@ -390,6 +496,15 @@ describe('Admin controller', () => {
 
       expect(result).toEqual(expectedResult);
       expect(mockAdminService.rejectComment).toHaveBeenCalledWith('1');
+    });
+
+    it('should throw error when validation fails', async () => {
+      const ctx = { params: { id: 'invalid' } } as RequestContext<any, any>;
+      const error = new Error('Validation failed');
+
+      caster<jest.Mock>(adminValidator.getIdValidator).mockReturnValue({ left: error });
+
+      await expect(getController(getStrapi()).rejectComment(ctx)).rejects.toThrow();
     });
   });
 });

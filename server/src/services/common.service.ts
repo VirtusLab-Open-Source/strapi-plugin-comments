@@ -22,6 +22,7 @@ import { client as clientValidator } from '../validators/api';
 import { Comment, CommentRelated, CommentWithRelated } from '../validators/repositories';
 import { Pagination } from '../validators/repositories/utils';
 import { buildAuthorModel, filterOurResolvedReports, getRelatedGroups } from './utils/functions';
+import sanitizeHtml from 'sanitize-html';
 
 
 const PAGE_SIZE = 10;
@@ -480,6 +481,32 @@ const commonService = ({ strapi }: StrapiContext) => ({
       data: {
         removed: true,
       }
+    });
+  },
+
+  sanitizeCommentContent(content: string) {
+    return sanitizeHtml(content, {
+      allowedTags: [
+        'p', 'br', 'hr',
+        'div', 'span',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'strong', 'i', 'em', 'del',
+        'blockquote',
+        'ul', 'ol', 'li',
+        'pre', 'code',
+        'a',
+        'img',
+        'table', 'thead', 'tbody', 'tr', 'th', 'td',
+        'video', 'audio', 'source',
+      ],
+      allowedAttributes: {
+        '*': ['href', 'align', 'alt', 'center', 'width', 'height', 'type', 'controls', 'target'],
+        img: ['src', 'alt'],
+        source: ['src', 'type'],
+        video: ['src', 'controls', 'width', 'height'],
+        audio: ['src', 'controls'],
+      },
+      allowedSchemes: ['http', 'https', 'mailto'],
     });
   },
 

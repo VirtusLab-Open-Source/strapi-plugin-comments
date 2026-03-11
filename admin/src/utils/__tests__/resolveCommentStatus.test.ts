@@ -53,4 +53,25 @@ describe('resolveCommentStatus()', () => {
       }),
     ).toEqual("UNKNOWN");
   });
+  it('should handle to review status when reviewFlowEnabled is true', () => {
+    expect(
+      resolveCommentStatus({
+        removed: false,
+        blocked: false,
+        blockedThread: false,
+        approvalStatus: 'PENDING',
+        reviewFlowEnabled: true,
+      }),
+    ).toEqual("TO_REVIEW");
+  });
+  it('should return OPEN when approvalStatus is null and no other conditions match', () => {
+    expect(
+      resolveCommentStatus({
+        removed: false,
+        blocked: false,
+        blockedThread: false,
+        approvalStatus: null,
+      }),
+    ).toEqual("OPEN");
+  });
 });

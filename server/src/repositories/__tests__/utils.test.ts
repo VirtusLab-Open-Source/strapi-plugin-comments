@@ -15,6 +15,17 @@ describe('Utils', () => {
       expect(result).toBe('plugin::comments.comment');
       expect(strapi.plugin).toHaveBeenCalledWith('comments');
     });
+
+    it('should return undefined when contentType is not found', () => {
+      const strapi = caster<CoreStrapi>({
+        plugin: jest.fn().mockReturnValue({
+          contentType: jest.fn().mockReturnValue(undefined)
+        })
+      });
+
+      const result = getModelUid(strapi, 'comment');
+      expect(result).toBeUndefined();
+    });
   });
 
   describe('getDefaultAuthorPopulate', () => {
@@ -47,6 +58,20 @@ describe('Utils', () => {
     it('should return true when content type is not found', () => {
       const strapi = caster<CoreStrapi>({
         contentType: jest.fn().mockReturnValue(null)
+      });
+
+      const result = getDefaultAuthorPopulate(strapi);
+      expect(result).toBe(true);
+    });
+
+    it('should handle attributes with undefined relation type', () => {
+      const strapi = caster<CoreStrapi>({
+        contentType: jest.fn().mockReturnValue({
+          attributes: {
+            username: { type: 'string' },
+            avatar: undefined,
+          }
+        })
       });
 
       const result = getDefaultAuthorPopulate(strapi);

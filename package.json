@@ -1,6 +1,6 @@
 {
   "name": "@alfanet-technologies/strapi-plugin-comments",
-  "version": "3.1.5",
+  "version": "3.2.3",
   "description": "Strapi - Comments plugin",
   "strapi": {
     "name": "comments",
@@ -58,9 +58,6 @@
     "codemirror5": "npm:codemirror@^5.65.11",
     "match-sorter": "^6.3.4",
     "no-profanity": "^1.5.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.22.3",
     "sanitize-html": "^2.13.1",
     "styled-components": "6.1.8",
     "zod": "^3.23.8",
@@ -69,12 +66,12 @@
   "devDependencies": {
     "@jest/types": "29.5.x",
     "@sensinum/strapi-utils": "^1.0.10",
-    "@strapi/plugin-cloud": "^5.14.0",
-    "@strapi/plugin-graphql": "5.14.0",
-    "@strapi/plugin-users-permissions": "^5.14.0",
+    "@strapi/plugin-cloud": "^5.37.0",
+    "@strapi/plugin-graphql": "^5.37.0",
+    "@strapi/plugin-users-permissions": "^5.37.0",
     "@strapi/sdk-plugin": "^5.3.2",
-    "@strapi/strapi": "^5.14.0",
-    "@strapi/types": "^5.14.0",
+    "@strapi/strapi": "^5.37.0",
+    "@strapi/types": "^5.37.0",
     "@types/jest": "^30.0.0",
     "@types/koa": "^2.15.0",
     "@types/minimatch": "3.0.5",
@@ -87,11 +84,14 @@
     "jest-styled-components": "^7.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^6.22.3",
     "ts-jest": "^29.1.4",
     "ts-node": "^10.9.1",
     "typescript": "^5.6.2"
   },
   "peerDependencies": {
+    "@strapi/design-system": ">=2.0.0-rc.0 <3.0.0",
+    "@strapi/icons": ">=2.0.0-rc.0 <3.0.0",
     "@strapi/sdk-plugin": "^5.0.0",
     "@strapi/strapi": "^5.0.0",
     "react": "^17.0.0 || ^18.0.0",
@@ -130,7 +130,7 @@
     }
   ],
   "engines": {
-    "node": ">=18.0.0 <=22.x.x",
+    "node": ">=18.0.0 <=24.x.x",
     "npm": ">=6.0.0"
   },
   "keywords": [
