@@ -129,7 +129,7 @@ const Settings = () => {
         <Layouts.Header
           title={getMessage('page.settings.header.title')}
           subtitle={
-            <Flex direction="row" gap={3} alignItems="center">
+            <Flex direction="row" gap={3} alignItems="center" justifyContent="space-between">
               <Typography variant="epsilon" textColor="neutral600" tag="p">
                 {getMessage('page.settings.header.description')}
               </Typography>
