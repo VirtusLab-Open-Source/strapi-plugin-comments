@@ -28,6 +28,7 @@ import {SingleLineContent} from '../SingleLineComponent/SingleLineContent';
 import {MultiLineContent} from '../MultiLineContent/MultiLineContent';
 import {ModeratorResponseModal} from '../ModeratorResponseModal';
 import { pluginId } from '../../pluginId';
+import {TEXT_VARIANTS} from '@strapi/design-system/dist/styles/type';
 
 type Props = {
   readonly item: Comment;
@@ -140,7 +141,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
             label={!item.isAdminComment ? item.author?.name || getMessage('page.discover.table.header.author.name') : undefined}
             align="start"
             side="left">
-            <Flex gap={2} style={{ cursor: item.isAdminComment ? 'default' : 'help' }} onClick={copyEmail}>
+            <Flex gap={2} style={{ cursor: item.isAdminComment ? 'default' : 'help' }} onClick={copyName}>
               {item.author && !isMobile && (
                 <UserAvatar
                   name={name || ''}
@@ -157,7 +158,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
             side="left"
           >
             <SingleLineContent
-              onClick={copyName}
+              onClick={copyEmail}
               style={{ cursor: item.isAdminComment ? 'default' : 'copy' }}
             >
               {name || getMessage('components.author.unknown')}
@@ -185,13 +186,38 @@ export const CommentRow: FC<Props> = ({ item }) => {
           <MultiLineContent>{item.content}</MultiLineContent>
         </Flex>
       </Td>
-      <Td display={{ initial: 'none', large: 'table-cell' }}>
-        <Typography>
-          {formatDate(item.updatedAt || item.createdAt, {
-            dateStyle: 'long',
-            timeStyle: 'short',
-          })}
-        </Typography>
+      <Td  display={{ initial: 'none', large: 'table-cell' }}>
+        <Flex
+          direction="column"
+          alignItems="flex-end"
+          gap={2}
+        >
+          <Typography variant="pi">
+            {formatDate(item.createdAt, {
+              dateStyle: 'long',
+              timeStyle: 'short',
+            })}
+          </Typography>
+          { item.lastExperience &&
+              <Flex
+                  direction="column"
+                  alignItems="flex-end"
+                  gap={2}
+              >
+                <Typography variant="pi" textColor="neutral600">
+                  {getMessage(
+                    'page.discover.table.header.lastExperience',
+                    'Last experience'
+                  )}
+                </Typography>
+                <Typography variant="pi" textColor="neutral600">
+                  {formatDate(item.lastExperience, {
+                    dateStyle: 'long',
+                  })}
+                </Typography>
+              </Flex>
+          }
+        </Flex>
       </Td>
       <Td maxWidth="20%">
         <Flex
@@ -218,6 +244,8 @@ export const CommentRow: FC<Props> = ({ item }) => {
               <ApproveFlow
                 id={item.id}
                 canModerate={canModerate}
+                canApprove={needsApproval || canApprove}
+                canReject={needsApproval || canReject}
                 queryKey={api.comments.findAll.getKey()}
               />
             )}

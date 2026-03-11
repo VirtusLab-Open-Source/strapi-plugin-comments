@@ -41,6 +41,8 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
 
   const api = useAPI();
   const { canModerate, canAccessReports, canReviewReports } = usePermissions();
+  const canApprove = approvalStatus !== 'APPROVED';
+  const canReject = approvalStatus !== 'REJECTED';
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -214,6 +216,8 @@ export const DiscussionThreadItemActions: FC<DiscussionThreadItemProps> = ({ ite
               <ApproveFlow
                 id={id}
                 canModerate={canModerate}
+                canApprove={needsApproval || canApprove}
+                canReject={needsApproval || canReject}
                 queryKey={api.comments.findOne.getKey(id)}
               />
             )}
