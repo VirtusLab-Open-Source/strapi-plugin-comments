@@ -1,11 +1,13 @@
 import { Flex, IconButton, Link, Td, Tooltip, Tr, Typography } from '@strapi/design-system';
-import { Eye } from '@strapi/icons';
+import { Cross, Eye } from '@strapi/icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { isEmpty, isNil } from 'lodash';
-import { FC, SyntheticEvent, useMemo } from 'react';
+import { FC, SyntheticEvent, useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Comment } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
+import { useCommentMutations } from '../../hooks/useCommentMutations';
 import { usePermissions } from '../../hooks/usePermissions';
 import { getMessage } from '../../utils';
 import { ApproveFlow } from '../ApproveFlow';
@@ -14,6 +16,7 @@ import { IconButtonGroup } from '../IconButtonGroup';
 import { ReviewFlow } from '../ReviewFlow';
 import { UserAvatar } from '../UserAvatar';
 import { useIsMobile } from '@strapi/strapi/admin';
+import { ConfirmationDialog } from '../ConfirmationDialog';
 
 type Props = {
   readonly item: Comment;
@@ -25,6 +28,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
     canReviewReports,
   } = usePermissions();
   const api = useAPI();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { formatDate } = useIntl();
 
@@ -64,6 +68,23 @@ export const CommentRow: FC<Props> = ({ item }) => {
   const { name, email, avatar } = item.author || {};
 
   const isMobile = useIsMobile()
+
+  const onDeleteSuccess = useCallback(() => {
+    return queryClient.invalidateQueries({
+      queryKey: api.comments.findAll.getKey(),
+      exact: false,
+    });
+  }, [api.comments.findAll, queryClient]);
+
+  const { commentMutation } = useCommentMutations({
+    comment: {
+      deleteSuccess: onDeleteSuccess,
+    },
+  });
+
+  const handleDeleteClick = () => {
+    commentMutation.delete.mutate(item.id);
+  };
 
   return (
     <Tr>
@@ -141,6 +162,23 @@ export const CommentRow: FC<Props> = ({ item }) => {
             >
               <Eye />
             </IconButton>
+            {canModerate && (
+              <ConfirmationDialog
+                title="This will delete this comment, are you sure"
+                labelConfirm="Yes"
+                labelCancel="No"
+                onConfirm={handleDeleteClick}
+                Trigger={({ onClick }) => (
+                  <IconButton
+                    onClick={onClick}
+                    loading={commentMutation.delete.isPending}
+                    label="Delete"
+                  >
+                    <Cross />
+                  </IconButton>
+                )}
+              />
+            )}
           </IconButtonGroup>
         </Flex>
       </Td>
