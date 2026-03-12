@@ -83,7 +83,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
   });
 
   const handleDeleteClick = () => {
-    commentMutation.delete.mutate(item.id);
+    return commentMutation.delete.mutateAsync(item.id);
   };
 
   return (
