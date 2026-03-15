@@ -173,6 +173,15 @@ describe('common.service', () => {
 
       expect(result).toBe(false);
     });
+
+    it('should return true when no user is provided', () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      const result = service.isValidUserContext();
+
+      expect(result).toBe(true);
+    });
   });
 
   describe('findOne', () => {
@@ -292,6 +301,171 @@ describe('common.service', () => {
 
       expect(result.data).toHaveLength(2);
       expect(mockCommentRepository.findWithCount).toHaveBeenCalled();
+    });
+    it('should merge related entity when relatedEntity is provided', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComments = [{ id: 1, content: 'Comment 1', related: 'api::test.test:1' }];
+
+      const relatedEntity = {
+        documentId: '1',
+        uid: 'api::test.test',
+        title: 'Test',
+      };
+
+      mockCommentRepository.findWithCount.mockResolvedValue({
+        results: mockComments,
+        pagination: { total: 1 },
+      });
+      mockStoreRepository.getConfig.mockResolvedValue([]);
+      caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
+
+      const result = await service.findAllFlat(
+        {
+          fields: ['id', 'content'],
+        },
+        relatedEntity
+      );
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].related).toEqual(relatedEntity);
+    });
+    it('should handle authorUser populate and threadOf filter', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComments = [{ id: 1, content: 'Comment 1', threadOf: '5' }];
+
+      mockCommentRepository.findWithCount.mockResolvedValue({
+        results: mockComments,
+        pagination: { total: 1 },
+      });
+      mockStoreRepository.getConfig.mockResolvedValue([]);
+      caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
+
+      const result = await service.findAllFlat({
+        fields: ['id', 'content'],
+        filters: { threadOf: '5' },
+        populate: {
+          authorUser: {
+            populate: true,
+          },
+        },
+      });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].threadOf).toBe(5);
+    });
+    it('should use pagination pageSize and page when provided', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommentRepository.findWithCount.mockResolvedValue({
+        results: [],
+        pagination: { total: 0 },
+      });
+      mockStoreRepository.getConfig.mockResolvedValue([]);
+      caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
+
+      await service.findAllFlat({
+        fields: ['id', 'content'],
+        pagination: { pageSize: 20, page: 3 },
+      });
+
+      expect(mockCommentRepository.findWithCount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pageSize: 20,
+          page: 3,
+        })
+      );
+    });
+    it('should fetch related entities when relatedEntity is null', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComments = [
+        { id: 1, content: 'Comment 1', related: 'api::test.test:1', locale: 'en' },
+      ];
+
+      mockCommentRepository.findWithCount.mockResolvedValue({
+        results: mockComments,
+        pagination: { total: 1 },
+      });
+
+      mockFindOne.mockResolvedValue({
+        documentId: '1',
+        uid: 'api::test.test',
+        title: 'Test',
+        locale: 'en',
+      });
+
+      const result = await service.findAllFlat({ fields: ['id', 'content'] }, null);
+
+      expect(result.data).toHaveLength(1);
+      expect(mockFindOne).toHaveBeenCalled();
+    });
+    it('should skip blocked author props when isAdmin is true', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommentRepository.findWithCount.mockResolvedValue({
+        results: [],
+        pagination: { total: 0 },
+      });
+      caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
+
+      await service.findAllFlat({
+        fields: ['id', 'content'],
+        isAdmin: true,
+      });
+
+      expect(mockStoreRepository.getConfig).not.toHaveBeenCalled();
+    });
+    it('should handle populated threadOf object', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComments = [
+        {
+          id: 1,
+          content: 'Reply',
+          threadOf: { id: 5, content: 'Parent', authorName: 'John' },
+        },
+      ];
+
+      mockCommentRepository.findWithCount.mockResolvedValue({
+        results: mockComments,
+        pagination: { total: 1 },
+      });
+      mockStoreRepository.getConfig.mockResolvedValue([]);
+      caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
+
+      const result = await service.findAllFlat({
+        fields: ['id', 'content'],
+      });
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].threadOf).toBeDefined();
+    });
+  });
+
+  describe('sanitizeCommentEntity', () => {
+    it('should handle populate as an array', () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const entity = { id: 1, content: 'Test', authorName: 'John' };
+
+      const result = service.sanitizeCommentEntity(entity, [], [], ['authorUser']);
+
+      expect(result).toBeDefined();
+      expect(result.id).toBe(1);
+    });
+    it('should handle populate as an object', () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const entity = { id: 1, content: 'Test', authorName: 'John' };
+
+      const result = service.sanitizeCommentEntity(entity, [], [], { authorUser: true });
+
+      expect(result).toBeDefined();
+      expect(result.id).toBe(1);
     });
   });
 
@@ -721,6 +895,26 @@ describe('common.service', () => {
 
       expect(result).toHaveLength(0);
     });
+
+    it('should handle comments with null locale', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComments = [{ id: 1, related: 'api::test.test:1', locale: null }];
+
+      mockFindOne.mockResolvedValue({
+        documentId: '1',
+        uid: 'api::test.test',
+        title: 'Test',
+      });
+
+      await service.findRelatedEntitiesFor(mockComments);
+
+      expect(mockFindOne).toHaveBeenCalledWith(
+        expect.objectContaining({
+          locale: undefined,
+        })
+      );
+    });
   });
 
   describe('Handle entity updates', () => {
@@ -747,6 +941,48 @@ describe('common.service', () => {
 
       expect(result).toEqual({ count: 2 });
       expect(mockCommentRepository.updateMany).toHaveBeenCalled();
+    });
+    it('should mark comments as removed for given relation and locale', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommentRepository.updateMany.mockResolvedValue({ count: 1 });
+
+      await service.perRemove('api::test.test:1', 'en');
+
+      expect(mockCommentRepository.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            related: 'api::test.test:1',
+          }),
+          data: { removed: true },
+        })
+      );
+    });
+    it('should include null locale filter when locale matches default locale', async () => {
+      const strapiWithI18n = caster<StrapiContext>({
+        strapi: {
+          documents: () => ({
+            findOne: mockFindOne,
+            findMany: mockFindMany,
+          }),
+          plugin: (name: string) =>
+            name === 'i18n' ? { service: () => ({ getDefaultLocale: () => 'en' }) } : null,
+        },
+      });
+      const service = getService(strapiWithI18n);
+
+      mockCommentRepository.updateMany.mockResolvedValue({ count: 1 });
+
+      await service.perRemove('api::test.test:1', 'en');
+
+      expect(mockCommentRepository.updateMany).toHaveBeenCalledWith({
+        where: {
+          related: 'api::test.test:1',
+          $or: [{ locale: 'en' }, { locale: { $eq: null } }],
+        },
+        data: { removed: true },
+      });
     });
   });
 });
