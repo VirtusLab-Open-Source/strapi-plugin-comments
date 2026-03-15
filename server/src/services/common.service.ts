@@ -1,16 +1,8 @@
 import { Params } from '@strapi/database/dist/entity-manager/types';
 import { UID } from '@strapi/strapi';
-import {
-  first,
-  get,
-  isNil,
-  isObject,
-  isString,
-  omit as filterItem,
-  parseInt,
-  uniq,
-} from 'lodash';
+import { omit as filterItem, first, get, isNil, isObject, isString, parseInt, uniq } from 'lodash';
 import { isProfane, replaceProfanities } from 'no-profanity';
+import sanitizeHtml from 'sanitize-html';
 import { Id, PathTo, PathValue, RelatedEntity, StrapiContext } from '../@types';
 import { CommentsPluginConfig } from '../config';
 import { ContentTypesUUIDs } from '../content-types';
@@ -22,12 +14,9 @@ import { client as clientValidator } from '../validators/api';
 import { Comment, CommentRelated, CommentWithRelated } from '../validators/repositories';
 import { Pagination } from '../validators/repositories/utils';
 import { buildAuthorModel, filterOurResolvedReports, getRelatedGroups } from './utils/functions';
-import sanitizeHtml from 'sanitize-html';
-
 
 const PAGE_SIZE = 10;
 const REQUIRED_FIELDS = ['id'];
-
 
 type ParsedRelation = {
   uid: UID.ContentType;
@@ -37,18 +26,27 @@ type ParsedRelation = {
 type Created = PathTo<CommentsPluginConfig>;
 
 const commonService = ({ strapi }: StrapiContext) => ({
-  async getConfig<T extends Created>(prop?: T, defaultValue?: PathValue<CommentsPluginConfig, T>, useLocal = false): Promise<PathValue<CommentsPluginConfig, T>> {
+  async getConfig<T extends Created>(
+    prop?: T,
+    defaultValue?: PathValue<CommentsPluginConfig, T>,
+    useLocal = false
+  ): Promise<PathValue<CommentsPluginConfig, T>> {
     const storeRepository = getStoreRepository(strapi);
     const config = await storeRepository.getConfig();
     if (prop && !useLocal) {
       return get(config, prop, defaultValue) as PathValue<CommentsPluginConfig, T>;
     }
     if (useLocal) {
-      return storeRepository.getLocalConfig(prop, defaultValue) as PathValue<CommentsPluginConfig, T>;
+      return storeRepository.getLocalConfig(prop, defaultValue) as PathValue<
+        CommentsPluginConfig,
+        T
+      >;
     }
     return config as PathValue<CommentsPluginConfig, T>;
   },
-  parseRelationString(relation: `${string}::${string}.${string}:${string}` | string): ParsedRelation {
+  parseRelationString(
+    relation: `${string}::${string}.${string}:${string}` | string
+  ): ParsedRelation {
     const [uid, relatedStringId] = getRelatedGroups(relation);
     return { uid: uid as UID.ContentType, relatedId: relatedStringId };
   },
@@ -56,18 +54,28 @@ const commonService = ({ strapi }: StrapiContext) => ({
     return user ? user.id != undefined : true;
   },
 
-  sanitizeCommentEntity(entity: Comment | CommentWithRelated, blockedAuthors: string[], omitProps: Array<keyof Comment> = [], populate: any = {}): Comment {
+  sanitizeCommentEntity(
+    entity: Comment | CommentWithRelated,
+    blockedAuthors: string[],
+    omitProps: Array<keyof Comment> = [],
+    populate: any = {}
+  ): Comment {
     const fieldsToPopulate = Array.isArray(populate) ? populate : Object.keys(populate || {});
-    return filterItem({
-      ...buildAuthorModel(
-        {
-          ...entity,
-          threadOf: isObject(entity.threadOf) ? buildAuthorModel(entity.threadOf, blockedAuthors, fieldsToPopulate) : entity.threadOf,
-        },
-        blockedAuthors,
-        fieldsToPopulate,
-      ),
-    }, omitProps) as Comment;
+    return filterItem(
+      {
+        ...buildAuthorModel(
+          {
+            ...entity,
+            threadOf: isObject(entity.threadOf)
+              ? buildAuthorModel(entity.threadOf, blockedAuthors, fieldsToPopulate)
+              : entity.threadOf,
+          },
+          blockedAuthors,
+          fieldsToPopulate
+        ),
+      },
+      omitProps
+    ) as Comment;
   },
 
   // Find comments in the flat structure
@@ -84,7 +92,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
       filters = {},
       locale,
     }: clientValidator.FindAllFlatSchema,
-    relatedEntity?: any,
+    relatedEntity?: any
   ): Promise<{
     data: Array<CommentWithRelated | Comment>;
     pagination?: Pagination;
@@ -93,19 +101,19 @@ const commonService = ({ strapi }: StrapiContext) => ({
     const defaultSelect = (['id', 'related'] as const).filter((field) => !omit.includes(field));
 
     const populateClause: clientValidator.FindAllFlatSchema['populate'] = {
-      authorUser: { 
+      authorUser: {
         populate: true,
-        avatar: { populate: true } 
+        avatar: { populate: true },
       },
       ...(isObject(populate) ? populate : {}),
     };
-    const doNotPopulateAuthor = isAdmin ? [] : await this.getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
+    const doNotPopulateAuthor = isAdmin
+      ? []
+      : await this.getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
     const [operator, direction] = getOrderBy(sort);
     const fieldsQuery = {
       orderBy: { [operator]: direction },
-      select: Array.isArray(fields)
-        ? uniq([...fields, defaultSelect].flat())
-        : fields,
+      select: Array.isArray(fields) ? uniq([...fields, defaultSelect].flat()) : fields,
     };
 
     const params = {
@@ -119,12 +127,15 @@ const commonService = ({ strapi }: StrapiContext) => ({
       page: pagination?.page || (skip ? Math.floor(skip / limit) : 1) || 1,
     };
 
-    const { results: entries, pagination: resultPaginationData } = await getCommentRepository(strapi).findWithCount(params);
+    const { results: entries, pagination: resultPaginationData } =
+      await getCommentRepository(strapi).findWithCount(params);
 
     const entriesWithThreads = await Promise.all(
       entries.map(async (_) => {
-        const { results, pagination: { total } } = await getCommentRepository(strapi)
-        .findWithCount({
+        const {
+          results,
+          pagination: { total },
+        } = await getCommentRepository(strapi).findWithCount({
           where: {
             threadOf: _.id,
           },
@@ -134,18 +145,30 @@ const commonService = ({ strapi }: StrapiContext) => ({
           itemsInTread: total,
           firstThreadItemId: first(results)?.id,
         };
-      }),
+      })
     );
-    const relatedEntities = omit.includes('related') ? [] : relatedEntity !== null ? [relatedEntity] : await this.findRelatedEntitiesFor([...entries]);
+    const relatedEntities = omit.includes('related')
+      ? []
+      : relatedEntity !== null
+        ? [relatedEntity]
+        : await this.findRelatedEntitiesFor([...entries]);
     const hasRelatedEntitiesToMap = relatedEntities.filter((_: RelatedEntity) => _).length > 0;
 
     const result = entries.map((_) => {
       const threadedItem = entriesWithThreads.find((item) => item.id === _.id);
-      const parsedThreadOf = 'threadOf' in filters ? (isString(filters.threadOf) ? parseInt(filters.threadOf) : filters.threadOf) : null;
+      const parsedThreadOf =
+        'threadOf' in filters
+          ? isString(filters.threadOf)
+            ? parseInt(filters.threadOf)
+            : filters.threadOf
+          : null;
 
       let authorUserPopulate = {};
       if (isObject(populate?.authorUser)) {
-        authorUserPopulate = 'populate' in populate.authorUser ? (populate.authorUser.populate) : populateClause.authorUser;
+        authorUserPopulate =
+          'populate' in populate.authorUser
+            ? populate.authorUser.populate
+            : populateClause.authorUser;
       }
 
       const primitiveThreadOf = typeof parsedThreadOf === 'number' ? parsedThreadOf : null;
@@ -159,12 +182,14 @@ const commonService = ({ strapi }: StrapiContext) => ({
         },
         doNotPopulateAuthor,
         omit as Array<keyof Comment>,
-        authorUserPopulate,
+        authorUserPopulate
       );
     });
 
     return {
-      data: hasRelatedEntitiesToMap ? result.map((_) => this.mergeRelatedEntityTo(_, relatedEntities)) : result,
+      data: hasRelatedEntitiesToMap
+        ? result.map((_) => this.mergeRelatedEntityTo(_, relatedEntities))
+        : result,
       pagination: resultPaginationData,
     };
   },
@@ -183,7 +208,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     entry: Comment | CommentWithRelated,
     relatedEntity?: any,
     dropBlockedThreads = false,
-    blockNestedThreads = false,
+    blockNestedThreads = false
   ) {
     if (!entry.gotThread) {
       return {
@@ -209,7 +234,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
         locale,
         limit: Number.MAX_SAFE_INTEGER,
       },
-      relatedEntity,
+      relatedEntity
     );
     const allChildren =
       entry.blockedThread && dropBlockedThreads
@@ -229,9 +254,9 @@ const commonService = ({ strapi }: StrapiContext) => ({
                 },
                 child,
                 relatedEntity,
-                dropBlockedThreads,
-              ),
-            ),
+                dropBlockedThreads
+              )
+            )
           );
 
     return {
@@ -258,14 +283,12 @@ const commonService = ({ strapi }: StrapiContext) => ({
       limit,
       pagination,
     }: clientValidator.FindAllInHierarchyValidatorSchema,
-    relatedEntity?: any,
+    relatedEntity?: any
   ) {
     const rootEntries = await this.findAllFlat(
       {
         filters: {
-          threadOf: startingFromId
-            ? { $eq: startingFromId.toString() }
-            : { $null: true },
+          threadOf: startingFromId ? { $eq: startingFromId.toString() } : { $null: true },
           ...filters,
         },
         pagination,
@@ -277,7 +300,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
         locale,
         limit,
       },
-      relatedEntity,
+      relatedEntity
     );
 
     const rootEntriesWithChildren = await Promise.all(
@@ -295,9 +318,9 @@ const commonService = ({ strapi }: StrapiContext) => ({
           },
           entry,
           relatedEntity,
-          dropBlockedThreads,
-        ),
-      ),
+          dropBlockedThreads
+        )
+      )
     );
 
     return rootEntriesWithChildren;
@@ -315,7 +338,10 @@ const commonService = ({ strapi }: StrapiContext) => ({
     if (!entity) {
       throw new PluginError(400, 'Comment does not exist. Check your payload please.');
     }
-    const doNotPopulateAuthor: Array<string> = await this.getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
+    const doNotPopulateAuthor: Array<string> = await this.getConfig(
+      CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS,
+      []
+    );
     const item = this.sanitizeCommentEntity(entity, doNotPopulateAuthor);
     return filterOurResolvedReports(item);
   },
@@ -329,55 +355,67 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
 
   // Find all for author
-  async findAllPerAuthor({
+  async findAllPerAuthor(
+    {
       filters = {},
       populate = {},
       pagination,
       sort,
+      omit = [],
       fields,
       isAdmin = false,
       authorId,
+      limit,
+      locale,
+      skip,
     }: clientValidator.FindAllPerAuthorValidatorSchema,
-    isStrapiAuthor: boolean = false,
+    isStrapiAuthor: boolean = false
   ) {
-    {
-      if (isNil(authorId)) {
-        return {
-          data: [],
-        };
-      }
-
-      const authorQuery = isStrapiAuthor ? {
-        authorUser: {
-          id: authorId,
-        },
-      } : {
-        authorId,
-      };
-
-      const response = await this.findAllFlat({
-        filters: {
-          ...filterItem(filters, ['related']),
-          ...authorQuery,
-        },
-        pagination,
-        populate,
-        sort,
-        fields,
-        isAdmin,
-      });
-
+    if (isNil(authorId)) {
       return {
-        ...response,
-        data: response.data.map(({ author, ...rest }) => rest),
+        data: [],
       };
     }
+
+    const authorQuery = isStrapiAuthor
+      ? {
+          authorUser: {
+            id: authorId,
+          },
+        }
+      : {
+          authorId,
+        };
+
+    const response = await this.findAllFlat({
+      filters: {
+        ...filterItem(filters, ['related']),
+        ...authorQuery,
+      },
+      pagination,
+      populate,
+      sort,
+      fields,
+      isAdmin,
+      omit,
+      limit,
+      skip,
+      locale,
+    });
+
+    return {
+      ...response,
+      data: response.data.map(({ author, ...rest }) => rest),
+    };
   },
 
   // Find all related entiries
   async findRelatedEntitiesFor(entries: Array<Comment>): Promise<Array<CommentRelated>> {
     const data = entries.reduce(
-      (acc: { [key: string]: { documentIds: Array<string | number>, locale?: Array<string> } }, curr: Comment) => {
+      (
+        acc: { [key: string]: { documentIds: Array<string | number>; locale?: Array<string> } },
+        curr: Comment
+      ) => {
         const [relatedUid, relatedStringId] = getRelatedGroups(curr.related);
         return {
           ...acc,
@@ -388,47 +426,56 @@ const commonService = ({ strapi }: StrapiContext) => ({
           },
         };
       },
-      {},
+      {}
     );
 
     return Promise.all(
-      Object.entries(data).map(
-        async ([relatedUid, { documentIds, locale }]) => {
-          return Promise.all(
-            documentIds.map((documentId, index) =>
-              strapi.documents(relatedUid as ContentTypesUUIDs).findOne({
-                documentId: documentId.toString(),
-                locale: !isNil(locale[index]) ? locale[index] : undefined,
-                status: 'published',
-              }),
-            ),
-          ).then((relatedEntities) => relatedEntities
-            .filter(_ => _).map((_) => ({
+      Object.entries(data).map(async ([relatedUid, { documentIds, locale }]) => {
+        return Promise.all(
+          documentIds.map((documentId, index) =>
+            strapi.documents(relatedUid as ContentTypesUUIDs).findOne({
+              documentId: documentId.toString(),
+              locale: !isNil(locale[index]) ? locale[index] : undefined,
+              status: 'published',
+            })
+          )
+        ).then((relatedEntities) =>
+          relatedEntities
+            .filter((_) => _)
+            .map((_) => ({
               ..._,
               uid: relatedUid,
-            })),
-          );
-        },
-      ),
+            }))
+        );
+      })
     ).then((result) => result.flat(2));
   },
 
   // Merge related entity with comment
-  mergeRelatedEntityTo(entity: Comment, relatedEntities: Array<CommentRelated> = []): CommentWithRelated {
+  mergeRelatedEntityTo(
+    entity: Comment,
+    relatedEntities: Array<CommentRelated> = []
+  ): CommentWithRelated {
     return {
       ...entity,
-      related: relatedEntities.find(
-        (relatedEntity) => {
-          if (relatedEntity.locale && entity.locale) {
-            return entity.related === `${relatedEntity.uid}:${relatedEntity.documentId}` && entity.locale === relatedEntity.locale;
-          }
-          return entity.related === `${relatedEntity.uid}:${relatedEntity.documentId}`;
-        },
-      ),
+      related: relatedEntities.find((relatedEntity) => {
+        if (relatedEntity.locale && entity.locale) {
+          return (
+            entity.related === `${relatedEntity.uid}:${relatedEntity.documentId}` &&
+            entity.locale === relatedEntity.locale
+          );
+        }
+        return entity.related === `${relatedEntity.uid}:${relatedEntity.documentId}`;
+      }),
     };
   },
   // TODO: we need to add deepLimit to the function to prevent infinite loops
-  async modifiedNestedNestedComments<T extends keyof Comment>(id: Id, fieldName: T, value: Comment[T], deepLimit: number = 10): Promise<boolean> {
+  async modifiedNestedNestedComments<T extends keyof Comment>(
+    id: Id,
+    fieldName: T,
+    value: Comment[T],
+    deepLimit: number = 10
+  ): Promise<boolean> {
     if (deepLimit === 0) {
       return true;
     }
@@ -441,7 +488,8 @@ const commonService = ({ strapi }: StrapiContext) => ({
       if (entities.length === changedEntries.count && changedEntries.count > 0) {
         const nestedTransactions = await Promise.all(
           entities.map((item) =>
-            this.modifiedNestedNestedComments(item.id, fieldName, value, deepLimit - 1)),
+            this.modifiedNestedNestedComments(item.id, fieldName, value, deepLimit - 1)
+          )
         );
         return nestedTransactions.length === changedEntries.count;
       }
@@ -455,49 +503,68 @@ const commonService = ({ strapi }: StrapiContext) => ({
     const config = await this.getConfig(CONFIG_PARAMS.BAD_WORDS, true);
     if (config) {
       if (content && isProfane({ testString: content })) {
-        throw new PluginError(
-          400,
-          "Bad language used! Please polite your comment...",
-          {
-            content: {
-              original: content,
-              filtered: content && replaceProfanities({ testString: content }),
-            },
+        throw new PluginError(400, 'Bad language used! Please polite your comment...', {
+          content: {
+            original: content,
+            filtered: content && replaceProfanities({ testString: content }),
           },
-        );
+        });
       }
     }
     return content;
   },
 
   async perRemove(related: string, locale?: string) {
-    const defaultLocale = await strapi.plugin('i18n')?.service('locales').getDefaultLocale() || null;
-    return getCommentRepository(strapi)
-    .updateMany({
+    const defaultLocale =
+      (await strapi.plugin('i18n')?.service('locales').getDefaultLocale()) || null;
+    return getCommentRepository(strapi).updateMany({
       where: {
         related,
-        $or: [{ locale }, defaultLocale === locale ? { locale: { $eq: null } } : null].filter(Boolean)
+        $or: [{ locale }, defaultLocale === locale ? { locale: { $eq: null } } : null].filter(
+          Boolean
+        ),
       },
       data: {
         removed: true,
-      }
+      },
     });
   },
 
   sanitizeCommentContent(content: string) {
     return sanitizeHtml(content, {
       allowedTags: [
-        'p', 'br', 'hr',
-        'div', 'span',
-        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-        'strong', 'i', 'em', 'del',
+        'p',
+        'br',
+        'hr',
+        'div',
+        'span',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        'strong',
+        'i',
+        'em',
+        'del',
         'blockquote',
-        'ul', 'ol', 'li',
-        'pre', 'code',
+        'ul',
+        'ol',
+        'li',
+        'pre',
+        'code',
         'a',
         'img',
-        'table', 'thead', 'tbody', 'tr', 'th', 'td',
-        'video', 'audio', 'source',
+        'table',
+        'thead',
+        'tbody',
+        'tr',
+        'th',
+        'td',
+        'video',
+        'audio',
+        'source',
       ],
       allowedAttributes: {
         '*': ['href', 'align', 'alt', 'center', 'width', 'height', 'type', 'controls', 'target'],
@@ -510,11 +577,9 @@ const commonService = ({ strapi }: StrapiContext) => ({
     });
   },
 
-  registerLifecycleHook(/*{ callback, contentTypeName, hookName }*/) {
-  },
+  registerLifecycleHook(/*{ callback, contentTypeName, hookName }*/) {},
 
-  async runLifecycleHook(/*{ contentTypeName, event, hookName }*/) {
-  },
+  async runLifecycleHook(/*{ contentTypeName, event, hookName }*/) {},
 });
 
 type CommonService = ReturnType<typeof commonService>;
