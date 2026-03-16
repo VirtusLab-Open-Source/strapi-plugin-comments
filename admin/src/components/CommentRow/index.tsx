@@ -1,5 +1,6 @@
 import { Flex, IconButton, Link, Td, Tooltip, Tr, Typography } from '@strapi/design-system';
-import { Cross, Eye } from '@strapi/icons';
+import { Eye, Trash } from '@strapi/icons';
+import { useIsMobile } from '@strapi/strapi/admin';
 import { useQueryClient } from '@tanstack/react-query';
 import { isEmpty, isNil } from 'lodash';
 import { FC, SyntheticEvent, useCallback, useMemo } from 'react';
@@ -12,21 +13,16 @@ import { usePermissions } from '../../hooks/usePermissions';
 import { getMessage } from '../../utils';
 import { ApproveFlow } from '../ApproveFlow';
 import { CommentStatusBadge } from '../CommentStatusBadge';
+import { ConfirmationDialog } from '../ConfirmationDialog';
 import { IconButtonGroup } from '../IconButtonGroup';
 import { ReviewFlow } from '../ReviewFlow';
 import { UserAvatar } from '../UserAvatar';
-import { useIsMobile } from '@strapi/strapi/admin';
-import { ConfirmationDialog } from '../ConfirmationDialog';
 
 type Props = {
   readonly item: Comment;
 };
 export const CommentRow: FC<Props> = ({ item }) => {
-  const {
-    canAccessReports,
-    canModerate,
-    canReviewReports,
-  } = usePermissions();
+  const { canAccessReports, canModerate, canReviewReports } = usePermissions();
   const api = useAPI();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -67,7 +63,7 @@ export const CommentRow: FC<Props> = ({ item }) => {
 
   const { name, email, avatar } = item.author || {};
 
-  const isMobile = useIsMobile()
+  const isMobile = useIsMobile();
 
   const onDeleteSuccess = useCallback(() => {
     return queryClient.invalidateQueries({
@@ -83,8 +79,10 @@ export const CommentRow: FC<Props> = ({ item }) => {
   });
 
   const handleDeleteClick = () => {
-    return commentMutation.delete.mutateAsync(item.id);
+    commentMutation.delete.mutate(item.id);
   };
+
+  const shouldShowDeleteButton = canModerate && !item.removed;
 
   return (
     <Tr>
@@ -94,20 +92,19 @@ export const CommentRow: FC<Props> = ({ item }) => {
       <Td maxWidth="200px">
         <Tooltip
           open={item.isAdminComment ? false : undefined}
-          label={!item.isAdminComment ? email || getMessage('page.discover.table.header.author.email') : undefined}
+          label={
+            !item.isAdminComment
+              ? email || getMessage('page.discover.table.header.author.email')
+              : undefined
+          }
           align="start"
-          side="left">
+          side="left"
+        >
           <Flex gap={2} style={{ cursor: item.isAdminComment ? 'default' : 'help' }}>
             {item.author && !isMobile && (
-              <UserAvatar
-                name={name || ''}
-                avatar={avatar}
-                isAdminComment={item.isAdminComment}
-              />
+              <UserAvatar name={name || ''} avatar={avatar} isAdminComment={item.isAdminComment} />
             )}
-            <Typography ellipsis>
-              {name || getMessage('components.author.unknown')}
-            </Typography>
+            <Typography ellipsis>{name || getMessage('components.author.unknown')}</Typography>
           </Flex>
         </Tooltip>
       </Td>
@@ -122,14 +119,14 @@ export const CommentRow: FC<Props> = ({ item }) => {
                 id: 'page.discover.table.cell.thread',
                 props: { id: item.threadOf.id },
               },
-              '#' + item.threadOf.id,
+              '#' + item.threadOf.id
             )}
           </Link>
-        ) : '-'}
+        ) : (
+          '-'
+        )}
       </Td>
-      <Td maxWidth="200px">
-        {contentTypeLink ?? '-'}
-      </Td>
+      <Td maxWidth="200px">{contentTypeLink ?? '-'}</Td>
       <Td display={{ initial: 'none', large: 'table-cell' }}>
         <Typography>
           {formatDate(item.updatedAt || item.createdAt, {
@@ -158,27 +155,33 @@ export const CommentRow: FC<Props> = ({ item }) => {
             {canReviewReports && <ReviewFlow item={item} />}
             <IconButton
               onClick={onClickDetails(item.id)}
-              label={getMessage("page.details.panel.discussion.nav.drilldown", "View")}
+              label={getMessage('page.details.panel.discussion.nav.drilldown', 'View')}
             >
               <Eye />
             </IconButton>
-            {canModerate && (
+            {shouldShowDeleteButton ? (
               <ConfirmationDialog
-                title="This will delete this comment, are you sure"
-                labelConfirm="Yes"
-                labelCancel="No"
+                title={getMessage('page.details.actions.comment.delete.confirmation.header')}
+                labelConfirm={getMessage(
+                  'page.details.actions.comment.delete.confirmation.button.confirm'
+                )}
+                labelCancel={getMessage(
+                  'page.details.actions.comment.delete.confirmation.button.cancel'
+                )}
                 onConfirm={handleDeleteClick}
                 Trigger={({ onClick }) => (
                   <IconButton
                     onClick={onClick}
                     loading={commentMutation.delete.isPending}
-                    label="Delete"
+                    label={getMessage('page.details.actions.comment.delete', 'Delete')}
                   >
-                    <Cross />
+                    <Trash />
                   </IconButton>
                 )}
-              />
-            )}
+              >
+                {getMessage('page.details.actions.comment.delete.confirmation.description')}
+              </ConfirmationDialog>
+            ) : null}
           </IconButtonGroup>
         </Flex>
       </Td>
