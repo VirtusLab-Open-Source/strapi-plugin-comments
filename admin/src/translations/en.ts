@@ -37,12 +37,12 @@ const en = {
   'page.discover.table.cell.thread': 'Comment #{id}',
   'page.discover.table.action.display': 'Display',
   'page.discover.table.action.reports': 'Reports',
-  'page.discover.table.empty': 'You don\'t have any comments yet.',
+  'page.discover.table.empty': "You don't have any comments yet.",
   'page.discover.table.empty.search': 'No comments match the search.',
   'page.discover.table.filters': 'Filtering',
   'page.discover.table.reports.review': 'Review reports',
   'page.reports.header': 'Resolve reports',
-  'page.reports.table.empty': 'You don\'t have any reports yet.',
+  'page.reports.table.empty': "You don't have any reports yet.",
   'page.reports.table.empty.search': 'No reports match the search.',
   'page.reports.table.header.id': 'ID',
   'page.reports.table.header.reason': 'Reason',
@@ -77,9 +77,12 @@ const en = {
   'page.details.panel.discussion.warnings.reports.dialog.status.RESOLVED': 'Resolved',
   'page.details.panel.discussion.warnings.reports.dialog.actions': 'Actions',
   'page.details.panel.discussion.warnings.reports.dialog.actions.resolve': 'Resolve',
-  'page.details.panel.discussion.warnings.reports.dialog.actions.resolve.selected': 'Resolve reports ({count})',
-  'page.details.panel.discussion.warnings.reports.dialog.confirmation.success': 'Open report has been resolved',
-  'page.details.panel.discussion.warnings.reports.selected.dialog.confirmation.success': 'Open reports has been resolved',
+  'page.details.panel.discussion.warnings.reports.dialog.actions.resolve.selected':
+    'Resolve reports ({count})',
+  'page.details.panel.discussion.warnings.reports.dialog.confirmation.success':
+    'Open report has been resolved',
+  'page.details.panel.discussion.warnings.reports.selected.dialog.confirmation.success':
+    'Open reports has been resolved',
   'page.details.panel.discussion.warnings.comments.header': 'Moderation: Review reported comment',
   'page.details.panel.discussion.status.blocked': 'Blocked',
   'page.details.panel.discussion.reply': 'Reply',
@@ -95,7 +98,8 @@ const en = {
   'page.details.panel.loading': 'Fetching entity...',
   'page.details.actions.comment.block': 'Block comment',
   'page.details.actions.comment.block.confirmation.header': 'Moderation: Block comment',
-  'page.details.actions.comment.block.confirmation.description': 'Do you really want to block this comment?',
+  'page.details.actions.comment.block.confirmation.description':
+    'Do you really want to block this comment?',
   'page.details.actions.comment.block.confirmation.button.confirm': 'Yes, block it',
   'page.details.actions.comment.block.confirmation.success': 'Comment has been blocked',
   'page.details.actions.comment.unblock': 'Unblock comment',
@@ -107,7 +111,8 @@ const en = {
   'page.details.actions.comment.reports.reject': 'Reject',
   'page.details.actions.thread.block': 'Block thread',
   'page.details.actions.thread.block.confirmation.header': 'Moderation: Block thread',
-  'page.details.actions.thread.block.confirmation.description': 'Do you really want to block whole thread? No further discussions are going to be allowed.',
+  'page.details.actions.thread.block.confirmation.description':
+    'Do you really want to block whole thread? No further discussions are going to be allowed.',
   'page.details.actions.thread.block.confirmation.button.confirm': 'Yes, block it',
   'page.details.actions.thread.block.confirmation.success': 'Thread has been blocked',
   'page.details.actions.thread.unblock': 'Unblock thread',
@@ -116,6 +121,11 @@ const en = {
   'page.details.actions.thread.modal.update.comment': 'Update comment',
   'page.details.actions.comment.approve.confirmation.success': 'Comment has been approved',
   'page.details.actions.comment.reject.confirmation.success': 'Comment has been rejected',
+  'page.details.actions.comment.delete.confirmation.header': 'Moderation: Delete comment',
+  'page.details.actions.comment.delete.confirmation.description':
+    'Do you really want to delete this comment? This action is irreversible.',
+  'page.details.actions.comment.delete.confirmation.button.confirm': 'Yes, delete it',
+  'page.details.actions.comment.delete.confirmation.button.cancel': 'Cancel',
   'page.details.filters.label': 'View',
   'page.details.filters.removed.visibility': 'Show removed comments',
   'page.coming.soon': 'Wait for what is coming soon...',
@@ -129,33 +139,44 @@ const en = {
   'page.settings.section.additional': 'Additional configuration',
   'page.settings.section.client': 'Client portal configuration',
   'page.settings.section.restore': 'Restore default settings',
-  'page.settings.section.restore.subtitle': 'Discarding all of applied settings and getting back to plugin default ones. Use reasonable.',
+  'page.settings.section.restore.subtitle':
+    'Discarding all of applied settings and getting back to plugin default ones. Use reasonable.',
   'page.settings.form.enabledCollections.label': 'Enable comments only for',
   'page.settings.form.enabledCollections.placeholder': 'Select one or more collection',
-  'page.settings.form.enabledCollections.hint': 'If none is selected, all the content types are enabled',
+  'page.settings.form.enabledCollections.hint':
+    'If none is selected, all the content types are enabled',
   'page.settings.form.contentTypesSettings.label': 'Content types',
   'page.settings.form.contentTypesSettings.tooltip': 'Custom configuration per content type',
   'page.settings.form.moderatorRoles.label': 'Send significant notifications to',
   'page.settings.form.moderatorRoles.placeholder': 'Select one or more roles',
-  'page.settings.form.moderatorRoles.hint': 'Roles which are going to be notified by the plugin about significant actions to perform',
+  'page.settings.form.moderatorRoles.hint':
+    'Roles which are going to be notified by the plugin about significant actions to perform',
   'page.settings.form.badWords.label': 'Bad words filtering',
-  'page.settings.form.badWords.hint': 'If enabled, every post / update of comment is going to be checked against bad wording',
+  'page.settings.form.badWords.hint':
+    'If enabled, every post / update of comment is going to be checked against bad wording',
   'page.settings.form.gqlAuth.label': 'GraphQL queries authorization',
-  'page.settings.form.gqlAuth.hint': 'If enabled, GraphQL API queries & mutations can be triggered only by Authenticated Strapi users. Otherwise API remains open.',
+  'page.settings.form.gqlAuth.hint':
+    'If enabled, GraphQL API queries & mutations can be triggered only by Authenticated Strapi users. Otherwise API remains open.',
   'page.settings.form.approvalFlow.label': 'Approval flow',
-  'page.settings.form.approvalFlow.hint': 'Comments associated with content type "{name}" are going to be taken through manual approval flow',
+  'page.settings.form.approvalFlow.hint':
+    'Comments associated with content type "{name}" are going to be taken through manual approval flow',
   'page.settings.form.entryLabel.label': 'Title fields',
-  'page.settings.form.entryLabel.placeholder': 'Select at least one or leave empty to apply defaults',
-  'page.settings.form.entryLabel.hint': 'If left empty title rendering is going to take following ordered fields: "Title", "Subject" & "Name"',
+  'page.settings.form.entryLabel.placeholder':
+    'Select at least one or leave empty to apply defaults',
+  'page.settings.form.entryLabel.hint':
+    'If left empty title rendering is going to take following ordered fields: "Title", "Subject" & "Name"',
   'page.settings.form.client.url.label': 'Portal URL',
   'page.settings.form.client.url.hint': 'URL where your client portal is available',
   'page.settings.form.client.email.label': 'Communication e-mail',
-  'page.settings.form.client.email.hint': 'E-mail address used for mailings, communication with users on behalf of portal team',
+  'page.settings.form.client.email.hint':
+    'E-mail address used for mailings, communication with users on behalf of portal team',
   'page.settings.actions.restore.confirmation.header': 'Restore default configuration',
-  'page.settings.actions.restore.confirmation.description': 'You\'re about to restore plugin configuration to it default values. It might have destructive impact on already collected content. Do you really want to proceed?',
+  'page.settings.actions.restore.confirmation.description':
+    "You're about to restore plugin configuration to it default values. It might have destructive impact on already collected content. Do you really want to proceed?",
   'page.settings.actions.restore.confirmation.button.confirm': 'Yes, I want to restore',
   'page.settings.actions.restart.alert.title': 'Strapi requires restart',
-  'page.settings.actions.restart.alert.description': 'You\'ve made a configuration changes which requires your Strapi application to be restarted to take an effect in GraphQL schema. Do it manually or by using below trigger.',
+  'page.settings.actions.restart.alert.description':
+    "You've made a configuration changes which requires your Strapi application to be restarted to take an effect in GraphQL schema. Do it manually or by using below trigger.",
   'page.settings.actions.restart.alert.close': 'Discard',
   'page.settings.notification.fetch.error': 'Failed to fetch configuration. Retrying...',
   'page.settings.notification.submit.success': 'Configuration has been saved successfully',
@@ -163,10 +184,12 @@ const en = {
   'page.settings.notification.restore.success': 'Configuration has been restored successfully',
   'page.settings.notification.restore.error': 'Failed to restore configuration. Try again.',
   'page.settings.notification.restart.success': 'Application has been restarted successfully',
-  'page.settings.notification.restart.error': 'Failed to restart your application. Try to do it manually.',
+  'page.settings.notification.restart.error':
+    'Failed to restart your application. Try to do it manually.',
   'page.settings.loading': 'Fetching configuration...',
   'page.settings.form.author.blockedProps.label': 'Blocked author details',
-  'page.settings.form.author.blockedProps.hint': 'Specified properties will be filtered out from author\'s details (comma-separated)',
+  'page.settings.form.author.blockedProps.hint':
+    "Specified properties will be filtered out from author's details (comma-separated)",
   'components.confirmation.dialog.header': 'Confirmation',
   'components.confirmation.dialog.description': 'Do you really want to perform this action?',
   'components.confirmation.dialog.button.confirm': 'Yes, I do',
