@@ -62,7 +62,8 @@ export default {
   'page.details.panel.discussion.warnings.reports.description': 'açık raporlar',
   'page.details.panel.discussion.warnings.reports.review': 'Gözden geçir',
   'page.details.panel.discussion.warnings.reports.dialog.list': 'Raporlananlar',
-  'page.details.panel.discussion.warnings.reports.dialog.header': 'Moderasyon: Açık raporları gözden geçirin',
+  'page.details.panel.discussion.warnings.reports.dialog.header':
+    'Moderasyon: Açık raporları gözden geçirin',
   'page.details.panel.discussion.warnings.reports.dialog.selectAll': 'Tüm girişleri seç',
   'page.details.panel.discussion.warnings.reports.dialog.select': 'Varlığı seç',
   'page.details.panel.discussion.warnings.reports.dialog.reason': 'Sebep',
@@ -76,10 +77,14 @@ export default {
   'page.details.panel.discussion.warnings.reports.dialog.status.RESOLVED': 'Çözüldü',
   'page.details.panel.discussion.warnings.reports.dialog.actions': 'Düzenle',
   'page.details.panel.discussion.warnings.reports.dialog.actions.resolve': 'Çöz',
-  'page.details.panel.discussion.warnings.reports.dialog.actions.resolve.selected': 'Raporları çözümle ({Count})',
-  'page.details.panel.discussion.warnings.reports.dialog.confirmation.success': 'Açık rapor çözümlendi',
-  'page.details.panel.discussion.warnings.reports.selected.dialog.confirmation.success': 'Açık raporlar çözümlendi',
-  'page.details.panel.discussion.warnings.comments.header': 'Yönetim: Rapor edilen yorumu gözden geçirin',
+  'page.details.panel.discussion.warnings.reports.dialog.actions.resolve.selected':
+    'Raporları çözümle ({Count})',
+  'page.details.panel.discussion.warnings.reports.dialog.confirmation.success':
+    'Açık rapor çözümlendi',
+  'page.details.panel.discussion.warnings.reports.selected.dialog.confirmation.success':
+    'Açık raporlar çözümlendi',
+  'page.details.panel.discussion.warnings.comments.header':
+    'Yönetim: Rapor edilen yorumu gözden geçirin',
   'page.details.panel.discussion.status.blocked': 'Engellenmiş',
   'page.details.panel.discussion.reply': 'Cevapla',
   'page.details.panel.discussion.reopen': 'Tekrar aç',
@@ -94,7 +99,8 @@ export default {
   'page.details.panel.loading': 'Varlık getiriyor ...',
   'page.details.actions.comment.block': 'Blok Yorum',
   'page.details.actions.comment.block.confirmation.header': 'Yönetim: Yorumu blokla',
-  'page.details.actions.comment.block.confirmation.description': 'Bu yorumu engellemek istediğinize emin misiniz?',
+  'page.details.actions.comment.block.confirmation.description':
+    'Bu yorumu engellemek istediğinize emin misiniz?',
   'page.details.actions.comment.block.confirmation.button.confirm': 'Evet, engelle',
   'page.details.actions.comment.block.confirmation.success': 'Yorum engellendi',
   'page.details.actions.comment.unblock': 'Engeli aç',
@@ -104,7 +110,8 @@ export default {
   'page.details.actions.comment.reports.review': 'Gözden geçir',
   'page.details.actions.thread.block': 'Başlığı engelle',
   'page.details.actions.thread.block.confirmation.header': 'Yönetim: Başlığı engelle',
-  'page.details.actions.thread.block.confirmation.description': 'Bu başlığı engellemek istediğinize emin misiniz? Başka tartışmalara izin verilmeyecek.',
+  'page.details.actions.thread.block.confirmation.description':
+    'Bu başlığı engellemek istediğinize emin misiniz? Başka tartışmalara izin verilmeyecek.',
   'page.details.actions.thread.block.confirmation.button.confirm': 'Evet, engelle',
   'page.details.actions.thread.block.confirmation.success': 'Başlık engellendi',
   'page.details.actions.thread.unblock': 'Başlığın engelini aç',
@@ -113,6 +120,11 @@ export default {
   'page.details.actions.thread.modal.update.comment': 'Yorumu güncelle',
   'page.details.actions.comment.approve.confirmation.success': 'Yorum onaylandı',
   'page.details.actions.comment.reject.confirmation.success': 'Yorum reddedildi',
+  'page.details.actions.comment.delete.confirmation.header': 'Yönetim: Yorumu sil',
+  'page.details.actions.comment.delete.confirmation.description':
+    'Bu yorumu silmek istediğinize emin misiniz? Bu işlem tersine çevrilemez.',
+  'page.details.actions.comment.delete.confirmation.button.confirm': 'Evet, sil',
+  'page.details.actions.comment.delete.confirmation.button.cancel': 'İptal',
   'page.details.filters.label': 'Görüntüle',
   'page.details.filters.removed.visibility': 'Kaldırılan yorumları göster',
   'page.coming.soon': 'Yakında  ...',
@@ -121,38 +133,49 @@ export default {
   'page.settings.header.description': 'Yorum yönetimi yetkilerini yapılandırın',
   'page.settings.actions.submit': 'Kaydet',
   'page.settings.actions.restore': 'Varsayılan ayarlara dön',
-  'page.settings.actions.restart': 'Strapi\'yi yeniden başlat',
+  'page.settings.actions.restart': "Strapi'yi yeniden başlat",
   'page.settings.section.general': 'Genel ayarlar',
   'page.settings.section.additional': 'Ek ayarlar',
   'page.settings.section.client': 'Portal ayarları',
   'page.settings.section.restore': 'Ayarları varsayılana döndür',
-  'page.settings.section.restore.subtitle': 'Değiştirilen tüm ayarları sil ve eklenti varsayılan ayarlarına dön. Bu özelliği dikkatli kullanın.',
+  'page.settings.section.restore.subtitle':
+    'Değiştirilen tüm ayarları sil ve eklenti varsayılan ayarlarına dön. Bu özelliği dikkatli kullanın.',
   'page.settings.form.enabledCollections.label': 'Sadece şu yorumlara izin ver',
   'page.settings.form.enabledCollections.placeholder': 'Bir veya daha fazla koleksiyon seçin',
-  'page.settings.form.enabledCollections.hint': 'Hiçbiri seçilmezse, tüm içerik türleri etkinleştirilir',
+  'page.settings.form.enabledCollections.hint':
+    'Hiçbiri seçilmezse, tüm içerik türleri etkinleştirilir',
   'page.settings.form.contentTypesSettings.label': 'İçerik türleri',
   'page.settings.form.contentTypesSettings.tooltip': 'İçerik türü özelinde ayarlayın',
   'page.settings.form.moderatorRoles.label': 'Önemli bildirimler gönderin',
   'page.settings.form.moderatorRoles.placeholder': 'Bir veya daha fazla rol seçin',
-  'page.settings.form.moderatorRoles.hint': 'Yapılacak önemli işlemler hakkında eklenti tarafından bilgilendirilecek roller',
+  'page.settings.form.moderatorRoles.hint':
+    'Yapılacak önemli işlemler hakkında eklenti tarafından bilgilendirilecek roller',
   'page.settings.form.badWords.label': 'Küfür filtreleme',
-  'page.settings.form.badWords.hint': 'Etkinleştirilirse tüm yorumlar ve yorum düzenlemeleri küfür filtresinden geçirilecek',
+  'page.settings.form.badWords.hint':
+    'Etkinleştirilirse tüm yorumlar ve yorum düzenlemeleri küfür filtresinden geçirilecek',
   'page.settings.form.gqlAuth.label': 'GraphQL Sorgu Yetkileri',
-  'page.settings.form.gqlAuth.hint': 'Etkinse, GraphQL API sorguları ve mutasyonları yalnızca kimliği doğrulanmış Strapi kullanıcıları tarafından tetiklenebilir. Aksi takdirde API açık kalır.',
+  'page.settings.form.gqlAuth.hint':
+    'Etkinse, GraphQL API sorguları ve mutasyonları yalnızca kimliği doğrulanmış Strapi kullanıcıları tarafından tetiklenebilir. Aksi takdirde API açık kalır.',
   'page.settings.form.approvalFlow.label': 'Onay akışı',
-  'page.settings.form.approvalFlow.hint': 'İçerik türü "{name}" ile ilişkili yorumlar manuel onay akışı yoluyla alınacak',
+  'page.settings.form.approvalFlow.hint':
+    'İçerik türü "{name}" ile ilişkili yorumlar manuel onay akışı yoluyla alınacak',
   'page.settings.form.entryLabel.label': 'Başlık alanları',
-  'page.settings.form.entryLabel.placeholder': 'Varsayılanları uygulamak için en az bir tane seçin veya boş bırakın',
-  'page.settings.form.entryLabel.hint': 'Boş başlık bırakırsa, sipariş edilen alanları takip edecekse: "Başlık", "Konu" ve "İsim',
+  'page.settings.form.entryLabel.placeholder':
+    'Varsayılanları uygulamak için en az bir tane seçin veya boş bırakın',
+  'page.settings.form.entryLabel.hint':
+    'Boş başlık bırakırsa, sipariş edilen alanları takip edecekse: "Başlık", "Konu" ve "İsim',
   'page.settings.form.client.url.label': 'Portal URL',
-  'page.settings.form.client.url.hint': 'Müşteri portalınızın URL\'i',
+  'page.settings.form.client.url.hint': "Müşteri portalınızın URL'i",
   'page.settings.form.client.email.label': 'İletişim e-postası',
-  'page.settings.form.client.email.hint': 'Postalar için kullanılan e-posta adresi, portal ekibi adına kullanıcılarla iletişim',
+  'page.settings.form.client.email.hint':
+    'Postalar için kullanılan e-posta adresi, portal ekibi adına kullanıcılarla iletişim',
   'page.settings.actions.restore.confirmation.header': 'Varsayılan ayarlara dön',
-  'page.settings.actions.restore.confirmation.description': 'Eklenti yapılandırmasını varsayılan değerlere geri yüklemek üzeresiniz. Halihazırda toplanan içerik üzerinde yıkıcı etkisi olabilir. Devam etmek istediğinize emin misiniz?',
+  'page.settings.actions.restore.confirmation.description':
+    'Eklenti yapılandırmasını varsayılan değerlere geri yüklemek üzeresiniz. Halihazırda toplanan içerik üzerinde yıkıcı etkisi olabilir. Devam etmek istediğinize emin misiniz?',
   'page.settings.actions.restore.confirmation.button.confirm': 'Evet, geri yüklemek istiyorum',
-  'page.settings.actions.restart.alert.title': 'Strapi\'nin yeniden başlaması gerekiyor',
-  'page.settings.actions.restart.alert.description': 'Strapi uygulamanızın GraphQL şemasında bir etki elde etmek için yeniden başlatılmasını gerektiren bir yapılandırma değişiklikleri yaptınız. Manuel olarak veya aşağıdaki tetikleyiciyi kullanarak yapın.',
+  'page.settings.actions.restart.alert.title': "Strapi'nin yeniden başlaması gerekiyor",
+  'page.settings.actions.restart.alert.description':
+    'Strapi uygulamanızın GraphQL şemasında bir etki elde etmek için yeniden başlatılmasını gerektiren bir yapılandırma değişiklikleri yaptınız. Manuel olarak veya aşağıdaki tetikleyiciyi kullanarak yapın.',
   'page.settings.actions.restart.alert.close': 'Vazgeç',
   'page.settings.notification.fetch.error': 'Yapılandırmayı getiremedi. Yeniden deneme ...',
   'page.settings.notification.submit.success': 'Yapılandırma başarıyla kaydedildi',
@@ -160,10 +183,12 @@ export default {
   'page.settings.notification.restore.success': 'Yapılandırma başarıyla geri yüklendi',
   'page.settings.notification.restore.error': 'Yapılandırmayı geri yükleyemedi. Tekrar deneyin.',
   'page.settings.notification.restart.success': 'Uygulama başarıyla yeniden başlatıldı',
-  'page.settings.notification.restart.error': 'Uygulama yeniden başlatamadı. Manuel olarak yapmaya çalışın.',
+  'page.settings.notification.restart.error':
+    'Uygulama yeniden başlatamadı. Manuel olarak yapmaya çalışın.',
   'page.settings.loading': 'Ayarlar getiriliyor ...',
   'components.confirmation.dialog.header': 'Onayla',
-  'components.confirmation.dialog.description': 'Bu eylemi gerçekleştirmek istediğinize emin misiniz?',
+  'components.confirmation.dialog.description':
+    'Bu eylemi gerçekleştirmek istediğinize emin misiniz?',
   'components.confirmation.dialog.button.confirm': 'Eminim',
   'components.confirmation.dialog.button.cancel': 'İptal et',
   'components.toogle.enabled': 'Aktif',
