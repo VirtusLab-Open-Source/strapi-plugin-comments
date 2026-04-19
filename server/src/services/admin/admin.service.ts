@@ -1,6 +1,4 @@
-import { isNil } from 'lodash';
 import { Id, StrapiContext } from '../../@types';
-import { APPROVAL_STATUS } from '../../const';
 import { getCommentRepository, getReportCommentRepository } from '../../repositories';
 import { getDefaultAuthorPopulate } from '../../repositories/utils';
 import { getPluginService } from '../../utils/getPluginService';
@@ -169,51 +167,19 @@ export default ({ strapi }: StrapiContext) => {
       };
     },
     async changeBlockedComment(id: Id, forceStatus?: boolean) {
-      const entry = await this.getCommonService().findOne({ id });
-      return this.getCommonService().updateComment(
-        { id },
-        { blocked: !isNil(forceStatus) ? forceStatus : !entry.blocked },
-      );
+      return this.getCommonService().changeBlockedComment(id, forceStatus);
     },
     async deleteComment(id: Id) {
       return getCommentRepository(strapi).update({ where: { id }, data: { removed: true } });
     },
     async blockCommentThread(id: Id, forceStatus?: boolean) {
-      const entry = await this.getCommonService().findOne({ id });
-      const status = forceStatus || !entry.blocked;
-      const updatedEntry = await this.getCommonService().updateComment(
-        { id },
-        { blocked: status, blockedThread: status },
-      );
-      await this.blockNestedThreads(id, status);
-      return this.getCommonService().sanitizeCommentEntity(updatedEntry, []);
+      return this.getCommonService().changeBlockedCommentThread(id, forceStatus);
     },
     async approveComment(id: Id) {
-      const entity = await getCommentRepository(strapi).update({
-        where: { id },
-        data: { approvalStatus: APPROVAL_STATUS.APPROVED },
-      });
-      if (!entity) {
-        throw new PluginError(404, 'Not found');
-      }
-      return this.getCommonService().sanitizeCommentEntity(entity, []);
+      return this.getCommonService().approveComment(id);
     },
     async rejectComment(id: Id) {
-      const entity = await getCommentRepository(strapi).update({
-        where: { id },
-        data: { approvalStatus: APPROVAL_STATUS.REJECTED },
-      });
-      if (!entity) {
-        throw new PluginError(404, 'Not found');
-      }
-      return this.getCommonService().sanitizeCommentEntity(entity, []);
-    },
-    async blockNestedThreads(id: Id, status: boolean) {
-      return this.getCommonService().modifiedNestedNestedComments(
-        id,
-        'blockedThread',
-        status,
-      );
+      return this.getCommonService().rejectComment(id);
     },
     async resolveAbuseReport({
       id: commentId,

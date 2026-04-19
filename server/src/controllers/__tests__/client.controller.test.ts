@@ -24,6 +24,10 @@ jest.mock('../../validators/api', () => ({
     updateCommentValidator: jest.fn(),
     reportAbuseValidator: jest.fn(),
     removeCommentValidator: jest.fn(),
+    changeBlockedCommentValidator: jest.fn(),
+    resolveAbuseReportValidator: jest.fn(),
+    resolveCommentMultipleAbuseReportsValidator: jest.fn(),
+    resolveMultipleAbuseReportsValidator: jest.fn(),
   },
 }));
 
@@ -39,6 +43,18 @@ describe('Client controller', () => {
     findAllFlat: jest.fn(),
     findAllInHierarchy: jest.fn(),
     findAllPerAuthor: jest.fn(),
+    changeBlockedComment: jest.fn(),
+    changeBlockedCommentThread: jest.fn(),
+    approveComment: jest.fn(),
+    rejectComment: jest.fn(),
+  };
+
+  const mockAdminService = {
+    resolveAbuseReport: jest.fn(),
+    resolveCommentMultipleAbuseReports: jest.fn(),
+    resolveAllAbuseReportsForComment: jest.fn(),
+    resolveAllAbuseReportsForThread: jest.fn(),
+    resolveMultipleAbuseReports: jest.fn(),
   };
 
   const mockStoreRepository = {
@@ -51,6 +67,7 @@ describe('Client controller', () => {
       .mockImplementation((_, name) => {
         if (name === 'client') return mockClientService;
         if (name === 'common') return mockCommonService;
+        if (name === 'admin') return mockAdminService;
         return null;
       });
     caster<jest.Mock>(getStoreRepository).mockReturnValue(mockStoreRepository);
@@ -608,6 +625,479 @@ describe('Client controller', () => {
       caster<jest.Mock>(clientValidator.removeCommentValidator).mockReturnValue({ left: error });
 
       await expect(getController(getStrapi()).removeComment(ctx)).rejects.toThrow();
+    });
+  });
+
+  describe('blockComment', () => {
+    it('should block comment when validation passes', async () => {
+      const ctx = {
+        params: { relation: 'test', commentId: '1' },
+      } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const validatedData = { relation: 'test', commentId: '1' };
+      const expectedResult = { id: 1, blocked: true };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        right: validatedData,
+      });
+      mockCommonService.changeBlockedComment.mockResolvedValue(expectedResult);
+
+      const result = await getController(getStrapi()).blockComment(ctx);
+
+      expect(result).toEqual(expectedResult);
+      expect(mockCommonService.changeBlockedComment).toHaveBeenCalledWith('1', true);
+    });
+
+    it('should throw when store config fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+
+      mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
+
+      await expect(getController(getStrapi()).blockComment(ctx)).rejects.toThrow();
+    });
+
+    it('should throw when validator fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        left: new Error('Validation failed'),
+      });
+
+      await expect(getController(getStrapi()).blockComment(ctx)).rejects.toThrow();
+    });
+  });
+
+  describe('unblockComment', () => {
+    it('should unblock comment when validation passes', async () => {
+      const ctx = {
+        params: { relation: 'test', commentId: '2' },
+      } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const validatedData = { relation: 'test', commentId: '2' };
+      const expectedResult = { id: 2, blocked: false };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        right: validatedData,
+      });
+      mockCommonService.changeBlockedComment.mockResolvedValue(expectedResult);
+
+      const result = await getController(getStrapi()).unblockComment(ctx);
+
+      expect(result).toEqual(expectedResult);
+      expect(mockCommonService.changeBlockedComment).toHaveBeenCalledWith('2', false);
+    });
+
+    it('should throw when store config fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+
+      mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
+
+      await expect(getController(getStrapi()).unblockComment(ctx)).rejects.toThrow();
+    });
+
+    it('should throw when validator fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        left: new Error('Validation failed'),
+      });
+
+      await expect(getController(getStrapi()).unblockComment(ctx)).rejects.toThrow();
+    });
+  });
+
+  describe('blockCommentThread', () => {
+    it('should block thread when validation passes', async () => {
+      const ctx = {
+        params: { relation: 'test', commentId: '3' },
+      } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const validatedData = { relation: 'test', commentId: '3' };
+      const expectedResult = { id: 3, blocked: true, blockedThread: true };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        right: validatedData,
+      });
+      mockCommonService.changeBlockedCommentThread.mockResolvedValue(expectedResult);
+
+      const result = await getController(getStrapi()).blockCommentThread(ctx);
+
+      expect(result).toEqual(expectedResult);
+      expect(mockCommonService.changeBlockedCommentThread).toHaveBeenCalledWith('3', true);
+    });
+
+    it('should throw when store config fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+
+      mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
+
+      await expect(getController(getStrapi()).blockCommentThread(ctx)).rejects.toThrow();
+    });
+
+    it('should throw when validator fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        left: new Error('Validation failed'),
+      });
+
+      await expect(getController(getStrapi()).blockCommentThread(ctx)).rejects.toThrow();
+    });
+  });
+
+  describe('unblockCommentThread', () => {
+    it('should unblock thread when validation passes', async () => {
+      const ctx = {
+        params: { relation: 'test', commentId: '4' },
+      } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const validatedData = { relation: 'test', commentId: '4' };
+      const expectedResult = { id: 4, blocked: false, blockedThread: false };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        right: validatedData,
+      });
+      mockCommonService.changeBlockedCommentThread.mockResolvedValue(expectedResult);
+
+      const result = await getController(getStrapi()).unblockCommentThread(ctx);
+
+      expect(result).toEqual(expectedResult);
+      expect(mockCommonService.changeBlockedCommentThread).toHaveBeenCalledWith('4', false);
+    });
+
+    it('should throw when store config fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+
+      mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
+
+      await expect(getController(getStrapi()).unblockCommentThread(ctx)).rejects.toThrow();
+    });
+
+    it('should throw when validator fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        left: new Error('Validation failed'),
+      });
+
+      await expect(getController(getStrapi()).unblockCommentThread(ctx)).rejects.toThrow();
+    });
+  });
+
+  describe('approveComment', () => {
+    it('should approve comment when validation passes', async () => {
+      const ctx = {
+        params: { relation: 'test', commentId: '5' },
+      } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const validatedData = { relation: 'test', commentId: '5' };
+      const expectedResult = { id: 5, approvalStatus: 'APPROVED' };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        right: validatedData,
+      });
+      mockCommonService.approveComment.mockResolvedValue(expectedResult);
+
+      const result = await getController(getStrapi()).approveComment(ctx);
+
+      expect(result).toEqual(expectedResult);
+      expect(mockCommonService.approveComment).toHaveBeenCalledWith('5');
+    });
+
+    it('should throw when store config fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+
+      mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
+
+      await expect(getController(getStrapi()).approveComment(ctx)).rejects.toThrow();
+    });
+
+    it('should throw when validator fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        left: new Error('Validation failed'),
+      });
+
+      await expect(getController(getStrapi()).approveComment(ctx)).rejects.toThrow();
+    });
+  });
+
+  describe('rejectComment', () => {
+    it('should reject comment when validation passes', async () => {
+      const ctx = {
+        params: { relation: 'test', commentId: '6' },
+      } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const validatedData = { relation: 'test', commentId: '6' };
+      const expectedResult = { id: 6, approvalStatus: 'REJECTED' };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        right: validatedData,
+      });
+      mockCommonService.rejectComment.mockResolvedValue(expectedResult);
+
+      const result = await getController(getStrapi()).rejectComment(ctx);
+
+      expect(result).toEqual(expectedResult);
+      expect(mockCommonService.rejectComment).toHaveBeenCalledWith('6');
+    });
+
+    it('should throw when store config fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+
+      mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
+
+      await expect(getController(getStrapi()).rejectComment(ctx)).rejects.toThrow();
+    });
+
+    it('should throw when validator fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        left: new Error('Validation failed'),
+      });
+
+      await expect(getController(getStrapi()).rejectComment(ctx)).rejects.toThrow();
+    });
+  });
+
+  describe('resolveAbuseReport', () => {
+    it('should resolve single report when validation passes', async () => {
+      const ctx = {
+        params: { relation: 'test', commentId: '1', reportId: '9' },
+      } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const validated = { relation: 'test', commentId: 1, reportId: 9 };
+      const expected = { count: 1 };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.resolveAbuseReportValidator).mockReturnValue({ right: validated });
+      mockAdminService.resolveAbuseReport.mockResolvedValue(expected);
+
+      const result = await getController(getStrapi()).resolveAbuseReport(ctx);
+
+      expect(result).toEqual(expected);
+      expect(mockAdminService.resolveAbuseReport).toHaveBeenCalledWith({ id: 1, reportId: 9 });
+    });
+
+    it('should throw when store config fails', async () => {
+      const ctx = {
+        params: { relation: 'test', commentId: '1', reportId: '9' },
+      } as RequestContext;
+
+      mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
+
+      await expect(getController(getStrapi()).resolveAbuseReport(ctx)).rejects.toThrow();
+    });
+
+    it('should throw when validator fails', async () => {
+      const ctx = {
+        params: { relation: 'test', commentId: '1', reportId: '9' },
+      } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.resolveAbuseReportValidator).mockReturnValue({
+        left: new Error('Validation failed'),
+      });
+
+      await expect(getController(getStrapi()).resolveAbuseReport(ctx)).rejects.toThrow();
+    });
+  });
+
+  describe('resolveCommentMultipleAbuseReports', () => {
+    it('should resolve selected reports when validation passes', async () => {
+      const ctx = {
+        params: { relation: 'test', commentId: '2' },
+        request: { body: { reportIds: [10, 11] } },
+      } as RequestContext<{ reportIds: number[] }>;
+      const config = { enabledCollections: ['test'] };
+      const validated = { relation: 'test', commentId: 2, reportIds: [10, 11] };
+      const expected = { count: 2 };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.resolveCommentMultipleAbuseReportsValidator).mockReturnValue({
+        right: validated,
+      });
+      mockAdminService.resolveCommentMultipleAbuseReports.mockResolvedValue(expected);
+
+      const result = await getController(getStrapi()).resolveCommentMultipleAbuseReports(ctx);
+
+      expect(result).toEqual(expected);
+      expect(mockAdminService.resolveCommentMultipleAbuseReports).toHaveBeenCalledWith({
+        id: 2,
+        reportIds: [10, 11],
+      });
+    });
+
+    it('should throw when store config fails', async () => {
+      const ctx = {
+        params: { relation: 'test', commentId: '2' },
+        request: { body: { reportIds: [10, 11] } },
+      } as RequestContext<{ reportIds: number[] }>;
+
+      mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
+
+      await expect(getController(getStrapi()).resolveCommentMultipleAbuseReports(ctx)).rejects.toThrow();
+    });
+
+    it('should throw when validator fails', async () => {
+      const ctx = {
+        params: { relation: 'test', commentId: '2' },
+        request: { body: { reportIds: [10, 11] } },
+      } as RequestContext<{ reportIds: number[] }>;
+      const config = { enabledCollections: ['test'] };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.resolveCommentMultipleAbuseReportsValidator).mockReturnValue({
+        left: new Error('Validation failed'),
+      });
+
+      await expect(getController(getStrapi()).resolveCommentMultipleAbuseReports(ctx)).rejects.toThrow();
+    });
+  });
+
+  describe('resolveAllAbuseReportsForComment', () => {
+    it('should delegate to admin when validation passes', async () => {
+      const ctx = { params: { relation: 'test', commentId: '3' } } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const validated = { relation: 'test', commentId: 3 };
+      const expected = { count: 3 };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({ right: validated });
+      mockAdminService.resolveAllAbuseReportsForComment.mockResolvedValue(expected);
+
+      const result = await getController(getStrapi()).resolveAllAbuseReportsForComment(ctx);
+
+      expect(result).toEqual(expected);
+      expect(mockAdminService.resolveAllAbuseReportsForComment).toHaveBeenCalledWith(3);
+    });
+
+    it('should throw when store config fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '3' } } as RequestContext;
+
+      mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
+
+      await expect(getController(getStrapi()).resolveAllAbuseReportsForComment(ctx)).rejects.toThrow();
+    });
+
+    it('should throw when validator fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '3' } } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        left: new Error('Validation failed'),
+      });
+
+      await expect(getController(getStrapi()).resolveAllAbuseReportsForComment(ctx)).rejects.toThrow();
+    });
+  });
+
+  describe('resolveAllAbuseReportsForThread', () => {
+    it('should delegate to admin when validation passes', async () => {
+      const ctx = { params: { relation: 'test', commentId: '4' } } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+      const validated = { relation: 'test', commentId: 4 };
+      const expected = { count: 1 };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({ right: validated });
+      mockAdminService.resolveAllAbuseReportsForThread.mockResolvedValue(expected);
+
+      const result = await getController(getStrapi()).resolveAllAbuseReportsForThread(ctx);
+
+      expect(result).toEqual(expected);
+      expect(mockAdminService.resolveAllAbuseReportsForThread).toHaveBeenCalledWith(4);
+    });
+
+    it('should throw when store config fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '4' } } as RequestContext;
+
+      mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
+
+      await expect(getController(getStrapi()).resolveAllAbuseReportsForThread(ctx)).rejects.toThrow();
+    });
+
+    it('should throw when validator fails', async () => {
+      const ctx = { params: { relation: 'test', commentId: '4' } } as RequestContext;
+      const config = { enabledCollections: ['test'] };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({
+        left: new Error('Validation failed'),
+      });
+
+      await expect(getController(getStrapi()).resolveAllAbuseReportsForThread(ctx)).rejects.toThrow();
+    });
+  });
+
+  describe('resolveMultipleAbuseReports', () => {
+    it('should delegate to admin with reportIds only', async () => {
+      const ctx = {
+        params: { relation: 'test' },
+        request: { body: { reportIds: [20, 21] } },
+      } as RequestContext<{ reportIds: number[] }>;
+      const config = { enabledCollections: ['test'] };
+      const validated = { relation: 'test', reportIds: [20, 21] };
+      const expected = { count: 2 };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.resolveMultipleAbuseReportsValidator).mockReturnValue({
+        right: validated,
+      });
+      mockAdminService.resolveMultipleAbuseReports.mockResolvedValue(expected);
+
+      const result = await getController(getStrapi()).resolveMultipleAbuseReports(ctx);
+
+      expect(result).toEqual(expected);
+      expect(mockAdminService.resolveMultipleAbuseReports).toHaveBeenCalledWith({ reportIds: [20, 21] });
+    });
+
+    it('should throw when store config fails', async () => {
+      const ctx = {
+        params: { relation: 'test' },
+        request: { body: { reportIds: [20, 21] } },
+      } as RequestContext<{ reportIds: number[] }>;
+
+      mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
+
+      await expect(getController(getStrapi()).resolveMultipleAbuseReports(ctx)).rejects.toThrow();
+    });
+
+    it('should throw when validator fails', async () => {
+      const ctx = {
+        params: { relation: 'test' },
+        request: { body: { reportIds: [20, 21] } },
+      } as RequestContext<{ reportIds: number[] }>;
+      const config = { enabledCollections: ['test'] };
+
+      mockStoreRepository.get.mockResolvedValue({ right: config });
+      caster<jest.Mock>(clientValidator.resolveMultipleAbuseReportsValidator).mockReturnValue({
+        left: new Error('Validation failed'),
+      });
+
+      await expect(getController(getStrapi()).resolveMultipleAbuseReports(ctx)).rejects.toThrow();
     });
   });
 });

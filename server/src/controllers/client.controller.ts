@@ -132,6 +132,183 @@ const controllers = ({ strapi }: StrapiContext) => ({
     }
     throw throwError(ctx, unwrapEither(configResult));
   },
+
+  async blockComment(
+    ctx: RequestContext<object, Pick<clientValidator.ChangeBlockedCommentValidatorSchema, 'relation' | 'commentId'>>
+  ) {
+    const configResult = await this.getStoreRepository().get(true);
+    if (isRight(configResult)) {
+      const config = unwrapEither(configResult);
+      const result = clientValidator.changeBlockedCommentValidator(config.enabledCollections, ctx.params);
+      if (isRight(result)) {
+        return this.getService('common').changeBlockedComment(unwrapEither(result).commentId, true);
+      }
+      throw throwError(ctx, unwrapEither(result));
+    }
+    throw throwError(ctx, unwrapEither(configResult));
+  },
+
+  async unblockComment(
+    ctx: RequestContext<object, Pick<clientValidator.ChangeBlockedCommentValidatorSchema, 'relation' | 'commentId'>>
+  ) {
+    const configResult = await this.getStoreRepository().get(true);
+    if (isRight(configResult)) {
+      const config = unwrapEither(configResult);
+      const result = clientValidator.changeBlockedCommentValidator(config.enabledCollections, ctx.params);
+      if (isRight(result)) {
+        return this.getService('common').changeBlockedComment(unwrapEither(result).commentId, false);
+      }
+      throw throwError(ctx, unwrapEither(result));
+    }
+    throw throwError(ctx, unwrapEither(configResult));
+  },
+
+  async blockCommentThread(
+    ctx: RequestContext<object, Pick<clientValidator.ChangeBlockedCommentValidatorSchema, 'relation' | 'commentId'>>
+  ) {
+    const configResult = await this.getStoreRepository().get(true);
+    if (isRight(configResult)) {
+      const config = unwrapEither(configResult);
+      const result = clientValidator.changeBlockedCommentValidator(config.enabledCollections, ctx.params);
+      if (isRight(result)) {
+        return this.getService('common').changeBlockedCommentThread(unwrapEither(result).commentId, true);
+      }
+      throw throwError(ctx, unwrapEither(result));
+    }
+    throw throwError(ctx, unwrapEither(configResult));
+  },
+
+  async unblockCommentThread(
+    ctx: RequestContext<object, Pick<clientValidator.ChangeBlockedCommentValidatorSchema, 'relation' | 'commentId'>>
+  ) {
+    const configResult = await this.getStoreRepository().get(true);
+    if (isRight(configResult)) {
+      const config = unwrapEither(configResult);
+      const result = clientValidator.changeBlockedCommentValidator(config.enabledCollections, ctx.params);
+      if (isRight(result)) {
+        return this.getService('common').changeBlockedCommentThread(unwrapEither(result).commentId, false);
+      }
+      throw throwError(ctx, unwrapEither(result));
+    }
+    throw throwError(ctx, unwrapEither(configResult));
+  },
+
+  async approveComment(
+    ctx: RequestContext<object, Pick<clientValidator.ChangeBlockedCommentValidatorSchema, 'relation' | 'commentId'>>
+  ) {
+    const configResult = await this.getStoreRepository().get(true);
+    if (isRight(configResult)) {
+      const config = unwrapEither(configResult);
+      const result = clientValidator.changeBlockedCommentValidator(config.enabledCollections, ctx.params);
+      if (isRight(result)) {
+        return this.getService('common').approveComment(unwrapEither(result).commentId);
+      }
+      throw throwError(ctx, unwrapEither(result));
+    }
+    throw throwError(ctx, unwrapEither(configResult));
+  },
+
+  async rejectComment(
+    ctx: RequestContext<object, Pick<clientValidator.ChangeBlockedCommentValidatorSchema, 'relation' | 'commentId'>>
+  ) {
+    const configResult = await this.getStoreRepository().get(true);
+    if (isRight(configResult)) {
+      const config = unwrapEither(configResult);
+      const result = clientValidator.changeBlockedCommentValidator(config.enabledCollections, ctx.params);
+      if (isRight(result)) {
+        return this.getService('common').rejectComment(unwrapEither(result).commentId);
+      }
+      throw throwError(ctx, unwrapEither(result));
+    }
+    throw throwError(ctx, unwrapEither(configResult));
+  },
+
+  async resolveAbuseReport(
+    ctx: RequestContext<object, Pick<clientValidator.ResolveAbuseReportValidatorSchema, 'relation' | 'commentId' | 'reportId'>>
+  ) {
+    const configResult = await this.getStoreRepository().get(true);
+    if (isRight(configResult)) {
+      const config = unwrapEither(configResult);
+      const result = clientValidator.resolveAbuseReportValidator(config.enabledCollections, ctx.params);
+      if (isRight(result)) {
+        const { commentId, reportId } = unwrapEither(result);
+        return this.getService('admin').resolveAbuseReport({ id: commentId, reportId });
+      }
+      throw throwError(ctx, unwrapEither(result));
+    }
+    throw throwError(ctx, unwrapEither(configResult));
+  },
+
+  async resolveCommentMultipleAbuseReports(
+    ctx: RequestContext<{ reportIds: number[] }, Pick<clientValidator.ResolveCommentMultipleAbuseReportsValidatorSchema, 'relation' | 'commentId'>>
+  ) {
+    const configResult = await this.getStoreRepository().get(true);
+    if (isRight(configResult)) {
+      const config = unwrapEither(configResult);
+      const result = clientValidator.resolveCommentMultipleAbuseReportsValidator(config.enabledCollections, {
+        ...ctx.params,
+        ...ctx.request.body,
+      });
+      if (isRight(result)) {
+        const { commentId, reportIds } = unwrapEither(result);
+        return this.getService('admin').resolveCommentMultipleAbuseReports({ id: commentId, reportIds });
+      }
+      throw throwError(ctx, unwrapEither(result));
+    }
+    throw throwError(ctx, unwrapEither(configResult));
+  },
+
+  async resolveAllAbuseReportsForComment(
+    ctx: RequestContext<object, Pick<clientValidator.ResolveAllAbuseReportsForCommentValidatorSchema, 'relation' | 'commentId'>>
+  ) {
+    const configResult = await this.getStoreRepository().get(true);
+    if (isRight(configResult)) {
+      const config = unwrapEither(configResult);
+      const result = clientValidator.changeBlockedCommentValidator(config.enabledCollections, ctx.params);
+      if (isRight(result)) {
+        return this.getService('admin').resolveAllAbuseReportsForComment(unwrapEither(result).commentId);
+      }
+      throw throwError(ctx, unwrapEither(result));
+    }
+    throw throwError(ctx, unwrapEither(configResult));
+  },
+
+  async resolveAllAbuseReportsForThread(
+    ctx: RequestContext<object, Pick<clientValidator.ResolveAllAbuseReportsForThreadValidatorSchema, 'relation' | 'commentId'>>
+  ) {
+    const configResult = await this.getStoreRepository().get(true);
+    if (isRight(configResult)) {
+      const config = unwrapEither(configResult);
+      const result = clientValidator.changeBlockedCommentValidator(config.enabledCollections, ctx.params);
+      if (isRight(result)) {
+        return this.getService('admin').resolveAllAbuseReportsForThread(
+          Number(unwrapEither(result).commentId),
+        );
+      }
+      throw throwError(ctx, unwrapEither(result));
+    }
+    throw throwError(ctx, unwrapEither(configResult));
+  },
+
+  async resolveMultipleAbuseReports(
+    ctx: RequestContext<{ reportIds: number[] }, Pick<clientValidator.ResolveMultipleAbuseReportsValidatorSchema, 'relation'>>
+  ) {
+    const configResult = await this.getStoreRepository().get(true);
+    if (isRight(configResult)) {
+      const config = unwrapEither(configResult);
+      const result = clientValidator.resolveMultipleAbuseReportsValidator(
+        config.enabledCollections,
+        ctx.params.relation,
+        ctx.request.body,
+      );
+      if (isRight(result)) {
+        const { reportIds } = unwrapEither(result);
+        return this.getService('admin').resolveMultipleAbuseReports({ reportIds });
+      }
+      throw throwError(ctx, unwrapEither(result));
+    }
+    throw throwError(ctx, unwrapEither(configResult));
+  },
 });
 
 export default controllers;

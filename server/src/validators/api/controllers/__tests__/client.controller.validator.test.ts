@@ -2,12 +2,16 @@ import { REPORT_REASON } from '../../../../const/REPORT_REASON';
 import { isLeft, isRight } from '../../../../utils/Either';
 import { APPROVAL_STATUS, AUTHOR_TYPE } from '../../../../utils/constants';
 import {
+  changeBlockedCommentValidator,
   findAllFlatValidator,
   findAllInHierarchyValidator,
   findAllPerAuthorValidator,
   newCommentValidator,
   removeCommentValidator,
   reportAbuseValidator,
+  resolveAbuseReportValidator,
+  resolveCommentMultipleAbuseReportsValidator,
+  resolveMultipleAbuseReportsValidator,
   updateCommentValidator,
 } from '../client.controller.validator';
 
@@ -593,6 +597,89 @@ describe('Client controller validator', () => {
         relation: 'api::article.article:1',
         authorId: null,
       });
+      expect(isLeft(result)).toBe(true);
+    });
+  });
+
+  describe('changeBlockedCommentValidator', () => {
+    it('should return right when relation and commentId are valid', () => {
+      const result = changeBlockedCommentValidator(['api::test.test'], {
+        relation: 'api::test.test:1',
+        commentId: '5',
+      });
+      expect(isRight(result)).toBe(true);
+      if (isRight(result)) {
+        expect(result.right).toEqual({
+          relation: 'api::test.test:1',
+          commentId: '5',
+        });
+      }
+    });
+
+    it('should return left when relation is not enabled', () => {
+      const result = changeBlockedCommentValidator(['api::test.test'], {
+        relation: 'api::other.other:1',
+        commentId: 1,
+      });
+      expect(isLeft(result)).toBe(true);
+    });
+  });
+
+  describe('resolveAbuseReportValidator', () => {
+    it('should return right when relation, commentId and reportId are valid', () => {
+      const result = resolveAbuseReportValidator(['api::test.test'], {
+        relation: 'api::test.test:1',
+        commentId: '1',
+        reportId: '9',
+      });
+      expect(isRight(result)).toBe(true);
+    });
+
+    it('should return left when reportId is missing', () => {
+      const result = resolveAbuseReportValidator(['api::test.test'], {
+        relation: 'api::test.test:1',
+        commentId: '1',
+      });
+      expect(isLeft(result)).toBe(true);
+    });
+  });
+
+  describe('resolveCommentMultipleAbuseReportsValidator', () => {
+    it('should return right with reportIds', () => {
+      const result = resolveCommentMultipleAbuseReportsValidator(['api::test.test'], {
+        relation: 'api::test.test:1',
+        commentId: 1,
+        reportIds: [10, 11],
+      });
+      expect(isRight(result)).toBe(true);
+    });
+
+    it('should return left when reportIds is empty', () => {
+      const result = resolveCommentMultipleAbuseReportsValidator(['api::test.test'], {
+        relation: 'api::test.test:1',
+        commentId: 1,
+        reportIds: [],
+      });
+      expect(isLeft(result)).toBe(true);
+    });
+  });
+
+  describe('resolveMultipleAbuseReportsValidator', () => {
+    it('should return right with relation and reportIds in body', () => {
+      const result = resolveMultipleAbuseReportsValidator(
+        ['api::test.test'],
+        'api::test.test:1',
+        { reportIds: [1, 2] }
+      );
+      expect(isRight(result)).toBe(true);
+    });
+
+    it('should return left when relation is not enabled', () => {
+      const result = resolveMultipleAbuseReportsValidator(
+        ['api::test.test'],
+        'api::other.other:1',
+        { reportIds: [1] }
+      );
       expect(isLeft(result)).toBe(true);
     });
   });

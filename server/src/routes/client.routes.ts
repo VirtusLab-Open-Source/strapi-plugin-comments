@@ -47,6 +47,161 @@ const routes: StrapiRoute<'client'>[] = [
   },
   {
     method: 'PUT',
+    path: '/:relation/comment/:commentId/block',
+    handler: 'client.blockComment',
+    config: {
+      policies: [],
+      description: 'Block a comment',
+      tag: {
+        plugin: 'comments',
+        name: 'Comments',
+        actionType: 'update',
+      },
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/:relation/comment/:commentId/unblock',
+    handler: 'client.unblockComment',
+    config: {
+      policies: [],
+      description: 'Unblock a comment',
+      tag: {
+        plugin: 'comments',
+        name: 'Comments',
+        actionType: 'update',
+      },
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/:relation/comment/:commentId/thread/block',
+    handler: 'client.blockCommentThread',
+    config: {
+      policies: [],
+      description: 'Block a comment and its thread',
+      tag: {
+        plugin: 'comments',
+        name: 'Comments',
+        actionType: 'update',
+      },
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/:relation/comment/:commentId/thread/unblock',
+    handler: 'client.unblockCommentThread',
+    config: {
+      policies: [],
+      description: 'Unblock a comment thread',
+      tag: {
+        plugin: 'comments',
+        name: 'Comments',
+        actionType: 'update',
+      },
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/:relation/comment/:commentId/approve',
+    handler: 'client.approveComment',
+    config: {
+      policies: [],
+      description: 'Approve a comment',
+      tag: {
+        plugin: 'comments',
+        name: 'Comments',
+        actionType: 'update',
+      },
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/:relation/comment/:commentId/reject',
+    handler: 'client.rejectComment',
+    config: {
+      policies: [],
+      description: 'Reject a comment',
+      tag: {
+        plugin: 'comments',
+        name: 'Comments',
+        actionType: 'update',
+      },
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/:relation/comment/:commentId/report/:reportId/resolve',
+    handler: 'client.resolveAbuseReport',
+    config: {
+      policies: [],
+      description: 'Resolve a single abuse report for a comment',
+      tag: {
+        plugin: 'comments',
+        name: 'Comments',
+        actionType: 'update',
+      },
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/:relation/comment/:commentId/report/resolve',
+    handler: 'client.resolveCommentMultipleAbuseReports',
+    config: {
+      policies: [],
+      description: 'Resolve selected abuse reports for a comment',
+      tag: {
+        plugin: 'comments',
+        name: 'Comments',
+        actionType: 'update',
+      },
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/:relation/comment/:commentId/reports/resolve-all',
+    handler: 'client.resolveAllAbuseReportsForComment',
+    config: {
+      policies: [],
+      description: 'Resolve all abuse reports for a comment',
+      tag: {
+        plugin: 'comments',
+        name: 'Comments',
+        actionType: 'update',
+      },
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/:relation/comment/:commentId/reports/resolve-thread',
+    handler: 'client.resolveAllAbuseReportsForThread',
+    config: {
+      policies: [],
+      description:
+        'Resolve all unresolved abuse reports for a comment and its thread',
+      tag: {
+        plugin: 'comments',
+        name: 'Comments',
+        actionType: 'update',
+      },
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/:relation/reports/resolve-multiple',
+    handler: 'client.resolveMultipleAbuseReports',
+    config: {
+      policies: [],
+      description: 'Resolve multiple abuse reports by id across comments',
+      tag: {
+        plugin: 'comments',
+        name: 'Comments',
+        actionType: 'update',
+      },
+    },
+  },
+  {
+    method: 'PUT',
     path: '/:relation/comment/:commentId',
     handler: 'client.put',
     config: {

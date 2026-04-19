@@ -250,3 +250,83 @@ export const removeCommentValidator = (enabledCollections: string[], payload: ob
 export type RemoveCommentValidatorSchema = ExtractRightEither<
   ReturnType<typeof removeCommentValidator>
 >;
+
+const getChangeBlockedCommentSchema = (enabledCollections: string[]) =>
+  z.object({
+    relation: getRelationValidator(enabledCollections),
+    commentId: z.union([z.string(), z.number()]),
+  });
+
+export const changeBlockedCommentValidator = (
+  enabledCollections: string[],
+  payload: object
+) => {
+  return validate(getChangeBlockedCommentSchema(enabledCollections).safeParse(payload));
+};
+
+export type ChangeBlockedCommentValidatorSchema = ExtractRightEither<
+  ReturnType<typeof changeBlockedCommentValidator>
+>;
+
+const getResolveAbuseReportSchema = (enabledCollections: string[]) =>
+  getRelationSchema(enabledCollections).merge(
+    getStringToNumberValidator({
+      commentId: AVAILABLE_OPERATORS.single,
+      reportId: AVAILABLE_OPERATORS.single,
+    })
+  );
+
+export const resolveAbuseReportValidator = (enabledCollections: string[], payload: object) => {
+  return validate(getResolveAbuseReportSchema(enabledCollections).safeParse(payload));
+};
+
+export type ResolveAbuseReportValidatorSchema = ExtractRightEither<
+  ReturnType<typeof resolveAbuseReportValidator>
+>;
+
+export const resolveCommentMultipleAbuseReportsValidator = (
+  enabledCollections: string[],
+  payload: object
+) => {
+  return validate(
+    getRelationSchema(enabledCollections)
+      .merge(
+        getStringToNumberValidator({
+          commentId: AVAILABLE_OPERATORS.single,
+          reportIds: AVAILABLE_OPERATORS.array,
+        })
+      )
+      .refine((data) => data.reportIds.length > 0, { message: 'reportIds must not be empty' })
+      .safeParse(payload)
+  );
+};
+
+export type ResolveCommentMultipleAbuseReportsValidatorSchema = ExtractRightEither<
+  ReturnType<typeof resolveCommentMultipleAbuseReportsValidator>
+>;
+
+export type ResolveAllAbuseReportsForCommentValidatorSchema = ChangeBlockedCommentValidatorSchema;
+export type ResolveAllAbuseReportsForThreadValidatorSchema = ChangeBlockedCommentValidatorSchema;
+
+export const resolveMultipleAbuseReportsValidator = (
+  enabledCollections: string[],
+  relation: string,
+  payload: object
+) => {
+  return validate(
+    z
+      .object({
+        relation: getRelationValidator(enabledCollections),
+      })
+      .merge(
+        z.object({
+          reportIds: z.array(stringToNumberValidator).min(1),
+        })
+      )
+      .safeParse({ ...payload, relation })
+  );
+};
+
+export type ResolveMultipleAbuseReportsValidatorSchema = ExtractRightEither<
+  ReturnType<typeof resolveMultipleAbuseReportsValidator>
+>;

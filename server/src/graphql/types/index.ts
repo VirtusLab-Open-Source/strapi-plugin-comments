@@ -9,8 +9,13 @@ import { getCreateCommentAuthor } from './getCreateCommentAuthor';
 import { getCreateReport } from './getCreateReport';
 import { getIdType } from './getId';
 import { getIdentityAuthor } from './getIdentityAuthor';
+import { getModerateCommentInput } from './getModerateCommentInput';
 import { getRemoveComment } from './getRemoveComment';
 import { getReport } from './getReport';
+import { getReportsResolveBatch } from './getReportsResolveBatch';
+import { getResolveAbuseReportInput } from './getResolveAbuseReportInput';
+import { getResolveCommentMultipleAbuseReportsInput } from './getResolveCommentMultipleAbuseReportsInput';
+import { getResolveMultipleAbuseReportsInput } from './getResolveMultipleAbuseReportsInput';
 import { getReportReason } from './getReportReason';
 import { getResponseFindAll } from './getResponseFindAll';
 import { getResponseFindAllPerAuthor } from './getResponseFindAllPerAuthor';
@@ -28,7 +33,12 @@ const typesFactories = [
   getCreateReport,
   getIdType,
   getIdentityAuthor,
+  getModerateCommentInput,
   getRemoveComment,
+  getReportsResolveBatch,
+  getResolveAbuseReportInput,
+  getResolveCommentMultipleAbuseReportsInput,
+  getResolveMultipleAbuseReportsInput,
   getReportReason,
   getResponseFindAll,
   getResponseFindAllPerAuthor,

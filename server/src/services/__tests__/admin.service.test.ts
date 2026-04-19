@@ -25,6 +25,10 @@ describe('admin.service', () => {
   const mockCommonService = {
     findOne: jest.fn(),
     updateComment: jest.fn(),
+    changeBlockedComment: jest.fn(),
+    changeBlockedCommentThread: jest.fn(),
+    approveComment: jest.fn(),
+    rejectComment: jest.fn(),
     sanitizeCommentEntity: jest.fn(),
     sanitizeCommentContent: jest.fn((content: string) => content),
     parseRelationString: jest.fn(),
@@ -705,138 +709,73 @@ describe('admin.service', () => {
   });
 
   describe('changeBlockedComment', () => {
-    it('should toggle comment blocked status', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockComment = { id: 1, blocked: false };
+      const mockResult = { id: 1, blocked: true };
 
-      mockCommonService.findOne.mockResolvedValue(mockComment);
-      mockCommonService.updateComment.mockResolvedValue({ ...mockComment, blocked: true });
+      mockCommonService.changeBlockedComment.mockResolvedValue(mockResult);
 
       const result = await service.changeBlockedComment(1);
 
-      expect(result.blocked).toBe(true);
-      expect(mockCommonService.updateComment).toHaveBeenCalledWith({ id: 1 }, { blocked: true });
+      expect(result).toEqual(mockResult);
+      expect(mockCommonService.changeBlockedComment).toHaveBeenCalledWith(1, undefined);
+    });
+
+    it('should pass forceStatus to common service', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.changeBlockedComment.mockResolvedValue({ id: 1, blocked: false });
+
+      await service.changeBlockedComment(1, false);
+
+      expect(mockCommonService.changeBlockedComment).toHaveBeenCalledWith(1, false);
     });
   });
 
   describe('blockCommentThread', () => {
-    it('should block comment and its thread', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockComment = { id: 1, blocked: false, blockedThread: false };
+      const mockResult = { id: 1, blocked: true, blockedThread: true };
 
-      mockCommonService.findOne.mockResolvedValue(mockComment);
-      mockCommonService.updateComment.mockResolvedValue({
-        ...mockComment,
-        blocked: true,
-        blockedThread: true,
-      });
-      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
-      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+      mockCommonService.changeBlockedCommentThread.mockResolvedValue(mockResult);
 
       const result = await service.blockCommentThread(1);
 
-      expect(result.blocked).toBe(true);
-      expect(result.blockedThread).toBe(true);
-      expect(mockCommonService.modifiedNestedNestedComments).toHaveBeenCalled();
+      expect(result).toEqual(mockResult);
+      expect(mockCommonService.changeBlockedCommentThread).toHaveBeenCalledWith(1, undefined);
     });
 
-    it('should use forceStatus true when provided', async () => {
+    it('should pass forceStatus to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockComment = { id: 1, blocked: false, blockedThread: false };
 
-      mockCommonService.findOne.mockResolvedValue(mockComment);
-      mockCommonService.updateComment.mockResolvedValue({
-        ...mockComment,
-        blocked: true,
-        blockedThread: true,
-      });
-      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
-      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
-
-      await service.blockCommentThread(1, true);
-
-      expect(mockCommonService.updateComment).toHaveBeenCalledWith(
-        { id: 1 },
-        { blocked: true, blockedThread: true },
-      );
-    });
-
-    it('should use forceStatus false when provided', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-      const mockComment = { id: 1, blocked: true, blockedThread: true };
-
-      mockCommonService.findOne.mockResolvedValue(mockComment);
-      mockCommonService.updateComment.mockResolvedValue({
-        ...mockComment,
+      mockCommonService.changeBlockedCommentThread.mockResolvedValue({
+        id: 1,
         blocked: false,
         blockedThread: false,
       });
-      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
-      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
 
       await service.blockCommentThread(1, false);
 
-      expect(mockCommonService.updateComment).toHaveBeenCalledWith(
-        { id: 1 },
-        { blocked: false, blockedThread: false },
-      );
-    });
-
-    it('should use !entry.blocked when forceStatus is undefined', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-      const mockComment = { id: 1, blocked: true, blockedThread: true };
-
-      mockCommonService.findOne.mockResolvedValue(mockComment);
-      mockCommonService.updateComment.mockResolvedValue({
-        ...mockComment,
-        blocked: false,
-        blockedThread: false,
-      });
-      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
-      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
-
-      await service.blockCommentThread(1);
-
-      expect(mockCommonService.updateComment).toHaveBeenCalledWith(
-        { id: 1 },
-        { blocked: false, blockedThread: false },
-      );
+      expect(mockCommonService.changeBlockedCommentThread).toHaveBeenCalledWith(1, false);
     });
   });
 
   describe('approveComment', () => {
-    it('should approve a comment', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockComment = { id: 1, approvalStatus: APPROVAL_STATUS.PENDING };
+      const mockResult = { id: 1, approvalStatus: APPROVAL_STATUS.APPROVED };
 
-      mockCommentRepository.update.mockResolvedValue({
-        ...mockComment,
-        approvalStatus: APPROVAL_STATUS.APPROVED,
-      });
-      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+      mockCommonService.approveComment.mockResolvedValue(mockResult);
 
       const result = await service.approveComment(1);
 
-      expect(result.approvalStatus).toBe(APPROVAL_STATUS.APPROVED);
-      expect(mockCommentRepository.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: { approvalStatus: APPROVAL_STATUS.APPROVED },
-      });
-    });
-
-    it('should throw error when comment not found', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-
-      mockCommentRepository.update.mockResolvedValue(null);
-
-      await expect(service.approveComment(1)).rejects.toThrow('Not found');
+      expect(result).toEqual(mockResult);
+      expect(mockCommonService.approveComment).toHaveBeenCalledWith(1);
     });
   });
 
@@ -940,33 +879,17 @@ describe('admin.service', () => {
   });
 
   describe('rejectComment', () => {
-    it('should reject a comment', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockComment = { id: 1, approvalStatus: APPROVAL_STATUS.PENDING };
+      const mockResult = { id: 1, approvalStatus: APPROVAL_STATUS.REJECTED };
 
-      mockCommentRepository.update.mockResolvedValue({
-        ...mockComment,
-        approvalStatus: APPROVAL_STATUS.REJECTED,
-      });
-      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+      mockCommonService.rejectComment.mockResolvedValue(mockResult);
 
       const result = await service.rejectComment(1);
 
-      expect(result.approvalStatus).toBe(APPROVAL_STATUS.REJECTED);
-      expect(mockCommentRepository.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: { approvalStatus: APPROVAL_STATUS.REJECTED },
-      });
-    });
-
-    it('should throw error when comment not found', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-
-      mockCommentRepository.update.mockResolvedValue(null);
-
-      await expect(service.rejectComment(1)).rejects.toThrow('Not found');
+      expect(result).toEqual(mockResult);
+      expect(mockCommonService.rejectComment).toHaveBeenCalledWith(1);
     });
   });
 

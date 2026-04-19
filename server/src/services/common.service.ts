@@ -4,6 +4,7 @@ import { omit as filterItem, first, get, isNil, isObject, isString, parseInt, un
 import { isProfane, replaceProfanities } from 'no-profanity';
 import sanitizeHtml from 'sanitize-html';
 import { Id, PathTo, PathValue, RelatedEntity, StrapiContext } from '../@types';
+import { APPROVAL_STATUS } from '../const';
 import { CommentsPluginConfig } from '../config';
 import { ContentTypesUUIDs } from '../content-types';
 import { getCommentRepository, getStoreRepository } from '../repositories';
@@ -352,6 +353,47 @@ const commonService = ({ strapi }: StrapiContext) => ({
 
   async updateComment(criteria: Partial<Params['where']>, data: Partial<Comment>) {
     return getCommentRepository(strapi).update({ where: criteria, data });
+  },
+
+  async changeBlockedComment(id: Id, forceStatus?: boolean) {
+    const entry = await this.findOne({ id });
+    return this.updateComment(
+      { id },
+      { blocked: !isNil(forceStatus) ? forceStatus : !entry.blocked },
+    );
+  },
+
+  async changeBlockedCommentThread(id: Id, forceStatus?: boolean) {
+    const entry = await this.findOne({ id });
+    const status = !isNil(forceStatus) ? forceStatus : !entry.blocked;
+    const updatedEntry = await this.updateComment(
+      { id },
+      { blocked: status, blockedThread: status },
+    );
+    await this.modifiedNestedNestedComments(id, 'blockedThread', status);
+    return this.sanitizeCommentEntity(updatedEntry, []);
+  },
+
+  async approveComment(id: Id) {
+    const entity = await getCommentRepository(strapi).update({
+      where: { id },
+      data: { approvalStatus: APPROVAL_STATUS.APPROVED },
+    });
+    if (!entity) {
+      throw new PluginError(404, 'Not found');
+    }
+    return this.sanitizeCommentEntity(entity, []);
+  },
+
+  async rejectComment(id: Id) {
+    const entity = await getCommentRepository(strapi).update({
+      where: { id },
+      data: { approvalStatus: APPROVAL_STATUS.REJECTED },
+    });
+    if (!entity) {
+      throw new PluginError(404, 'Not found');
+    }
+    return this.sanitizeCommentEntity(entity, []);
   },
 
   // Find all for author
