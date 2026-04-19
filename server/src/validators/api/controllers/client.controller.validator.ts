@@ -301,6 +301,26 @@ export const resolveCommentMultipleAbuseReportsValidator = (
   );
 };
 
+/**
+ * Same merge pattern as admin `getCommentResolveMultipleAbuseReportsValidator`: spread the body,
+ * then set `relation` and `commentId` from the route so path always wins over the body.
+ */
+export const getCommentResolveMultipleAbuseReportsValidator = (
+  enabledCollections: string[],
+  params: { relation?: string; commentId?: string | number },
+  body: unknown
+) => {
+  const bodyPart =
+    body && typeof body === 'object' && !Array.isArray(body)
+      ? (body as Record<string, unknown>)
+      : {};
+  return resolveCommentMultipleAbuseReportsValidator(enabledCollections, {
+    ...bodyPart,
+    relation: params.relation,
+    commentId: params.commentId,
+  });
+};
+
 export type ResolveCommentMultipleAbuseReportsValidatorSchema = ExtractRightEither<
   ReturnType<typeof resolveCommentMultipleAbuseReportsValidator>
 >;

@@ -32,7 +32,7 @@ export const getResolveAllAbuseReportsForThread = (strapi: CoreStrapi, nexus: Ne
       if (!isRight(validated)) {
         throw unwrapEither(validated);
       }
-      const result = await getPluginService(strapi, 'admin').resolveAllAbuseReportsForThread(
+      const result = await getPluginService(strapi, 'common').resolveAllAbuseReportsForThread(
         Number(unwrapEither(validated).commentId),
       );
       return toBatchResult(result);

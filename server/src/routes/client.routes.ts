@@ -47,7 +47,7 @@ const routes: StrapiRoute<'client'>[] = [
   },
   {
     method: 'PUT',
-    path: '/:relation/comment/:commentId/block',
+    path: '/:relation/moderate/single/:commentId/block',
     handler: 'client.blockComment',
     config: {
       policies: [],
@@ -61,7 +61,7 @@ const routes: StrapiRoute<'client'>[] = [
   },
   {
     method: 'PUT',
-    path: '/:relation/comment/:commentId/unblock',
+    path: '/:relation/moderate/single/:commentId/unblock',
     handler: 'client.unblockComment',
     config: {
       policies: [],
@@ -75,7 +75,7 @@ const routes: StrapiRoute<'client'>[] = [
   },
   {
     method: 'PUT',
-    path: '/:relation/comment/:commentId/thread/block',
+    path: '/:relation/moderate/thread/:commentId/block',
     handler: 'client.blockCommentThread',
     config: {
       policies: [],
@@ -89,7 +89,7 @@ const routes: StrapiRoute<'client'>[] = [
   },
   {
     method: 'PUT',
-    path: '/:relation/comment/:commentId/thread/unblock',
+    path: '/:relation/moderate/thread/:commentId/unblock',
     handler: 'client.unblockCommentThread',
     config: {
       policies: [],
@@ -103,7 +103,7 @@ const routes: StrapiRoute<'client'>[] = [
   },
   {
     method: 'PUT',
-    path: '/:relation/comment/:commentId/approve',
+    path: '/:relation/moderate/single/:commentId/approve',
     handler: 'client.approveComment',
     config: {
       policies: [],
@@ -117,7 +117,7 @@ const routes: StrapiRoute<'client'>[] = [
   },
   {
     method: 'PUT',
-    path: '/:relation/comment/:commentId/reject',
+    path: '/:relation/moderate/single/:commentId/reject',
     handler: 'client.rejectComment',
     config: {
       policies: [],
@@ -131,7 +131,7 @@ const routes: StrapiRoute<'client'>[] = [
   },
   {
     method: 'PUT',
-    path: '/:relation/comment/:commentId/report/:reportId/resolve',
+    path: '/:relation/moderate/single/:commentId/report/:reportId/resolve',
     handler: 'client.resolveAbuseReport',
     config: {
       policies: [],
@@ -145,7 +145,7 @@ const routes: StrapiRoute<'client'>[] = [
   },
   {
     method: 'PUT',
-    path: '/:relation/comment/:commentId/report/resolve',
+    path: '/:relation/moderate/single/:commentId/report/resolve',
     handler: 'client.resolveCommentMultipleAbuseReports',
     config: {
       policies: [],
@@ -159,7 +159,7 @@ const routes: StrapiRoute<'client'>[] = [
   },
   {
     method: 'PUT',
-    path: '/:relation/comment/:commentId/reports/resolve-all',
+    path: '/:relation/moderate/all/:commentId/reports/resolve-all',
     handler: 'client.resolveAllAbuseReportsForComment',
     config: {
       policies: [],
@@ -173,7 +173,7 @@ const routes: StrapiRoute<'client'>[] = [
   },
   {
     method: 'PUT',
-    path: '/:relation/comment/:commentId/reports/resolve-thread',
+    path: '/:relation/moderate/all/:commentId/reports/resolve-thread',
     handler: 'client.resolveAllAbuseReportsForThread',
     config: {
       policies: [],
@@ -188,7 +188,7 @@ const routes: StrapiRoute<'client'>[] = [
   },
   {
     method: 'PUT',
-    path: '/:relation/reports/resolve-multiple',
+    path: '/:relation/moderate/multiple/reports/resolve-multiple',
     handler: 'client.resolveMultipleAbuseReports',
     config: {
       policies: [],

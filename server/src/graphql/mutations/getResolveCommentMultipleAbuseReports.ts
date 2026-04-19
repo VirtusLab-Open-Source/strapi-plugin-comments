@@ -28,22 +28,19 @@ export const getResolveCommentMultipleAbuseReports = (strapi: CoreStrapi, nexus:
         throw unwrapEither(configResult);
       }
       const config = unwrapEither(configResult);
-      const validated = clientValidator.resolveCommentMultipleAbuseReportsValidator(
+      const validated = clientValidator.getCommentResolveMultipleAbuseReportsValidator(
         config.enabledCollections,
-        {
-          relation,
-          commentId: id,
-          reportIds,
-        },
+        { relation, commentId: id },
+        { reportIds },
       );
       if (!isRight(validated)) {
         throw unwrapEither(validated);
       }
       const { commentId, reportIds: ids } = unwrapEither(validated);
-      const result = await getPluginService(strapi, 'admin').resolveCommentMultipleAbuseReports({
-        id: commentId,
-        reportIds: ids,
-      });
+      const result = await getPluginService(strapi, 'common').resolveCommentMultipleAbuseReports(
+        commentId,
+        ids,
+      );
       return toBatchResult(result);
     },
   };

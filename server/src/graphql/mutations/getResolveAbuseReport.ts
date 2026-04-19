@@ -33,7 +33,7 @@ export const getResolveAbuseReport = (strapi: CoreStrapi, nexus: Nexus) => {
         throw unwrapEither(validated);
       }
       const { commentId, reportId: rid } = unwrapEither(validated);
-      return getPluginService(strapi, 'admin').resolveAbuseReport({ id: commentId, reportId: rid });
+      return getPluginService(strapi, 'common').resolveAbuseReport(commentId, rid);
     },
   };
 };

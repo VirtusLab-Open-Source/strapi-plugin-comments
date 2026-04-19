@@ -65,18 +65,21 @@ const updateResultSchema = z.object({
 export type Report = z.infer<typeof reportSchema>;
 
 
-const findManySchema = z.array(z.object({
-  id: z.number(),
-  documentId: z.string().nullable(),
-  content: z.string(),
-  reason: z.string(),
-  resolved: z.boolean(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  publishedAt: z.string().nullable(),
-  locale: z.string().nullable(),
-  related: dbBaseCommentSchema.nullable(),
-}));
+/** findMany rows may omit `related` or expose it as an FK id unless populated */
+const findManySchema = z.array(
+  z.object({
+    id: z.number(),
+    documentId: z.string().nullable(),
+    content: z.string(),
+    reason: z.string(),
+    resolved: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    publishedAt: z.string().nullable(),
+    locale: z.string().nullable(),
+    related: z.union([dbBaseCommentSchema, z.number()]).nullish(),
+  })
+);
 
 export type ReportResultValidator = {
   findMany: z.infer<typeof findManySchema>;

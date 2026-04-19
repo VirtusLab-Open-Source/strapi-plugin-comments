@@ -185,94 +185,24 @@ export default ({ strapi }: StrapiContext) => {
       id: commentId,
       reportId,
     }: adminValidator.CommentResolveAbuseReportValidatorSchema) {
-      return getReportCommentRepository(strapi).update({
-        where: {
-          id: reportId,
-          related: commentId,
-        },
-        data: {
-          resolved: true,
-        },
-      });
+      return this.getCommonService().resolveAbuseReport(commentId, reportId);
     },
     async resolveCommentMultipleAbuseReports({
       id: commentId,
       reportIds: ids,
     }: adminValidator.CommentResolveMultipleAbuseReportsValidatorSchema) {
-      const reports = await getReportCommentRepository(strapi).findMany({
-        where: {
-          id: ids,
-          related: commentId,
-        },
-        populate: ['related'],
-      });
-
-      if (reports.length === ids.length) {
-        return getReportCommentRepository(strapi).updateMany({
-          where: {
-            id: ids,
-          },
-          data: {
-            resolved: true,
-          },
-        });
-      }
-      throw new PluginError(
-        400,
-        'At least one of selected reports got invalid comment entity relation. Try again.',
-      );
+      return this.getCommonService().resolveCommentMultipleAbuseReports(commentId, ids);
     },
     async resolveAllAbuseReportsForComment(id: Id) {
-      if (!id) {
-        throw new PluginError(
-          400,
-          'There is something wrong with comment Id. Try again.',
-        );
-      }
-      return getReportCommentRepository(strapi).updateMany({
-        where: {
-          related: id,
-          resolved: false,
-        },
-        data: {
-          resolved: true,
-        },
-      });
+      return this.getCommonService().resolveAllAbuseReportsForComment(id);
     },
     async resolveAllAbuseReportsForThread(commentId: number) {
-      if (!commentId) {
-        throw new PluginError(
-          400,
-          'There is something wrong with comment Id. Try again.',
-        );
-      }
-      const commentsInThread = await getCommentRepository(strapi).findMany({
-        where: {
-          threadOf: commentId,
-        },
-        select: ['id'],
-      });
-      return getReportCommentRepository(strapi).updateMany({
-        where: {
-          related: commentsInThread.map(({ id }) => id).concat([commentId]),
-          resolved: false,
-        },
-        data: {
-          resolved: true,
-        },
-      });
+      return this.getCommonService().resolveAllAbuseReportsForThread(commentId);
     },
     async resolveMultipleAbuseReports({
       reportIds,
     }: adminValidator.ReportsMultipleAbuseValidator) {
-      return getReportCommentRepository(strapi).updateMany({
-        where: {
-          id: { $in: reportIds },
-        },
-        data: {
-          resolved: true,
-        },
-      });
+      return this.getCommonService().resolveMultipleAbuseReports(reportIds);
     },
     async postComment({ id, author, content }: adminValidator.CommentPostValidatorSchema) {
       const entity = await getCommentRepository(strapi).findOne({

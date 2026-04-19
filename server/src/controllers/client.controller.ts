@@ -232,7 +232,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
       const result = clientValidator.resolveAbuseReportValidator(config.enabledCollections, ctx.params);
       if (isRight(result)) {
         const { commentId, reportId } = unwrapEither(result);
-        return this.getService('admin').resolveAbuseReport({ id: commentId, reportId });
+        return this.getService('common').resolveAbuseReport(commentId, reportId);
       }
       throw throwError(ctx, unwrapEither(result));
     }
@@ -245,13 +245,14 @@ const controllers = ({ strapi }: StrapiContext) => ({
     const configResult = await this.getStoreRepository().get(true);
     if (isRight(configResult)) {
       const config = unwrapEither(configResult);
-      const result = clientValidator.resolveCommentMultipleAbuseReportsValidator(config.enabledCollections, {
-        ...ctx.params,
-        ...ctx.request.body,
-      });
+      const result = clientValidator.getCommentResolveMultipleAbuseReportsValidator(
+        config.enabledCollections,
+        { relation: ctx.params.relation, commentId: ctx.params.commentId },
+        ctx.request.body,
+      );
       if (isRight(result)) {
         const { commentId, reportIds } = unwrapEither(result);
-        return this.getService('admin').resolveCommentMultipleAbuseReports({ id: commentId, reportIds });
+        return this.getService('common').resolveCommentMultipleAbuseReports(commentId, reportIds);
       }
       throw throwError(ctx, unwrapEither(result));
     }
@@ -266,7 +267,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
       const config = unwrapEither(configResult);
       const result = clientValidator.changeBlockedCommentValidator(config.enabledCollections, ctx.params);
       if (isRight(result)) {
-        return this.getService('admin').resolveAllAbuseReportsForComment(unwrapEither(result).commentId);
+        return this.getService('common').resolveAllAbuseReportsForComment(unwrapEither(result).commentId);
       }
       throw throwError(ctx, unwrapEither(result));
     }
@@ -281,7 +282,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
       const config = unwrapEither(configResult);
       const result = clientValidator.changeBlockedCommentValidator(config.enabledCollections, ctx.params);
       if (isRight(result)) {
-        return this.getService('admin').resolveAllAbuseReportsForThread(
+        return this.getService('common').resolveAllAbuseReportsForThread(
           Number(unwrapEither(result).commentId),
         );
       }
@@ -303,7 +304,7 @@ const controllers = ({ strapi }: StrapiContext) => ({
       );
       if (isRight(result)) {
         const { reportIds } = unwrapEither(result);
-        return this.getService('admin').resolveMultipleAbuseReports({ reportIds });
+        return this.getService('common').resolveMultipleAbuseReports(reportIds);
       }
       throw throwError(ctx, unwrapEither(result));
     }

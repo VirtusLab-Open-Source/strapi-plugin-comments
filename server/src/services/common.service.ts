@@ -7,7 +7,7 @@ import { Id, PathTo, PathValue, RelatedEntity, StrapiContext } from '../@types';
 import { APPROVAL_STATUS } from '../const';
 import { CommentsPluginConfig } from '../config';
 import { ContentTypesUUIDs } from '../content-types';
-import { getCommentRepository, getStoreRepository } from '../repositories';
+import { getCommentRepository, getReportCommentRepository, getStoreRepository } from '../repositories';
 import { getOrderBy } from '../repositories/utils';
 import { CONFIG_PARAMS } from '../utils/constants';
 import PluginError from '../utils/PluginError';
@@ -394,6 +394,112 @@ const commonService = ({ strapi }: StrapiContext) => ({
       throw new PluginError(404, 'Not found');
     }
     return this.sanitizeCommentEntity(entity, []);
+  },
+
+  async resolveAbuseReport(commentId: Id, reportId: Id) {
+    return getReportCommentRepository(strapi).update({
+      where: {
+        id: reportId,
+        related: commentId,
+      },
+      data: {
+        resolved: true,
+      },
+    });
+  },
+
+  async resolveCommentMultipleAbuseReports(commentId: Id, reportIds: number[]) {
+    const reports = await getReportCommentRepository(strapi).findMany({
+      where: {
+        id: reportIds,
+        related: commentId,
+      },
+      populate: ['related'],
+    });
+
+    if (reports.length !== reportIds.length) {
+      throw new PluginError(
+        400,
+        'At least one of selected reports got invalid comment entity relation. Try again.',
+      );
+    }
+    return getReportCommentRepository(strapi).updateMany({
+      where: {
+        id: reportIds,
+      },
+      data: {
+        resolved: true,
+      },
+    });
+  },
+
+  async resolveAllAbuseReportsForComment(id: Id) {
+    if (!id) {
+      throw new PluginError(
+        400,
+        'There is something wrong with comment Id. Try again.',
+      );
+    }
+    const reports = await getReportCommentRepository(strapi).findMany({
+      where: {
+        related: id,
+        resolved: false,
+      },
+    });
+    if (reports.length === 0) {
+      return { count: 0 };
+    }
+    return getReportCommentRepository(strapi).updateMany({
+      where: {
+        id: { $in: reports.map((r) => r.id) },
+      },
+      data: {
+        resolved: true,
+      },
+    });
+  },
+
+  async resolveAllAbuseReportsForThread(commentId: number) {
+    if (!commentId) {
+      throw new PluginError(
+        400,
+        'There is something wrong with comment Id. Try again.',
+      );
+    }
+    const commentsInThread = await getCommentRepository(strapi).findMany({
+      where: {
+        threadOf: commentId,
+      },
+    });
+    const relatedCommentIds = commentsInThread.map(({ id }) => id).concat([commentId]);
+    const reports = await getReportCommentRepository(strapi).findMany({
+      where: {
+        related: relatedCommentIds,
+        resolved: false,
+      },
+    });
+    if (reports.length === 0) {
+      return { count: 0 };
+    }
+    return getReportCommentRepository(strapi).updateMany({
+      where: {
+        id: { $in: reports.map((r) => r.id) },
+      },
+      data: {
+        resolved: true,
+      },
+    });
+  },
+
+  async resolveMultipleAbuseReports(reportIds: number[]) {
+    return getReportCommentRepository(strapi).updateMany({
+      where: {
+        id: { $in: reportIds },
+      },
+      data: {
+        resolved: true,
+      },
+    });
   },
 
   // Find all for author

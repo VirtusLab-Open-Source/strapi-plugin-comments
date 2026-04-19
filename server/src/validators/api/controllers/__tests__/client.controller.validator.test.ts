@@ -10,6 +10,7 @@ import {
   removeCommentValidator,
   reportAbuseValidator,
   resolveAbuseReportValidator,
+  getCommentResolveMultipleAbuseReportsValidator,
   resolveCommentMultipleAbuseReportsValidator,
   resolveMultipleAbuseReportsValidator,
   updateCommentValidator,
@@ -661,6 +662,40 @@ describe('Client controller validator', () => {
         reportIds: [],
       });
       expect(isLeft(result)).toBe(true);
+    });
+  });
+
+  describe('getCommentResolveMultipleAbuseReportsValidator', () => {
+    it('should merge body then override relation and commentId from params (like admin)', () => {
+      const result = getCommentResolveMultipleAbuseReportsValidator(
+        ['api::test.test'],
+        { relation: 'api::test.test:1', commentId: '2' },
+        { reportIds: [10, 11], relation: 'api::other.other:9', commentId: '99' },
+      );
+      expect(isRight(result)).toBe(true);
+      if (isRight(result)) {
+        expect(result.right.relation).toBe('api::test.test:1');
+        expect(result.right.commentId).toBe(2);
+        expect(result.right.reportIds).toEqual([10, 11]);
+      }
+    });
+
+    it('should return left when body omits reportIds even if params are set', () => {
+      const result = getCommentResolveMultipleAbuseReportsValidator(
+        ['api::test.test'],
+        { relation: 'api::test.test:1', commentId: '1' },
+        {},
+      );
+      expect(isLeft(result)).toBe(true);
+    });
+
+    it('should return right with reportIds in body only', () => {
+      const result = getCommentResolveMultipleAbuseReportsValidator(
+        ['api::test.test'],
+        { relation: 'api::test.test:1', commentId: '1' },
+        { reportIds: [10, 11] },
+      );
+      expect(isRight(result)).toBe(true);
     });
   });
 

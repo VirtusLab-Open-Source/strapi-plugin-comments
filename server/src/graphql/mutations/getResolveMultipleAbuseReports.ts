@@ -34,9 +34,7 @@ export const getResolveMultipleAbuseReports = (strapi: CoreStrapi, nexus: Nexus)
         throw unwrapEither(validated);
       }
       const { reportIds: ids } = unwrapEither(validated);
-      const result = await getPluginService(strapi, 'admin').resolveMultipleAbuseReports({
-        reportIds: ids,
-      });
+      const result = await getPluginService(strapi, 'common').resolveMultipleAbuseReports(ids);
       return toBatchResult(result);
     },
   };

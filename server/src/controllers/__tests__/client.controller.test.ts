@@ -26,7 +26,7 @@ jest.mock('../../validators/api', () => ({
     removeCommentValidator: jest.fn(),
     changeBlockedCommentValidator: jest.fn(),
     resolveAbuseReportValidator: jest.fn(),
-    resolveCommentMultipleAbuseReportsValidator: jest.fn(),
+    getCommentResolveMultipleAbuseReportsValidator: jest.fn(),
     resolveMultipleAbuseReportsValidator: jest.fn(),
   },
 }));
@@ -47,9 +47,6 @@ describe('Client controller', () => {
     changeBlockedCommentThread: jest.fn(),
     approveComment: jest.fn(),
     rejectComment: jest.fn(),
-  };
-
-  const mockAdminService = {
     resolveAbuseReport: jest.fn(),
     resolveCommentMultipleAbuseReports: jest.fn(),
     resolveAllAbuseReportsForComment: jest.fn(),
@@ -67,7 +64,6 @@ describe('Client controller', () => {
       .mockImplementation((_, name) => {
         if (name === 'client') return mockClientService;
         if (name === 'common') return mockCommonService;
-        if (name === 'admin') return mockAdminService;
         return null;
       });
     caster<jest.Mock>(getStoreRepository).mockReturnValue(mockStoreRepository);
@@ -891,12 +887,12 @@ describe('Client controller', () => {
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
       caster<jest.Mock>(clientValidator.resolveAbuseReportValidator).mockReturnValue({ right: validated });
-      mockAdminService.resolveAbuseReport.mockResolvedValue(expected);
+      mockCommonService.resolveAbuseReport.mockResolvedValue(expected);
 
       const result = await getController(getStrapi()).resolveAbuseReport(ctx);
 
       expect(result).toEqual(expected);
-      expect(mockAdminService.resolveAbuseReport).toHaveBeenCalledWith({ id: 1, reportId: 9 });
+      expect(mockCommonService.resolveAbuseReport).toHaveBeenCalledWith(1, 9);
     });
 
     it('should throw when store config fails', async () => {
@@ -935,18 +931,15 @@ describe('Client controller', () => {
       const expected = { count: 2 };
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
-      caster<jest.Mock>(clientValidator.resolveCommentMultipleAbuseReportsValidator).mockReturnValue({
+      caster<jest.Mock>(clientValidator.getCommentResolveMultipleAbuseReportsValidator).mockReturnValue({
         right: validated,
       });
-      mockAdminService.resolveCommentMultipleAbuseReports.mockResolvedValue(expected);
+      mockCommonService.resolveCommentMultipleAbuseReports.mockResolvedValue(expected);
 
       const result = await getController(getStrapi()).resolveCommentMultipleAbuseReports(ctx);
 
       expect(result).toEqual(expected);
-      expect(mockAdminService.resolveCommentMultipleAbuseReports).toHaveBeenCalledWith({
-        id: 2,
-        reportIds: [10, 11],
-      });
+      expect(mockCommonService.resolveCommentMultipleAbuseReports).toHaveBeenCalledWith(2, [10, 11]);
     });
 
     it('should throw when store config fails', async () => {
@@ -968,7 +961,7 @@ describe('Client controller', () => {
       const config = { enabledCollections: ['test'] };
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
-      caster<jest.Mock>(clientValidator.resolveCommentMultipleAbuseReportsValidator).mockReturnValue({
+      caster<jest.Mock>(clientValidator.getCommentResolveMultipleAbuseReportsValidator).mockReturnValue({
         left: new Error('Validation failed'),
       });
 
@@ -977,7 +970,7 @@ describe('Client controller', () => {
   });
 
   describe('resolveAllAbuseReportsForComment', () => {
-    it('should delegate to admin when validation passes', async () => {
+    it('should delegate to common when validation passes', async () => {
       const ctx = { params: { relation: 'test', commentId: '3' } } as RequestContext;
       const config = { enabledCollections: ['test'] };
       const validated = { relation: 'test', commentId: 3 };
@@ -985,12 +978,12 @@ describe('Client controller', () => {
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
       caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({ right: validated });
-      mockAdminService.resolveAllAbuseReportsForComment.mockResolvedValue(expected);
+      mockCommonService.resolveAllAbuseReportsForComment.mockResolvedValue(expected);
 
       const result = await getController(getStrapi()).resolveAllAbuseReportsForComment(ctx);
 
       expect(result).toEqual(expected);
-      expect(mockAdminService.resolveAllAbuseReportsForComment).toHaveBeenCalledWith(3);
+      expect(mockCommonService.resolveAllAbuseReportsForComment).toHaveBeenCalledWith(3);
     });
 
     it('should throw when store config fails', async () => {
@@ -1015,7 +1008,7 @@ describe('Client controller', () => {
   });
 
   describe('resolveAllAbuseReportsForThread', () => {
-    it('should delegate to admin when validation passes', async () => {
+    it('should delegate to common when validation passes', async () => {
       const ctx = { params: { relation: 'test', commentId: '4' } } as RequestContext;
       const config = { enabledCollections: ['test'] };
       const validated = { relation: 'test', commentId: 4 };
@@ -1023,12 +1016,12 @@ describe('Client controller', () => {
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
       caster<jest.Mock>(clientValidator.changeBlockedCommentValidator).mockReturnValue({ right: validated });
-      mockAdminService.resolveAllAbuseReportsForThread.mockResolvedValue(expected);
+      mockCommonService.resolveAllAbuseReportsForThread.mockResolvedValue(expected);
 
       const result = await getController(getStrapi()).resolveAllAbuseReportsForThread(ctx);
 
       expect(result).toEqual(expected);
-      expect(mockAdminService.resolveAllAbuseReportsForThread).toHaveBeenCalledWith(4);
+      expect(mockCommonService.resolveAllAbuseReportsForThread).toHaveBeenCalledWith(4);
     });
 
     it('should throw when store config fails', async () => {
@@ -1053,7 +1046,7 @@ describe('Client controller', () => {
   });
 
   describe('resolveMultipleAbuseReports', () => {
-    it('should delegate to admin with reportIds only', async () => {
+    it('should delegate to common with reportIds only', async () => {
       const ctx = {
         params: { relation: 'test' },
         request: { body: { reportIds: [20, 21] } },
@@ -1066,12 +1059,12 @@ describe('Client controller', () => {
       caster<jest.Mock>(clientValidator.resolveMultipleAbuseReportsValidator).mockReturnValue({
         right: validated,
       });
-      mockAdminService.resolveMultipleAbuseReports.mockResolvedValue(expected);
+      mockCommonService.resolveMultipleAbuseReports.mockResolvedValue(expected);
 
       const result = await getController(getStrapi()).resolveMultipleAbuseReports(ctx);
 
       expect(result).toEqual(expected);
-      expect(mockAdminService.resolveMultipleAbuseReports).toHaveBeenCalledWith({ reportIds: [20, 21] });
+      expect(mockCommonService.resolveMultipleAbuseReports).toHaveBeenCalledWith([20, 21]);
     });
 
     it('should throw when store config fails', async () => {

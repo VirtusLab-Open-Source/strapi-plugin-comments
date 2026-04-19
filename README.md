@@ -542,7 +542,7 @@ Reports abuse in specified Comment content based on it `commentId` and related t
 }
 ```
 
-_Available reason enums:_ `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See [configuration section](#configuration).)
+_Available reason enums:_ `BAD_LANGUAGE`, `OTHER`, `DISCRIMINATION` (want more? See [configuration section](#configuration).)
 
 **Example response body**
 
@@ -559,59 +559,61 @@ _Available reason enums:_ `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See
 
 ### Moderate comments (Content API)
 
-Use these endpoints when you need to moderate comments or abuse reports from your own app or integration (mobile app, custom dashboard, automation), instead of only from the Strapi admin panel. They cover blocking, approval workflow, and marking abuse reports as resolved. All use the same base URL pattern as other Content API comment routes (`/api/comments/api::<collection name>.<content type name>:<entity document id>/...`). Enable the matching actions under **Settings → Users & Permissions → Roles** after a server restart so new routes appear. Unless noted, send an empty body and authenticate if your API is not public.
+Use these endpoints when you need to moderate comments or abuse reports from your own app or integration instead of only from the Strapi admin panel. They cover blocking, approval workflow, and marking abuse reports as resolved. Paths are grouped under `moderate/single` (one comment), `moderate/thread` (thread-wide block), `moderate/all` (bulk resolve on a comment or thread), and `moderate/multiple` (bulk resolve by report id). The relation prefix is the same as elsewhere: `/api/comments/api::<collection name>.<content type name>:<entity document id>/…`.
 
 #### Block or unblock a comment
 
 Sets or clears the `blocked` flag on one comment (does not change nested replies by itself).
 
-`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>/block`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/single/<commentId>/block`
 
-`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>/unblock`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/single/<commentId>/unblock`
 
-**Example URL (block)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2/block`
+**Example URL (block)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/single/2/block`
 
-**Example URL (unblock)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2/unblock`
+**Example URL (unblock)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/single/2/unblock`
 
-#### Block or unblock a comment thread
+### Block or unblock a comment thread
 
 Marks the root comment and its nested replies as blocked or unblocked (`blocked` / `blockedThread` and descendants).
 
-`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>/thread/block`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/thread/<commentId>/block`
 
-`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>/thread/unblock`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/thread/<commentId>/unblock`
 
-**Example URL (block thread)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2/thread/block`
+**Example URL (block thread)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/thread/2/block`
 
-**Example URL (unblock thread)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2/thread/unblock`
+**Example URL (unblock thread)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/thread/2/unblock`
 
-#### Approve or reject a comment
+### Approve or reject a comment
 
 For approval-flow content types: sets `approvalStatus` to approved or rejected.
 
-`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>/approve`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/single/<commentId>/approve`
 
-`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>/reject`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/single/<commentId>/reject`
 
-**Example URL (approve)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2/approve`
+**Example URL (approve)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/single/2/approve`
 
-**Example URL (reject)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2/reject`
+**Example URL (reject)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/single/2/reject`
 
-#### Resolve a single abuse report
+### Resolve a single abuse report
 
 Marks one report as resolved for the given comment (`reportId` must belong to that comment).
 
-`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>/report/<reportId>/resolve`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/single/<commentId>/report/<reportId>/resolve`
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2/report/15/resolve`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/single/2/report/15/resolve`
 
-#### Resolve selected abuse reports for one comment
+### Resolve selected abuse reports for one comment
 
 Resolves only the listed report ids; all must exist and be tied to this comment or the request fails.
 
-`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>/report/resolve`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/single/<commentId>/report/resolve`
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2/report/resolve`
+Send a **JSON body** with `Content-Type: application/json`. The comment id is taken only from the URL (`reportIds` is required in the body).
+
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/single/2/report/resolve`
 
 **Example request body**
 
@@ -621,29 +623,29 @@ Resolves only the listed report ids; all must exist and be tied to this comment 
 }
 ```
 
-#### Resolve all abuse reports for a comment
+### Resolve all abuse reports for a comment
 
 Marks every unresolved abuse report for this comment as resolved (does not include replies in the thread).
 
-`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>/reports/resolve-all`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/all/<commentId>/reports/resolve-all`
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2/reports/resolve-all`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/all/2/reports/resolve-all`
 
-#### Resolve all abuse reports for a comment and its thread
+### Resolve all abuse reports for a comment and its thread
 
 Resolves unresolved reports for this comment and for all comments in its thread (direct and nested replies).
 
-`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/comment/<commentId>/reports/resolve-thread`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/all/<commentId>/reports/resolve-thread`
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/comment/2/reports/resolve-thread`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/all/2/reports/resolve-thread`
 
 #### Resolve multiple abuse reports by id
 
 Bulk-resolve by report primary keys only. The relation segment in the URL still scopes the request to your enabled collection; reports may belong to different comments.
 
-`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/reports/resolve-multiple`
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/multiple/reports/resolve-multiple`
 
-**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/reports/resolve-multiple`
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/multiple/reports/resolve-multiple`
 
 **Example request body**
 
@@ -932,7 +934,7 @@ mutation updateComment {
 
 _REST API equivalent: [Moderate comments (Content API) → Block or unblock a comment](#block-or-unblock-a-comment)_
 
-Same validation and behavior as the Content API `PUT …/comment/:commentId/block` and `…/unblock` routes: `id` is the comment id, `relation` identifies the entry (same string as queries use).
+Same validation and behavior as the Content API `PUT …/moderate/single/:commentId/block` and `…/unblock` routes: `id` is the comment id, `relation` identifies the entry (same string as queries use).
 
 **Example request (block)**
 
@@ -971,7 +973,7 @@ mutation unblockComment {
 
 _REST API equivalent: [Moderate comments (Content API) → Block or unblock a comment thread](#block-or-unblock-a-comment-thread)_
 
-Same validation as the Content API `…/thread/block` and `…/thread/unblock` routes. `id` is the comment that heads the thread.
+Same validation as the Content API `…/moderate/thread/:commentId/block` and `…/unblock` routes. `id` is the comment that heads the thread.
 
 **Example request (block thread)**
 

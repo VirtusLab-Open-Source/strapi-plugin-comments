@@ -36,6 +36,11 @@ describe('admin.service', () => {
     findRelatedEntitiesFor: jest.fn(),
     mergeRelatedEntityTo: jest.fn(),
     modifiedNestedNestedComments: jest.fn(),
+    resolveAbuseReport: jest.fn(),
+    resolveCommentMultipleAbuseReports: jest.fn(),
+    resolveAllAbuseReportsForComment: jest.fn(),
+    resolveAllAbuseReportsForThread: jest.fn(),
+    resolveMultipleAbuseReports: jest.fn(),
   };
 
   const mockCommentRepository = {
@@ -780,23 +785,20 @@ describe('admin.service', () => {
   });
 
   describe('resolveAbuseReport', () => {
-    it('should resolve abuse report', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockReport = { id: 1, resolved: false };
+      const expected = { id: 1, resolved: true };
 
-      mockReportCommentRepository.update.mockResolvedValue({
-        ...mockReport,
-        resolved: true,
-      });
+      mockCommonService.resolveAbuseReport.mockResolvedValue(expected);
 
       const result = await service.resolveAbuseReport({
         id: 1,
         reportId: 1,
       });
 
-      expect(result.resolved).toBe(true);
-      expect(mockReportCommentRepository.update).toHaveBeenCalled();
+      expect(result).toEqual(expected);
+      expect(mockCommonService.resolveAbuseReport).toHaveBeenCalledWith(1, 1);
     });
   });
 
@@ -933,189 +935,68 @@ describe('admin.service', () => {
   });
 
   describe('resolveCommentMultipleAbuseReports', () => {
-    it('should resolve multiple abuse reports for a comment', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockReports = [
-        { id: 1, related: { id: 1 } },
-        { id: 2, related: { id: 1 } },
-      ];
+      const expected = { count: 2 };
 
-      mockReportCommentRepository.findMany.mockResolvedValue(mockReports);
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 2 });
+      mockCommonService.resolveCommentMultipleAbuseReports.mockResolvedValue(expected);
 
       const result = await service.resolveCommentMultipleAbuseReports({
         id: 1,
         reportIds: [1, 2],
       });
 
-      expect(result.count).toBe(2);
-      expect(mockReportCommentRepository.findMany).toHaveBeenCalledWith({
-        where: {
-          id: [1, 2],
-          related: 1,
-        },
-        populate: ['related'],
-      });
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          id: [1, 2],
-        },
-        data: {
-          resolved: true,
-        },
-      });
-    });
-
-    it('should throw error when reports have invalid comment relation', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-      const mockReports = [{ id: 1, related: { id: 1 } }];
-
-      mockReportCommentRepository.findMany.mockResolvedValue(mockReports);
-
-      await expect(
-        service.resolveCommentMultipleAbuseReports({
-          id: 1,
-          reportIds: [1, 2],
-        })
-      ).rejects.toThrow('At least one of selected reports got invalid comment entity relation');
+      expect(result).toEqual(expected);
+      expect(mockCommonService.resolveCommentMultipleAbuseReports).toHaveBeenCalledWith(1, [1, 2]);
     });
   });
 
   describe('resolveAllAbuseReportsForComment', () => {
-    it('should resolve all abuse reports for a comment', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
+      const expected = { count: 3 };
 
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 3 });
+      mockCommonService.resolveAllAbuseReportsForComment.mockResolvedValue(expected);
 
       const result = await service.resolveAllAbuseReportsForComment(1);
 
-      expect(result.count).toBe(3);
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          related: 1,
-          resolved: false,
-        },
-        data: {
-          resolved: true,
-        },
-      });
-    });
-
-    it('should throw error when comment id is not provided', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-
-      await expect(service.resolveAllAbuseReportsForComment(null)).rejects.toThrow(
-        'There is something wrong with comment Id'
-      );
+      expect(result).toEqual(expected);
+      expect(mockCommonService.resolveAllAbuseReportsForComment).toHaveBeenCalledWith(1);
     });
   });
 
   describe('resolveAllAbuseReportsForThread', () => {
-    it('should resolve all abuse reports for a comment thread', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockThreadComments = [{ id: 2 }, { id: 3 }];
+      const expected = { count: 3 };
 
-      mockCommentRepository.findMany.mockResolvedValue(mockThreadComments);
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 3 });
+      mockCommonService.resolveAllAbuseReportsForThread.mockResolvedValue(expected);
 
       const result = await service.resolveAllAbuseReportsForThread(1);
 
-      expect(result.count).toBe(3);
-      expect(mockCommentRepository.findMany).toHaveBeenCalledWith({
-        where: {
-          threadOf: 1,
-        },
-        select: ['id'],
-      });
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          related: [2, 3, 1],
-          resolved: false,
-        },
-        data: {
-          resolved: true,
-        },
-      });
-    });
-
-    it('should throw error when comment id is not provided', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-
-      await expect(service.resolveAllAbuseReportsForThread(null)).rejects.toThrow(
-        'There is something wrong with comment Id'
-      );
-    });
-
-    it('should handle thread with no comments', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-
-      mockCommentRepository.findMany.mockResolvedValue([]);
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 1 });
-
-      const result = await service.resolveAllAbuseReportsForThread(1);
-
-      expect(result.count).toBe(1);
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          related: [1],
-          resolved: false,
-        },
-        data: {
-          resolved: true,
-        },
-      });
+      expect(result).toEqual(expected);
+      expect(mockCommonService.resolveAllAbuseReportsForThread).toHaveBeenCalledWith(1);
     });
   });
 
   describe('resolveMultipleAbuseReports', () => {
-    it('should resolve multiple abuse reports', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
       const reportIds = [1, 2, 3];
+      const expected = { count: 3 };
 
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 3 });
+      mockCommonService.resolveMultipleAbuseReports.mockResolvedValue(expected);
 
       const result = await service.resolveMultipleAbuseReports({
         reportIds,
       });
 
-      expect(result.count).toBe(3);
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          id: { $in: reportIds },
-        },
-        data: {
-          resolved: true,
-        },
-      });
-    });
-
-    it('should handle empty report ids array', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 0 });
-
-      const result = await service.resolveMultipleAbuseReports({
-        reportIds: [],
-      });
-
-      expect(result.count).toBe(0);
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          id: { $in: [] },
-        },
-        data: {
-          resolved: true,
-        },
-      });
+      expect(result).toEqual(expected);
+      expect(mockCommonService.resolveMultipleAbuseReports).toHaveBeenCalledWith(reportIds);
     });
   });
 });
