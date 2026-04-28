@@ -542,7 +542,7 @@ Reports abuse in specified Comment content based on it `commentId` and related t
 }
 ```
 
-_Available reason enums:_ `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See [configuration section](#configuration).)
+_Available reason enums:_ `BAD_LANGUAGE`, `OTHER`, `DISCRIMINATION` (want more? See [configuration section](#configuration).)
 
 **Example response body**
 
@@ -556,6 +556,104 @@ _Available reason enums:_ `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See
 
 - `200` - Successful. Response with reported abuse.
 - `409` - Conflict. Occurs when trying to report an abuse to a non existing comment.
+
+### Moderate comments (Content API)
+
+Use these endpoints when you need to moderate comments or abuse reports from your own app or integration instead of only from the Strapi admin panel. They cover blocking, approval workflow, and marking abuse reports as resolved. Paths are grouped under `moderate/single` (one comment), `moderate/thread` (thread-wide block), `moderate/all` (bulk resolve on a comment or thread), and `moderate/multiple` (bulk resolve by report id). The relation prefix is the same as elsewhere: `/api/comments/api::<collection name>.<content type name>:<entity document id>/…`.
+
+#### Block or unblock a comment
+
+Sets or clears the `blocked` flag on one comment (does not change nested replies by itself).
+
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/single/<commentId>/block`
+
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/single/<commentId>/unblock`
+
+**Example URL (block)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/single/2/block`
+
+**Example URL (unblock)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/single/2/unblock`
+
+### Block or unblock a comment thread
+
+Marks the root comment and its nested replies as blocked or unblocked (`blocked` / `blockedThread` and descendants).
+
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/thread/<commentId>/block`
+
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/thread/<commentId>/unblock`
+
+**Example URL (block thread)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/thread/2/block`
+
+**Example URL (unblock thread)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/thread/2/unblock`
+
+### Approve or reject a comment
+
+For approval-flow content types: sets `approvalStatus` to approved or rejected.
+
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/single/<commentId>/approve`
+
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/single/<commentId>/reject`
+
+**Example URL (approve)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/single/2/approve`
+
+**Example URL (reject)**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/single/2/reject`
+
+### Resolve a single abuse report
+
+Marks one report as resolved for the given comment (`reportId` must belong to that comment).
+
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/single/<commentId>/report/<reportId>/resolve`
+
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/single/2/report/15/resolve`
+
+### Resolve selected abuse reports for one comment
+
+Resolves only the listed report ids; all must exist and be tied to this comment or the request fails.
+
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/single/<commentId>/report/resolve`
+
+Send a **JSON body** with `Content-Type: application/json`. The comment id is taken only from the URL (`reportIds` is required in the body).
+
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/single/2/report/resolve`
+
+**Example request body**
+
+```json
+{
+  "reportIds": [15, 16]
+}
+```
+
+### Resolve all abuse reports for a comment
+
+Marks every unresolved abuse report for this comment as resolved (does not include replies in the thread).
+
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/all/<commentId>/reports/resolve-all`
+
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/all/2/reports/resolve-all`
+
+### Resolve all abuse reports for a comment and its thread
+
+Resolves unresolved reports for this comment and for all comments in its thread (direct and nested replies).
+
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/all/<commentId>/reports/resolve-thread`
+
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/all/2/reports/resolve-thread`
+
+#### Resolve multiple abuse reports by id
+
+Bulk-resolve by report primary keys only. The relation segment in the URL still scopes the request to your enabled collection; reports may belong to different comments.
+
+`PUT <host>/api/comments/api::<collection name>.<content type name>:<entity document id>/moderate/multiple/reports/resolve-multiple`
+
+**Example URL**: `https://localhost:1337/api/comments/api::page.page:njx99iv4p4txuqp307ye8625/moderate/multiple/reports/resolve-multiple`
+
+**Example request body**
+
+```json
+{
+  "reportIds": [15, 18, 22]
+}
+```
 
 ## 🕸️ Public GraphQL specification
 
@@ -828,6 +926,215 @@ mutation updateComment {
       "createdAt": "2022-01-26T07:45:35.978Z",
       "updatedAt": "2022-01-26T07:47:44.659Z"
     }
+  }
+}
+```
+
+### Block or unblock a comment
+
+_REST API equivalent: [Moderate comments (Content API) → Block or unblock a comment](#block-or-unblock-a-comment)_
+
+Same validation and behavior as the Content API `PUT …/moderate/single/:commentId/block` and `…/unblock` routes: `id` is the comment id, `relation` identifies the entry (same string as queries use).
+
+**Example request (block)**
+
+```graphql
+mutation blockComment {
+  blockComment(
+    input: {
+      id: "2"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
+    }
+  ) {
+    id
+    blocked
+    content
+  }
+}
+```
+
+**Example request (unblock)**
+
+```graphql
+mutation unblockComment {
+  unblockComment(
+    input: {
+      id: "2"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
+    }
+  ) {
+    id
+    blocked
+  }
+}
+```
+
+### Block or unblock a comment thread
+
+_REST API equivalent: [Moderate comments (Content API) → Block or unblock a comment thread](#block-or-unblock-a-comment-thread)_
+
+Same validation as the Content API `…/moderate/thread/:commentId/block` and `…/unblock` routes. `id` is the comment that heads the thread.
+
+**Example request (block thread)**
+
+```graphql
+mutation blockCommentThread {
+  blockCommentThread(
+    input: {
+      id: "2"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
+    }
+  ) {
+    id
+    blockedThread
+    blocked
+  }
+}
+```
+
+**Example request (unblock thread)**
+
+```graphql
+mutation unblockCommentThread {
+  unblockCommentThread(
+    input: {
+      id: "2"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
+    }
+  ) {
+    id
+    blockedThread
+  }
+}
+```
+
+### Approve or reject a comment
+
+_REST API equivalent: [Moderate comments (Content API) → Approve or reject a comment](#approve-or-reject-a-comment)_
+
+For content types that use the approval workflow.
+
+**Example request (approve)**
+
+```graphql
+mutation approveComment {
+  approveComment(
+    input: {
+      id: "2"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
+    }
+  ) {
+    id
+    approvalStatus
+  }
+}
+```
+
+**Example request (reject)**
+
+```graphql
+mutation rejectComment {
+  rejectComment(
+    input: {
+      id: "2"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
+    }
+  ) {
+    id
+    approvalStatus
+  }
+}
+```
+
+### Resolve abuse reports (GraphQL)
+
+Batch resolve mutations return `ReportsResolveBatch { count }` (rows updated). `resolveAbuseReport` returns a `Report` entity, like `createAbuseReport`.
+
+#### Resolve a single abuse report
+
+_REST API equivalent: [Moderate comments (Content API) → Resolve a single abuse report](#resolve-a-single-abuse-report)_
+
+```graphql
+mutation resolveAbuseReport {
+  resolveAbuseReport(
+    input: {
+      id: "2"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
+      reportId: 15
+    }
+  ) {
+    id
+    content
+    updatedAt
+  }
+}
+```
+
+#### Resolve selected abuse reports for one comment
+
+_REST API equivalent: [Moderate comments (Content API) → Resolve selected abuse reports for one comment](#resolve-selected-abuse-reports-for-one-comment)_
+
+```graphql
+mutation resolveCommentMultipleAbuseReports {
+  resolveCommentMultipleAbuseReports(
+    input: {
+      id: "2"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
+      reportIds: [15, 16]
+    }
+  ) {
+    count
+  }
+}
+```
+
+#### Resolve all abuse reports for a comment
+
+_REST API equivalent: [Moderate comments (Content API) → Resolve all abuse reports for a comment](#resolve-all-abuse-reports-for-a-comment)_
+
+```graphql
+mutation resolveAllAbuseReportsForComment {
+  resolveAllAbuseReportsForComment(
+    input: {
+      id: "2"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
+    }
+  ) {
+    count
+  }
+}
+```
+
+#### Resolve all abuse reports for a comment and its thread
+
+_REST API equivalent: [Moderate comments (Content API) → Resolve all abuse reports for a comment and its thread](#resolve-all-abuse-reports-for-a-comment-and-its-thread)_
+
+```graphql
+mutation resolveAllAbuseReportsForThread {
+  resolveAllAbuseReportsForThread(
+    input: {
+      id: "2"
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
+    }
+  ) {
+    count
+  }
+}
+```
+
+#### Resolve multiple abuse reports by id
+
+_REST API equivalent: [Moderate comments (Content API) → Resolve multiple abuse reports by id](#resolve-multiple-abuse-reports-by-id)_
+
+```graphql
+mutation resolveMultipleAbuseReports {
+  resolveMultipleAbuseReports(
+    input: {
+      relation: "api::page.page:njx99iv4p4txuqp307ye8625"
+      reportIds: [15, 18, 22]
+    }
+  ) {
+    count
   }
 }
 ```

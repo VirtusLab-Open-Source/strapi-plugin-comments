@@ -9,5 +9,16 @@ export const getResolversConfig = (config: CommentsPluginConfig) => {
     'Mutation.getUpdateComment': { auth },
     'Mutation.getRemoveComment': { auth },
     'Mutation.getCreateAbuseReport': { auth },
+    'Mutation.blockComment': { auth },
+    'Mutation.unblockComment': { auth },
+    'Mutation.blockCommentThread': { auth },
+    'Mutation.unblockCommentThread': { auth },
+    'Mutation.approveComment': { auth },
+    'Mutation.rejectComment': { auth },
+    'Mutation.resolveAbuseReport': { auth },
+    'Mutation.resolveCommentMultipleAbuseReports': { auth },
+    'Mutation.resolveAllAbuseReportsForComment': { auth },
+    'Mutation.resolveAllAbuseReportsForThread': { auth },
+    'Mutation.resolveMultipleAbuseReports': { auth },
   };
 };

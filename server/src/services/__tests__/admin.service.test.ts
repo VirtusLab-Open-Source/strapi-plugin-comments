@@ -25,6 +25,10 @@ describe('admin.service', () => {
   const mockCommonService = {
     findOne: jest.fn(),
     updateComment: jest.fn(),
+    changeBlockedComment: jest.fn(),
+    changeBlockedCommentThread: jest.fn(),
+    approveComment: jest.fn(),
+    rejectComment: jest.fn(),
     sanitizeCommentEntity: jest.fn(),
     sanitizeCommentContent: jest.fn((content: string) => content),
     parseRelationString: jest.fn(),
@@ -32,6 +36,11 @@ describe('admin.service', () => {
     findRelatedEntitiesFor: jest.fn(),
     mergeRelatedEntityTo: jest.fn(),
     modifiedNestedNestedComments: jest.fn(),
+    resolveAbuseReport: jest.fn(),
+    resolveCommentMultipleAbuseReports: jest.fn(),
+    resolveAllAbuseReportsForComment: jest.fn(),
+    resolveAllAbuseReportsForThread: jest.fn(),
+    resolveMultipleAbuseReports: jest.fn(),
   };
 
   const mockCommentRepository = {
@@ -705,159 +714,91 @@ describe('admin.service', () => {
   });
 
   describe('changeBlockedComment', () => {
-    it('should toggle comment blocked status', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockComment = { id: 1, blocked: false };
+      const mockResult = { id: 1, blocked: true };
 
-      mockCommonService.findOne.mockResolvedValue(mockComment);
-      mockCommonService.updateComment.mockResolvedValue({ ...mockComment, blocked: true });
+      mockCommonService.changeBlockedComment.mockResolvedValue(mockResult);
 
       const result = await service.changeBlockedComment(1);
 
-      expect(result.blocked).toBe(true);
-      expect(mockCommonService.updateComment).toHaveBeenCalledWith({ id: 1 }, { blocked: true });
+      expect(result).toEqual(mockResult);
+      expect(mockCommonService.changeBlockedComment).toHaveBeenCalledWith(1, undefined);
+    });
+
+    it('should pass forceStatus to common service', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.changeBlockedComment.mockResolvedValue({ id: 1, blocked: false });
+
+      await service.changeBlockedComment(1, false);
+
+      expect(mockCommonService.changeBlockedComment).toHaveBeenCalledWith(1, false);
     });
   });
 
   describe('blockCommentThread', () => {
-    it('should block comment and its thread', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockComment = { id: 1, blocked: false, blockedThread: false };
+      const mockResult = { id: 1, blocked: true, blockedThread: true };
 
-      mockCommonService.findOne.mockResolvedValue(mockComment);
-      mockCommonService.updateComment.mockResolvedValue({
-        ...mockComment,
-        blocked: true,
-        blockedThread: true,
-      });
-      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
-      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+      mockCommonService.changeBlockedCommentThread.mockResolvedValue(mockResult);
 
       const result = await service.blockCommentThread(1);
 
-      expect(result.blocked).toBe(true);
-      expect(result.blockedThread).toBe(true);
-      expect(mockCommonService.modifiedNestedNestedComments).toHaveBeenCalled();
+      expect(result).toEqual(mockResult);
+      expect(mockCommonService.changeBlockedCommentThread).toHaveBeenCalledWith(1, undefined);
     });
 
-    it('should use forceStatus true when provided', async () => {
+    it('should pass forceStatus to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockComment = { id: 1, blocked: false, blockedThread: false };
 
-      mockCommonService.findOne.mockResolvedValue(mockComment);
-      mockCommonService.updateComment.mockResolvedValue({
-        ...mockComment,
-        blocked: true,
-        blockedThread: true,
-      });
-      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
-      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
-
-      await service.blockCommentThread(1, true);
-
-      expect(mockCommonService.updateComment).toHaveBeenCalledWith(
-        { id: 1 },
-        { blocked: true, blockedThread: true },
-      );
-    });
-
-    it('should use forceStatus false when provided', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-      const mockComment = { id: 1, blocked: true, blockedThread: true };
-
-      mockCommonService.findOne.mockResolvedValue(mockComment);
-      mockCommonService.updateComment.mockResolvedValue({
-        ...mockComment,
+      mockCommonService.changeBlockedCommentThread.mockResolvedValue({
+        id: 1,
         blocked: false,
         blockedThread: false,
       });
-      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
-      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
 
       await service.blockCommentThread(1, false);
 
-      expect(mockCommonService.updateComment).toHaveBeenCalledWith(
-        { id: 1 },
-        { blocked: false, blockedThread: false },
-      );
-    });
-
-    it('should use !entry.blocked when forceStatus is undefined', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-      const mockComment = { id: 1, blocked: true, blockedThread: true };
-
-      mockCommonService.findOne.mockResolvedValue(mockComment);
-      mockCommonService.updateComment.mockResolvedValue({
-        ...mockComment,
-        blocked: false,
-        blockedThread: false,
-      });
-      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
-      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
-
-      await service.blockCommentThread(1);
-
-      expect(mockCommonService.updateComment).toHaveBeenCalledWith(
-        { id: 1 },
-        { blocked: false, blockedThread: false },
-      );
+      expect(mockCommonService.changeBlockedCommentThread).toHaveBeenCalledWith(1, false);
     });
   });
 
   describe('approveComment', () => {
-    it('should approve a comment', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockComment = { id: 1, approvalStatus: APPROVAL_STATUS.PENDING };
+      const mockResult = { id: 1, approvalStatus: APPROVAL_STATUS.APPROVED };
 
-      mockCommentRepository.update.mockResolvedValue({
-        ...mockComment,
-        approvalStatus: APPROVAL_STATUS.APPROVED,
-      });
-      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+      mockCommonService.approveComment.mockResolvedValue(mockResult);
 
       const result = await service.approveComment(1);
 
-      expect(result.approvalStatus).toBe(APPROVAL_STATUS.APPROVED);
-      expect(mockCommentRepository.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: { approvalStatus: APPROVAL_STATUS.APPROVED },
-      });
-    });
-
-    it('should throw error when comment not found', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-
-      mockCommentRepository.update.mockResolvedValue(null);
-
-      await expect(service.approveComment(1)).rejects.toThrow('Not found');
+      expect(result).toEqual(mockResult);
+      expect(mockCommonService.approveComment).toHaveBeenCalledWith(1);
     });
   });
 
   describe('resolveAbuseReport', () => {
-    it('should resolve abuse report', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockReport = { id: 1, resolved: false };
+      const expected = { id: 1, resolved: true };
 
-      mockReportCommentRepository.update.mockResolvedValue({
-        ...mockReport,
-        resolved: true,
-      });
+      mockCommonService.resolveAbuseReport.mockResolvedValue(expected);
 
       const result = await service.resolveAbuseReport({
         id: 1,
         reportId: 1,
       });
 
-      expect(result.resolved).toBe(true);
-      expect(mockReportCommentRepository.update).toHaveBeenCalled();
+      expect(result).toEqual(expected);
+      expect(mockCommonService.resolveAbuseReport).toHaveBeenCalledWith(1, 1);
     });
   });
 
@@ -940,33 +881,17 @@ describe('admin.service', () => {
   });
 
   describe('rejectComment', () => {
-    it('should reject a comment', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockComment = { id: 1, approvalStatus: APPROVAL_STATUS.PENDING };
+      const mockResult = { id: 1, approvalStatus: APPROVAL_STATUS.REJECTED };
 
-      mockCommentRepository.update.mockResolvedValue({
-        ...mockComment,
-        approvalStatus: APPROVAL_STATUS.REJECTED,
-      });
-      mockCommonService.sanitizeCommentEntity.mockImplementation((comment) => comment);
+      mockCommonService.rejectComment.mockResolvedValue(mockResult);
 
       const result = await service.rejectComment(1);
 
-      expect(result.approvalStatus).toBe(APPROVAL_STATUS.REJECTED);
-      expect(mockCommentRepository.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: { approvalStatus: APPROVAL_STATUS.REJECTED },
-      });
-    });
-
-    it('should throw error when comment not found', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-
-      mockCommentRepository.update.mockResolvedValue(null);
-
-      await expect(service.rejectComment(1)).rejects.toThrow('Not found');
+      expect(result).toEqual(mockResult);
+      expect(mockCommonService.rejectComment).toHaveBeenCalledWith(1);
     });
   });
 
@@ -1010,189 +935,68 @@ describe('admin.service', () => {
   });
 
   describe('resolveCommentMultipleAbuseReports', () => {
-    it('should resolve multiple abuse reports for a comment', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockReports = [
-        { id: 1, related: { id: 1 } },
-        { id: 2, related: { id: 1 } },
-      ];
+      const expected = { count: 2 };
 
-      mockReportCommentRepository.findMany.mockResolvedValue(mockReports);
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 2 });
+      mockCommonService.resolveCommentMultipleAbuseReports.mockResolvedValue(expected);
 
       const result = await service.resolveCommentMultipleAbuseReports({
         id: 1,
         reportIds: [1, 2],
       });
 
-      expect(result.count).toBe(2);
-      expect(mockReportCommentRepository.findMany).toHaveBeenCalledWith({
-        where: {
-          id: [1, 2],
-          related: 1,
-        },
-        populate: ['related'],
-      });
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          id: [1, 2],
-        },
-        data: {
-          resolved: true,
-        },
-      });
-    });
-
-    it('should throw error when reports have invalid comment relation', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-      const mockReports = [{ id: 1, related: { id: 1 } }];
-
-      mockReportCommentRepository.findMany.mockResolvedValue(mockReports);
-
-      await expect(
-        service.resolveCommentMultipleAbuseReports({
-          id: 1,
-          reportIds: [1, 2],
-        })
-      ).rejects.toThrow('At least one of selected reports got invalid comment entity relation');
+      expect(result).toEqual(expected);
+      expect(mockCommonService.resolveCommentMultipleAbuseReports).toHaveBeenCalledWith(1, [1, 2]);
     });
   });
 
   describe('resolveAllAbuseReportsForComment', () => {
-    it('should resolve all abuse reports for a comment', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
+      const expected = { count: 3 };
 
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 3 });
+      mockCommonService.resolveAllAbuseReportsForComment.mockResolvedValue(expected);
 
       const result = await service.resolveAllAbuseReportsForComment(1);
 
-      expect(result.count).toBe(3);
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          related: 1,
-          resolved: false,
-        },
-        data: {
-          resolved: true,
-        },
-      });
-    });
-
-    it('should throw error when comment id is not provided', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-
-      await expect(service.resolveAllAbuseReportsForComment(null)).rejects.toThrow(
-        'There is something wrong with comment Id'
-      );
+      expect(result).toEqual(expected);
+      expect(mockCommonService.resolveAllAbuseReportsForComment).toHaveBeenCalledWith(1);
     });
   });
 
   describe('resolveAllAbuseReportsForThread', () => {
-    it('should resolve all abuse reports for a comment thread', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockThreadComments = [{ id: 2 }, { id: 3 }];
+      const expected = { count: 3 };
 
-      mockCommentRepository.findMany.mockResolvedValue(mockThreadComments);
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 3 });
+      mockCommonService.resolveAllAbuseReportsForThread.mockResolvedValue(expected);
 
       const result = await service.resolveAllAbuseReportsForThread(1);
 
-      expect(result.count).toBe(3);
-      expect(mockCommentRepository.findMany).toHaveBeenCalledWith({
-        where: {
-          threadOf: 1,
-        },
-        select: ['id'],
-      });
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          related: [2, 3, 1],
-          resolved: false,
-        },
-        data: {
-          resolved: true,
-        },
-      });
-    });
-
-    it('should throw error when comment id is not provided', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-
-      await expect(service.resolveAllAbuseReportsForThread(null)).rejects.toThrow(
-        'There is something wrong with comment Id'
-      );
-    });
-
-    it('should handle thread with no comments', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-
-      mockCommentRepository.findMany.mockResolvedValue([]);
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 1 });
-
-      const result = await service.resolveAllAbuseReportsForThread(1);
-
-      expect(result.count).toBe(1);
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          related: [1],
-          resolved: false,
-        },
-        data: {
-          resolved: true,
-        },
-      });
+      expect(result).toEqual(expected);
+      expect(mockCommonService.resolveAllAbuseReportsForThread).toHaveBeenCalledWith(1);
     });
   });
 
   describe('resolveMultipleAbuseReports', () => {
-    it('should resolve multiple abuse reports', async () => {
+    it('should delegate to common service', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
       const reportIds = [1, 2, 3];
+      const expected = { count: 3 };
 
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 3 });
+      mockCommonService.resolveMultipleAbuseReports.mockResolvedValue(expected);
 
       const result = await service.resolveMultipleAbuseReports({
         reportIds,
       });
 
-      expect(result.count).toBe(3);
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          id: { $in: reportIds },
-        },
-        data: {
-          resolved: true,
-        },
-      });
-    });
-
-    it('should handle empty report ids array', async () => {
-      const strapi = getStrapi();
-      const service = getService(strapi);
-
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 0 });
-
-      const result = await service.resolveMultipleAbuseReports({
-        reportIds: [],
-      });
-
-      expect(result.count).toBe(0);
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          id: { $in: [] },
-        },
-        data: {
-          resolved: true,
-        },
-      });
+      expect(result).toEqual(expected);
+      expect(mockCommonService.resolveMultipleAbuseReports).toHaveBeenCalledWith(reportIds);
     });
   });
 });
