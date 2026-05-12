@@ -4,8 +4,7 @@ import styled from 'styled-components';
 
 export const StatusBadgeStyled = styled(Badge)`
   padding: 5px 8px;
-  border: 1px ${({ theme, color }) => theme.colors[`${color}200`]} solid;
-
+  border: 1px ${({ theme, color }) => theme.colors[`${color}200` as keyof typeof theme.colors]} solid;
   overflow: hidden;
 
   text-overflow: ellipsis;
