@@ -117,7 +117,7 @@ const Settings = () => {
               </Button>
             </RenderIf>
           )}
-        />
+          />
         <Layouts.Content>
           {isRestartRequired && (
             <Box marginBottom={4}>
@@ -283,9 +283,9 @@ const Settings = () => {
                   </Typography>
                   <Grid.Root gap={4} marginTop={4} width="100%">
                     <Grid.Item xs={4} alignItems="start">
-                      <Field.Root width="100%" hint={getMessage('page.settings.form.enabledCollections.hint')}>
-                        <Field.Label htmlFor="enabledCollections">
-                          {getMessage('page.settings.form.enabledCollections.label')}
+                      <Field.Root width="100%" hint={getMessage('page.settings.form.badWords.hint')}>
+                        <Field.Label htmlFor="badWords">
+                          {getMessage('page.settings.form.badWords.label')}
                         </Field.Label>
                         <Toggle
                           name="badWords"
