@@ -64,12 +64,17 @@ export const DetailsEntry: FC<DetailsEntryProps> = ({ config, entity, filters, o
               </Typography>
               <Typography>{entity[entityLabelKey!]}</Typography>
             </Flex>
-            <Flex space={4}>
+            <Flex
+              direction="column"
+              alignItems="flex-start"
+              space={4}
+            >
               {itemKeys.map((key) => (
                 <Flex
                   key={`prop_${key}`}
                   direction="column"
                   alignItems="flex-start"
+                  marginBottom={2}
                 >
                   <Typography fontWeight="bold">{formatLabel(key)}</Typography>
                   <Typography>{entity[key]}</Typography>

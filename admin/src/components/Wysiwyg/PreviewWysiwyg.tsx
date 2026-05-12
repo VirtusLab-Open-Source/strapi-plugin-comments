@@ -1,28 +1,14 @@
-import * as React from 'react';
-
-import sanitizeHtml from 'sanitize-html';
 import { styled } from 'styled-components';
 
 import { md } from './utils/mdRenderer';
+import { useSanitizedHTML } from '../../hooks/useSanitizedHTML';
 
 interface PreviewWysiwygProps {
   data?: string;
 }
 
 const PreviewWysiwyg = ({ data = '' }: PreviewWysiwygProps) => {
-  const html = React.useMemo(
-    () =>
-      sanitizeHtml(md.render(data.replaceAll('\\n', '\n') || ''), {
-        ...sanitizeHtml.defaults,
-        allowedTags: false,
-        allowedAttributes: {
-          '*': ['href', 'align', 'alt', 'center', 'width', 'height', 'type', 'controls', 'target'],
-          img: ['src', 'alt'],
-          source: ['src', 'type'],
-        },
-      }),
-    [data]
-  );
+  const html = useSanitizedHTML(md.render(data.replaceAll('\\n', '\n') || ''));
 
   return (
     <Wrapper>

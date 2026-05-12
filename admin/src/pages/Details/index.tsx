@@ -16,7 +16,6 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
   const { id } = useParams<{ id: string }>();
   const [filters, setFilters] = useState({});
   const {
-    isLoadingForPermissions,
     canAccess,
     canModerate,
     canAccessReports,
@@ -74,7 +73,7 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
           />
           <Layouts.Content>
             <Grid.Root gap={4}>
-              <Grid.Item col={9} s={12}>
+              <Grid.Item col={9} xs={12}>
                 <DiscussionThread
                   level={level}
                   selected={selected}
@@ -86,7 +85,7 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
                   }}
                 />
               </Grid.Item>
-              <Grid.Item col={3} s={12} alignItems="flex-start">
+              <Grid.Item col={3} xs={12} alignItems="flex-start">
                 <DetailsEntry
                   config={config}
                   entity={entity}

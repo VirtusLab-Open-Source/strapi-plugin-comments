@@ -2,7 +2,7 @@ import type { CommentsPluginTranslations } from './en';
 
 export default {
   'plugin.name': 'Комментарии',
-  'plugin.section': 'Плагин \'Комментарии\'',
+  'plugin.section': "Плагин 'Комментарии'",
   'plugin.section.item': 'Конфигурация',
   'common.button.back': 'Назад',
   'nav.header.moderation': 'Модерация',
@@ -62,7 +62,8 @@ export default {
   'page.details.panel.discussion.warnings.reports.description': 'открыть отчеты',
   'page.details.panel.discussion.warnings.reports.review': 'Обзор',
   'page.details.panel.discussion.warnings.reports.dialog.list': 'Отчеты',
-  'page.details.panel.discussion.warnings.reports.dialog.header': 'Модерация: Обзор открытых отчетов',
+  'page.details.panel.discussion.warnings.reports.dialog.header':
+    'Модерация: Обзор открытых отчетов',
   'page.details.panel.discussion.warnings.reports.dialog.selectAll': 'Выбрать все записи',
   'page.details.panel.discussion.warnings.reports.dialog.select': 'Выбрать сущность',
   'page.details.panel.discussion.warnings.reports.dialog.reason': 'Причина',
@@ -76,10 +77,14 @@ export default {
   'page.details.panel.discussion.warnings.reports.dialog.status.RESOLVED': 'Закрыт',
   'page.details.panel.discussion.warnings.reports.dialog.actions': 'Действия',
   'page.details.panel.discussion.warnings.reports.dialog.actions.resolve': 'Закрыть',
-  'page.details.panel.discussion.warnings.reports.dialog.actions.resolve.selected': 'Закрытых отчетов ({count})',
-  'page.details.panel.discussion.warnings.reports.dialog.confirmation.success': 'Отчеты были закрыты',
-  'page.details.panel.discussion.warnings.reports.selected.dialog.confirmation.success': 'Отчеты были закрыты',
-  'page.details.panel.discussion.warnings.comments.header': 'Модерация: Обзор комментариев с жалобами',
+  'page.details.panel.discussion.warnings.reports.dialog.actions.resolve.selected':
+    'Закрытых отчетов ({count})',
+  'page.details.panel.discussion.warnings.reports.dialog.confirmation.success':
+    'Отчеты были закрыты',
+  'page.details.panel.discussion.warnings.reports.selected.dialog.confirmation.success':
+    'Отчеты были закрыты',
+  'page.details.panel.discussion.warnings.comments.header':
+    'Модерация: Обзор комментариев с жалобами',
   'page.details.panel.discussion.status.blocked': 'Заблокировано',
   'page.details.panel.discussion.reply': 'Ответить',
   'page.details.panel.discussion.reopen': 'Переоткрыть',
@@ -94,7 +99,8 @@ export default {
   'page.details.panel.loading': 'Получение сущности...',
   'page.details.actions.comment.block': 'Заблокировать комментарий',
   'page.details.actions.comment.block.confirmation.header': 'Модерация: Заблокировать комментарий',
-  'page.details.actions.comment.block.confirmation.description': 'Вы действительно хотите заблокировать данный комментарий?',
+  'page.details.actions.comment.block.confirmation.description':
+    'Вы действительно хотите заблокировать данный комментарий?',
   'page.details.actions.comment.block.confirmation.button.confirm': 'Да, заблокировать',
   'page.details.actions.comment.block.confirmation.success': 'Комментарий заблокирован',
   'page.details.actions.comment.unblock': 'Разблокировать комментарий',
@@ -104,7 +110,8 @@ export default {
   'page.details.actions.comment.reports.review': 'Обзор',
   'page.details.actions.thread.block': 'Заблокировать тему',
   'page.details.actions.thread.block.confirmation.header': 'Модерация: Заблокировать тему',
-  'page.details.actions.thread.block.confirmation.description': 'Вы действительно хотите заблокировать всю тему? Дальнейшие обсуждения будут недоступны.',
+  'page.details.actions.thread.block.confirmation.description':
+    'Вы действительно хотите заблокировать всю тему? Дальнейшие обсуждения будут недоступны.',
   'page.details.actions.thread.block.confirmation.button.confirm': 'Да, заблокировать',
   'page.details.actions.thread.block.confirmation.success': 'Тема Заблокирована',
   'page.details.actions.thread.unblock': 'Разблокировать тему',
@@ -113,6 +120,11 @@ export default {
   'page.details.actions.thread.modal.update.comment': 'Обновить комментарий',
   'page.details.actions.comment.approve.confirmation.success': 'Комментарий разрешен',
   'page.details.actions.comment.reject.confirmation.success': 'Комментарий отклонен',
+  'page.details.actions.comment.delete.confirmation.header': 'Модерация: Удалить комментарий',
+  'page.details.actions.comment.delete.confirmation.description':
+    'Вы действительно хотите удалить этот комментарий? Это действие необратимо.',
+  'page.details.actions.comment.delete.confirmation.button.confirm': 'Да, удалить',
+  'page.details.actions.comment.delete.confirmation.button.cancel': 'Отмена',
   'page.details.filters.label': 'Вид',
   'page.details.filters.removed.visibility': 'Показать удаленные Комментарии',
   'page.coming.soon': 'Скоро...',
@@ -126,44 +138,59 @@ export default {
   'page.settings.section.additional': 'Дополнительные настройки',
   'page.settings.section.client': 'Клиентские настройки',
   'page.settings.section.restore': 'Восстановить настройки по-умолчанию',
-  'page.settings.section.restore.subtitle': 'Сбросить все примененные настройки и вернуться к настройкам по-умолчанию. Используйте разумно.',
+  'page.settings.section.restore.subtitle':
+    'Сбросить все примененные настройки и вернуться к настройкам по-умолчанию. Используйте разумно.',
   'page.settings.form.enabledCollections.label': 'Включить комментарии только для',
   'page.settings.form.enabledCollections.placeholder': 'Выберите одну или более коллекций',
-  'page.settings.form.enabledCollections.hint': 'Если ничего не выбрано, то комментарии будут включены для всех типов контента',
+  'page.settings.form.enabledCollections.hint':
+    'Если ничего не выбрано, то комментарии будут включены для всех типов контента',
   'page.settings.form.contentTypesSettings.label': 'Типы контента',
   'page.settings.form.contentTypesSettings.tooltip': 'Тонкая настройка для типа контента',
   'page.settings.form.moderatorRoles.label': 'Отправить важные уведомления',
   'page.settings.form.moderatorRoles.placeholder': 'Выберите одну или более ролей',
-  'page.settings.form.moderatorRoles.hint': 'Роли, которые будут уведомлены плагином о важных действиях для выполнения',
+  'page.settings.form.moderatorRoles.hint':
+    'Роли, которые будут уведомлены плагином о важных действиях для выполнения',
   'page.settings.form.badWords.label': 'Фильтрация ругательств',
-  'page.settings.form.badWords.hint': 'Если включена, то каждый новый комментарий или его изменение, будет проверен на ругательства',
+  'page.settings.form.badWords.hint':
+    'Если включена, то каждый новый комментарий или его изменение, будет проверен на ругательства',
   'page.settings.form.gqlAuth.label': 'Авторизация запросов GraphQL',
-  'page.settings.form.gqlAuth.hint': 'If enabled, GraphQL API queries & mutations can be triggered only by Authenticated Strapi users. Otherwise API remains open.',
+  'page.settings.form.gqlAuth.hint':
+    'If enabled, GraphQL API queries & mutations can be triggered only by Authenticated Strapi users. Otherwise API remains open.',
   'page.settings.form.approvalFlow.label': 'Бизнес-процесс согласования',
-  'page.settings.form.approvalFlow.hint': 'Комментарии, связанные с типом контента "{name}", будут проведены через ручной бизнес-процесс согласования',
+  'page.settings.form.approvalFlow.hint':
+    'Комментарии, связанные с типом контента "{name}", будут проведены через ручной бизнес-процесс согласования',
   'page.settings.form.entryLabel.label': 'Заголовки полей',
-  'page.settings.form.entryLabel.placeholder': 'Выберите хотя бы один или не заполняйте для применения настроек по-умолчанию',
-  'page.settings.form.entryLabel.hint': 'Если не заполнить, то вывод заголовков будет в следующем порядке полей: "Заголовок", "Тема" & "Имя"',
+  'page.settings.form.entryLabel.placeholder':
+    'Выберите хотя бы один или не заполняйте для применения настроек по-умолчанию',
+  'page.settings.form.entryLabel.hint':
+    'Если не заполнить, то вывод заголовков будет в следующем порядке полей: "Заголовок", "Тема" & "Имя"',
   'page.settings.form.client.url.label': 'URL портала',
   'page.settings.form.client.url.hint': 'URL клиентского портала',
   'page.settings.form.client.email.label': 'Связь через e-mail',
-  'page.settings.form.client.email.hint': 'E-mail будет использован для рассылок и коммуникации с пользователями от имени команды портала',
+  'page.settings.form.client.email.hint':
+    'E-mail будет использован для рассылок и коммуникации с пользователями от имени команды портала',
   'page.settings.actions.restore.confirmation.header': 'Восстановить настройки по-умолчанию',
-  'page.settings.actions.restore.confirmation.description': 'Вы собираетесь восстановить настройки по-умолчанию. Это может деструктивно повлиять на существующий контент. Вы действительно хотите продолжить?',
-  'page.settings.actions.restore.confirmation.button.confirm': 'Да, я хочу восстановить настройки по-умолчанию',
+  'page.settings.actions.restore.confirmation.description':
+    'Вы собираетесь восстановить настройки по-умолчанию. Это может деструктивно повлиять на существующий контент. Вы действительно хотите продолжить?',
+  'page.settings.actions.restore.confirmation.button.confirm':
+    'Да, я хочу восстановить настройки по-умолчанию',
   'page.settings.actions.restart.alert.title': 'Strapi необходимо перезапустить',
-  'page.settings.actions.restart.alert.description': 'Вы внесли в конфигурацию изменения, которые требуют перезапуск Strapi для применения изменений в схеме GraphQL. Сделайте это вручную или воспользуйтесь тригером ниже.',
+  'page.settings.actions.restart.alert.description':
+    'Вы внесли в конфигурацию изменения, которые требуют перезапуск Strapi для применения изменений в схеме GraphQL. Сделайте это вручную или воспользуйтесь тригером ниже.',
   'page.settings.actions.restart.alert.close': 'Отменить',
   'page.settings.notification.fetch.error': 'Ошибка получения конфигурации. Повторная попытка...',
   'page.settings.notification.submit.success': 'Конфигурация успешно сохранена',
   'page.settings.notification.submit.error': 'Ошибка сохранения конфигурации. Попробуйте снова.',
   'page.settings.notification.restore.success': 'Конфигурация успешно восстановлена',
-  'page.settings.notification.restore.error': 'Ошибка восстановления конфигурации. Попробуйте снова.',
+  'page.settings.notification.restore.error':
+    'Ошибка восстановления конфигурации. Попробуйте снова.',
   'page.settings.notification.restart.success': 'Приложение успешно перезапущено',
-  'page.settings.notification.restart.error': 'Ошибка перезапуска приложения. Попробуйте перезапустить вручную.',
+  'page.settings.notification.restart.error':
+    'Ошибка перезапуска приложения. Попробуйте перезапустить вручную.',
   'page.settings.loading': 'Получение конфигурации...',
   'page.settings.form.author.blockedProps.label': 'Подробная информация о заблокированном авторе',
-  'page.settings.form.author.blockedProps.hint': 'Указанные свойства будут отфильтрованы из информации об авторе (разделитель запятая)',
+  'page.settings.form.author.blockedProps.hint':
+    'Указанные свойства будут отфильтрованы из информации об авторе (разделитель запятая)',
   'components.confirmation.dialog.header': 'Подтверждение',
   'components.confirmation.dialog.description': 'Вы действительно подтверждаете действие?',
   'components.confirmation.dialog.button.confirm': 'Да, подтверждаю',
@@ -194,4 +221,6 @@ export default {
   'customField.comments.input.populate.label': 'Заполнить',
   'customField.comments.input.populate.author.label': 'Заполнить поле автора',
   'customField.comments.input.populate.avatar.label': 'Заполнить поле аватар',
+  'success.approveItem': 'Комментарий разрешен',
+  'success.rejectItem': 'Комментарий отклонен',
 } satisfies CommentsPluginTranslations;

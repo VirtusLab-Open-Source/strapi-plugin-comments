@@ -218,9 +218,9 @@ const roleSchema = z.object({
   name: z.string(),
   code: z.string(),
   description: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  publishedAt: z.string(),
+  createdAt: z.string().nullable(),
+  updatedAt: z.string().nullable(),
+  publishedAt: z.string().nullable(),
   locale: z.string().nullable(),
   usersCount: z.number(),
 });
@@ -239,11 +239,11 @@ export const userSchema = z.object({
     username: z.string().nullable(),
     email: z.string(),
     isActive: z.boolean(),
-    blocked: z.boolean(),
+    blocked: z.boolean().nullable(),
     preferedLanguage: z.string().nullable(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-    publishedAt: z.string(),
+    createdAt: z.string().nullable(),
+    updatedAt: z.string().nullable(),
+    publishedAt: z.string().nullable(),
     locale: z.null(),
     roles: z.array(
       z.object({

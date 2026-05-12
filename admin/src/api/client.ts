@@ -126,7 +126,7 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
       return fetch.put(`/${URL_PREFIX}/moderate/all/${id}/report/resolve`);
     },
     resolveAllAbuseReportsForThread(id: number) {
-      return fetch.put(`/${URL_PREFIX}/moderate/thread/${id}/report/resolve-thread`);
+      return fetch.put(`/${URL_PREFIX}/moderate/all/${id}/report/resolve-thread`);
     },
   },
   settings: {

@@ -39,7 +39,7 @@ export const ReportsTableRow: FC<ReportsTableRowProps> = ({ item, isChecked, onS
       </Td>
       <Td style={cellMaxWidth}>
         <Typography textColor="neutral800" ellipsis>
-          {item.content || getMessage('compontents.content.unknown')}
+          {item.content || getMessage('components.content.unknown')}
         </Typography>
       </Td>
       <Td style={cellMaxWidth}>
@@ -47,7 +47,7 @@ export const ReportsTableRow: FC<ReportsTableRowProps> = ({ item, isChecked, onS
          <ReportStatusBadge item={item} />
         </Typography>
       </Td>
-      <Td>
+      <Td display={{ initial: 'none', large: 'table-cell' }}>
         <Typography textColor="neutral800">
           {formatDate(item.updatedAt || item.createdAt, {
             dateStyle: 'long',

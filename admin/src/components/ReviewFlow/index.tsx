@@ -72,7 +72,10 @@ export const ReviewFlow: FC<Props> = ({
       <Modal.Trigger>
         {canReviewReports && reports?.length && (
           <IconButton
-            label="Review"
+            label={getMessage(
+              'page.details.actions.comment.reports.review',
+              'Review',
+            )}
           >
             <ReviewIcon />
           </IconButton>

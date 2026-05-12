@@ -76,9 +76,16 @@ export default {
   'page.details.panel.discussion.warnings.reports.dialog.status.RESOLVED': '已解决',
   'page.details.panel.discussion.warnings.reports.dialog.actions': '操作',
   'page.details.panel.discussion.warnings.reports.dialog.actions.resolve': '解决',
-  'page.details.panel.discussion.warnings.reports.dialog.actions.resolve.selected': '解决报告 ({count})',
+  'page.details.panel.discussion.warnings.reports.dialog.actions.resolve.selected':
+    '解决报告 ({count})',
   'page.details.panel.discussion.warnings.reports.dialog.confirmation.success': '已解决打开的报告',
-  'page.details.panel.discussion.warnings.reports.selected.dialog.confirmation.success': '已解决打开的报告',
+  'page.details.panel.discussion.warnings.reports.selected.dialog.confirmation.success':
+    '已解决打开的报告',
+  'page.details.actions.comment.delete.confirmation.header': '审核：删除评论',
+  'page.details.actions.comment.delete.confirmation.description':
+    '确定要删除这个评论吗？这个操作是不可逆的。',
+  'page.details.actions.comment.delete.confirmation.button.confirm': '确定',
+  'page.details.actions.comment.delete.confirmation.button.cancel': '取消',
   'page.details.panel.discussion.warnings.comments.header': '审核：审查报告评论',
   'page.details.panel.discussion.status.blocked': '已屏蔽',
   'page.details.panel.discussion.reply': '回复',
@@ -104,7 +111,8 @@ export default {
   'page.details.actions.comment.reports.review': '审查',
   'page.details.actions.thread.block': '屏蔽线索',
   'page.details.actions.thread.block.confirmation.header': '审核：屏蔽线索',
-  'page.details.actions.thread.block.confirmation.description': '确定要阻塞整个线索吗？不允许进行进一步的讨论。',
+  'page.details.actions.thread.block.confirmation.description':
+    '确定要阻塞整个线索吗？不允许进行进一步的讨论。',
   'page.details.actions.thread.block.confirmation.button.confirm': '确定',
   'page.details.actions.thread.block.confirmation.success': '线索已被屏蔽',
   'page.details.actions.thread.unblock': '取消屏蔽线索',
@@ -129,7 +137,8 @@ export default {
   'page.settings.section.restore.subtitle': '放弃所有应用的设置并恢复到插件默认设置。请合理使用。',
   'page.settings.form.enabledCollections.label': '为Content Type启用评论',
   'page.settings.form.enabledCollections.placeholder': '选择一个或多个集合',
-  'page.settings.form.enabledCollections.hint': '如果未选择任何Content Type，则会启用所有Content Type',
+  'page.settings.form.enabledCollections.hint':
+    '如果未选择任何Content Type，则会启用所有Content Type',
   'page.settings.form.contentTypesSettings.label': 'Content-Type',
   'page.settings.form.contentTypesSettings.tooltip': '每种Content Type的自定义配置',
   'page.settings.form.moderatorRoles.label': '发送重要通知到',
@@ -138,21 +147,26 @@ export default {
   'page.settings.form.badWords.label': '不良词汇筛选',
   'page.settings.form.badWords.hint': '如果启用，则每次发布/更新评论时都会针对不良词汇进行检查',
   'page.settings.form.gqlAuth.label': 'GraphQL查询授权',
-  'page.settings.form.gqlAuth.hint': '如果启用， GraphQL API queries 和 mutations 只能由经过身份验证的 Strapi 用户触发。否则 API 将保持打开状态。',
+  'page.settings.form.gqlAuth.hint':
+    '如果启用， GraphQL API queries 和 mutations 只能由经过身份验证的 Strapi 用户触发。否则 API 将保持打开状态。',
   'page.settings.form.approvalFlow.label': '审批流程',
-  'page.settings.form.approvalFlow.hint': '与Content Type "{name}" 关联的评论将通过手动审批流程获取',
+  'page.settings.form.approvalFlow.hint':
+    '与Content Type "{name}" 关联的评论将通过手动审批流程获取',
   'page.settings.form.entryLabel.label': '标题字段',
   'page.settings.form.entryLabel.placeholder': '至少选择一个或保留为空以应用默认值',
-  'page.settings.form.entryLabel.hint': '如果保留为空，则标题呈现将采用以下有序字段: "Title", "Subject" & "Name"',
+  'page.settings.form.entryLabel.hint':
+    '如果保留为空，则标题呈现将采用以下有序字段: "Title", "Subject" & "Name"',
   'page.settings.form.client.url.label': '门户网站URL',
   'page.settings.form.client.url.hint': '您的客户端门户可用的URL',
   'page.settings.form.client.email.label': '通信电子邮件',
   'page.settings.form.client.email.hint': '用于邮寄、代表门户团队与用户沟通的电子邮件地址',
   'page.settings.actions.restore.confirmation.header': '恢复默认配置',
-  'page.settings.actions.restore.confirmation.description': '您即将将插件配置恢复为默认值。它可能会对已经收集的内容产生破坏性影响。确定要继续吗？',
+  'page.settings.actions.restore.confirmation.description':
+    '您即将将插件配置恢复为默认值。它可能会对已经收集的内容产生破坏性影响。确定要继续吗？',
   'page.settings.actions.restore.confirmation.button.confirm': '确定',
   'page.settings.actions.restart.alert.title': 'Strapi需要重新启动',
-  'page.settings.actions.restart.alert.description': '您已经进行了配置更改，需要重新启动Strapi应用程序才能在GraphQL模式中生效。手动或使用下面的触发器执行此操作。',
+  'page.settings.actions.restart.alert.description':
+    '您已经进行了配置更改，需要重新启动Strapi应用程序才能在GraphQL模式中生效。手动或使用下面的触发器执行此操作。',
   'page.settings.actions.restart.alert.close': '丢弃',
   'page.settings.notification.fetch.error': '无法获取配置。正在重试...',
   'page.settings.notification.submit.success': '配置保存成功',
@@ -163,7 +177,8 @@ export default {
   'page.settings.notification.restart.error': '无法重新启动应用程序。请尝试手动操作。',
   'page.settings.loading': '加载配置中...',
   'page.settings.form.author.blockedProps.label': '屏蔽的作者详细信息',
-  'page.settings.form.author.blockedProps.hint': '指定的属性将从作者的详细信息中筛选出来（以逗号分隔）',
+  'page.settings.form.author.blockedProps.hint':
+    '指定的属性将从作者的详细信息中筛选出来（以逗号分隔）',
   'components.confirmation.dialog.header': '确认书',
   'components.confirmation.dialog.description': '您真的要执行此操作吗？',
   'components.confirmation.dialog.button.confirm': '确定',
@@ -194,4 +209,6 @@ export default {
   'customField.comments.input.populate.label': '填充',
   'customField.comments.input.populate.author.label': '填充作者字段',
   'customField.comments.input.populate.avatar.label': '填充头像字段',
+  'success.approveItem': '评论已通过',
+  'success.rejectItem': '评论已拒绝',
 } satisfies CommentsPluginTranslations;

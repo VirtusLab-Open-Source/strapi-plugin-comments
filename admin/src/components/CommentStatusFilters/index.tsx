@@ -57,6 +57,7 @@ export const CommentsStatusFilters = () => {
       value={currentFilter}
       onClear={() => handleChange(undefined)}
       onChange={handleChange}
+      size="S"
     >
       {COMMENT_OPTIONS.map((option) => (
         <SingleSelectOption value={option}>

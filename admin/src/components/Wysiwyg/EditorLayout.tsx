@@ -44,7 +44,15 @@ const EditorLayout = ({
 
   if (isExpandMode) {
     return (
-      <Portal role="dialog" aria-modal={false}>
+      <Portal 
+        role="dialog"
+        aria-modal={false}
+        width="100vw"
+        height="100vh"
+        position="absolute"
+        top={0}
+        pointerEvents="all"
+      >
         <FocusTrap onEscape={onCollapse}>
           <ExpandWrapper
             position="fixed"
@@ -52,7 +60,7 @@ const EditorLayout = ({
             left={0}
             right={0}
             bottom={0}
-            zIndex={4}
+            zIndex={400}
             justifyContent="center"
             onClick={onCollapse}
           >

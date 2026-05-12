@@ -9,6 +9,7 @@ import { tryCatch } from '../utils/tryCatch';
 import { client } from '../validators/api';
 import { Comment } from '../validators/repositories';
 import { resolveUserContextError } from './utils/functions';
+import sanitizeHtml from 'sanitize-html';
 
 /**
  * Comments Plugin - Client services
@@ -84,7 +85,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
           ...authorData,
           threadOf,
           locale,
-          content: clearContent,
+          content: this.getCommonService().sanitizeCommentContent(clearContent),
           related: relation,
           approvalStatus: isApprovalFlowEnabled
             ? APPROVAL_STATUS.PENDING
@@ -121,7 +122,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
         if (existingComment && existingComment.author?.id?.toString() === authorId?.toString()) {
           const entity = await getCommentRepository(strapi).update({
             where: { id: commentId },
-            data: { content },
+            data: { content: this.getCommonService().sanitizeCommentContent(content) },
             populate: { threadOf: true, authorUser: { populate: ['avatar'] }, },
           });
           return this.getCommonService().sanitizeCommentEntity(entity, blockedAuthorProps);
