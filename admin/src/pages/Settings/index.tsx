@@ -117,7 +117,7 @@ const Settings = () => {
               </Button>
             </RenderIf>
           )}
-          />
+        />
         <Layouts.Content>
           {isRestartRequired && (
             <Box marginBottom={4}>
