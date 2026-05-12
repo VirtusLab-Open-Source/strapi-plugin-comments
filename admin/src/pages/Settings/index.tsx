@@ -335,13 +335,10 @@ const Settings = () => {
                     {getMessage('page.settings.section.additional')}
                   </Typography>
                   <Grid.Root gap={4} marginTop={4} width="100%">
-                    <Grid.Item col={4} xs={12} alignItems="start">
-                      <Field.Root
-                        width="100%"
-                        hint={getMessage('page.settings.form.enabledCollections.hint')}
-                      >
-                        <Field.Label htmlFor="enabledCollections">
-                          {getMessage('page.settings.form.enabledCollections.label')}
+                    <Grid.Item xs={4} xs={12} alignItems="start">
+                      <Field.Root width="100%" hint={getMessage('page.settings.form.badWords.hint')}>
+                        <Field.Label htmlFor="badWords">
+                          {getMessage('page.settings.form.badWords.label')}
                         </Field.Label>
                         <Toggle
                           name="badWords"
