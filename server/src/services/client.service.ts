@@ -8,8 +8,8 @@ import { getPluginService } from '../utils/getPluginService';
 import { tryCatch } from '../utils/tryCatch';
 import { client } from '../validators/api';
 import { Comment } from '../validators/repositories';
+import { emailService } from './email.service';
 import { resolveUserContextError } from './utils/functions';
-import sanitizeHtml from 'sanitize-html';
 
 /**
  * Comments Plugin - Client services
@@ -151,13 +151,13 @@ export const clientService = ({ strapi }: StrapiContext) => {
 
         if (reportAgainstEntity) {
           const entity = await getReportCommentRepository(strapi)
-          .create({
-            data: {
-              ...payload,
-              resolved: false,
-              related: commentId,
-            },
-          });
+            .create({
+              data: {
+                ...payload,
+                resolved: false,
+                related: commentId,
+              },
+            });
           if (entity) {
             const response = {
               ...entity,
@@ -211,14 +211,14 @@ export const clientService = ({ strapi }: StrapiContext) => {
         });
         if (entity) {
           const removedEntity = await getCommentRepository(strapi)
-          .update({
-            where: {
-              id: commentId,
-              related: relation,
-            },
-            data: { removed: true },
-            populate: { threadOf: true, authorUser: { populate: ['avatar'] }, },
-          });
+            .update({
+              where: {
+                id: commentId,
+                related: relation,
+              },
+              data: { removed: true },
+              populate: { threadOf: true, authorUser: { populate: ['avatar'] }, },
+            });
 
           await this.markAsRemovedNested(commentId, true);
           const doNotPopulateAuthor = await this.getCommonService().getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
@@ -241,26 +241,27 @@ export const clientService = ({ strapi }: StrapiContext) => {
     async sendAbuseReportEmail(reason: string, content: string) {
       const SUPER_ADMIN_ROLE = 'strapi-super-admin';
       const rolesToNotify = await this.getCommonService().getConfig(CONFIG_PARAMS.MODERATOR_ROLES, [SUPER_ADMIN_ROLE]);
+
       if (rolesToNotify.length > 0) {
         const emails = await strapi.query('admin::user')
-                                   .findMany({ where: { roles: { code: rolesToNotify } } })
-                                   .then((users) => users.map((user) => user.email));
+          .findMany({ where: { roles: { code: rolesToNotify } } })
+          .then((users) => users.map((user) => user.email));
         if (emails.length > 0) {
           const from = await strapi.query('admin::user').findOne({ where: { roles: { code: SUPER_ADMIN_ROLE } } });
-          if (strapi.plugin('email')) {
-            await strapi.plugin('email')
-                        .service('email')
-                        .send({
-                          to: emails,
-                          from: from.email,
-                          subject: 'New abuse report on comment',
-                          text: `
-                        There was a new abuse report on your app. 
-                        Reason: ${reason}
-                        Message: ${content}
-                    `,
-                        });
-          }
+
+          const sender = emailService({ strapi });
+
+          await sender
+            .send({
+              to: emails,
+              from: from.email,
+              subject: 'New abuse report on comment',
+              text: `
+                      There was a new abuse report on your app. 
+                      Reason: ${reason}
+                      Message: ${content}
+                  `,
+            });
         }
       }
     },
@@ -286,24 +287,29 @@ export const clientService = ({ strapi }: StrapiContext) => {
 
         if (emailRecipient) {
           const superAdmin = await strapi.query('admin::user')
-                                         .findOne({
-                                           where: {
-                                             roles: { code: 'strapi-super-admin' },
-                                           },
-                                         });
+            .findOne({
+              where: {
+                roles: { code: 'strapi-super-admin' },
+              },
+            });
 
           const emailSender = await this.getCommonService().getConfig('client.contactEmail', superAdmin.email);
           const clientAppUrl = await this.getCommonService().getConfig('client.url', 'our site');
 
+          if (!emailSender || !clientAppUrl) {
+            strapi.log.warn('Email sender or client app URL not found');
+            return;
+          }
+
+          const sender = emailService({ strapi });
+
           try {
-            await strapi
-            .plugin('email')
-            .service('email')
-            .send({
-              to: [emailRecipient],
-              from: emailSender,
-              subject: 'You\'ve got a new response to your comment',
-              text: `Hello ${thread?.author?.name || emailRecipient}!
+            await sender
+              .send({
+                to: [emailRecipient],
+                from: emailSender,
+                subject: 'You\'ve got a new response to your comment',
+                text: `Hello ${thread?.author?.name || emailRecipient}!
                 You've got a new response to your comment by ${entity?.author?.name || entity?.author?.email}.
                 
                 ------
@@ -314,10 +320,14 @@ export const clientService = ({ strapi }: StrapiContext) => {
                 
                 Visit ${clientAppUrl} and continue the discussion.
                 `,
-            });
+              });
           } catch (err) {
             strapi.log.error(err);
-            throw err;
+
+            throw new PluginError(
+              500,
+              `Failed to send response notification email`,
+            );
           }
         }
       }
