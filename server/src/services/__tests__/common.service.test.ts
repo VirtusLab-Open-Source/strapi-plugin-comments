@@ -874,6 +874,7 @@ describe('common.service', () => {
         documentId: '1',
         locale: 'en',
         title: 'Test Title 1',
+        id: 1
       };
 
       mockFindOne.mockResolvedValue(mockRelatedEntities);
