@@ -445,6 +445,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
             .map((_) => ({
               ..._,
               uid: relatedUid,
+              id: typeof _.id === 'number' ? _.id : parseInt(_.id, 10),
             }))
         );
       })
