@@ -4,14 +4,14 @@ import pluginPermissions from '../permissions';
 
 export const usePermissions = () => {
   const viewPermissions = useMemo(
-    () => ({
-      access: pluginPermissions.access,
-      moderate: pluginPermissions.moderate,
-      accessReports: pluginPermissions.reports,
-      reviewReports: pluginPermissions.reportsReview,
-      settings: pluginPermissions.settings,
-      settingsChange: pluginPermissions.settingsChange,
-    }),
+    () => ([
+      ...pluginPermissions.access,
+      ...pluginPermissions.moderate,
+      ...pluginPermissions.reports,
+      ...pluginPermissions.reportsReview,
+      ...pluginPermissions.settings,
+      ...pluginPermissions.settingsChange,
+    ]),
     [],
   );
   const {
@@ -25,6 +25,7 @@ export const usePermissions = () => {
       canReportsReview,
     },
   } = useRBAC(viewPermissions);
+
   return {
     isLoadingForPermissions,
     canAccess: canCommentsRead || canReportsRead || canSettingsRead,
