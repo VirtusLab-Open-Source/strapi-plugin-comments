@@ -4,8 +4,8 @@ import { omit as filterItem, first, get, isNil, isObject, isString, parseInt, un
 import { isProfane, replaceProfanities } from 'no-profanity';
 import sanitizeHtml from 'sanitize-html';
 import { Id, PathTo, PathValue, RelatedEntity, StrapiContext } from '../@types';
-import { APPROVAL_STATUS } from '../const';
 import { CommentsPluginConfig } from '../config';
+import { APPROVAL_STATUS } from '../const';
 import { ContentTypesUUIDs } from '../content-types';
 import { getCommentRepository, getReportCommentRepository, getStoreRepository } from '../repositories';
 import { getOrderBy } from '../repositories/utils';
@@ -241,24 +241,24 @@ const commonService = ({ strapi }: StrapiContext) => ({
       entry.blockedThread && dropBlockedThreads
         ? []
         : await Promise.all(
-            children.data.map((child) =>
-              this.getCommentsChildren(
-                {
-                  filters,
-                  populate,
-                  sort,
-                  fields,
-                  isAdmin,
-                  omit,
-                  locale,
-                  limit,
-                },
-                child,
-                relatedEntity,
-                dropBlockedThreads
-              )
+          children.data.map((child) =>
+            this.getCommentsChildren(
+              {
+                filters,
+                populate,
+                sort,
+                fields,
+                isAdmin,
+                omit,
+                locale,
+                limit,
+              },
+              child,
+              relatedEntity,
+              dropBlockedThreads
             )
-          );
+          )
+        );
 
     return {
       ...entry,
@@ -451,7 +451,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     }
     return getReportCommentRepository(strapi).updateMany({
       where: {
-        id: { $in: reports.map((r) => r.id) },
+        id: { $in: reports.map(({ id }) => id) },
       },
       data: {
         resolved: true,
@@ -478,28 +478,22 @@ const commonService = ({ strapi }: StrapiContext) => ({
         resolved: false,
       },
     });
+
     if (reports.length === 0) {
       return { count: 0 };
     }
-    return getReportCommentRepository(strapi).updateMany({
-      where: {
-        id: { $in: reports.map((r) => r.id) },
-      },
-      data: {
+
+    return getReportCommentRepository(strapi)
+      .updateManyByIds(reports.map(({ id }) => id), {
         resolved: true,
-      },
-    });
+      });
   },
 
   async resolveMultipleAbuseReports(reportIds: number[]) {
-    return getReportCommentRepository(strapi).updateMany({
-      where: {
-        id: { $in: reportIds },
-      },
-      data: {
+    return getReportCommentRepository(strapi)
+      .updateManyByIds(reportIds, {
         resolved: true,
-      },
-    });
+      });
   },
 
   // Find all for author
@@ -527,13 +521,13 @@ const commonService = ({ strapi }: StrapiContext) => ({
 
     const authorQuery = isStrapiAuthor
       ? {
-          authorUser: {
-            id: authorId,
-          },
-        }
+        authorUser: {
+          id: authorId,
+        },
+      }
       : {
-          authorId,
-        };
+        authorId,
+      };
 
     const response = await this.findAllFlat({
       filters: {
@@ -593,6 +587,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
             .map((_) => ({
               ..._,
               uid: relatedUid,
+              id: typeof _.id === 'number' ? _.id : parseInt(_.id, 10),
             }))
         );
       })

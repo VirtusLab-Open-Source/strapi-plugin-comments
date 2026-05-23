@@ -180,3 +180,7 @@ export const externalAuthorSchema = z.object({
 });
 
 export const primitiveUnion = z.union([z.string(), z.number(), z.boolean()]);
+
+export const isRecord = (value: unknown): value is Record<string, unknown> => {
+  return value && typeof value === 'object' && !Array.isArray(value);
+};

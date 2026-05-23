@@ -105,6 +105,79 @@ describe('Report repository', () => {
       expect(strapi.query(UID).updateMany).toHaveBeenCalledWith(params);
     });
   });
+
+  describe('updateManyByIds', () => {
+    it('returns the result from updateMany', async () => {
+      const ids = [1, 2, 3];
+      const data = { resolved: true };
+      const updateResult = { count: 3 };
+      const strapi = getStrapi();
+      caster<jest.Mock>(strapi.query(UID).updateMany).mockResolvedValue(updateResult);
+
+      const result = await getRepository(strapi).updateManyByIds(ids, data);
+
+      expect(result).toEqual(updateResult);
+    });
+
+    it('passes ids and data to updateMany with a $in where clause', async () => {
+      const ids = [10, 20, 30];
+      const data = { resolved: true };
+      const strapi = getStrapi();
+      caster<jest.Mock>(strapi.query(UID).updateMany).mockResolvedValue({ count: 3 });
+
+      await getRepository(strapi).updateManyByIds(ids, data);
+
+      expect(strapi.query(UID).updateMany).toHaveBeenCalledWith({
+        where: {
+          id: { $in: ids },
+        },
+        data,
+      });
+    });
+
+    it('propagates errors thrown by updateMany', async () => {
+      const ids = [1];
+      const data = { resolved: true };
+      const error = new Error('updateMany failed');
+      const strapi = getStrapi();
+      caster<jest.Mock>(strapi.query(UID).updateMany).mockRejectedValue(error);
+
+      await expect(getRepository(strapi).updateManyByIds(ids, data)).rejects.toThrow('updateMany failed');
+    });
+
+    it('handles an empty ids array', async () => {
+      const data = { resolved: true };
+      const strapi = getStrapi();
+      caster<jest.Mock>(strapi.query(UID).updateMany).mockResolvedValue({ count: 0 });
+
+      const result = await getRepository(strapi).updateManyByIds([], data);
+
+      expect(result).toEqual({ count: 0 });
+      expect(strapi.query(UID).updateMany).toHaveBeenCalledWith({
+        where: {
+          id: { $in: [] },
+        },
+        data,
+      });
+    });
+
+    it('handles a single id', async () => {
+      const ids = [5];
+      const data = { resolved: true };
+      const strapi = getStrapi();
+      caster<jest.Mock>(strapi.query(UID).updateMany).mockResolvedValue({ count: 1 });
+
+      const result = await getRepository(strapi).updateManyByIds(ids, data);
+
+      expect(result).toEqual({ count: 1 });
+      expect(strapi.query(UID).updateMany).toHaveBeenCalledWith({
+        where: {
+          id: { $in: [5] },
+        },
+        data,
+      });
+    });
+  });
   describe('when getConfig returns true', () => {
     beforeEach(() => {
       caster<jest.Mock>(getConfig).mockResolvedValue(true);

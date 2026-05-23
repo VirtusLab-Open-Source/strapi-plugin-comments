@@ -1,7 +1,7 @@
 import { isProfane, replaceProfanities } from 'no-profanity';
 import { StrapiContext } from '../../@types';
-import { APPROVAL_STATUS } from '../../const';
 import { CommentsPluginConfig } from '../../config';
+import { APPROVAL_STATUS } from '../../const';
 import { getCommentRepository, getReportCommentRepository, getStoreRepository } from '../../repositories';
 import { getOrderBy } from '../../repositories/utils';
 import { caster } from '../../test/utils';
@@ -40,6 +40,7 @@ describe('common.service', () => {
     findMany: jest.fn(),
     update: jest.fn(),
     updateMany: jest.fn(),
+    updateManyByIds: jest.fn(),
   };
 
   const mockStoreRepository = {
@@ -1027,6 +1028,7 @@ describe('common.service', () => {
         documentId: '1',
         locale: 'en',
         title: 'Test Title 1',
+        id: 1,
       };
 
       mockFindOne.mockResolvedValue(mockRelatedEntities);
@@ -1267,7 +1269,7 @@ describe('common.service', () => {
 
       mockCommentRepository.findMany.mockResolvedValue(mockThreadComments);
       mockReportCommentRepository.findMany.mockResolvedValue([{ id: 20 }, { id: 21 }, { id: 22 }]);
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 3 });
+      mockReportCommentRepository.updateManyByIds.mockResolvedValue({ count: 3 });
 
       const result = await service.resolveAllAbuseReportsForThread(1);
 
@@ -1283,14 +1285,7 @@ describe('common.service', () => {
           resolved: false,
         },
       });
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          id: { $in: [20, 21, 22] },
-        },
-        data: {
-          resolved: true,
-        },
-      });
+      expect(mockReportCommentRepository.updateManyByIds).toHaveBeenCalledWith([20, 21, 22], { resolved: true });
     });
 
     it('should throw error when comment id is not provided', async () => {
@@ -1308,7 +1303,7 @@ describe('common.service', () => {
 
       mockCommentRepository.findMany.mockResolvedValue([]);
       mockReportCommentRepository.findMany.mockResolvedValue([{ id: 5 }]);
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 1 });
+      mockReportCommentRepository.updateManyByIds.mockResolvedValue({ count: 1 });
 
       const result = await service.resolveAllAbuseReportsForThread(1);
 
@@ -1319,14 +1314,7 @@ describe('common.service', () => {
           resolved: false,
         },
       });
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          id: { $in: [5] },
-        },
-        data: {
-          resolved: true,
-        },
-      });
+      expect(mockReportCommentRepository.updateManyByIds).toHaveBeenCalledWith([5], { resolved: true });
     });
 
     it('should return count 0 when there are no unresolved reports on thread', async () => {
@@ -1349,38 +1337,24 @@ describe('common.service', () => {
       const service = getService(strapi);
       const reportIds = [1, 2, 3];
 
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 3 });
+      mockReportCommentRepository.updateManyByIds.mockResolvedValue({ count: 3 });
 
       const result = await service.resolveMultipleAbuseReports(reportIds);
 
       expect(result.count).toBe(3);
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          id: { $in: reportIds },
-        },
-        data: {
-          resolved: true,
-        },
-      });
+      expect(mockReportCommentRepository.updateManyByIds).toHaveBeenCalledWith(reportIds, { resolved: true });
     });
 
     it('should handle empty report ids array', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
 
-      mockReportCommentRepository.updateMany.mockResolvedValue({ count: 0 });
+      mockReportCommentRepository.updateManyByIds.mockResolvedValue({ count: 0 });
 
       const result = await service.resolveMultipleAbuseReports([]);
 
       expect(result.count).toBe(0);
-      expect(mockReportCommentRepository.updateMany).toHaveBeenCalledWith({
-        where: {
-          id: { $in: [] },
-        },
-        data: {
-          resolved: true,
-        },
-      });
+      expect(mockReportCommentRepository.updateManyByIds).toHaveBeenCalledWith([], { resolved: true });
     });
   });
 });

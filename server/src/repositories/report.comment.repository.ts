@@ -2,7 +2,7 @@ import { Params } from '@strapi/database/dist/entity-manager/types';
 import { once } from 'lodash';
 import { CoreStrapi } from '../@types';
 import { getConfig } from '../utils/getConfig';
-import { ReportResultValidator, reportResultValidator } from '../validators/repositories';
+import { Report, ReportResultValidator, reportResultValidator } from '../validators/repositories';
 import { shouldValidateArray, shouldValidateObject } from '../validators/repositories/utils';
 import { getModelUid } from './utils';
 
@@ -28,6 +28,14 @@ export const getReportCommentRepositorySource = (strapi: CoreStrapi) => {
     },
     async updateMany(params: Params) {
       return repository.updateMany(params);
+    },
+    async updateManyByIds(ids: number[], data: Partial<Report>) {
+      return repository.updateMany({
+        where: {
+          id: { $in: ids },
+        },
+        data,
+      });
     },
     async create(params: Params) {
       const isValidationEnabled = await getConfig(strapi, 'isValidationEnabled', false);

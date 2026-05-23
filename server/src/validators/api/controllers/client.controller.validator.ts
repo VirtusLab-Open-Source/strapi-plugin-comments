@@ -3,6 +3,7 @@ import { CommentsPluginConfig } from '../../../config';
 import { APPROVAL_STATUS } from '../../../const';
 import { AUTHOR_TYPE, CONFIG_PARAMS } from '../../../utils/constants';
 import { ExtractRightEither } from '../../../utils/Either';
+import { isRecord } from '../../utils';
 import {
   AVAILABLE_OPERATORS,
   externalAuthorSchema,
@@ -308,14 +309,12 @@ export const resolveCommentMultipleAbuseReportsValidator = (
 export const getCommentResolveMultipleAbuseReportsValidator = (
   enabledCollections: string[],
   params: { relation?: string; commentId?: string | number },
-  body: unknown
+  bodyRaw: unknown
 ) => {
-  const bodyPart =
-    body && typeof body === 'object' && !Array.isArray(body)
-      ? (body as Record<string, unknown>)
-      : {};
+  const body = isRecord(bodyRaw) ? bodyRaw : {};
+
   return resolveCommentMultipleAbuseReportsValidator(enabledCollections, {
-    ...bodyPart,
+    ...body,
     relation: params.relation,
     commentId: params.commentId,
   });
