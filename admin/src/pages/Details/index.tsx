@@ -89,6 +89,7 @@ export const Details: FC<{ config: Config }> = ({ config }) => {
                 <DetailsEntry
                   config={config}
                   entity={entity}
+                  selected={selected}
                   filters={filters}
                   onChangeFilters={setFilters}
                   schema={contentTypeData?.schema || ({ attributes: {} } as any)}
