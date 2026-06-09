@@ -148,7 +148,7 @@ export const commentsSchema = z.object({
 
 export const commentDetailsSchema = z.object({
   entity: relatedSchema,
-  selected: baseCommentSchema
+  selected: getCommentSchema()
     .merge(
       z.object({
         related: z.string(),
