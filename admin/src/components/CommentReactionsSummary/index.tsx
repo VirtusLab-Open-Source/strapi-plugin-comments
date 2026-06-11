@@ -22,7 +22,6 @@ export const CommentReactionsSummary: FC<CommentReactionsSummaryProps> = ({
   documentId,
   locale,
 }) => {
-  console.log('CommentReactionsSummary', documentId, locale);
   const fetchClient = useFetchClient();
 
   const typesQuery = useQuery({

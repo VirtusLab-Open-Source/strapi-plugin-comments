@@ -156,6 +156,9 @@ export default {
   'page.settings.form.gqlAuth.label': 'Авторизация запросов GraphQL',
   'page.settings.form.gqlAuth.hint':
     'If enabled, GraphQL API queries & mutations can be triggered only by Authenticated Strapi users. Otherwise API remains open.',
+  'page.settings.form.reactionsEnabled.label': 'Интеграция реакций',
+  'page.settings.form.reactionsEnabled.hint':
+    'Если включено, ответы API комментариев (REST и GraphQL) содержат счётчики реакций. Требуется установленный и включённый плагин Reactions.',
   'page.settings.form.approvalFlow.label': 'Бизнес-процесс согласования',
   'page.settings.form.approvalFlow.hint':
     'Комментарии, связанные с типом контента "{name}", будут проведены через ручной бизнес-процесс согласования',

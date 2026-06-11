@@ -131,6 +131,9 @@ export default {
   'page.settings.form.gqlAuth.label': 'GraphQL queries authorization',
   'page.settings.form.gqlAuth.hint':
     'Se ativado, as queries e mutations da API GraphQL podem ser acionadas apenas por usuários autenticados do Strapi. Caso contrário, a API permanece aberta.',
+  'page.settings.form.reactionsEnabled.label': 'Integração de reações',
+  'page.settings.form.reactionsEnabled.hint':
+    'Se ativado, as respostas da API de comentários (REST e GraphQL) incluem contadores de reações. Requer o plugin Reactions instalado e ativado.',
   'page.settings.form.approvalFlow.label': 'Fluxo de aprovação',
   'page.settings.form.approvalFlow.hint':
     'Os comentários associados ao tipo de conteúdo "{name}" passarão pelo fluxo de aprovação manual',

@@ -22,7 +22,7 @@ export const getStoreRepositorySource = (strapi: CoreStrapi) => {
     async get<T extends boolean>(
       viaSettingsPage?: T,
     ): Promise<
-      Either<unknown, T extends true ? CommentsPluginConfig : Omit<CommentsPluginConfig, 'enabledCollections' | 'moderatorRoles' | 'isGQLPluginEnabled'>>
+      Either<unknown, T extends true ? CommentsPluginConfig : Omit<CommentsPluginConfig, 'enabledCollections' | 'moderatorRoles' | 'isGQLPluginEnabled' | 'isReactionsPluginInstalled'>>
     > {
       const config = await this.getConfig();
       const additionalConfiguration = {
@@ -37,6 +37,7 @@ export const getStoreRepositorySource = (strapi: CoreStrapi) => {
         ),
       };
       const isGQLPluginEnabled = !!strapi.plugin('graphql');
+      const reactionsPluginInstalled = !!strapi.plugin('reactions');
       const reportReasons = this.getLocalConfig('reportReasons');
       if (config) {
         // TODO: add report reasons to config page
@@ -45,6 +46,7 @@ export const getStoreRepositorySource = (strapi: CoreStrapi) => {
           ...additionalConfiguration,
           reportReasons,
           isGQLPluginEnabled: viaSettingsPage ? isGQLPluginEnabled : undefined,
+          isReactionsPluginInstalled: viaSettingsPage ? reactionsPluginInstalled : undefined,
         });
       }
       const entryLabel = this.getLocalConfig('entryLabel');
@@ -67,10 +69,11 @@ export const getStoreRepositorySource = (strapi: CoreStrapi) => {
           enabledCollections,
           moderatorRoles,
           isGQLPluginEnabled,
+          isReactionsPluginInstalled: reactionsPluginInstalled,
         });
       }
 
-      return makeRight(result) as unknown as Either<unknown, T extends true ? CommentsPluginConfig : Omit<CommentsPluginConfig, 'enabledCollections' | 'moderatorRoles' | 'isGQLPluginEnabled'>>;
+      return makeRight(result) as unknown as Either<unknown, T extends true ? CommentsPluginConfig : Omit<CommentsPluginConfig, 'enabledCollections' | 'moderatorRoles' | 'isGQLPluginEnabled' | 'isReactionsPluginInstalled'>>;
     },
     async update(config: CommentsPluginConfig) {
       const pluginStore = await this.getStore();

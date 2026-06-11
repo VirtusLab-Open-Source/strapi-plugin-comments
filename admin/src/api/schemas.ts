@@ -5,6 +5,7 @@ export const configSchema = z.object({
   entryLabel: z.record(z.array(z.string())),
   approvalFlow: z.array(z.string()),
   blockedAuthorProps: z.array(z.string()),
+  reactionsEnabled: z.boolean(),
   reportReasons: z.record(z.string()),
   regex: z.object({
     uid: z.string(),
@@ -15,6 +16,7 @@ export const configSchema = z.object({
   enabledCollections: z.array(z.string()),
   moderatorRoles: z.array(z.string()),
   isGQLPluginEnabled: z.boolean(),
+  isReactionsPluginInstalled: z.boolean(),
   badWords: z.boolean().nullable().optional(),
   gql: z
     .object({

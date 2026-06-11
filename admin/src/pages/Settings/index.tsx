@@ -93,6 +93,7 @@ const Settings = () => {
       updateSettingsMutation.mutate({
         ...values,
         blockedAuthorProps: values.blockedAuthorProps.split(',').map((prop: string) => prop.trim()),
+        reactionsEnabled: values.reactionsEnabled,
       });
     },
     [updateSettingsMutation]
@@ -120,6 +121,7 @@ const Settings = () => {
   const clientUrl = config.data.client?.url;
   const clientEmail = config.data.client?.contactEmail;
   const blockedAuthorProps = config.data.blockedAuthorProps ?? [];
+  const reactionsEnabled = config.data.reactionsEnabled ?? false;
   const onDiscardRestart = () => setIsRestartRequired(false);
 
   return (
@@ -183,6 +185,7 @@ const Settings = () => {
               approvalFlow: config.data.approvalFlow,
               entryLabel: config.data.entryLabel,
               blockedAuthorProps: blockedAuthorProps.join(', '),
+              reactionsEnabled,
             }}
           >
             {({ values, onChange }) => (
@@ -384,6 +387,27 @@ const Settings = () => {
                         <Field.Hint />
                       </Field.Root>
                     </Grid.Item>
+                    <RenderIf condition={config.data.isReactionsPluginInstalled}>
+                      <Grid.Item col={4} xs={12} alignItems="start">
+                        <Field.Root
+                          width="100%"
+                          hint={getMessage('page.settings.form.reactionsEnabled.hint')}
+                        >
+                          <Field.Label>
+                            {getMessage('page.settings.form.reactionsEnabled.label')}
+                          </Field.Label>
+                          <Toggle
+                            name="reactionsEnabled"
+                            checked={values.reactionsEnabled}
+                            onChange={onChange}
+                            onLabel={getMessage('components.toogle.enabled')}
+                            offLabel={getMessage('components.toogle.disabled')}
+                            width="100%"
+                          />
+                          <Field.Hint />
+                        </Field.Root>
+                      </Grid.Item>
+                    </RenderIf>
                   </Grid.Root>
                 </Box>
                 <Box {...boxDefaultProps}>

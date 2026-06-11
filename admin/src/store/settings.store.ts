@@ -26,6 +26,7 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
     enabledCollections: [],
     moderatorRoles: [],
     isGQLPluginEnabled: false,
+    isReactionsPluginInstalled: false,
     client: {
       url: '',
       contactEmail: '',
