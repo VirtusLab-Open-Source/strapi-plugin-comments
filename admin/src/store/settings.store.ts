@@ -11,6 +11,7 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
     entryLabel: {},
     approvalFlow: [],
     blockedAuthorProps: [],
+    reactionsEnabled: false,
     reportReasons: {
       BAD_LANGUAGE: 'BAD_LANGUAGE',
       DISCRIMINATION: 'DISCRIMINATION',

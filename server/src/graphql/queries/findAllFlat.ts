@@ -22,7 +22,7 @@ export default (strapi: CoreStrapi, nexus: Nexus) => {
     },
     async resolve(obj: Object, args) {
       const { relation, filters, sort, pagination } = args;
-      return await getPluginService(strapi, 'common').findAllFlat(
+      const response = await getPluginService(strapi, 'common').findAllFlat(
         flatInput({
           relation,
           filters: getPluginService(strapi, 'gql').graphQLFiltersToStrapiQuery(filters, contentType),
@@ -31,6 +31,14 @@ export default (strapi: CoreStrapi, nexus: Nexus) => {
         }),
         undefined,
       );
+
+      return {
+        data: response.data,
+        pagination: response.pagination,
+        meta: {
+          reactions: response.meta?.reactions,
+        },
+      };
     },
   };
 };
