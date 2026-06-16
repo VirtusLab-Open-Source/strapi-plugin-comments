@@ -37,7 +37,7 @@ export const getStoreRepositorySource = (strapi: CoreStrapi) => {
         ),
       };
       const isGQLPluginEnabled = !!strapi.plugin('graphql');
-      const reactionsPluginInstalled = !!strapi.plugin('reactions');
+      const isReactionsPluginInstalled = !!strapi.plugin('reactions');
       const reportReasons = this.getLocalConfig('reportReasons');
       if (config) {
         // TODO: add report reasons to config page
@@ -46,7 +46,7 @@ export const getStoreRepositorySource = (strapi: CoreStrapi) => {
           ...additionalConfiguration,
           reportReasons,
           isGQLPluginEnabled: viaSettingsPage ? isGQLPluginEnabled : undefined,
-          isReactionsPluginInstalled: viaSettingsPage ? reactionsPluginInstalled : undefined,
+          isReactionsPluginInstalled: viaSettingsPage ? isReactionsPluginInstalled : undefined,
         });
       }
       const entryLabel = this.getLocalConfig('entryLabel');
@@ -69,7 +69,7 @@ export const getStoreRepositorySource = (strapi: CoreStrapi) => {
           enabledCollections,
           moderatorRoles,
           isGQLPluginEnabled,
-          isReactionsPluginInstalled: reactionsPluginInstalled,
+          isReactionsPluginInstalled,
         });
       }
 

@@ -25,7 +25,7 @@ export const reactionsService = ({ strapi }: StrapiContext) => ({
   },
 
   isPluginInstalled() {
-    return Object.keys(strapi.plugins).includes('reactions');
+    return !!strapi.plugin('reactions');
   },
 
   async isEnabled() {
