@@ -47,6 +47,8 @@ describe('client.service', () => {
   const mockCommentRepository = {
     create: jest.fn(),
     update: jest.fn(),
+    findOne: jest.fn(),
+    findMany: jest.fn(),
   };
 
   const mockReportCommentRepository = {
@@ -70,9 +72,19 @@ describe('client.service', () => {
     error: jest.fn(),
   };
 
+  const mockReactionsService = {
+    removeForComments: jest.fn().mockResolvedValue(undefined),
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
-    caster<jest.Mock>(getPluginService).mockReturnValue(mockCommonService);
+    caster<jest.Mock>(getPluginService).mockImplementation((_strapi, name: string) => {
+      if (name === 'reactions') {
+        return mockReactionsService;
+      }
+
+      return mockCommonService;
+    });
     caster<jest.Mock>(getCommentRepository).mockReturnValue(
       mockCommentRepository
     );
@@ -441,13 +453,21 @@ describe('client.service', () => {
     it('should mark comment as removed when all validations pass', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
-      const mockEntity = { id: 1, content: 'Test comment', removed: true };
+      const mockEntity = {
+        id: 1,
+        documentId: 'doc-1',
+        content: 'Test comment',
+        removed: true,
+        locale: 'en',
+      };
       const mockSanitizedEntity = { id: 1, content: '[removed]', removed: true };
 
       jest.spyOn(service, 'markAsRemovedNested').mockResolvedValue(true);
 
       mockCommonService.isValidUserContext.mockReturnValue(true);
       mockCommonService.findOne.mockResolvedValue(mockEntity);
+      mockCommentRepository.findOne.mockResolvedValue(mockEntity);
+      mockCommentRepository.findMany.mockResolvedValue([]);
       mockCommentRepository.update.mockResolvedValue(mockEntity);
       mockCommonService.sanitizeCommentEntity.mockReturnValue(mockSanitizedEntity);
 
@@ -455,6 +475,7 @@ describe('client.service', () => {
 
       expect(result).toEqual(mockSanitizedEntity);
       expect(service.markAsRemovedNested).toHaveBeenCalledWith(1, true);
+      expect(mockReactionsService.removeForComments).toHaveBeenCalledWith(['doc-1'], 'en');
       expect(mockCommentRepository.update).toHaveBeenCalledWith({
         where: {
           id: 1,

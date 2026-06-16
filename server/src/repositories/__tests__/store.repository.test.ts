@@ -93,6 +93,19 @@ describe('Store repository', () => {
       });
     });
 
+    it('includes isReactionsPluginInstalled as false when reactions plugin is not installed', async () => {
+      const strapi = getStrapi();
+      const mockConfig = { entryLabel: 'test', approvalFlow: true };
+      mockStore.get.mockResolvedValue(mockConfig);
+      caster<jest.Mock>(strapi.plugin).mockImplementation((name: string) =>
+        name === 'graphql' ? { kind: 'plugin' } : undefined,
+      );
+
+      const result = await getRepository(strapi).get(true);
+
+      expect(result.right).toHaveProperty('isReactionsPluginInstalled', false);
+    });
+
     it('returns local config when store is empty', async () => {
       const strapi = getStrapi();
       mockStore.get.mockResolvedValue(null);
@@ -116,11 +129,14 @@ describe('Store repository', () => {
     it('includes additional fields when viaSettingsPage is true', async () => {
       const strapi = getStrapi();
       mockStore.get.mockResolvedValue(null);
-      caster<jest.Mock>(strapi.plugin).mockReturnValue(true); // Mock graphql plugin enabled
+      caster<jest.Mock>(strapi.plugin).mockImplementation((name: string) =>
+        name === 'graphql' || name === 'reactions' ? true : undefined,
+      );
 
       const result = await getRepository(strapi).get(true);
 
       expect(result.right).toHaveProperty('isGQLPluginEnabled', true);
+      expect(result.right).toHaveProperty('isReactionsPluginInstalled', true);
       expect(result.right).toHaveProperty('enabledCollections');
       expect(result.right).toHaveProperty('moderatorRoles');
     });
@@ -233,6 +249,7 @@ describe('Store repository', () => {
           enabledCollections: ['api::article.article'],
           moderatorRoles: ['authenticated'],
           isGQLPluginEnabled: true,
+          isReactionsPluginInstalled: true,
           regex: expect.any(Object),
         });
       });
