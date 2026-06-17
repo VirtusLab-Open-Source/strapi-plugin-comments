@@ -42,6 +42,7 @@ describe('client.service', () => {
     findOne: jest.fn(),
     sanitizeCommentEntity: jest.fn(),
     sanitizeCommentContent: jest.fn((content: string) => content),
+    modifiedNestedNestedComments: jest.fn(),
   };
 
   const mockCommentRepository = {
@@ -294,6 +295,109 @@ describe('client.service', () => {
         PluginError
       );
     });
+
+    it('should throw error when threadOf does not exist', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue({ id: 1 });
+      mockCommonService.getConfig.mockResolvedValue([]);
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.findOne.mockRejectedValue(new Error('Not found'));
+
+      await expect(
+        service.create({ ...mockPayload, threadOf: 99 }, mockUser),
+      ).rejects.toMatchObject({
+        status: 400,
+        message: 'Thread does not exist',
+      });
+    });
+
+    it('should throw error when author data is incomplete', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue({ id: 1 });
+      mockCommonService.getConfig.mockResolvedValue([]);
+      mockCommonService.isValidUserContext.mockReturnValue(false);
+      mockCommonService.checkBadWords.mockResolvedValue('Test comment');
+
+      await expect(
+        service.create(
+          {
+            ...mockPayload,
+            author: {
+              name: 'Author Name',
+              email: 'author@test.com',
+            },
+          },
+          undefined,
+        ),
+      ).rejects.toMatchObject({
+        status: 400,
+        message:
+          'Not able to recognise author of a comment. Make sure you\'ve provided "author" property in a payload or authenticated your request properly.',
+      });
+    });
+
+    it('should throw error when approval status is invalid for approval flow', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue({ id: 1, requireCommentsApproval: false });
+      mockCommonService.getConfig.mockResolvedValue(['api::test.test']);
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.checkBadWords.mockResolvedValue('Test comment');
+
+      await expect(
+        service.create(
+          { ...mockPayload, approvalStatus: APPROVAL_STATUS.APPROVED },
+          mockUser,
+        ),
+      ).rejects.toMatchObject({
+        status: 400,
+        message: 'Invalid approval status',
+      });
+    });
+
+    it('should still return created comment when response notification fails', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockEntity = { id: 1, content: 'Test comment' };
+      const mockSanitizedEntity = { id: 1, content: 'Clean comment' };
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue({ id: 1 });
+      mockCommonService.getConfig.mockResolvedValue([]);
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.checkBadWords.mockResolvedValue('Test comment');
+      mockCommentRepository.create.mockResolvedValue(mockEntity);
+      mockCommonService.sanitizeCommentEntity.mockReturnValue(mockSanitizedEntity);
+      jest.spyOn(service, 'sendResponseNotification').mockRejectedValue(new Error('Email failed'));
+
+      const result = await service.create(mockPayload, mockUser);
+
+      expect(result).toEqual(mockSanitizedEntity);
+      expect(consoleErrorSpy).toHaveBeenCalled();
+
+      consoleErrorSpy.mockRestore();
+    });
   });
 
   describe('update', () => {
@@ -440,6 +544,50 @@ describe('client.service', () => {
 
       await expect(service.reportAbuse(mockPayload, mockUser)).rejects.toThrow(PluginError);
     });
+
+    it('should throw error when user context is invalid', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.isValidUserContext.mockReturnValue(false);
+
+      await expect(service.reportAbuse(mockPayload, mockUser)).rejects.toThrow(PluginError);
+      expect(mockCommonService.findOne).not.toHaveBeenCalled();
+    });
+
+    it('should return report even when abuse report email fails', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComment = { id: 1, content: 'Test comment', isAdminComment: false };
+      const mockReport = { id: 1, reason: REPORT_REASON.BAD_LANGUAGE, content: 'Report content' };
+
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.findOne.mockResolvedValue(mockComment);
+      mockReportCommentRepository.create.mockResolvedValue(mockReport);
+      jest.spyOn(service, 'sendAbuseReportEmail').mockRejectedValue(new Error('Email failed'));
+
+      const result = await service.reportAbuse(mockPayload, mockUser);
+
+      expect(result).toEqual({
+        ...mockReport,
+        related: mockComment,
+      });
+    });
+
+    it('should throw error when report cannot be created', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComment = { id: 1, content: 'Test comment', isAdminComment: false };
+
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.findOne.mockResolvedValue(mockComment);
+      mockReportCommentRepository.create.mockResolvedValue(null);
+
+      await expect(service.reportAbuse(mockPayload, mockUser)).rejects.toMatchObject({
+        status: 500,
+        message: 'Report cannot be created',
+      });
+    });
   });
 
   describe('markAsRemoved', () => {
@@ -494,6 +642,88 @@ describe('client.service', () => {
       mockCommonService.findOne.mockResolvedValue(null);
 
       await expect(service.markAsRemoved(mockPayload, mockUser)).rejects.toThrow(PluginError);
+    });
+
+    it('should throw error when user context is invalid and authorId is missing', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.isValidUserContext.mockReturnValue(false);
+
+      await expect(service.markAsRemoved(mockPayload, undefined as any)).rejects.toThrow(
+        PluginError,
+      );
+      expect(mockCommonService.findOne).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when neither authenticated user id nor authorId is provided', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+
+      await expect(
+        service.markAsRemoved(
+          { ...mockPayload, authorId: null },
+          { email: 'test@test.com', username: 'test' } as AdminUser,
+        ),
+      ).rejects.toMatchObject({
+        status: 403,
+        message:
+          'You\'re not allowed to take an action on that entity. Make sure that you\'ve provided proper "authorId" or authenticated your request properly.',
+      });
+    });
+
+    it('should mark comment as removed using authorId when no authenticated user is provided', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockEntity = {
+        id: 1,
+        documentId: 'doc-1',
+        content: 'Test comment',
+        removed: true,
+        locale: 'pl',
+      };
+      const mockSanitizedEntity = { id: 1, content: '[removed]', removed: true };
+
+      jest.spyOn(service, 'markAsRemovedNested').mockResolvedValue(true);
+
+      mockCommonService.isValidUserContext.mockReturnValue(false);
+      mockCommonService.findOne.mockResolvedValue(mockEntity);
+      mockCommentRepository.findOne.mockResolvedValue(mockEntity);
+      mockCommentRepository.findMany.mockResolvedValue([]);
+      mockCommentRepository.update.mockResolvedValue(mockEntity);
+      mockCommonService.sanitizeCommentEntity.mockReturnValue(mockSanitizedEntity);
+
+      const result = await service.markAsRemoved(
+        { ...mockPayload, authorId: 42 },
+        undefined as any,
+      );
+
+      expect(result).toEqual(mockSanitizedEntity);
+      expect(mockCommonService.findOne).toHaveBeenCalledWith({
+        id: 1,
+        related: 'api::test.test:1',
+        authorId: 42,
+      });
+    });
+  });
+
+  describe('markAsRemovedNested', () => {
+    it('should delegate nested comment removal to common service', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
+
+      const result = await service.markAsRemovedNested(5, true);
+
+      expect(result).toBe(true);
+      expect(mockCommonService.modifiedNestedNestedComments).toHaveBeenCalledWith(
+        5,
+        'removed',
+        true,
+      );
     });
   });
 
