@@ -713,6 +713,38 @@ describe('common.service', () => {
 
       expect(typedResult[0].children).toHaveLength(0); // drop blocked threads
     });
+
+    it('should return hierarchy without reactions when reactions integration is disabled', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComments = [
+        { id: 1, content: 'Parent 1', threadOf: null, documentId: 'doc-1', gotThread: true },
+        { id: 2, content: 'Child 1', threadOf: '1', documentId: 'doc-2', gotThread: false },
+      ];
+
+      mockReactionsService.isEnabled.mockResolvedValue(false);
+      mockCommentRepository.findMany.mockResolvedValue(mockComments);
+      caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
+      mockCommentRepository.findWithCount.mockImplementation(async (args) => {
+        const threadOf = args?.where?.threadOf?.$eq ?? null;
+        const filtered = mockComments.filter((c) => c.threadOf === threadOf);
+        return {
+          results: filtered,
+          pagination: { total: filtered.length },
+        };
+      });
+      mockStoreRepository.getConfig.mockResolvedValue([]);
+
+      const result = await service.findAllInHierarchy({
+        fields: ['id', 'content', 'threadOf', 'documentId', 'gotThread'],
+      });
+
+      const typedResult = result as CommentWithChildren[];
+
+      expect(typedResult).toHaveLength(1);
+      expect(typedResult[0]).not.toHaveProperty('reactions');
+      expect(mockReactionsService.getCountsForComments).not.toHaveBeenCalled();
+    });
   });
 
   describe('updateComment', () => {

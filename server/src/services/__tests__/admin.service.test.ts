@@ -61,11 +61,21 @@ describe('admin.service', () => {
     delete: jest.fn(),
   };
 
+  const mockReactionsService = {
+    removeForComments: jest.fn().mockResolvedValue(undefined),
+  };
+
   const mockFindOne = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
-    caster<jest.Mock>(getPluginService).mockReturnValue(mockCommonService);
+    caster<jest.Mock>(getPluginService).mockImplementation((_strapi, name: string) => {
+      if (name === 'reactions') {
+        return mockReactionsService;
+      }
+
+      return mockCommonService;
+    });
     caster<jest.Mock>(getCommentRepository).mockReturnValue(mockCommentRepository);
     caster<jest.Mock>(getReportCommentRepository).mockReturnValue(mockReportCommentRepository);
     caster<jest.Mock>(getDefaultAuthorPopulate).mockReturnValue(true);
@@ -862,6 +872,28 @@ describe('admin.service', () => {
         where: { id: 1 },
         data: { removed: true },
       });
+    });
+
+    it('should remove reactions when deleted comment has documentId', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommentRepository.findOne.mockResolvedValue({
+        id: 1,
+        documentId: 'doc-1',
+        locale: 'en',
+        removed: false,
+      });
+      mockCommentRepository.update.mockResolvedValue({
+        id: 1,
+        documentId: 'doc-1',
+        locale: 'en',
+        removed: true,
+      });
+
+      await service.deleteComment(1);
+
+      expect(mockReactionsService.removeForComments).toHaveBeenCalledWith(['doc-1'], 'en');
     });
 
     it('should handle non-existent comment', async () => {
