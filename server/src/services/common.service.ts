@@ -423,7 +423,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     return this.sanitizeCommentEntity(updatedEntry, []);
   },
 
-  async approveComment(id: Id, commentRepository: CommentRepository) {
+  async approveComment(id: Id, commentRepository = getCommentRepository(strapi)) {
     const entity = await commentRepository.update({
       where: { id },
       data: { approvalStatus: APPROVAL_STATUS.APPROVED },
@@ -434,7 +434,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     return this.sanitizeCommentEntity(entity, []);
   },
 
-  async rejectComment(id: Id, commentRepository: CommentRepository) {
+  async rejectComment(id: Id, commentRepository = getCommentRepository(strapi)) {
     const entity = await commentRepository.update({
       where: { id },
       data: { approvalStatus: APPROVAL_STATUS.REJECTED },
@@ -508,7 +508,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
     });
   },
 
-  async resolveAllAbuseReportsForThread(commentId: number, commentRepository: CommentRepository) {
+  async resolveAllAbuseReportsForThread(commentId: number, commentRepository = getCommentRepository(strapi)) {
     if (!commentId) {
       throw new PluginError(
         400,

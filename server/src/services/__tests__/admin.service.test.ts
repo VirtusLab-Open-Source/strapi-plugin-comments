@@ -791,7 +791,7 @@ describe('admin.service', () => {
       const result = await service.approveComment(1, mockCommentRepository);
 
       expect(result).toEqual(mockResult);
-      expect(mockCommonService.approveComment).toHaveBeenCalledWith(1);
+      expect(mockCommonService.approveComment).toHaveBeenCalledWith(1, mockCommentRepository);
     });
   });
 
@@ -959,7 +959,7 @@ describe('admin.service', () => {
       const result = await service.rejectComment(1, mockCommentRepository);
 
       expect(result).toEqual(mockResult);
-      expect(mockCommonService.rejectComment).toHaveBeenCalledWith(1);
+      expect(mockCommonService.rejectComment).toHaveBeenCalledWith(1, mockCommentRepository);
     });
   });
 
@@ -1046,7 +1046,7 @@ describe('admin.service', () => {
       const result = await service.resolveAllAbuseReportsForThread(1, mockCommentRepository);
 
       expect(result).toEqual(expected);
-      expect(mockCommonService.resolveAllAbuseReportsForThread).toHaveBeenCalledWith(1);
+      expect(mockCommonService.resolveAllAbuseReportsForThread).toHaveBeenCalledWith(1, mockCommentRepository);
     });
   });
 
