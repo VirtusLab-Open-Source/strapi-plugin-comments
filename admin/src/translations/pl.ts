@@ -158,9 +158,9 @@ export default {
   'page.settings.form.gqlAuth.label': 'Autoryzacja zapytań GraphQL',
   'page.settings.form.gqlAuth.hint':
     'Jeśli jest włączone, zapytania i mutacje interfejsu API GraphQL mogą być wywoływane tylko przez uwierzytelnionych użytkowników Strapi. W przeciwnym razie API pozostaje otwarte.',
-  'page.settings.form.reactionsEnabled.label': 'Integracja reakcji',
+  'page.settings.form.reactionsEnabled.label': 'Integracja z pluginem Reakcji',
   'page.settings.form.reactionsEnabled.hint':
-    'Po włączeniu odpowiedzi API komentarzy (REST i GraphQL) zawierają liczniki reakcji. Wymaga zainstalowanego i włączonego pluginu Reactions.',
+    'Po włączeniu odpowiedzi API komentarzy (REST i GraphQL) zawierają liczniki reakcji. Wymaga zainstalowanego i włączonego pluginu Reakcji.',
   'page.settings.form.approvalFlow.label': 'Przebieg zatwierdzania',
   'page.settings.form.approvalFlow.hint':
     'Komentarze powiązane z typem zawartości "{name}" będą podlegały ręcznemu procesowi zatwierdzania',
