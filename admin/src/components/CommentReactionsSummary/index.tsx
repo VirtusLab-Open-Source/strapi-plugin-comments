@@ -1,17 +1,12 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 import { get, isEmpty } from 'lodash';
 import { Data } from '@strapi/strapi';
 import { Box, Divider, Grid, Typography } from '@strapi/design-system';
-import { useQuery } from '@tanstack/react-query';
-import { useFetchClient } from '@strapi/strapi/admin';
-
 import { ReactionCounter } from '../ReactionCounter';
 import { getMessage } from '../../utils';
-import {
-  fetchReactionCounts,
-  fetchReactionTypes,
-  ReactionType,
-} from '../../utils/reactionsIntegration';
+import { ReactionType } from '../../utils/reactionsIntegration';
+import { useReactionCounts } from '../../hooks/useReactionCounts';
+import { useReactionTypes } from '../../hooks/useReactionTypes';
 
 type CommentReactionsSummaryProps = {
   documentId?: Data.DocumentID;
@@ -22,20 +17,8 @@ export const CommentReactionsSummary: FC<CommentReactionsSummaryProps> = ({
   documentId,
   locale,
 }) => {
-  const fetchClient = useFetchClient();
-
-  const typesQuery = useQuery({
-    queryKey: ['comments-reactions-config'],
-    queryFn: () => fetchReactionTypes(fetchClient),
-    retry: false,
-  });
-
-  const countsQuery = useQuery({
-    queryKey: ['comments-reactions-counts', documentId, locale],
-    queryFn: () => fetchReactionCounts(documentId!, locale || undefined, fetchClient),
-    enabled: Boolean(documentId),
-    retry: false,
-  });
+  const typesQuery = useReactionTypes();
+  const countsQuery = useReactionCounts(documentId!, locale);
 
   if (typesQuery.isError || countsQuery.isError) {
     return null;
