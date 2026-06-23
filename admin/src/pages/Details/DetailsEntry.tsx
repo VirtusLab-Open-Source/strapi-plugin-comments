@@ -56,7 +56,7 @@ export const DetailsEntry: FC<DetailsEntryProps> = ({
     <Box padding={4} background="neutral0" width="100%">
       <CommentReactionsSummary
         documentId={selected?.documentId}
-        locale={(selected as { locale?: string | null } | undefined)?.locale}
+        locale={selected?.locale}
       />
       {canEntityRender && (
         <Box marginBottom={4}>

@@ -138,7 +138,8 @@ const commentSchema: z.ZodType<Comment> = getCommentSchema();
 export type Comment = BaseComment & {
   threadOf?: Comment | null
   related?: z.infer<typeof relatedSchema> | string
-  documentId?: string
+  documentId?: string,
+  locale?: string | null
 };
 
 
