@@ -1,6 +1,7 @@
+import type { FC } from 'react';
 import { Tooltip } from '@strapi/design-system';
 import { usePluginTheme } from '@sensinum/strapi-utils';
-
+import type { ReactionType } from 'src/utils/reactionsIntegration';
 import {
   ReactionCounterContainer,
   ReactionCounterDot,
@@ -9,19 +10,11 @@ import {
   ReactionName,
 } from './styled';
 
-export type ReactionCounterProps = {
-  name: string;
-  icon?: { url?: string } | null;
-  emoji?: string | null;
+type ReactionCounterProps = Omit<ReactionType, 'slug'> & {
   count: number;
 };
 
-export const ReactionCounter = ({
-  name,
-  icon,
-  emoji,
-  count = 0,
-}: ReactionCounterProps) => {
+export const ReactionCounter: FC<ReactionCounterProps> = ({ name, icon, emoji, count = 0 }) => {
   const { theme } = usePluginTheme();
 
   return (
