@@ -1,5 +1,4 @@
 import { Box, Divider, Flex, Typography, Checkbox } from '@strapi/design-system';
-import { useQueryClient } from '@tanstack/react-query';
 import { capitalize, first, isEmpty, isNil, take } from 'lodash';
 import { FC, useCallback } from 'react';
 import { Comment, CommentDetails, Config, ContentType } from '../../api/schemas';
@@ -25,7 +24,6 @@ export const DetailsEntry: FC<DetailsEntryProps> = ({
   const { entryLabel = {} } = config;
   const { attributes = {} } = schema;
   const { removed = false } = filters;
-  const queryClient = useQueryClient();
 
   const keys = Object.keys(attributes);
   const entityLabelKey = first(entryLabel[entity?.uid]);
