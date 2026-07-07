@@ -9,7 +9,7 @@ import { useReactionCounts } from '../../hooks/useReactionCounts';
 import { useReactionTypes } from '../../hooks/useReactionTypes';
 
 type CommentReactionsSummaryProps = {
-  documentId?: Data.DocumentID;
+  documentId: Data.DocumentID;
   locale?: string | null;
 };
 
@@ -18,7 +18,7 @@ export const CommentReactionsSummary: FC<CommentReactionsSummaryProps> = ({
   locale,
 }) => {
   const typesQuery = useReactionTypes();
-  const countsQuery = useReactionCounts(documentId!, locale);
+  const countsQuery = useReactionCounts(documentId, locale);
 
   if (typesQuery.isError || countsQuery.isError) {
     return null;

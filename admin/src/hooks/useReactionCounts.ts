@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Data } from '@strapi/strapi';
 import { useFetchClient } from '@strapi/strapi/admin';
 import { fetchReactionCounts } from '../utils/reactionsIntegration';
-import { ValidationError } from '../utils/errors';
+import { assertNonEmpty } from 'src/utils/functions';
 
 export const useReactionCounts = (documentId: Data.DocumentID, locale?: string | null) => {
   const { get } = useFetchClient();
@@ -10,9 +10,7 @@ export const useReactionCounts = (documentId: Data.DocumentID, locale?: string |
   return useQuery({
     queryKey: ['comments-reactions-counts', documentId, locale],
     queryFn: () => {
-      if (!documentId) {
-        throw new ValidationError('documentId is required to fetch reaction counts');
-      }
+      assertNonEmpty<Data.DocumentID>(documentId);
 
       return fetchReactionCounts(documentId, locale || undefined, get);
     },
