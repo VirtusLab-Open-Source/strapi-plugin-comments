@@ -338,10 +338,10 @@ const Settings = () => {
                     <Grid.Item col={4} xs={12} alignItems="start">
                       <Field.Root
                         width="100%"
-                        hint={getMessage('page.settings.form.enabledCollections.hint')}
+                        hint={getMessage('page.settings.form.badWords.hint')}
                       >
-                        <Field.Label htmlFor="enabledCollections">
-                          {getMessage('page.settings.form.enabledCollections.label')}
+                        <Field.Label htmlFor="badWords">
+                          {getMessage('page.settings.form.badWords.label')}
                         </Field.Label>
                         <Toggle
                           name="badWords"
