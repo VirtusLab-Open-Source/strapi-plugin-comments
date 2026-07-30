@@ -156,6 +156,9 @@ export default {
   'page.settings.form.gqlAuth.label': 'GraphQL Sorgu Yetkileri',
   'page.settings.form.gqlAuth.hint':
     'Etkinse, GraphQL API sorguları ve mutasyonları yalnızca kimliği doğrulanmış Strapi kullanıcıları tarafından tetiklenebilir. Aksi takdirde API açık kalır.',
+  'page.settings.form.reactionsEnabled.label': 'Tepki entegrasyonu',
+  'page.settings.form.reactionsEnabled.hint':
+    'Etkinleştirildiğinde, yorum API yanıtları (REST ve GraphQL) tepki sayılarını içerir. Reactions eklentisinin kurulu ve etkin olması gerekir.',
   'page.settings.form.approvalFlow.label': 'Onay akışı',
   'page.settings.form.approvalFlow.hint':
     'İçerik türü "{name}" ile ilişkili yorumlar manuel onay akışı yoluyla alınacak',

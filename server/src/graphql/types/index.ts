@@ -4,6 +4,8 @@ import { getComment } from './getComment';
 import { getCommentAuthor } from './getCommentAuthor';
 import { getCommentAuthorType } from './getCommentAuthorType';
 import { getCommentNested } from './getCommentNested';
+import { getCommentReactionCount } from './getCommentReactionCount';
+import { getCommentReactionsMetaEntry } from './getCommentReactionsMetaEntry';
 import { getCreateComment } from './getCreateComment';
 import { getCreateCommentAuthor } from './getCreateCommentAuthor';
 import { getCreateReport } from './getCreateReport';
@@ -28,6 +30,8 @@ const typesFactories = [
   getCommentAuthor,
   getCommentAuthorType,
   getCommentNested,
+  getCommentReactionCount,
+  getCommentReactionsMetaEntry,
   getCreateComment,
   getCreateCommentAuthor,
   getCreateReport,

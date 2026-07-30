@@ -1,22 +1,29 @@
 import { Box, Divider, Flex, Typography, Checkbox } from '@strapi/design-system';
-import { useQueryClient } from '@tanstack/react-query';
 import { capitalize, first, isEmpty, isNil, take } from 'lodash';
 import { FC, useCallback } from 'react';
-import { CommentDetails, Config, ContentType } from '../../api/schemas';
+import { Comment, CommentDetails, Config, ContentType } from '../../api/schemas';
+import { CommentReactionsSummary } from '../../components/CommentReactionsSummary';
 import { getMessage } from '../../utils';
 
 type DetailsEntryProps = {
   readonly config: Config;
   readonly entity: CommentDetails['entity'];
+  readonly selected?: Comment | null;
   readonly filters: Record<string, unknown>;
   readonly onChangeFilters: (filters: Record<string, unknown>) => void;
   readonly schema: ContentType['data']['schema'];
 };
-export const DetailsEntry: FC<DetailsEntryProps> = ({ config, entity, filters, onChangeFilters, schema }) => {
+export const DetailsEntry: FC<DetailsEntryProps> = ({
+  config,
+  entity,
+  selected,
+  filters,
+  onChangeFilters,
+  schema,
+}) => {
   const { entryLabel = {} } = config;
   const { attributes = {} } = schema;
   const { removed = false } = filters;
-  const queryClient = useQueryClient();
 
   const keys = Object.keys(attributes);
   const entityLabelKey = first(entryLabel[entity?.uid]);
@@ -45,6 +52,10 @@ export const DetailsEntry: FC<DetailsEntryProps> = ({ config, entity, filters, o
 
   return (
     <Box padding={4} background="neutral0" width="100%">
+      <CommentReactionsSummary
+        documentId={selected?.documentId}
+        locale={selected?.locale}
+      />
       {canEntityRender && (
         <Box marginBottom={4}>
           <Typography

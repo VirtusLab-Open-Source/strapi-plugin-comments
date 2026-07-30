@@ -15,9 +15,15 @@ import { client as clientValidator } from '../validators/api';
 import { Comment, CommentRelated, CommentWithRelated } from '../validators/repositories';
 import { Pagination } from '../validators/repositories/utils';
 import { buildAuthorModel, filterOurResolvedReports, getRelatedGroups } from './utils/functions';
+import { getPluginService } from '../utils/getPluginService';
+import { ReactionsMeta } from './reactions.service';
+import {
+  attachReactionsToComments,
+  collectCommentDocumentIds,
+} from './utils/reactions';
 
 const PAGE_SIZE = 10;
-const REQUIRED_FIELDS = ['id'];
+const REQUIRED_FIELDS = ['id', 'documentId'];
 
 type ParsedRelation = {
   uid: UID.ContentType;
@@ -97,9 +103,12 @@ const commonService = ({ strapi }: StrapiContext) => ({
   ): Promise<{
     data: Array<CommentWithRelated | Comment>;
     pagination?: Pagination;
+    meta?: {
+      reactions: ReactionsMeta;
+    };
   }> {
     const omit = baseOmit.filter((field) => !REQUIRED_FIELDS.includes(field));
-    const defaultSelect = (['id', 'related'] as const).filter((field) => !omit.includes(field));
+    const defaultSelect = (['id', 'documentId', 'related'] as const).filter((field) => !omit.includes(field));
 
     const populateClause: clientValidator.FindAllFlatSchema['populate'] = {
       authorUser: {
@@ -187,11 +196,34 @@ const commonService = ({ strapi }: StrapiContext) => ({
       );
     });
 
+    const data = hasRelatedEntitiesToMap
+      ? result.map((_) => this.mergeRelatedEntityTo(_, relatedEntities))
+      : result;
+
+    const reactionsService = getPluginService(strapi, 'reactions');
+    const reactionsEnabled = await reactionsService.isEnabled();
+
+    if (!reactionsEnabled) {
+      return {
+        data,
+        pagination: resultPaginationData,
+      };
+    }
+
+    const reactionsMeta = await reactionsService.getCountsForComments(
+      data.map((entry) => entry.documentId),
+      locale,
+    );
+
     return {
-      data: hasRelatedEntitiesToMap
-        ? result.map((_) => this.mergeRelatedEntityTo(_, relatedEntities))
-        : result,
+      data: attachReactionsToComments(
+        data as Array<CommentWithRelated | Comment>,
+        reactionsMeta,
+      ),
       pagination: resultPaginationData,
+      meta: {
+        reactions: reactionsMeta,
+      },
     };
   },
 
@@ -324,7 +356,18 @@ const commonService = ({ strapi }: StrapiContext) => ({
       )
     );
 
-    return rootEntriesWithChildren;
+    const reactionsService = getPluginService(strapi, 'reactions');
+
+    if (!(await reactionsService.isEnabled())) {
+      return rootEntriesWithChildren;
+    }
+
+    const reactionsMeta = await reactionsService.getCountsForComments(
+      collectCommentDocumentIds(rootEntriesWithChildren),
+      locale,
+    );
+
+    return attachReactionsToComments(rootEntriesWithChildren, reactionsMeta);
   },
 
   // Find single comment
@@ -591,7 +634,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
             }))
         );
       })
-    ).then((result) => result.flat(2));
+    ).then((result) => result.flat(2) as Array<CommentRelated>);
   },
 
   // Merge related entity with comment

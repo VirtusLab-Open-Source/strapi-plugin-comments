@@ -10,6 +10,7 @@ import { client } from '../validators/api';
 import { Comment } from '../validators/repositories';
 import { emailService } from './email.service';
 import { resolveUserContextError } from './utils/functions';
+import { collectNestedCommentDocumentIds } from './utils/reactions';
 
 /**
  * Comments Plugin - Client services
@@ -221,6 +222,13 @@ export const clientService = ({ strapi }: StrapiContext) => {
             });
 
           await this.markAsRemovedNested(commentId, true);
+
+          const commentDocumentIds = await collectNestedCommentDocumentIds({ strapi }, commentId);
+          await getPluginService(strapi, 'reactions').removeForComments(
+            commentDocumentIds,
+            removedEntity.locale,
+          );
+
           const doNotPopulateAuthor = await this.getCommonService().getConfig(CONFIG_PARAMS.AUTHOR_BLOCKED_PROPS, []);
 
           return this.getCommonService().sanitizeCommentEntity(removedEntity, doNotPopulateAuthor);

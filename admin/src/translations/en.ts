@@ -157,6 +157,9 @@ const en = {
   'page.settings.form.gqlAuth.label': 'GraphQL queries authorization',
   'page.settings.form.gqlAuth.hint':
     'If enabled, GraphQL API queries & mutations can be triggered only by Authenticated Strapi users. Otherwise API remains open.',
+  'page.settings.form.reactionsEnabled.label': 'Reactions integration',
+  'page.settings.form.reactionsEnabled.hint':
+    'If enabled, comment responses in REST and GraphQL APIs include reaction counts. Requires the Reactions plugin to be installed and enabled.',
   'page.settings.form.approvalFlow.label': 'Approval flow',
   'page.settings.form.approvalFlow.hint':
     'Comments associated with content type "{name}" are going to be taken through manual approval flow',

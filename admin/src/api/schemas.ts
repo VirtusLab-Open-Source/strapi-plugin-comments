@@ -5,6 +5,7 @@ export const configSchema = z.object({
   entryLabel: z.record(z.array(z.string())),
   approvalFlow: z.array(z.string()),
   blockedAuthorProps: z.array(z.string()),
+  reactionsEnabled: z.boolean(),
   reportReasons: z.record(z.string()),
   regex: z.object({
     uid: z.string(),
@@ -15,6 +16,7 @@ export const configSchema = z.object({
   enabledCollections: z.array(z.string()),
   moderatorRoles: z.array(z.string()),
   isGQLPluginEnabled: z.boolean(),
+  isReactionsPluginInstalled: z.boolean(),
   badWords: z.boolean().nullable().optional(),
   gql: z
     .object({
@@ -136,7 +138,8 @@ const commentSchema: z.ZodType<Comment> = getCommentSchema();
 export type Comment = BaseComment & {
   threadOf?: Comment | null
   related?: z.infer<typeof relatedSchema> | string
-  documentId?: string
+  documentId?: string,
+  locale?: string | null
 };
 
 
@@ -148,7 +151,7 @@ export const commentsSchema = z.object({
 
 export const commentDetailsSchema = z.object({
   entity: relatedSchema,
-  selected: baseCommentSchema
+  selected: getCommentSchema()
     .merge(
       z.object({
         related: z.string(),

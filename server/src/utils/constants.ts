@@ -7,6 +7,7 @@ export const CONFIG_PARAMS = {
   MODERATOR_ROLES: 'moderatorRoles',
   BAD_WORDS: 'badWords',
   AUTHOR_BLOCKED_PROPS: 'blockedAuthorProps',
+  REACTIONS_ENABLED: 'reactionsEnabled',
 } as const;
 
 export const APPROVAL_STATUS = {

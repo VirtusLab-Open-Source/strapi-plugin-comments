@@ -149,6 +149,9 @@ export default {
   'page.settings.form.gqlAuth.label': 'GraphQL查询授权',
   'page.settings.form.gqlAuth.hint':
     '如果启用， GraphQL API queries 和 mutations 只能由经过身份验证的 Strapi 用户触发。否则 API 将保持打开状态。',
+  'page.settings.form.reactionsEnabled.label': '反应集成',
+  'page.settings.form.reactionsEnabled.hint':
+    '启用后，评论 API 响应（REST 和 GraphQL）将包含反应计数。需要安装并启用 Reactions 插件。',
   'page.settings.form.approvalFlow.label': '审批流程',
   'page.settings.form.approvalFlow.hint':
     '与Content Type "{name}" 关联的评论将通过手动审批流程获取',

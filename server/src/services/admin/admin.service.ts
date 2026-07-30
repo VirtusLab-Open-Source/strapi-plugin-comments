@@ -170,7 +170,20 @@ export default ({ strapi }: StrapiContext) => {
       return this.getCommonService().changeBlockedComment(id, forceStatus);
     },
     async deleteComment(id: Id) {
-      return getCommentRepository(strapi).update({ where: { id }, data: { removed: true } });
+      const entity = await getCommentRepository(strapi).findOne({ where: { id } });
+      const removedEntity = await getCommentRepository(strapi).update({
+        where: { id },
+        data: { removed: true },
+      });
+
+      if (entity?.documentId) {
+        await getPluginService(strapi, 'reactions').removeForComments(
+          [entity.documentId],
+          entity.locale,
+        );
+      }
+
+      return removedEntity;
     },
     async blockCommentThread(id: Id, forceStatus?: boolean) {
       return this.getCommonService().changeBlockedCommentThread(id, forceStatus);

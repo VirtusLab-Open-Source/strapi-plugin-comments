@@ -15,6 +15,15 @@ export const getComment = (nexus: Nexus) => {
         t.field("author", { type: "CommentAuthor" });
         t.string("createdAt");
         t.string("updatedAt");
+        t.list.field("reactions", {
+          type: "CommentReactionCount",
+          resolve(parent: { reactions?: Record<string, number> }) {
+            return Object.entries(parent.reactions || {}).map(([slug, count]) => ({
+              slug,
+              count,
+            }));
+          },
+        });
     },
   });
 };

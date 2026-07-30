@@ -27,6 +27,21 @@ jest.mock('no-profanity', () => ({
   replaceProfanities: jest.fn(),
 }));
 
+const mockReactionsService = {
+  getCountsForComments: jest.fn().mockResolvedValue({}),
+  isEnabled: jest.fn().mockResolvedValue(true),
+};
+
+jest.mock('../../utils/getPluginService', () => ({
+  getPluginService: jest.fn((_strapi, name: string) => {
+    if (name === 'reactions') {
+      return mockReactionsService;
+    }
+
+    return {};
+  }),
+}));
+
 describe('common.service', () => {
   const mockCommentRepository = {
     findOne: jest.fn(),
@@ -53,6 +68,9 @@ describe('common.service', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockStoreRepository.getLocalConfig.mockReset();
+    mockReactionsService.isEnabled.mockResolvedValue(true);
+    mockReactionsService.getCountsForComments.mockResolvedValue({});
     caster<jest.Mock>(getCommentRepository).mockReturnValue(mockCommentRepository);
     caster<jest.Mock>(getReportCommentRepository).mockReturnValue(mockReportCommentRepository);
     caster<jest.Mock>(getStoreRepository).mockReturnValue(mockStoreRepository);
@@ -111,6 +129,18 @@ describe('common.service', () => {
       const result = await service.getConfig('moderatorRoles', defaultValue, true);
 
       expect(result).toEqual(defaultValue);
+    });
+
+    it('should return default value when prop is missing in store', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockStoreRepository.getConfig.mockResolvedValue({ moderatorRoles: ['admin'] });
+
+      const result = await service.getConfig('reactionsEnabled', false);
+
+      expect(result).toBe(false);
+      expect(mockStoreRepository.getLocalConfig).not.toHaveBeenCalled();
     });
   });
 
@@ -280,6 +310,33 @@ describe('common.service', () => {
       expect(result.data).toHaveLength(2);
       expect(mockCommentRepository.findWithCount).toHaveBeenCalled();
     });
+
+    it('should omit reactions meta when reactions integration is disabled', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComments = [
+        { id: 1, content: 'Comment 1', documentId: 'doc-1' },
+      ];
+
+      mockReactionsService.isEnabled.mockResolvedValue(false);
+      mockCommentRepository.findWithCount.mockResolvedValue({
+        results: mockComments,
+        pagination: { total: 1 },
+      });
+      caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
+      mockStoreRepository.getConfig.mockResolvedValue([]);
+
+      const result = await service.findAllFlat({
+        fields: ['id', 'content'],
+        limit: 10,
+        skip: 0,
+      });
+
+      expect(result.meta).toBeUndefined();
+      expect(result.data[0]).not.toHaveProperty('reactions');
+      expect(mockReactionsService.getCountsForComments).not.toHaveBeenCalled();
+    });
+
     it('should return flat list of comments with populated user properties', async () => {
       const strapi = getStrapi();
       const service = getService(strapi);
@@ -656,6 +713,38 @@ describe('common.service', () => {
 
       expect(typedResult[0].children).toHaveLength(0); // drop blocked threads
     });
+
+    it('should return hierarchy without reactions when reactions integration is disabled', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComments = [
+        { id: 1, content: 'Parent 1', threadOf: null, documentId: 'doc-1', gotThread: true },
+        { id: 2, content: 'Child 1', threadOf: '1', documentId: 'doc-2', gotThread: false },
+      ];
+
+      mockReactionsService.isEnabled.mockResolvedValue(false);
+      mockCommentRepository.findMany.mockResolvedValue(mockComments);
+      caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
+      mockCommentRepository.findWithCount.mockImplementation(async (args) => {
+        const threadOf = args?.where?.threadOf?.$eq ?? null;
+        const filtered = mockComments.filter((c) => c.threadOf === threadOf);
+        return {
+          results: filtered,
+          pagination: { total: filtered.length },
+        };
+      });
+      mockStoreRepository.getConfig.mockResolvedValue([]);
+
+      const result = await service.findAllInHierarchy({
+        fields: ['id', 'content', 'threadOf', 'documentId', 'gotThread'],
+      });
+
+      const typedResult = result as CommentWithChildren[];
+
+      expect(typedResult).toHaveLength(1);
+      expect(typedResult[0]).not.toHaveProperty('reactions');
+      expect(mockReactionsService.getCountsForComments).not.toHaveBeenCalled();
+    });
   });
 
   describe('updateComment', () => {
@@ -919,7 +1008,7 @@ describe('common.service', () => {
             avatar: { populate: true },
           },
         },
-        select: ['id', 'content', 'related'],
+        select: ['id', 'content', 'documentId', 'related'],
         orderBy: { createdAt: 'desc' },
         where: { authorId: 1 },
       });
@@ -965,7 +1054,7 @@ describe('common.service', () => {
         where: { authorUser: { id: 1 } },
         pageSize: 10,
         page: 1,
-        select: ['id', 'content', 'related'],
+        select: ['id', 'content', 'documentId', 'related'],
         orderBy: { createdAt: 'desc' },
         populate: {
           authorUser: {
