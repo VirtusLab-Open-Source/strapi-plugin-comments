@@ -1,8 +1,8 @@
-import { Button, Checkbox, Table, Tbody, Th, Thead, Tr, Typography } from '@strapi/design-system';
+import { Button, Checkbox, Flex, Table, Tbody, Th, Thead, Tr, Typography } from '@strapi/design-system';
 import { Check } from '@strapi/icons';
 import { useNotification } from '@strapi/strapi/admin';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useIntl } from 'react-intl';
 import { CommentReport } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
@@ -31,7 +31,6 @@ export const ReportReviewTable: FC<Props> = ({
   const api = useAPI();
   const queryClient = useQueryClient();
   const { toggleNotification } = useNotification();
-
 
   const resolveReportMutation = useMutation({
     mutationKey: ['resolveReport', commentId],
@@ -102,6 +101,8 @@ export const ReportReviewTable: FC<Props> = ({
       </Thead>
       <Tbody>
         {reports.map((report) => {
+          const reportByAi = report.source === 'AI';
+
           return (
             <Tr key={report.id}>
               <Th>
@@ -112,7 +113,10 @@ export const ReportReviewTable: FC<Props> = ({
                 />
               </Th>
               <Th>
-                <ReportReasonBadge reason={report.reason} />
+                <Flex gap={4}>
+                  {reportByAi && <ReportReasonBadge reason={report.source} />}
+                  <ReportReasonBadge reason={report.reason} />
+                </Flex>
               </Th>
               <Th>{report.content}</Th>
               <Th>{

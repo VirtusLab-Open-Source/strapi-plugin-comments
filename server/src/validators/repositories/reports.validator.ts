@@ -43,6 +43,7 @@ const reportSchema = z.object({
   publishedAt: z.string().nullable(),
   locale: z.string().nullable(),
   related: relatedSchema.nullable().optional(),
+  source: z.enum(['USER', 'AI']).nullish(),
 });
 
 const findPageSchema = z.object({
@@ -78,6 +79,7 @@ const findManySchema = z.array(
     publishedAt: z.string().nullable(),
     locale: z.string().nullable(),
     related: z.union([dbBaseCommentSchema, z.number()]).nullish(),
+    source: z.enum(['USER', 'AI']).nullish(),
   })
 );
 

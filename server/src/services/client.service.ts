@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash';
 import { AdminUser, StrapiContext } from '../@types';
-import { APPROVAL_STATUS, CONFIG_PARAMS } from '../const';
+import { APPROVAL_STATUS, CONFIG_PARAMS, REPORT_SOURCE } from '../const';
 import { getCommentRepository, getReportCommentRepository } from '../repositories';
 import { isLeft, unwrapEither } from '../utils/Either';
 import PluginError from '../utils/error';
@@ -132,7 +132,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
     },
 
     // Report abuse in comment
-    async reportAbuse({ commentId, relation, ...payload }: client.ReportAbuseValidatorSchema, user?: AdminUser) {
+    async reportAbuse({ commentId, relation, source = REPORT_SOURCE.USER, ...payload }: client.ReportAbuseValidatorSchema, user?: AdminUser) {
       if (!this.getCommonService().isValidUserContext(user)) {
         throw resolveUserContextError(user);
       }
@@ -155,6 +155,7 @@ export const clientService = ({ strapi }: StrapiContext) => {
             .create({
               data: {
                 ...payload,
+                source,
                 resolved: false,
                 related: commentId,
               },

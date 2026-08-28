@@ -225,6 +225,7 @@ const getReportAbuseSchema = (config: CommentsPluginConfig) => {
     commentId: stringToNumberValidator,
     content: z.string().min(1),
     reason: z.nativeEnum(config.reportReasons),
+    source: z.enum(['USER', 'AI']).default('USER'),
   });
 };
 
