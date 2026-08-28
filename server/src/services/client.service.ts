@@ -107,6 +107,13 @@ export const clientService = ({ strapi }: StrapiContext) => {
       } catch (e) {
         console.error(e);
       }
+
+      await this.getCommonService().runLifecycleHook({
+        contentTypeName: 'comment',
+        hookName: 'afterCreate',
+        event: { action: 'afterCreate', result: sanitizedEntity },
+      });
+
       return sanitizedEntity;
     },
 
