@@ -1,9 +1,11 @@
-import { Button, Checkbox, Flex, Table, Tbody, Th, Thead, Tr, Typography } from '@strapi/design-system';
+import { Button, Checkbox, Flex, Table, Tbody, Th, Thead, Tr } from '@strapi/design-system';
 import { Check } from '@strapi/icons';
 import { Layouts, Page, Pagination, SearchInput, useNotification, useQueryParams } from '@strapi/strapi/admin';
 import { useQueryClient } from '@tanstack/react-query';
-import React, { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { Config } from '../../api/schemas';
+import { CustomInjectionZoneCell } from '../../components/CustomInjectionZoneCell';
+import { CustomInjectionZoneProvider } from '../../components/CustomInjectionZoneProvider';
 import { ReportsTableRow } from '../../components/ReportsTableRow';
 import { SortableTh } from '../../components/SortableTh';
 import { useAPI } from '../../hooks/useAPI';
@@ -96,24 +98,30 @@ export const Reports: FC<{ config: Config }> = ({ config }) => {
           </Flex>
         )} />
         <Layouts.Content>
-          <Table>
-            <Thead>
-              <Tr>
-                <Th>
-                  <Checkbox
-                    checked={isAllChecked}
-                    onCheckedChange={onCheckAll}
-                    disabled={result.filter((report) => !report.resolved).length === 0}
-                  />
-                </Th>
-                {tableHeaders.map((header) => (
-                  <SortableTh {...header}/>
-                ))}
-              </Tr>
-            </Thead>
-            <Tbody>
-              {result.map((entry) => {
-                return (
+          <CustomInjectionZoneProvider area="comments.reports.tableTop" reports={result}>
+            <Table>
+              <Thead>
+                <Tr>
+                  <Th>
+                    <Checkbox
+                      checked={isAllChecked}
+                      onCheckedChange={onCheckAll}
+                      disabled={result.filter((report) => !report.resolved).length === 0}
+                    />
+                  </Th>
+                  {tableHeaders.slice(0, 1).map((header) => (
+                    <SortableTh key={header.label} {...header} />
+                  ))}
+                  <CustomInjectionZoneCell as="th" area="comments.reports.tableHeaderSource" />
+                  <CustomInjectionZoneCell as="th" area="comments.reports.tableHeaderAiScore" />
+                  {tableHeaders.slice(1).map((header) => (
+                    <SortableTh key={header.label} {...header} />
+                  ))}
+                </Tr>
+              </Thead>
+              <Tbody>
+                {result.map((entry) => {
+                  return (
                   <ReportsTableRow
                     key={entry.id}
                     item={entry}
@@ -121,13 +129,14 @@ export const Reports: FC<{ config: Config }> = ({ config }) => {
                     onSelectionChange={onCheck}
                   />
                 );
-              })}
-            </Tbody>
-          </Table>
-          <Pagination.Root pageCount={pagination.pageCount} total={pagination.total}>
-            <Pagination.PageSize />
-            <Pagination.Links />
-          </Pagination.Root>
+                })}
+              </Tbody>
+            </Table>
+            <Pagination.Root pageCount={pagination.pageCount} total={pagination.total}>
+              <Pagination.PageSize />
+              <Pagination.Links />
+            </Pagination.Root>
+          </CustomInjectionZoneProvider>
         </Layouts.Content>
       </Page.Main>
     </>

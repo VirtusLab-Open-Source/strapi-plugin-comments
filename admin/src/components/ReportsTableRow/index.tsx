@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { useIntl } from 'react-intl';
 import { Report } from '../../api/schemas';
 import { getMessage } from '../../utils';
+import { CustomInjectionZoneCell } from '../CustomInjectionZoneCell';
 import { ReportStatusBadge } from '../ReportStatusBadge';
 import { ReviewFlow } from '../ReviewFlow';
 import { CommentReviewModal } from './CommentReviewModal';
@@ -32,6 +33,8 @@ export const ReportsTableRow: FC<ReportsTableRowProps> = ({ item, isChecked, onS
           #{item.id}
         </Typography>
       </Td>
+      <CustomInjectionZoneCell as="td" area="comments.reports.tableRowSource" report={item} />
+      <CustomInjectionZoneCell as="td" area="comments.reports.tableRowAiScore" report={item} />
       <Td>
         <Typography textColor="neutral800" variant="pi">
           {item.reason || getMessage('components.reason.unknown')}
