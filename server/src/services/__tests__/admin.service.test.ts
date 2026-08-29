@@ -780,6 +780,43 @@ describe('admin.service', () => {
     });
   });
 
+  describe('blockNestedThreads', () => {
+    it('should delegate to common service', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
+
+      const result = await service.blockNestedThreads(1, true, mockCommentRepository);
+
+      expect(result).toBe(true);
+      expect(mockCommonService.modifiedNestedNestedComments).toHaveBeenCalledWith(
+        1,
+        'blockedThread',
+        true,
+        undefined,
+        mockCommentRepository,
+      );
+    });
+
+    it('should pass blockedThread status to common service', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+
+      mockCommonService.modifiedNestedNestedComments.mockResolvedValue(true);
+
+      await service.blockNestedThreads(1, false, mockCommentRepository);
+
+      expect(mockCommonService.modifiedNestedNestedComments).toHaveBeenCalledWith(
+        1,
+        'blockedThread',
+        false,
+        undefined,
+        mockCommentRepository,
+      );
+    });
+  });
+
   describe('approveComment', () => {
     it('should delegate to common service', async () => {
       const strapi = getStrapi();

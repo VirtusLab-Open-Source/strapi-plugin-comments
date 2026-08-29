@@ -193,11 +193,13 @@ export default ({ strapi }: StrapiContext) => {
     async rejectComment(id: Id, commentRepository = getCommentRepository(strapi)) {
       return this.getCommonService().rejectComment(id, commentRepository);
     },
-    async blockNestedThreads(id: Id, status: boolean) {
+    async blockNestedThreads(id: Id, status: boolean, commentRepository: CommentRepository = getCommentRepository(strapi)) {
       return this.getCommonService().modifiedNestedNestedComments(
         id,
         'blockedThread',
         status,
+        undefined,
+        commentRepository,
       );
     },
     async resolveAbuseReport({
