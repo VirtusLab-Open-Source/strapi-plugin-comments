@@ -92,7 +92,9 @@ const commentReportSchema = z.object({
   resolved: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string().nullable(),
+  source: z.enum(['USER', 'AI']).nullish(),
 });
+
 const baseCommentSchema = z.object({
   id: z.number(),
   content: z.string(),
@@ -205,6 +207,7 @@ export const reportSchema = z.object({
   updatedAt: z.string().nullable(),
   createdAt: z.string(),
   related: baseCommentSchema,
+  source: z.enum(['USER', 'AI']).nullish(),
 });
 
 export type Report = z.infer<typeof reportSchema>;

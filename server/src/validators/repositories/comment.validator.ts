@@ -12,6 +12,7 @@ const reportSchema = z.object({
   updatedAt: z.string(),
   publishedAt: z.string().nullable(),
   locale: z.string().nullable(),
+  source: z.enum(['USER', 'AI']),
 });
 
 const baseCommentSchema = dbBaseCommentSchema.merge(
