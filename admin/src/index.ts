@@ -14,14 +14,22 @@ export default {
       name: name,
       injectionZones: {
         reports: {
-          tableTop: [],
           tableHeaderSource: [],
           tableRowSource: [],
-          tableHeaderAiScore: [],
-          tableRowAiScore: [],
+        },
+        reviews: {
+          tableHeaderSource: [],
+          tableRowSource: [],
+        },
+        pages: {
+          aiEvaluations: [],
+        },
+        sideNav: {
+          aiEvaluations: [],
+          mobileAiEvaluations: [],
         },
       },
-    })
+    });
 
     app.addMenuLink({
       to: `/plugins/${pluginId}`,

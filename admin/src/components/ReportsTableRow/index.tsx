@@ -33,8 +33,7 @@ export const ReportsTableRow: FC<ReportsTableRowProps> = ({ item, isChecked, onS
           #{item.id}
         </Typography>
       </Td>
-      <CustomInjectionZoneCell as="td" area="comments.reports.tableRowSource" report={item} />
-      <CustomInjectionZoneCell as="td" area="comments.reports.tableRowAiScore" report={item} />
+      <CustomInjectionZoneCell as="td" area="comments.reports.tableRowSource" source={item.source} />
       <Td>
         <Typography textColor="neutral800" variant="pi">
           {item.reason || getMessage('components.reason.unknown')}

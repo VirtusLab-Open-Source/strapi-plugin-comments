@@ -10,6 +10,7 @@ import { AllowedActions } from '../../types';
 import { getMessage } from '../../utils';
 import { ReportReasonBadge } from '../ReportReasonBadge';
 import { CommentReportStatusBadge } from '../CommentReportStatusBadge';
+import { CustomInjectionZoneCell } from '../CustomInjectionZoneCell';
 
 type Props = {
   commentId: number;
@@ -76,6 +77,7 @@ export const ReportReviewTable: FC<Props> = ({
               disabled={reports.filter((report) => !report.resolved).length === 0}
             />
           </Th>
+          <CustomInjectionZoneCell as='th' area='comments.reviews.tableHeaderSource' />
           <Th>
             <Typography variant="sigma">
               {getMessage('page.reports.table.header.reason', 'Reason')}
@@ -101,8 +103,6 @@ export const ReportReviewTable: FC<Props> = ({
       </Thead>
       <Tbody>
         {reports.map((report) => {
-          const reportByAi = report.source === 'AI';
-
           return (
             <Tr key={report.id}>
               <Th>
@@ -112,11 +112,9 @@ export const ReportReviewTable: FC<Props> = ({
                   disabled={report.resolved}
                 />
               </Th>
+              <CustomInjectionZoneCell as='th' area='comments.reviews.tableRowSource' source={report.source}/>
               <Th>
-                <Flex gap={4}>
-                  {reportByAi && <ReportReasonBadge reason={report.source} />}
-                  <ReportReasonBadge reason={report.reason} />
-                </Flex>
+                <ReportReasonBadge reason={report.reason} />
               </Th>
               <Th>{report.content}</Th>
               <Th>{

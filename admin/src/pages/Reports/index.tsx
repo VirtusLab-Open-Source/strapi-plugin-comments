@@ -5,7 +5,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { FC, useCallback, useState } from 'react';
 import { Config } from '../../api/schemas';
 import { CustomInjectionZoneCell } from '../../components/CustomInjectionZoneCell';
-import { CustomInjectionZoneProvider } from '../../components/CustomInjectionZoneProvider';
 import { ReportsTableRow } from '../../components/ReportsTableRow';
 import { SortableTh } from '../../components/SortableTh';
 import { useAPI } from '../../hooks/useAPI';
@@ -98,7 +97,6 @@ export const Reports: FC<{ config: Config }> = ({ config }) => {
           </Flex>
         )} />
         <Layouts.Content>
-          <CustomInjectionZoneProvider area="comments.reports.tableTop" reports={result}>
             <Table>
               <Thead>
                 <Tr>
@@ -113,7 +111,6 @@ export const Reports: FC<{ config: Config }> = ({ config }) => {
                     <SortableTh key={header.label} {...header} />
                   ))}
                   <CustomInjectionZoneCell as="th" area="comments.reports.tableHeaderSource" />
-                  <CustomInjectionZoneCell as="th" area="comments.reports.tableHeaderAiScore" />
                   {tableHeaders.slice(1).map((header) => (
                     <SortableTh key={header.label} {...header} />
                   ))}
@@ -136,7 +133,6 @@ export const Reports: FC<{ config: Config }> = ({ config }) => {
               <Pagination.PageSize />
               <Pagination.Links />
             </Pagination.Root>
-          </CustomInjectionZoneProvider>
         </Layouts.Content>
       </Page.Main>
     </>
