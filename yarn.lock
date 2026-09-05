@@ -6080,6 +6080,11 @@ date-fns@2.30.0, date-fns@^2.30.0:
   dependencies:
     "@babel/runtime" "^7.21.0"
 
+dayjs@^1.11.7:
+  version "1.11.23"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.23.tgz#b0a363506dde5f36cf5075e42ebe8115165a8c79"
+  integrity sha512-QDTCU0M0MxR3hQfnlDJfwekQiaanm1ubOD231u73WBckQ/fsamwRLiE2GBz6D3a/xF1NgfiDLJjXBa1hYOYTtQ==
+
 debounce@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/debounce/-/debounce-1.2.1.tgz#38881d8f4166a5c5848020c11827b834bcb3e0a5"
@@ -6360,10 +6365,24 @@ dom-serializer@^2.0.0:
     domhandler "^5.0.2"
     entities "^4.2.0"
 
+dom-serializer@^3.0.0:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/dom-serializer/-/dom-serializer-3.1.1.tgz#54be70ee4fcc2da010f488165e62294798dc57d3"
+  integrity sha512-4MEa38/QexBob6gFNwu+EGdWvhJ1OKuNwdYY3Y3NyeWDQfnGeDYQUDfIRzWu5B5gsv03so2Uxd28YC6zrsx3Lw==
+  dependencies:
+    domelementtype "^3.0.0"
+    domhandler "^6.0.0"
+    entities "^8.0.0"
+
 domelementtype@^2.0.1, domelementtype@^2.2.0, domelementtype@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/domelementtype/-/domelementtype-2.3.0.tgz#5c45e8e869952626331d7aab326d01daf65d589d"
   integrity sha512-OLETBj6w0OsagBwdXnPdN0cnMfF9opN69co+7ZrbfPGrdpPVNBUj02spi6B1N7wChLQiPn4CSH/zJvXw56gmHw==
+
+domelementtype@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/domelementtype/-/domelementtype-3.0.0.tgz#e6c0a24bd39ca5eb7ea67a98d2f699497d7bcc55"
+  integrity sha512-umCQid3jKbDmVjx8jGaW7uUykm4DEUeyV21hPxNMo2nV955DhUThwqyOIDtreepP31hl84X7G5U9ZfsWvIB3Pg==
 
 domhandler@^4.0.0, domhandler@^4.2.0, domhandler@^4.3.1:
   version "4.3.1"
@@ -6378,6 +6397,13 @@ domhandler@^5.0.2, domhandler@^5.0.3:
   integrity sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==
   dependencies:
     domelementtype "^2.3.0"
+
+domhandler@^6.0.0:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/domhandler/-/domhandler-6.0.1.tgz#75f351a03a6e10c35e08418f9cf0d287e00797cf"
+  integrity sha512-gYzvtM72ZtxQO0T048kd6HWSbbGCNOUwcnfQ01cqIJ4X2IYKFFHZ5mKvrQETcFXxsRObZulDaKmy//R7TPtsBg==
+  dependencies:
+    domelementtype "^3.0.0"
 
 domutils@^2.5.2, domutils@^2.8.0:
   version "2.8.0"
@@ -6396,6 +6422,15 @@ domutils@^3.0.1:
     dom-serializer "^2.0.0"
     domelementtype "^2.3.0"
     domhandler "^5.0.3"
+
+domutils@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/domutils/-/domutils-4.0.2.tgz#0c1ac1fdbe8f554a60a6f5eb143ee85630327c94"
+  integrity sha512-qI4JLRKnSzqFqr7hAlS5xQDusBCjKSEG4t4+7aNrIQMHBcsC2TGEhuyABJdYkgSewL57PNLYEiibY2iPKhKpaA==
+  dependencies:
+    dom-serializer "^3.0.0"
+    domelementtype "^3.0.0"
+    domhandler "^6.0.0"
 
 dot-case@^3.0.4:
   version "3.0.4"
@@ -6530,6 +6565,11 @@ entities@^4.2.0, entities@^4.4.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/entities/-/entities-4.5.0.tgz#5d268ea5e7113ec74c4d033b79ea5a35a488fb48"
   integrity sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==
+
+entities@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/entities/-/entities-8.0.0.tgz#c1df5fe3602429747fa233d0dd26f142f0ce4743"
+  integrity sha512-zwfzJecQ/Uej6tusMqwAqU/6KL2XaB2VZ2Jg54Je6ahNBGNH6Ek6g3jjNCF0fG9EWQKGZNddNjU5F1ZQn/sBnA==
 
 entities@~3.0.1:
   version "3.0.1"
@@ -7755,6 +7795,16 @@ html-webpack-plugin@5.6.0:
     lodash "^4.17.21"
     pretty-error "^4.0.0"
     tapable "^2.0.0"
+
+htmlparser2@^12.0.0:
+  version "12.0.0"
+  resolved "https://registry.yarnpkg.com/htmlparser2/-/htmlparser2-12.0.0.tgz#6a679d0f57c525990f9cbad8a585b320ecc6d198"
+  integrity sha512-Tz7u1i95/g2x2jz81+x0FBVhBhY5aRTvD3tXXdFaljuNdzDLJ8UGNRrTcj2cgQvAg3iW/h77Fz15nLW0L0CrZw==
+  dependencies:
+    domelementtype "^3.0.0"
+    domhandler "^6.0.0"
+    domutils "^4.0.2"
+    entities "^8.0.0"
 
 htmlparser2@^6.1.0:
   version "6.1.0"
@@ -9249,6 +9299,13 @@ kuler@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/kuler/-/kuler-2.0.0.tgz#e2c570a3800388fb44407e851531c1d670b061b3"
   integrity sha512-Xq9nH7KlWZmXAtodXDDRE7vs6DU1gTU8zYDHDiWLSip45Egwq3plLHzPn27NgvzL2r1LMPC1vdqh98sQxtqj4A==
+
+launder@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/launder/-/launder-1.7.1.tgz#ef7155ab0c3ddec2323089c961d2e9a249aa5b0d"
+  integrity sha512-mU6WRz5EusL9ZZuiZ5SO4Y6C0P9PAUR9iwdb6bzj4KDihm28DiHFw+/yk9DBH4f+Pv1wuzQ4e2jV3oQ7mkIqvw==
+  dependencies:
+    dayjs "^1.11.7"
 
 leven@^3.1.0:
   version "3.1.0"
@@ -11853,14 +11910,15 @@ sanitize-html@2.13.0:
     postcss "^8.3.11"
 
 sanitize-html@^2.13.1:
-  version "2.17.0"
-  resolved "https://registry.yarnpkg.com/sanitize-html/-/sanitize-html-2.17.0.tgz#a8f66420a6be981d8fe412e3397cc753782598e4"
-  integrity sha512-dLAADUSS8rBwhaevT12yCezvioCA+bmUTPH/u57xKPT8d++voeYE6HeluA/bPbQ15TwDBG2ii+QZIEmYx8VdxA==
+  version "2.17.7"
+  resolved "https://registry.yarnpkg.com/sanitize-html/-/sanitize-html-2.17.7.tgz#b16417c348ea5f99c2451964b6e6621ca6b1da94"
+  integrity sha512-PGtEkc9cbnedU3s9TmzDbpsZ8w086g/0Q8k8/oIO1NLNU3i5k9yn835CrjJSajp1KMmkisbO1qPXxNKO3welAg==
   dependencies:
     deepmerge "^4.2.2"
     escape-string-regexp "^4.0.0"
-    htmlparser2 "^8.0.0"
+    htmlparser2 "^12.0.0"
     is-plain-object "^5.0.0"
+    launder "^1.7.1"
     parse-srcset "^1.0.2"
     postcss "^8.3.11"
 
