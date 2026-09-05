@@ -117,14 +117,14 @@ const controllers = ({ strapi }: StrapiContext) => ({
     throw throwError(ctx, unwrapEither(either));
   },
 
-  async postComment(ctx: RequestContext<Omit<adminValidator.CommentPostValidatorSchema, 'id'>, Pick<adminValidator.CommentPostValidatorSchema, 'id'>>) {
+  async postCommentThread(ctx: RequestContext<Omit<adminValidator.CommentPostValidatorSchema, 'id'>, Pick<adminValidator.CommentPostValidatorSchema, 'id'>>) {
     const either = adminValidator.getCommentPostValidator({
       id: ctx.params.id,
       content: ctx.request.body.content,
       author: ctx.request.body.author,
     });
     if (isRight(either)) {
-      return this.getService('admin').postComment(unwrapEither(either));
+      return this.getService('admin').postCommentThread(unwrapEither(either));
     }
     throw throwError(ctx, unwrapEither(either));
   },
