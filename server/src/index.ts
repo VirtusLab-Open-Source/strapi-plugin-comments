@@ -1,3 +1,4 @@
+import type { Core } from '@strapi/strapi';
 import contentTypes from './content-types';
 import register from "./register";
 import bootstrap from "./bootstrap";
@@ -6,7 +7,7 @@ import controllers from "./controllers";
 import routes from "./routes";
 import services from "./services";
 
-export default {
+const plugin: Core.Plugin = {
   register,
   bootstrap,
   config,
@@ -14,4 +15,6 @@ export default {
   routes,
   services,
   contentTypes,
-};
+} as unknown as Core.Plugin;
+
+export default plugin;

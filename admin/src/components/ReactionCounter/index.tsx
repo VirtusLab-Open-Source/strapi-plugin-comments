@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { Tooltip } from '@strapi/design-system';
 import { usePluginTheme } from '@sensinum/strapi-utils';
-import type { ReactionType } from 'src/utils/reactionsIntegration';
+import type { ReactionType } from '../../utils/reactionsIntegration';
 import {
   ReactionCounterContainer,
   ReactionCounterDot,
