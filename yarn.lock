@@ -3387,6 +3387,37 @@
     lodash "4.17.21"
     react-remove-scroll "2.5.10"
 
+"@strapi/design-system@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@strapi/design-system/-/design-system-2.2.0.tgz#fbd9dfdee8f46eb0a4fbe276ce1b58b8f4624924"
+  integrity sha512-NO8DhQfApMXlEUeuUG39pKmPGcYCJZjApjPqtPbDFUr434WTeon/vJtJv/fqRs5GFPaJqqDH7YPlpZlJX3z3bA==
+  dependencies:
+    "@codemirror/lang-json" "6.0.1"
+    "@floating-ui/react-dom" "2.1.0"
+    "@internationalized/date" "3.5.4"
+    "@internationalized/number" "3.5.3"
+    "@radix-ui/react-accordion" "1.1.2"
+    "@radix-ui/react-alert-dialog" "1.0.5"
+    "@radix-ui/react-avatar" "1.0.4"
+    "@radix-ui/react-checkbox" "1.0.4"
+    "@radix-ui/react-dialog" "1.0.5"
+    "@radix-ui/react-dismissable-layer" "1.0.5"
+    "@radix-ui/react-dropdown-menu" "2.0.6"
+    "@radix-ui/react-focus-guards" "1.0.1"
+    "@radix-ui/react-focus-scope" "1.0.4"
+    "@radix-ui/react-popover" "1.0.7"
+    "@radix-ui/react-progress" "1.0.3"
+    "@radix-ui/react-radio-group" "1.1.3"
+    "@radix-ui/react-scroll-area" "1.0.5"
+    "@radix-ui/react-switch" "1.0.3"
+    "@radix-ui/react-tabs" "1.0.4"
+    "@radix-ui/react-tooltip" "1.0.7"
+    "@radix-ui/react-use-callback-ref" "1.0.1"
+    "@strapi/ui-primitives" "2.2.0"
+    "@uiw/react-codemirror" "4.22.2"
+    lodash "4.17.23"
+    react-remove-scroll "2.5.10"
+
 "@strapi/email@5.37.0":
   version "5.37.0"
   resolved "https://registry.yarnpkg.com/@strapi/email/-/email-5.37.0.tgz#c148b10604805fedd1ff026b98e262137df2eee6"
@@ -3440,6 +3471,11 @@
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@strapi/icons/-/icons-2.1.2.tgz#019cd6b62bd18f1827fad48dce15733892440013"
   integrity sha512-RnVKuhO8gCWbpIjIs0Qfm0rmOLUrvmCR33AHHClwi7L5i9UwTqVG8ajRPVGptG2dC5vA6JCigsVPAS6yXjUTHQ==
+
+"@strapi/icons@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@strapi/icons/-/icons-2.2.0.tgz#fe574fb26c991665a9bfc900c49afdf23a479add"
+  integrity sha512-wVItrWIDYtvGpv1S5Lg580b5PXH2iw6dgcFnri5vVz4qZDP6ZOTpLmkwZybkfZcpIzq1KkjKyA1JZ6NLBE59cQ==
 
 "@strapi/logger@5.37.0":
   version "5.37.0"
@@ -3529,22 +3565,22 @@
     pluralize "8.0.0"
 
 "@strapi/plugin-users-permissions@^5.37.0":
-  version "5.37.0"
-  resolved "https://registry.yarnpkg.com/@strapi/plugin-users-permissions/-/plugin-users-permissions-5.37.0.tgz#ff3026ef372c82a9591bd0d82c28573675471124"
-  integrity sha512-lsg4jqIN+HaJfUOabKN7Mkf24o4M9TgG1qX8cCET1uY5U9iHfVRlaBUZ4Rice55NHNiTordwkl8kjMDLG0CHYA==
+  version "5.45.0"
+  resolved "https://registry.yarnpkg.com/@strapi/plugin-users-permissions/-/plugin-users-permissions-5.45.0.tgz#3ee9cdd018bfdb4813a7356a15e6b61f5c5348e2"
+  integrity sha512-ts0AyHo6opA5PZAU/QxciB1jFg1dxZSgJ9lrLTeWG4C5qtLihgv7icqzTV9cqMarVzLwDWab4AoqCc0lGrQlKA==
   dependencies:
-    "@strapi/design-system" "2.1.2"
-    "@strapi/icons" "2.1.2"
-    "@strapi/utils" "5.37.0"
+    "@strapi/design-system" "2.2.0"
+    "@strapi/icons" "2.2.0"
+    "@strapi/utils" "5.45.0"
     bcryptjs "2.4.3"
     formik "2.4.5"
-    grant "^5.4.8"
+    grant "5.4.24"
     immer "9.0.21"
     jsonwebtoken "9.0.0"
-    jwk-to-pem "2.0.5"
-    koa "2.16.3"
+    jwk-to-pem "2.0.7"
+    koa "2.16.4"
     koa2-ratelimit "^1.1.3"
-    lodash "4.17.23"
+    lodash "4.18.1"
     prop-types "^15.8.1"
     purest "4.0.2"
     react-intl "6.6.2"
@@ -3740,6 +3776,33 @@
     aria-hidden "1.2.4"
     react-remove-scroll "2.5.10"
 
+"@strapi/ui-primitives@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@strapi/ui-primitives/-/ui-primitives-2.2.0.tgz#6fc083e4656f24e73bcc0f061bb199eaff94a563"
+  integrity sha512-CGvyIr+D7ZEuP9x4bmUFUiilHZwCkftiwV8Kh+o/jBETVlm5/8SrE5wihuyqSQTya1NxTHu0O8RTNkX0U6p8bQ==
+  dependencies:
+    "@radix-ui/number" "1.0.1"
+    "@radix-ui/primitive" "1.0.1"
+    "@radix-ui/react-collection" "1.0.3"
+    "@radix-ui/react-compose-refs" "1.0.1"
+    "@radix-ui/react-context" "1.0.1"
+    "@radix-ui/react-direction" "1.0.1"
+    "@radix-ui/react-dismissable-layer" "1.0.5"
+    "@radix-ui/react-focus-guards" "1.0.1"
+    "@radix-ui/react-focus-scope" "1.0.4"
+    "@radix-ui/react-id" "1.0.1"
+    "@radix-ui/react-popper" "1.1.3"
+    "@radix-ui/react-portal" "1.0.4"
+    "@radix-ui/react-primitive" "1.0.3"
+    "@radix-ui/react-slot" "1.0.2"
+    "@radix-ui/react-use-controllable-state" "1.0.1"
+    "@radix-ui/react-use-layout-effect" "1.0.1"
+    "@radix-ui/react-use-previous" "1.0.1"
+    "@radix-ui/react-visually-hidden" "1.0.3"
+    "@tanstack/react-virtual" "^3.10.8"
+    aria-hidden "1.2.4"
+    react-remove-scroll "2.5.10"
+
 "@strapi/upload@5.37.0":
   version "5.37.0"
   resolved "https://registry.yarnpkg.com/@strapi/upload/-/upload-5.37.0.tgz#ae465efbfe51219bb926a75e98583011652f9419"
@@ -3786,6 +3849,22 @@
     execa "5.1.1"
     http-errors "2.0.0"
     lodash "4.17.23"
+    node-machine-id "1.1.12"
+    p-map "4.0.0"
+    preferred-pm "3.1.3"
+    yup "0.32.9"
+    zod "3.25.67"
+
+"@strapi/utils@5.45.0":
+  version "5.45.0"
+  resolved "https://registry.yarnpkg.com/@strapi/utils/-/utils-5.45.0.tgz#641414eab08c6582678457420832eb7bb60c4fee"
+  integrity sha512-wnW7V3wMzKagb9Z7i998k/58pMBc4lDvlTrfwg1eK8bt4Ry34mM9mnz1BSL/z+EKZVojzOEhtyGOhx/ICVpjLA==
+  dependencies:
+    "@sindresorhus/slugify" "1.1.0"
+    date-fns "2.30.0"
+    execa "5.1.1"
+    http-errors "2.0.0"
+    lodash "4.18.1"
     node-machine-id "1.1.12"
     p-map "4.0.0"
     preferred-pm "3.1.3"
@@ -6453,7 +6532,7 @@ electron-to-chromium@^1.5.263:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.283.tgz#51d492c37c2d845a0dccb113fe594880c8616de8"
   integrity sha512-3vifjt1HgrGW/h76UEeny+adYApveS9dH2h3p57JYzBSXJIKUJAvtmIytDKjcSCt9xHfrNCFJ7gts6vkhuq++w==
 
-elliptic@^6.5.4, elliptic@^6.6.1:
+elliptic@^6.6.1:
   version "6.6.1"
   resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.6.1.tgz#3b8ffb02670bf69e382c7f65bf524c97c5405c06"
   integrity sha512-RaddvvMatK2LJHqFJ+YA4WysVN5Ita9E35botqIYspQ4TkRAlCicdzKOjlyv/1Za5RyTNn7di//eEV0uTAfe3g==
@@ -7519,7 +7598,7 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.5, graceful-fs@^4.1.6, graceful-fs@^4.2.0, 
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.11.tgz#4183e4e8bf08bb6e05bbb2f7d2e0c8f712ca40e3"
   integrity sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==
 
-grant@^5.4.8:
+grant@5.4.24:
   version "5.4.24"
   resolved "https://registry.yarnpkg.com/grant/-/grant-5.4.24.tgz#0b088e39c988f494c81fc0f534214f49a1242638"
   integrity sha512-PD5AvSI7wgCBDi2mEd6M/TIe+70c/fVc3Ik4B0s4mloWTy9J800eUEcxivOiyqSP9wvBy2QjWq1JR8gOfDMnEg==
@@ -9008,16 +9087,7 @@ jwa@^2.0.1:
     ecdsa-sig-formatter "1.0.11"
     safe-buffer "^5.0.1"
 
-jwk-to-pem@2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/jwk-to-pem/-/jwk-to-pem-2.0.5.tgz#151310bcfbcf731adc5ad9f379cbc8b395742906"
-  integrity sha512-L90jwellhO8jRKYwbssU9ifaMVqajzj3fpRjDKcsDzrslU9syRbFqfkXtT4B89HYAap+xsxNcxgBSB09ig+a7A==
-  dependencies:
-    asn1.js "^5.3.0"
-    elliptic "^6.5.4"
-    safe-buffer "^5.0.1"
-
-jwk-to-pem@^2.0.7:
+jwk-to-pem@2.0.7, jwk-to-pem@^2.0.7:
   version "2.0.7"
   resolved "https://registry.yarnpkg.com/jwk-to-pem/-/jwk-to-pem-2.0.7.tgz#ceee3ad9d90206c525a9d02f1efe29e8c691178f"
   integrity sha512-cSVphrmWr6reVchuKQZdfSs4U9c5Y4hwZggPoz6cbVnTpAVgGRpEuQng86IyqLeGZlhTh+c4MAreB6KbdQDKHQ==
@@ -9245,6 +9315,35 @@ koa@2.16.3:
     type-is "^1.6.16"
     vary "^1.1.2"
 
+koa@2.16.4:
+  version "2.16.4"
+  resolved "https://registry.yarnpkg.com/koa/-/koa-2.16.4.tgz#303b996f5c3f2a3bb771c7db5e4303ee05f2265f"
+  integrity sha512-3An0GCLDSR34tsCO4H8Tef8Pp2ngtaZDAZnsWJYelqXUK5wyiHvGItgK/xcSkmHLSTn1Jcho1mRQs2ehRzvKKw==
+  dependencies:
+    accepts "^1.3.5"
+    cache-content-type "^1.0.0"
+    content-disposition "~0.5.2"
+    content-type "^1.0.4"
+    cookies "~0.9.0"
+    debug "^4.3.2"
+    delegates "^1.0.0"
+    depd "^2.0.0"
+    destroy "^1.0.4"
+    encodeurl "^1.0.2"
+    escape-html "^1.0.3"
+    fresh "~0.5.2"
+    http-assert "^1.3.0"
+    http-errors "^1.6.3"
+    is-generator-function "^1.0.7"
+    koa-compose "^4.1.0"
+    koa-convert "^2.0.0"
+    on-finished "^2.3.0"
+    only "~0.0.2"
+    parseurl "^1.3.2"
+    statuses "^1.5.0"
+    type-is "^1.6.16"
+    vary "^1.1.2"
+
 kuler@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/kuler/-/kuler-2.0.0.tgz#e2c570a3800388fb44407e851531c1d670b061b3"
@@ -9402,10 +9501,15 @@ lodash@4.17.21:
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
-lodash@4.17.23, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.4:
+lodash@4.17.23:
   version "4.17.23"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.23.tgz#f113b0378386103be4f6893388c73d0bde7f2c5a"
   integrity sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==
+
+lodash@4.18.1, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.17.4:
+  version "4.18.1"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.18.1.tgz#ff2b66c1f6326d59513de2407bf881439812771c"
+  integrity sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==
 
 log-symbols@^4.1.0:
   version "4.1.0"
