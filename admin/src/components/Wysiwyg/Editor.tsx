@@ -39,6 +39,7 @@ const Editor = React.forwardRef<EditorApi, EditorProps>(
     },
     forwardedRef
   ) => {
+    const markdown = typeof value === 'string' ? value : '';
     const onChangeRef = React.useRef(onChange);
 
     React.useEffect(() => {
@@ -69,10 +70,10 @@ const Editor = React.forwardRef<EditorApi, EditorProps>(
     }, [editorRef, textareaRef, name, placeholder]);
 
     React.useEffect(() => {
-      if (value && !editorRef.current.hasFocus()) {
-        editorRef.current.setValue(value || '');
+      if (markdown && !editorRef.current.hasFocus()) {
+        editorRef.current.setValue(markdown);
       }
-    }, [editorRef, value]);
+    }, [editorRef, markdown]);
 
     React.useEffect(() => {
       if (isPreviewMode || disabled) {
@@ -109,7 +110,7 @@ const Editor = React.forwardRef<EditorApi, EditorProps>(
         <EditorStylesContainer $isExpandMode={isExpandMode} $disabled={disabled || isPreviewMode}>
           <textarea ref={textareaRef} />
         </EditorStylesContainer>
-        {isPreviewMode && <PreviewWysiwyg data={value || ''} />}
+        {isPreviewMode && <PreviewWysiwyg data={markdown} />}
       </EditorAndPreviewWrapper>
     );
   }
