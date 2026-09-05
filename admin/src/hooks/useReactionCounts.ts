@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Data } from '@strapi/strapi';
 import { useFetchClient } from '@strapi/strapi/admin';
 import { fetchReactionCounts } from '../utils/reactionsIntegration';
-import { assertNonEmpty } from 'src/utils/functions';
+import { assertNonEmpty } from '../utils/functions';
 
 export const useReactionCounts = (documentId: Data.DocumentID, locale?: string | null) => {
   const { get } = useFetchClient();

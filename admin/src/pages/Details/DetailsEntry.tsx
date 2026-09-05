@@ -52,10 +52,12 @@ export const DetailsEntry: FC<DetailsEntryProps> = ({
 
   return (
     <Box padding={4} background="neutral0" width="100%">
-      <CommentReactionsSummary
-        documentId={selected?.documentId}
-        locale={selected?.locale}
-      />
+      {selected?.documentId ? (
+        <CommentReactionsSummary
+          documentId={selected.documentId}
+          locale={selected.locale}
+        />
+      ) : null}
       {canEntityRender && (
         <Box marginBottom={4}>
           <Typography
