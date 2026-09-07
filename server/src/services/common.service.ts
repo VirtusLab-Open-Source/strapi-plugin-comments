@@ -23,7 +23,7 @@ import {
 } from './utils/reactions';
 import type { ContentType, LifeCycleEvent, LifeCycleHookName } from '../utils/types';
 
-type Effect<T> = (event: T) => void | Promise<void>;
+type Effect<T = void> = [T] extends [void] ? () => void | Promise<void> : (event: T) => void | Promise<void>;
 type LifecycleHookRecord = Partial<Record<LifeCycleHookName, Array<Effect<LifeCycleEvent>>>>;
 
 const lifecycleHookListeners: Record<ContentType, LifecycleHookRecord> = {
