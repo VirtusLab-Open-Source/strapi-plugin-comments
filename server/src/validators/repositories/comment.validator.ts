@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { dbBaseCommentSchema } from './comment.schema';
 import { paginationSchema } from './utils';
+import { ORIGIN_SOURCE } from '../../../../shared/constants';
 
 const reportSchema = z.object({
   id: z.number(),
@@ -12,7 +13,7 @@ const reportSchema = z.object({
   updatedAt: z.string(),
   publishedAt: z.string().nullable(),
   locale: z.string().nullable(),
-  source: z.enum(['USER', 'AI']),
+  source: z.enum(ORIGIN_SOURCE),
 });
 
 const baseCommentSchema = dbBaseCommentSchema.merge(
