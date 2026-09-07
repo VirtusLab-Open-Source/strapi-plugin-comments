@@ -4,8 +4,7 @@ import { Td, Th } from '@strapi/design-system';
 type CustomInjectionZoneCellProps = {
   area: `${string}.${string}.${string}`;
   as: 'th' | 'td';
-  [key: string]: unknown;
-};
+} & Record<string, unknown>;
 
 export const CustomInjectionZoneCell = ({ area, as, ...props }: CustomInjectionZoneCellProps) => {
   const getPlugin = useStrapiApp('CustomInjectionZoneCell', (state) => state.getPlugin);

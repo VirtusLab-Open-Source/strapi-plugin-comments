@@ -2,8 +2,7 @@ import { useStrapiApp } from '@strapi/strapi/admin';
 
 type CustomInjectionZoneProps = {
   area: `${string}.${string}.${string}`;
-  [key: string]: unknown;
-};
+} & Record<string, unknown>;
 
 export const CustomInjectionZone = ({ area, ...props }: CustomInjectionZoneProps) => {
   const getPlugin = useStrapiApp('CustomInjectionZone', (state) => state.getPlugin);
