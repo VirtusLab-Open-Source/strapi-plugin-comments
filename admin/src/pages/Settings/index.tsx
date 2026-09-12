@@ -28,6 +28,7 @@ import { usePermissions } from '../../hooks/usePermissions';
 import { CommonProviders } from '../../providers/CommonProviders';
 import { getMessage } from '../../utils';
 import { useSettingsAPI } from './hooks/useSettingsAPI';
+import { Config } from '../../api/schemas';
 
 const pluginVersion = pluginPkg.version;
 
@@ -45,6 +46,22 @@ const StyledAlert = styled(Alert)(() => ({
   },
 }));
 
+const defaultConfig: Config = {
+  entryLabel: {},
+  approvalFlow: [],
+  blockedAuthorProps: [],
+  reactionsEnabled: false,
+  reportReasons: {},
+  regex: { email: '', uid: '', relatedUid: '', sorting: '' },
+  enabledCollections: [],
+  moderatorRoles: [],
+  isGQLPluginEnabled: false,
+  isReactionsPluginInstalled: false,
+  client: { url: '', contactEmail: '' },
+  gql: { auth: false },
+  badWords: undefined,
+};
+
 const Settings = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const { toggleNotification } = useNotification();
@@ -54,9 +71,9 @@ const Settings = () => {
   const api = useAPI();
 
   const {
-    config,
-    collectionTypes,
-    roles,
+    config: configQuery,
+    collectionTypes: collectionTypesQuery,
+    roles: rolesQuery,
     restoreSettingsMutation,
     updateSettingsMutation,
     restartStrapiMutation,
@@ -99,29 +116,43 @@ const Settings = () => {
     [updateSettingsMutation]
   );
 
+  const config = configQuery.data ?? defaultConfig;
+  const collectionTypes = collectionTypesQuery.data ?? [];
+  const roles = rolesQuery.data ?? [];
+
   if (
-    config.status !== 'success' ||
-    collectionTypes.status !== 'success' ||
-    roles.status !== 'success' ||
+    configQuery.status === 'pending' ||
+    collectionTypesQuery.status === 'pending' ||
+    rolesQuery.status === 'pending' ||
     isLoadingForPermissions
   ) {
-    // TODO
     return getMessage('page.settings.loading');
   }
 
-  const allCollections = collectionTypes.data.filter((ct) => ct.uid.includes('api::'));
-  const enabledCollections = config.data.enabledCollections.filter((uid: string) =>
+  if (configQuery.status === 'error' || collectionTypesQuery.status === 'error' || rolesQuery.status === 'error') {
+    toggleNotification({
+      message: getMessage('page.settings.error'),
+      type: 'danger',
+    });
+    console.error('Failed to fetch configuration. Please try again later.');
+    console.error(configQuery.error);
+    console.error(collectionTypesQuery.error);
+    console.error(rolesQuery.error);
+  }
+
+  const allCollections = collectionTypes.filter((ct) => ct.uid.includes('api::'));
+  const enabledCollections = config.enabledCollections.filter((uid: string) =>
     allCollections.some((ct) => ct.uid === uid)
   );
-  const badWords = isNil(config.data.badWords) ? true : config.data?.badWords;
-  const gqlAuthEnabled = Boolean(config.data.gql?.auth || null);
-  const moderatorRoles = config.data.moderatorRoles.filter((role: string) =>
-    roles.data.filter((r) => r.code === role)
+  const badWords = isNil(config.badWords) ? true : config.badWords;
+  const gqlAuthEnabled = Boolean(config.gql?.auth || null);
+  const moderatorRoles = config.moderatorRoles.filter((role: string) =>
+    roles.filter((r) => r.code === role)
   );
-  const clientUrl = config.data.client?.url;
-  const clientEmail = config.data.client?.contactEmail;
-  const blockedAuthorProps = config.data.blockedAuthorProps ?? [];
-  const reactionsEnabled = config.data.reactionsEnabled ?? false;
+  const clientUrl = config.client?.url;
+  const clientEmail = config.client?.contactEmail;
+  const blockedAuthorProps = config.blockedAuthorProps ?? [];
+  const reactionsEnabled = config.reactionsEnabled ?? false;
   const onDiscardRestart = () => setIsRestartRequired(false);
 
   return (
@@ -182,8 +213,8 @@ const Settings = () => {
               clientEmail,
               clientUrl,
               gqlAuthEnabled,
-              approvalFlow: config.data.approvalFlow,
-              entryLabel: config.data.entryLabel,
+              approvalFlow: config.approvalFlow,
+              entryLabel: config.entryLabel,
               blockedAuthorProps: blockedAuthorProps.join(', '),
               reactionsEnabled,
             }}
@@ -387,7 +418,7 @@ const Settings = () => {
                         <Field.Hint />
                       </Field.Root>
                     </Grid.Item>
-                    <RenderIf condition={config.data.isReactionsPluginInstalled}>
+                    <RenderIf condition={config.isReactionsPluginInstalled}>
                       <Grid.Item col={4} xs={12} alignItems="start">
                         <Field.Root
                           width="100%"
@@ -456,7 +487,7 @@ const Settings = () => {
                             onChange('moderatorRoles', value);
                           }}
                         >
-                          {roles.data.map((role) => (
+                          {roles.map((role) => (
                             <MultiSelectOption key={role.code} value={role.code}>
                               {role.name}
                             </MultiSelectOption>

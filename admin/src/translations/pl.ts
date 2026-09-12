@@ -194,6 +194,7 @@ export default {
   'page.settings.notification.restart.error':
     'Nie udało się uruchomić aplikacji ponownie. Spróbuj zrobić to ręcznie.',
   'page.settings.loading': 'Pobieranie konfiguracji...',
+  'page.settings.error': 'Nie udało się pobrać konfiguracji. Sprawdź konsolę dla szczegółów.',
   'page.settings.form.author.blockedProps.label': 'Zablokowane dane autora',
   'page.settings.form.author.blockedProps.hint':
     'Określone właściwości zostaną filtrowane z danych autora (oddzielone przecinkiem)',

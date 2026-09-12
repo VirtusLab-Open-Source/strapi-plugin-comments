@@ -164,6 +164,7 @@ export default {
   'page.settings.notification.restart.error':
     'Falha ao reiniciar seu aplicativo. Tente fazer manualmente.',
   'page.settings.loading': 'Buscando configuração...',
+  'page.settings.error': 'Falha ao buscar a configuração. Verifique a console para mais detalhes.',
   'components.confirmation.dialog.header': 'Confirmação',
   'components.confirmation.dialog.description': 'Você realmente deseja realizar esta ação?',
   'components.confirmation.dialog.button.confirm': 'Sim eu quero',

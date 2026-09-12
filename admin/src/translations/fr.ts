@@ -200,6 +200,7 @@ export default {
   'page.settings.notification.restart.error':
     'Le redémarrage de votre application a échoué. Essayez de le faire manuellement.',
   'page.settings.loading': 'Récupération de la configuration…',
+  'page.settings.error': 'Impossible de récupérer la configuration. Vérifiez la console pour plus de détails.',
   'page.settings.form.author.blockedProps.label': "Détail de l'auteur bloqué",
   'page.settings.form.author.blockedProps.hint':
     "Les propriétés indiquées seront masquées dans le détail de l'auteur (séparées par des virgules)",
