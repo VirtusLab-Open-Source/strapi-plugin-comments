@@ -565,6 +565,67 @@ describe('Client controller validator', () => {
       );
       expect(isLeft(result)).toBe(true);
     });
+
+    it('should default source to USER when it is omitted', () => {
+      const result = reportAbuseValidator(
+        {
+          enabledCollections: ['api::article.article'],
+          reportReasons: {
+            BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
+          },
+        },
+        {
+          reason: 'BAD_LANGUAGE',
+          content: 'tedadadasst',
+          commentId: '1',
+          relation: 'api::article.article:1',
+        }
+      );
+
+      expect(isRight(result)).toBe(true);
+      expect(result.right).toMatchObject({ source: 'USER' });
+    });
+
+    it('should accept AI as report source', () => {
+      const result = reportAbuseValidator(
+        {
+          enabledCollections: ['api::article.article'],
+          reportReasons: {
+            BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
+          },
+        },
+        {
+          reason: 'BAD_LANGUAGE',
+          content: 'tedadadasst',
+          commentId: '1',
+          relation: 'api::article.article:1',
+          source: 'AI',
+        }
+      );
+
+      expect(isRight(result)).toBe(true);
+      expect(result.right).toMatchObject({ source: 'AI' });
+    });
+
+    it('should return left when source is invalid', () => {
+      const result = reportAbuseValidator(
+        {
+          enabledCollections: ['api::article.article'],
+          reportReasons: {
+            BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
+          },
+        },
+        {
+          reason: 'BAD_LANGUAGE',
+          content: 'tedadadasst',
+          commentId: '1',
+          relation: 'api::article.article:1',
+          source: 'MODERATOR',
+        }
+      );
+
+      expect(isLeft(result)).toBe(true);
+    });
   });
 
   describe('removeCommentValidator', () => {

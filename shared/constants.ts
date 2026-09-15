@@ -1,0 +1,1 @@
+export const ORIGIN_SOURCE = ['USER', 'AI'] as const;

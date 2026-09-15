@@ -1,5 +1,5 @@
 import { AdminUser, StrapiContext } from '../../@types';
-import { APPROVAL_STATUS, REPORT_REASON } from '../../const';
+import { APPROVAL_STATUS, REPORT_REASON, REPORT_SOURCE } from '../../const';
 import { getCommentRepository, getReportCommentRepository } from '../../repositories';
 import { caster } from '../../test/utils';
 import PluginError from '../../utils/error';
@@ -43,6 +43,7 @@ describe('client.service', () => {
     sanitizeCommentEntity: jest.fn(),
     sanitizeCommentContent: jest.fn((content: string) => content),
     modifiedNestedNestedComments: jest.fn(),
+    runLifecycleHook: jest.fn().mockResolvedValue(undefined),
   };
 
   const mockCommentRepository = {
@@ -166,6 +167,11 @@ describe('client.service', () => {
           threadOf: null,
         },
         populate: defaultPopulate,
+      });
+      expect(mockCommonService.runLifecycleHook).toHaveBeenCalledWith({
+        contentTypeName: 'comment',
+        hookName: 'afterCreate',
+        event: { action: 'afterCreate', result: mockSanitizedEntity },
       });
     });
 
@@ -528,6 +534,37 @@ describe('client.service', () => {
         data: {
           reason: REPORT_REASON.BAD_LANGUAGE,
           content: 'Report content',
+          source: REPORT_SOURCE.USER,
+          resolved: false,
+          related: 1,
+        },
+      });
+    });
+
+    it('should persist explicit report source when provided', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComment = { id: 1, content: 'Test comment', isAdminComment: false };
+      const mockReport = { id: 1, reason: REPORT_REASON.BAD_LANGUAGE, content: 'Report content', source: REPORT_SOURCE.AI };
+
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.findOne.mockResolvedValue(mockComment);
+      mockReportCommentRepository.create.mockResolvedValue(mockReport);
+
+      const result = await service.reportAbuse(
+        { ...mockPayload, source: REPORT_SOURCE.AI },
+        mockUser
+      );
+
+      expect(result).toEqual({
+        ...mockReport,
+        related: mockComment,
+      });
+      expect(mockReportCommentRepository.create).toHaveBeenCalledWith({
+        data: {
+          reason: REPORT_REASON.BAD_LANGUAGE,
+          content: 'Report content',
+          source: REPORT_SOURCE.AI,
           resolved: false,
           related: 1,
         },

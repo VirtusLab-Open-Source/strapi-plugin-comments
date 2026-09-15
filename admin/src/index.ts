@@ -9,6 +9,28 @@ const { name, displayName } = pluginPkg.strapi;
 
 export default {
   register(app: any) {
+    app.registerPlugin({
+      id: name,
+      name: name,
+      injectionZones: {
+        reports: {
+          tableHeaderSource: [],
+          tableRowSource: [],
+        },
+        reviews: {
+          tableHeaderSource: [],
+          tableRowSource: [],
+        },
+        pages: {
+          aiEvaluations: [],
+        },
+        sideNav: {
+          aiEvaluations: [],
+          mobileAiEvaluations: [],
+        },
+      },
+    });
+
     app.addMenuLink({
       to: `/plugins/${pluginId}`,
       badgeContent: 1,

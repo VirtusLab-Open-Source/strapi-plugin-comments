@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { dbBaseCommentSchema, avatarSchema } from './comment.schema';
 import { paginationSchema } from './utils';
+import { ORIGIN_SOURCE } from '../../../../shared/constants';
 
 const relatedSchema = z.object({
   id: z.number(),
@@ -43,6 +44,7 @@ const reportSchema = z.object({
   publishedAt: z.string().nullable(),
   locale: z.string().nullable(),
   related: relatedSchema.nullable().optional(),
+  source: z.enum(ORIGIN_SOURCE).nullish(),
 });
 
 const findPageSchema = z.object({
@@ -78,6 +80,7 @@ const findManySchema = z.array(
     publishedAt: z.string().nullable(),
     locale: z.string().nullable(),
     related: z.union([dbBaseCommentSchema, z.number()]).nullish(),
+    source: z.enum(ORIGIN_SOURCE).nullish(),
   })
 );
 

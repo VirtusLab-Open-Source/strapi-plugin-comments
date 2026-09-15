@@ -1,8 +1,8 @@
 import { Flex, Link, SubNav, SubNavHeader, SubNavLink, SubNavSection, SubNavSections } from '@strapi/design-system';
 import { NavLink } from 'react-router-dom';
-
 import { getMessage } from '../../utils';
 import { Box } from '@strapi/design-system';
+import { CustomInjectionZone } from '../CustomInjectionZone';
 
 export const SideNav = () => {
   return (
@@ -17,6 +17,7 @@ export const SideNav = () => {
             <SubNavLink to="/plugins/comments/reports" tag={NavLink} withBullet={false}>
               {getMessage('nav.item.reports')}
             </SubNavLink>
+            <CustomInjectionZone area='comments.sideNav.aiEvaluations' />
           </SubNavSection>
         </SubNavSections>
       </SubNav>
@@ -36,6 +37,7 @@ export const SideNav = () => {
           <Link tag={NavLink} to="/plugins/comments/reports">
             {getMessage('nav.item.reports')}
           </Link>
+          <CustomInjectionZone area='comments.sideNav.mobileAiEvaluations' />
         </Flex>
       </Box>
     </>
