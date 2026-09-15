@@ -7,6 +7,7 @@ import controllers from "./controllers";
 import routes from "./routes";
 import services from "./services";
 
+// TODO: Resolve Strapi typings legacy approach
 const plugin: Core.Plugin = {
   register,
   bootstrap,
