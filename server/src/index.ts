@@ -1,4 +1,3 @@
-import type { Core } from '@strapi/strapi';
 import contentTypes from './content-types';
 import register from "./register";
 import bootstrap from "./bootstrap";
@@ -7,8 +6,17 @@ import controllers from "./controllers";
 import routes from "./routes";
 import services from "./services";
 
-// TODO: Resolve Strapi typings legacy approach
-const plugin: Core.Plugin = {
+type CommentsPlugin = {
+  register: typeof register;
+  bootstrap: typeof bootstrap;
+  config: typeof config;
+  controllers: typeof controllers;
+  routes: typeof routes;
+  services: typeof services;
+  contentTypes: typeof contentTypes;
+};
+
+const plugin: CommentsPlugin = {
   register,
   bootstrap,
   config,
@@ -16,6 +24,6 @@ const plugin: Core.Plugin = {
   routes,
   services,
   contentTypes,
-} as unknown as Core.Plugin;
+};
 
 export default plugin;
