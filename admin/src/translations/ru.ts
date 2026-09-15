@@ -191,6 +191,7 @@ export default {
   'page.settings.notification.restart.error':
     'Ошибка перезапуска приложения. Попробуйте перезапустить вручную.',
   'page.settings.loading': 'Получение конфигурации...',
+  'page.settings.error': 'Ошибка получения конфигурации. Проверьте консоль для получения подробностей.',
   'page.settings.form.author.blockedProps.label': 'Подробная информация о заблокированном авторе',
   'page.settings.form.author.blockedProps.hint':
     'Указанные свойства будут отфильтрованы из информации об авторе (разделитель запятая)',

@@ -179,6 +179,7 @@ export default {
   'page.settings.notification.restart.success': '应用程序已成功重新启动',
   'page.settings.notification.restart.error': '无法重新启动应用程序。请尝试手动操作。',
   'page.settings.loading': '加载配置中...',
+  'page.settings.error': '无法加载配置。请检查控制台以获取详细信息。',
   'page.settings.form.author.blockedProps.label': '屏蔽的作者详细信息',
   'page.settings.form.author.blockedProps.hint':
     '指定的属性将从作者的详细信息中筛选出来（以逗号分隔）',

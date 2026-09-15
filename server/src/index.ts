@@ -6,7 +6,17 @@ import controllers from "./controllers";
 import routes from "./routes";
 import services from "./services";
 
-export default {
+type CommentsPlugin = {
+  register: typeof register;
+  bootstrap: typeof bootstrap;
+  config: typeof config;
+  controllers: typeof controllers;
+  routes: typeof routes;
+  services: typeof services;
+  contentTypes: typeof contentTypes;
+};
+
+const plugin: CommentsPlugin = {
   register,
   bootstrap,
   config,
@@ -15,3 +25,5 @@ export default {
   services,
   contentTypes,
 };
+
+export default plugin;

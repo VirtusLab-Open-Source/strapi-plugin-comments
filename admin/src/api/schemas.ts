@@ -5,7 +5,7 @@ export const configSchema = z.object({
   entryLabel: z.record(z.array(z.string())),
   approvalFlow: z.array(z.string()),
   blockedAuthorProps: z.array(z.string()),
-  reactionsEnabled: z.boolean(),
+  reactionsEnabled: z.boolean().optional().default(false),
   reportReasons: z.record(z.string()),
   regex: z.object({
     uid: z.string(),

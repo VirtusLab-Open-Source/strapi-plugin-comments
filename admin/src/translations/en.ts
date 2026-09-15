@@ -190,6 +190,7 @@ const en = {
   'page.settings.notification.restart.error':
     'Failed to restart your application. Try to do it manually.',
   'page.settings.loading': 'Fetching configuration...',
+  'page.settings.error': 'Failed to fetch configuration. Check console for details.',
   'page.settings.form.author.blockedProps.label': 'Blocked author details',
   'page.settings.form.author.blockedProps.hint':
     "Specified properties will be filtered out from author's details (comma-separated)",

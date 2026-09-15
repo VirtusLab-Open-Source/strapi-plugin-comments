@@ -189,6 +189,7 @@ export default {
   'page.settings.notification.restart.error':
     'Uygulama yeniden başlatamadı. Manuel olarak yapmaya çalışın.',
   'page.settings.loading': 'Ayarlar getiriliyor ...',
+  'page.settings.error': 'Ayarlar getirilemedi. Konsola bakarak detayları alın.',
   'components.confirmation.dialog.header': 'Onayla',
   'components.confirmation.dialog.description':
     'Bu eylemi gerçekleştirmek istediğinize emin misiniz?',
