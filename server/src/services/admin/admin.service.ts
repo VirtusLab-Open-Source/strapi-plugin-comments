@@ -8,7 +8,7 @@ import { admin as adminValidator } from '../../validators/api';
 import { filterOurResolvedReports, getAuthorName } from '../utils/functions';
 import { getAdminServiceUtils } from './utils';
 
-export default ({ strapi }: StrapiContext) => {
+const adminService = ({ strapi }: StrapiContext) => {
   const utils = getAdminServiceUtils(strapi);
   return ({
     getCommonService() {
@@ -269,3 +269,6 @@ export default ({ strapi }: StrapiContext) => {
     },
   });
 };
+
+export type AdminService = ReturnType<typeof adminService>;
+export default adminService;

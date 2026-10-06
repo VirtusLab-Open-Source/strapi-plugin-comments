@@ -3,7 +3,7 @@ import { CommentsPluginConfig } from '../config';
 import { getStoreRepository } from '../repositories';
 import { isRight } from '../utils/Either';
 
-export default ({ strapi }: StrapiContext) => {
+const settingsService = ({ strapi }: StrapiContext) => {
   const storeRepository = getStoreRepository(strapi);
   return ({
     getConfig: async (viaSettingsPage = false) => {
@@ -32,3 +32,6 @@ export default ({ strapi }: StrapiContext) => {
     },
   });
 };
+
+export type SettingsService = ReturnType<typeof settingsService>;
+export default settingsService;

@@ -369,17 +369,26 @@ const commonService = ({ strapi }: StrapiContext) => ({
     );
 
     const reactionsService = getPluginService(strapi, 'reactions');
+    const isEnabledReactionService = await reactionsService.isEnabled();
 
-    if (!(await reactionsService.isEnabled())) {
-      return rootEntriesWithChildren;
+    const data = !isEnabledReactionService
+      ? rootEntriesWithChildren
+      : attachReactionsToComments(
+          rootEntriesWithChildren,
+          await reactionsService.getCountsForComments(
+            collectCommentDocumentIds(rootEntriesWithChildren),
+            locale,
+          ),
+        );
+
+    if (pagination) {
+      return {
+        data,
+        pagination: rootEntries.pagination,
+      };
     }
 
-    const reactionsMeta = await reactionsService.getCountsForComments(
-      collectCommentDocumentIds(rootEntriesWithChildren),
-      locale,
-    );
-
-    return attachReactionsToComments(rootEntriesWithChildren, reactionsMeta);
+    return data;
   },
 
   // Find single comment
@@ -784,5 +793,5 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
 });
 
-type CommonService = ReturnType<typeof commonService>;
+export type CommonService = ReturnType<typeof commonService>;
 export default commonService;
