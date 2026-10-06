@@ -745,6 +745,66 @@ describe('common.service', () => {
       expect(typedResult[0]).not.toHaveProperty('reactions');
       expect(mockReactionsService.getCountsForComments).not.toHaveBeenCalled();
     });
+
+    it('should return array by default and paginated object with optional reactions', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockComments = [
+        { id: 1, content: 'Parent 1', threadOf: null, documentId: 'doc-1', gotThread: false },
+      ];
+      const mockPagination = { page: 1, pageSize: 10, pageCount: 1, total: 1 };
+      const query = {
+        fields: ['id', 'content', 'threadOf', 'documentId', 'gotThread'],
+      };
+
+      const setupMocks = () => {
+        mockCommentRepository.findMany.mockResolvedValue(mockComments);
+        caster<jest.Mock>(getOrderBy).mockReturnValue(['createdAt', 'desc']);
+        mockCommentRepository.findWithCount.mockImplementation(async (args) => {
+          const threadOf = args?.where?.threadOf?.$eq ?? null;
+          return {
+            results: mockComments.filter((c) => c.threadOf === threadOf),
+            pagination: mockPagination,
+          };
+        });
+        mockStoreRepository.getConfig.mockResolvedValue([]);
+      };
+
+      setupMocks();
+      mockReactionsService.isEnabled.mockResolvedValue(false);
+
+      expect(await service.findAllInHierarchy({ ...query })).toEqual([
+        expect.objectContaining({ id: 1 }),
+      ]);
+
+      setupMocks();
+      mockReactionsService.isEnabled.mockResolvedValue(false);
+
+      expect(
+        await service.findAllInHierarchy({
+          ...query,
+          pagination: { page: 1, pageSize: 10 },
+        }),
+      ).toEqual({
+        data: [expect.objectContaining({ id: 1 })],
+        pagination: mockPagination,
+      });
+      expect(mockReactionsService.getCountsForComments).not.toHaveBeenCalled();
+
+      setupMocks();
+      mockReactionsService.isEnabled.mockResolvedValue(true);
+      mockReactionsService.getCountsForComments.mockResolvedValue({ 'doc-1': { like: 1 } });
+
+      expect(
+        await service.findAllInHierarchy({
+          ...query,
+          pagination: { page: 1, pageSize: 10 },
+        }),
+      ).toEqual({
+        data: [expect.objectContaining({ id: 1, reactions: { like: 1 } })],
+        pagination: mockPagination,
+      });
+    });
   });
 
   describe('updateComment', () => {
