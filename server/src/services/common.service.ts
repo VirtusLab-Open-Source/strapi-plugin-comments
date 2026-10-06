@@ -21,10 +21,7 @@ import {
   attachReactionsToComments,
   collectCommentDocumentIds,
 } from './utils/reactions';
-import type { ContentType, LifeCycleEvent, LifeCycleHookName } from '../utils/types';
-
-type Effect<T = void> = [T] extends [void] ? () => void | Promise<void> : (event: T) => void | Promise<void>;
-type LifecycleHookRecord = Partial<Record<LifeCycleHookName, Array<Effect<LifeCycleEvent>>>>;
+import type { ContentType, LifeCycleEvent, LifeCycleHookName, LifecycleHookRecord, Effect } from '../utils/types';
 
 const lifecycleHookListeners: Record<ContentType, LifecycleHookRecord> = {
   comment: {},

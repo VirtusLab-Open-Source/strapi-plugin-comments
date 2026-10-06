@@ -43,3 +43,6 @@ export interface LifeCycleEvent<
   params?: TParams;
   result?: TResult | TResult[];
 }
+
+export type Effect<T = void> = [T] extends [void] ? () => void | Promise<void> : (event: T) => void | Promise<void>;
+export type LifecycleHookRecord = Partial<Record<LifeCycleHookName, Array<Effect<LifeCycleEvent>>>>;
