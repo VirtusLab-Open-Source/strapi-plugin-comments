@@ -21,6 +21,12 @@ import {
   attachReactionsToComments,
   collectCommentDocumentIds,
 } from './utils/reactions';
+import type { ContentType, LifeCycleEvent, LifeCycleHookName, LifecycleHookRecord, Effect } from '../utils/types';
+
+const lifecycleHookListeners: Record<ContentType, LifecycleHookRecord> = {
+  comment: {},
+  'comment-report': {},
+};
 
 const PAGE_SIZE = 10;
 const REQUIRED_FIELDS = ['id', 'documentId'];
@@ -763,9 +769,19 @@ const commonService = ({ strapi }: StrapiContext) => ({
     });
   },
 
-  registerLifecycleHook(/*{ callback, contentTypeName, hookName }*/) {},
+  registerLifecycleHook({ callback, contentTypeName, hookName }: { callback: Effect<LifeCycleEvent>; contentTypeName: ContentType; hookName: LifeCycleHookName }) {
+    if (!lifecycleHookListeners[contentTypeName][hookName]) {
+      lifecycleHookListeners[contentTypeName][hookName] = [];
+    }
+    lifecycleHookListeners[contentTypeName][hookName]!.push(callback);
+  },
 
-  async runLifecycleHook(/*{ contentTypeName, event, hookName }*/) {},
+  async runLifecycleHook({ contentTypeName, event, hookName }: { contentTypeName: ContentType; event: LifeCycleEvent; hookName: LifeCycleHookName }) {
+    const listeners = lifecycleHookListeners[contentTypeName][hookName] ?? [];
+    for (const listener of listeners) {
+      await listener(event);
+    }
+  },
 });
 
 type CommonService = ReturnType<typeof commonService>;

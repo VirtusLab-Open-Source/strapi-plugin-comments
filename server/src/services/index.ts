@@ -6,6 +6,7 @@ import commonServices from './common.service';
 import gqlService from './gql.service';
 import reactionsServices from './reactions.service';
 import settingsService from './settings.service';
+import { emailService } from './email.service';
 
 const pluginServices = {
   admin: adminServices,
@@ -13,7 +14,8 @@ const pluginServices = {
   common: commonServices,
   reactions: reactionsServices,
   settings: settingsService,
-  gql: gqlService
+  gql: gqlService,
+  email: emailService,
 };
 
 export type PluginServices = {

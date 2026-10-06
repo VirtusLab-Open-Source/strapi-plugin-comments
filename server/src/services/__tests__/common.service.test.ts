@@ -1446,4 +1446,65 @@ describe('common.service', () => {
       expect(mockReportCommentRepository.updateManyByIds).toHaveBeenCalledWith([], { resolved: true });
     });
   });
+
+  describe('lifecycle hooks', () => {
+    it('should invoke registered listeners with the given event', async () => {
+      const service = getService(getStrapi());
+      const callback = jest.fn();
+      const event = { action: 'afterFindOne' as const, result: { id: 1 } };
+
+      service.registerLifecycleHook({
+        callback,
+        contentTypeName: 'comment',
+        hookName: 'afterFindOne',
+      });
+
+      await service.runLifecycleHook({
+        contentTypeName: 'comment',
+        hookName: 'afterFindOne',
+        event,
+      });
+
+      expect(callback).toHaveBeenCalledTimes(1);
+      expect(callback).toHaveBeenCalledWith(event);
+    });
+
+    it('should not invoke listeners registered for a different content type', async () => {
+      const service = getService(getStrapi());
+      const commentCallback = jest.fn();
+      const reportCallback = jest.fn();
+
+      service.registerLifecycleHook({
+        callback: commentCallback,
+        contentTypeName: 'comment',
+        hookName: 'afterCount',
+      });
+      service.registerLifecycleHook({
+        callback: reportCallback,
+        contentTypeName: 'comment-report',
+        hookName: 'afterCount',
+      });
+
+      await service.runLifecycleHook({
+        contentTypeName: 'comment',
+        hookName: 'afterCount',
+        event: { action: 'afterCount' },
+      });
+
+      expect(commentCallback).toHaveBeenCalledTimes(1);
+      expect(reportCallback).not.toHaveBeenCalled();
+    });
+
+    it('should resolve when no listeners are registered for a hook', async () => {
+      const service = getService(getStrapi());
+
+      await expect(
+        service.runLifecycleHook({
+          contentTypeName: 'comment',
+          hookName: 'beforeDelete',
+          event: { action: 'beforeDelete' },
+        })
+      ).resolves.toBeUndefined();
+    });
+  });
 });

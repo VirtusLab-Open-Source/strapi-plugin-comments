@@ -1,8 +1,8 @@
-import { Button, Checkbox, Table, Tbody, Th, Thead, Tr, Typography } from '@strapi/design-system';
+import { Button, Checkbox, Flex, Table, Tbody, Th, Thead, Tr, Typography } from '@strapi/design-system';
 import { Check } from '@strapi/icons';
 import { useNotification } from '@strapi/strapi/admin';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { useIntl } from 'react-intl';
 import { CommentReport } from '../../api/schemas';
 import { useAPI } from '../../hooks/useAPI';
@@ -10,6 +10,7 @@ import { AllowedActions } from '../../types';
 import { getMessage } from '../../utils';
 import { ReportReasonBadge } from '../ReportReasonBadge';
 import { CommentReportStatusBadge } from '../CommentReportStatusBadge';
+import { CustomInjectionZoneCell } from '../CustomInjectionZoneCell';
 
 type Props = {
   commentId: number;
@@ -31,7 +32,6 @@ export const ReportReviewTable: FC<Props> = ({
   const api = useAPI();
   const queryClient = useQueryClient();
   const { toggleNotification } = useNotification();
-
 
   const resolveReportMutation = useMutation({
     mutationKey: ['resolveReport', commentId],
@@ -77,6 +77,7 @@ export const ReportReviewTable: FC<Props> = ({
               disabled={reports.filter((report) => !report.resolved).length === 0}
             />
           </Th>
+          <CustomInjectionZoneCell as='th' area='comments.reviews.tableHeaderSource' />
           <Th>
             <Typography variant="sigma">
               {getMessage('page.reports.table.header.reason', 'Reason')}
@@ -111,6 +112,7 @@ export const ReportReviewTable: FC<Props> = ({
                   disabled={report.resolved}
                 />
               </Th>
+              <CustomInjectionZoneCell as='th' area='comments.reviews.tableRowSource' source={report.source}/>
               <Th>
                 <ReportReasonBadge reason={report.reason} />
               </Th>

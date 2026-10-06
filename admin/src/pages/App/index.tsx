@@ -7,6 +7,7 @@ import { useSettingsStore } from '../../store/settings.store';
 import { Details } from '../Details';
 import { Discover } from '../Discover';
 import { Reports } from '../Reports';
+import { AiEvaluations } from '../AiEvaluations';
 
 
 const InnerApp = () => {
@@ -21,6 +22,7 @@ const InnerApp = () => {
         <Route path="/discover" element={<Discover />} />
         <Route path="/discover/:id" element={<Details config={config} />} />
         <Route path="/reports" element={<Reports config={config} />} />
+        <Route path="/ai-reports" element={<AiEvaluations />} />
         <Route path="*" element={<Navigate to="discover" replace />} />
       </Routes>
     </Layouts.Root>

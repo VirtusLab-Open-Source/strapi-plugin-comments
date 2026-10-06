@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { COMMENT_STATUS } from '../utils/constants';
+import { ORIGIN_SOURCE } from '../../../shared/constants';
 
 export const configSchema = z.object({
   entryLabel: z.record(z.array(z.string())),
@@ -92,7 +93,9 @@ const commentReportSchema = z.object({
   resolved: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string().nullable(),
+  source: z.enum(ORIGIN_SOURCE).nullish(),
 });
+
 const baseCommentSchema = z.object({
   id: z.number(),
   content: z.string(),
@@ -205,6 +208,7 @@ export const reportSchema = z.object({
   updatedAt: z.string().nullable(),
   createdAt: z.string(),
   related: baseCommentSchema,
+  source: z.enum(ORIGIN_SOURCE).nullish(),
 });
 
 export type Report = z.infer<typeof reportSchema>;

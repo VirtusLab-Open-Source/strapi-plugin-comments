@@ -26,7 +26,7 @@ export interface LifeCycleEvent<
   TParams = Record<string, unknown>
 > {
   action: THookName;
-  model: {
+  model?: {
     singularName: string;
     uid: string;
     tableName: string;
@@ -39,7 +39,10 @@ export interface LifeCycleEvent<
     }>;
     columnToAttribute: Record<string, string>;
   };
-  state: Record<string, unknown>;
-  params: TParams;
+  state?: Record<string, unknown>;
+  params?: TParams;
   result?: TResult | TResult[];
 }
+
+export type Effect<T = void> = [T] extends [void] ? () => void | Promise<void> : (event: T) => void | Promise<void>;
+export type LifecycleHookRecord = Partial<Record<LifeCycleHookName, Array<Effect<LifeCycleEvent>>>>;

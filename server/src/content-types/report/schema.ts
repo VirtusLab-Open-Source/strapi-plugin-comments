@@ -1,4 +1,4 @@
-import { REPORT_REASON } from '../../const';
+import { REPORT_REASON, REPORT_SOURCE } from '../../const';
 
 export default {
   collectionName: "plugin_comments_reports",
@@ -30,6 +30,13 @@ export default {
       type: "enumeration",
       enum: Object.values(REPORT_REASON),
       default: REPORT_REASON.OTHER,
+      configurable: false,
+      required: true,
+    },
+    source: {
+      type: "enumeration",
+      enum: Object.values(REPORT_SOURCE),
+      default: REPORT_SOURCE.USER,
       configurable: false,
       required: true,
     },
