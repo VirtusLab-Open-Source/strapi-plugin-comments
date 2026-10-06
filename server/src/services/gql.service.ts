@@ -212,4 +212,5 @@ const gqlService = ({ strapi }: StrapiContext) => {
   };
 };
 
+export type GqlService = ReturnType<typeof gqlService>;
 export default gqlService;
