@@ -55,7 +55,7 @@
     "codemirror5": "npm:codemirror@^5.65.11",
     "match-sorter": "^6.3.4",
     "no-profanity": "^1.5.1",
-    "sanitize-html": "2.17.5",
+    "sanitize-html": "2.17.7",
     "zod": "^3.23.8",
     "zustand": "^5.0.0-rc.2"
   },
