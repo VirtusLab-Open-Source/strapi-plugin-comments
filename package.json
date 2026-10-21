@@ -62,6 +62,7 @@
   "devDependencies": {
     "@jest/types": "29.5.x",
     "@sensinum/strapi-utils": "^1.0.12",
+    "@strapi/database": "^5.52.3",
     "@strapi/plugin-graphql": "^5.52.3",
     "@strapi/plugin-users-permissions": "^5.52.3",
     "@strapi/sdk-plugin": "^5.4.0",
