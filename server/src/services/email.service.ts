@@ -40,5 +40,3 @@ export const emailService = ({ strapi }: StrapiContext) => {
     },
   };
 };
-
-export type EmailService = ReturnType<typeof emailService>;

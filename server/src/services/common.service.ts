@@ -793,5 +793,4 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
 });
 
-export type CommonService = ReturnType<typeof commonService>;
 export default commonService;

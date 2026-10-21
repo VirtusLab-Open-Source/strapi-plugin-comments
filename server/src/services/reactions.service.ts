@@ -135,5 +135,4 @@ export const reactionsService = ({ strapi }: StrapiContext) => ({
   },
 });
 
-export type ReactionsService = ReturnType<typeof reactionsService>;
 export default reactionsService;

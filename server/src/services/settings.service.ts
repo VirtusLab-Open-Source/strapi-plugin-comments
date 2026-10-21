@@ -33,5 +33,4 @@ const settingsService = ({ strapi }: StrapiContext) => {
   });
 };
 
-export type SettingsService = ReturnType<typeof settingsService>;
 export default settingsService;

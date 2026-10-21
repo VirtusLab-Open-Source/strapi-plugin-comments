@@ -270,5 +270,4 @@ const adminService = ({ strapi }: StrapiContext) => {
   });
 };
 
-export type AdminService = ReturnType<typeof adminService>;
 export default adminService;

@@ -351,5 +351,4 @@ export const clientService = ({ strapi }: StrapiContext) => {
   });
 };
 
-export type ClientService = ReturnType<typeof clientService>;
 export default clientService;
