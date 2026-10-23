@@ -102,15 +102,21 @@ export const clientService = ({ strapi }: StrapiContext) => {
       };
       const sanitizedEntity = this.getCommonService().sanitizeCommentEntity(entity, doNotPopulateAuthor);
 
-      void this.sendResponseNotification(sanitizedEntity).catch((error) => console.error(error));
+      try {
+        await this.sendResponseNotification(sanitizedEntity);
+      } catch (error) {
+        strapi.log.error(error);
+      }
 
-      void this.getCommonService()
-        .runLifecycleHook({
+      try {
+        await this.getCommonService().runLifecycleHook({
           contentTypeName: 'comment',
           hookName: 'afterCreate',
           event: { action: 'afterCreate', result: sanitizedEntity },
-        })
-        .catch((error) => console.error(error));
+        });
+      } catch (error) {
+        strapi.log.error(error);
+      }
 
       return sanitizedEntity;
     },
