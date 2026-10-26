@@ -59,6 +59,7 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 - **Moderation Panel:** Search & Filter through the bucket with your auditory comments. Manage them by blocking single ones or full threads. All in combined list &amp; hierarchical tree view of threads.
 - **Automated Bad Words filtering:** By default end users are not allowed to post abusing comments where bad words have been used.
 - **Abuse Reporting & Reviewing:** Don't allow inferior language, react to reports from your community, send email notifications about issued reports
+- **Reactions plugin integration:** Optional integration with [`strapi-plugin-reactions`](https://github.com/VirtusLab-Open-Source/strapi-plugin-reactions) to expose reaction counts on comments in REST & GraphQL APIs and in the moderation panel (see [Reactions integration](#reactions-integration)).
 
 ## ⏳ Installation
 
@@ -113,6 +114,10 @@ In our minimum support we're following [official Node.js releases timelines](htt
 
 - `@strapi/plugin-graphql` - required to run GraphQL handled by this plugin
 
+**Optional plugin integrations**
+
+- [`strapi-plugin-reactions`](https://github.com/VirtusLab-Open-Source/strapi-plugin-reactions) - required only if you want comment reaction counts in public APIs and the admin UI. Enable it with **`reactionsEnabled`** on the Comments **Settings** page (see [Reactions integration](#reactions-integration)).
+
 **We recommend always using the latest version of Strapi to start your new projects**.
 
 ## 🔧 Configuration
@@ -122,6 +127,8 @@ To start your journey with **Comments plugin** you must first setup it using the
 ### Settings page
 
 On the dedicated page, you will be able to set up all crucial properties which drive the plugin and customize each individual collection for which **Comments plugin** should be enabled.
+
+When [`strapi-plugin-reactions`](https://github.com/VirtusLab-Open-Source/strapi-plugin-reactions) is installed, an additional **Reactions integration** toggle (`reactionsEnabled`) appears in the global settings section. It controls whether comment payloads include reaction counts (see [Reactions integration](#reactions-integration)).
 
 <div style="margin: 20px 0" align="center">
   <img style="width: 100%; height: auto;" src="https://www.sensinum.com/img/open-source/strapi-plugin-comments/configuration.png" alt="Plugin configuration" />
@@ -170,6 +177,7 @@ module.exports = ({ env }) => ({
 - `reportReasons` - set of enums you would like to use for issuing abuse reports. Provided by default `'BAD_LANGUAGE'`, `'DISCRIMINATION'` and `'OTHER'`.
 - `gql` - specific configuration for GraphQL. See [Additional GQL Configuration](#additional-gql-configuration)
 - `blockedAuthorProps` - list of author's entity properties removed from a response for client side
+- `reactionsEnabled` - stored in the plugin settings (Comments → **Settings**). When `true` and the [Reactions plugin](#reactions-integration) is installed and enabled, comment responses in REST and GraphQL include reaction counts. If the setting is missing or the Reactions plugin is not present, integration stays off regardless of other defaults.
 
 ## Additional GQL Configuration
 
@@ -244,7 +252,11 @@ Feature / Capability focused permissions:
   "createdAt": "2020-07-14T20:13:01.649Z",
   "updatedAt": "2020-07-14T20:13:01.670Z",
   "related": {}, // Related content type entity
-  "reports": [] // Reports issued against this comment
+  "reports": [], // Reports issued against this comment
+  "reactions": {
+    "like": 2,
+    "love": 1
+  } // Present only when reactionsEnabled is on and strapi-plugin-reactions is installed
 }
 ```
 
@@ -318,7 +330,11 @@ Return a flat structure of comments for specified instance of Content Type like 
   "meta": {
     "pagination": {
       // payload based on Strapi REST Pagination specification
-    }
+    },
+    "reactions": {
+      "njx99iv4p4txuqp307ye8625": { "like": 2 },
+      "another-comment-document-id": { "like": 1, "love": 3 }
+    } // Present only when reactionsEnabled is on (map keyed by comment documentId)
   }
 }
 ```
@@ -334,6 +350,8 @@ Return a flat structure of comments for specified instance of Content Type like 
 - [field selection](https://docs.strapi.io/dev-docs/api/rest/populate-select#field-selection)
 - [sorting](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#sorting)
 - [pagination](https://docs.strapi.io/dev-docs/api/rest/sort-pagination#pagination)
+
+> **Reactions:** With [Reactions integration](#reactions-integration) enabled, each item in `data` includes a `reactions` object; paginated flat responses may also include `meta.reactions` as above.
 
 ### Get Comments (by Author)
 
@@ -688,9 +706,15 @@ query {
       id
       name
     }
+    reactions {
+      slug
+      count
+    }
   }
 }
 ```
+
+> **Reactions:** The `reactions` field is available on comment types when [Reactions integration](#reactions-integration) is enabled. Each entry is `{ slug, count }`.
 
 **Example response**
 
@@ -737,19 +761,36 @@ query {
     relation: "api::page.page:njx99iv4p4txuqp307ye8625"
     filters: { content: { contains: "Test" } }
   ) {
-    id
-    content
-    blocked
-    threadOf {
+    data {
       id
+      content
+      blocked
+      threadOf {
+        id
+      }
+      author {
+        id
+        name
+      }
+      reactions {
+        slug
+        count
+      }
     }
-    author {
-      id
-      name
+    meta {
+      reactions {
+        documentId
+        counts {
+          slug
+          count
+        }
+      }
     }
   }
 }
 ```
+
+> **Reactions:** With integration enabled, `findAllFlat` returns the same per-comment `reactions` list plus optional `meta.reactions` for the current result set.
 
 **Example response**
 
@@ -1290,6 +1331,12 @@ module.exports = {
 ```
 
 If you already got it, make sure that `comments` plugin is inserted before `graphql`. That should do the job.
+
+### Reactions integration
+
+**Q:** I installed `strapi-plugin-reactions` but comment APIs do not return `reactions`. What should I check?
+
+**A:** Confirm both plugins are enabled, then open **Comments → Settings**, enable **Reactions integration** (`reactionsEnabled`), save, and restart Strapi if required. The toggle is hidden until the Reactions plugin is loaded. Reaction counts appear only on read endpoints (listing comments); users still create or remove reactions through the Reactions plugin API.
 
 ## 🤝 Contributing to the plugin
 
