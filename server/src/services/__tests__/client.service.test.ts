@@ -383,7 +383,7 @@ describe('client.service', () => {
       const service = getService(strapi);
       const mockEntity = { id: 1, content: 'Test comment' };
       const mockSanitizedEntity = { id: 1, content: 'Clean comment' };
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const notificationError = new Error('Email failed');
 
       mockCommonService.parseRelationString.mockReturnValue({
         uid: 'api::test.test',
@@ -395,14 +395,12 @@ describe('client.service', () => {
       mockCommonService.checkBadWords.mockResolvedValue('Test comment');
       mockCommentRepository.create.mockResolvedValue(mockEntity);
       mockCommonService.sanitizeCommentEntity.mockReturnValue(mockSanitizedEntity);
-      jest.spyOn(service, 'sendResponseNotification').mockRejectedValue(new Error('Email failed'));
+      jest.spyOn(service, 'sendResponseNotification').mockRejectedValue(notificationError);
 
       const result = await service.create(mockPayload, mockUser);
 
       expect(result).toEqual(mockSanitizedEntity);
-      expect(consoleErrorSpy).toHaveBeenCalled();
-
-      consoleErrorSpy.mockRestore();
+      expect(mockLog.error).toHaveBeenCalledWith(notificationError);
     });
 
     it('should still return created comment when afterCreate lifecycle hook fails', async () => {
@@ -411,7 +409,6 @@ describe('client.service', () => {
       const mockEntity = { id: 1, content: 'Test comment' };
       const mockSanitizedEntity = { id: 1, content: 'Clean comment' };
       const lifecycleError = new Error('Hook failed');
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
       mockCommonService.parseRelationString.mockReturnValue({
         uid: 'api::test.test',
@@ -429,9 +426,7 @@ describe('client.service', () => {
       const result = await service.create(mockPayload, mockUser);
 
       expect(result).toEqual(mockSanitizedEntity);
-      expect(consoleErrorSpy).toHaveBeenCalledWith(lifecycleError);
-
-      consoleErrorSpy.mockRestore();
+      expect(mockLog.error).toHaveBeenCalledWith(lifecycleError);
     });
   });
 
