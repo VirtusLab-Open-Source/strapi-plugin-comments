@@ -383,7 +383,7 @@ describe('client.service', () => {
       const service = getService(strapi);
       const mockEntity = { id: 1, content: 'Test comment' };
       const mockSanitizedEntity = { id: 1, content: 'Clean comment' };
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const notificationError = new Error('Email failed');
 
       mockCommonService.parseRelationString.mockReturnValue({
         uid: 'api::test.test',
@@ -395,14 +395,38 @@ describe('client.service', () => {
       mockCommonService.checkBadWords.mockResolvedValue('Test comment');
       mockCommentRepository.create.mockResolvedValue(mockEntity);
       mockCommonService.sanitizeCommentEntity.mockReturnValue(mockSanitizedEntity);
-      jest.spyOn(service, 'sendResponseNotification').mockRejectedValue(new Error('Email failed'));
+      jest.spyOn(service, 'sendResponseNotification').mockRejectedValue(notificationError);
 
       const result = await service.create(mockPayload, mockUser);
 
       expect(result).toEqual(mockSanitizedEntity);
-      expect(consoleErrorSpy).toHaveBeenCalled();
+      expect(mockLog.error).toHaveBeenCalledWith(notificationError);
+    });
 
-      consoleErrorSpy.mockRestore();
+    it('should still return created comment when afterCreate lifecycle hook fails', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const mockEntity = { id: 1, content: 'Test comment' };
+      const mockSanitizedEntity = { id: 1, content: 'Clean comment' };
+      const lifecycleError = new Error('Hook failed');
+
+      mockCommonService.parseRelationString.mockReturnValue({
+        uid: 'api::test.test',
+        relatedId: '1',
+      });
+      mockFindOne.mockResolvedValue({ id: 1 });
+      mockCommonService.getConfig.mockResolvedValue([]);
+      mockCommonService.isValidUserContext.mockReturnValue(true);
+      mockCommonService.checkBadWords.mockResolvedValue('Test comment');
+      mockCommentRepository.create.mockResolvedValue(mockEntity);
+      mockCommonService.sanitizeCommentEntity.mockReturnValue(mockSanitizedEntity);
+      mockCommonService.runLifecycleHook.mockRejectedValue(lifecycleError);
+      jest.spyOn(service, 'sendResponseNotification').mockResolvedValue(undefined);
+
+      const result = await service.create(mockPayload, mockUser);
+
+      expect(result).toEqual(mockSanitizedEntity);
+      expect(mockLog.error).toHaveBeenCalledWith(lifecycleError);
     });
   });
 

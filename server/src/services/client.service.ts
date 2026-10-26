@@ -104,15 +104,19 @@ export const clientService = ({ strapi }: StrapiContext) => {
 
       try {
         await this.sendResponseNotification(sanitizedEntity);
-      } catch (e) {
-        console.error(e);
+      } catch (error) {
+        strapi.log.error(error);
       }
 
-      await this.getCommonService().runLifecycleHook({
-        contentTypeName: 'comment',
-        hookName: 'afterCreate',
-        event: { action: 'afterCreate', result: sanitizedEntity },
-      });
+      try {
+        await this.getCommonService().runLifecycleHook({
+          contentTypeName: 'comment',
+          hookName: 'afterCreate',
+          event: { action: 'afterCreate', result: sanitizedEntity },
+        });
+      } catch (error) {
+        strapi.log.error(error);
+      }
 
       return sanitizedEntity;
     },
@@ -351,5 +355,4 @@ export const clientService = ({ strapi }: StrapiContext) => {
   });
 };
 
-type ClientService = ReturnType<typeof clientService>;
 export default clientService;
