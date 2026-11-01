@@ -5,6 +5,7 @@ import { getPluginService } from '../../utils/getPluginService';
 import PluginError from '../../utils/PluginError';
 
 import { admin as adminValidator } from '../../validators/api';
+import { CommentInput } from '../../validators/repositories';
 import { filterOurResolvedReports, getAuthorName } from '../utils/functions';
 import { getAdminServiceUtils } from './utils';
 
@@ -91,7 +92,8 @@ const adminService = ({ strapi }: StrapiContext) => {
         const populate = typeof defaultAuthorUserPopulate !== 'boolean' ? defaultAuthorUserPopulate?.populate : {};
         return filterOurResolvedReports(
           commonService.sanitizeCommentEntity(
-            entity,
+            // Report entity: `related` holds the reported comment, not a content-type relation.
+            entity as unknown as CommentInput,
             [],
             [],
             populate,

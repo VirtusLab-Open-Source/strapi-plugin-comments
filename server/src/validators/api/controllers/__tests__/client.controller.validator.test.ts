@@ -485,7 +485,7 @@ describe('Client controller validator', () => {
           reportReasons: {
             BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
           },
-        },
+        } as any,
         {
           reason: 'BAD_LANGUAGE',
           content: 'tedadadasst',
@@ -503,7 +503,7 @@ describe('Client controller validator', () => {
           reportReasons: {
             BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
           },
-        },
+        } as any,
         {
           reason: 'invalid',
           content: 'tedadadasst',
@@ -521,7 +521,7 @@ describe('Client controller validator', () => {
           reportReasons: {
             BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
           },
-        },
+        } as any,
         {
           reason: 'BAD_LANGUAGE',
           content: '',
@@ -538,7 +538,7 @@ describe('Client controller validator', () => {
           reportReasons: {
             BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
           },
-        },
+        } as any,
         {
           reason: 'BAD_LANGUAGE',
           content: 'tedadadasst',
@@ -555,7 +555,7 @@ describe('Client controller validator', () => {
           reportReasons: {
             BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
           },
-        },
+        } as any,
         {
           reason: 'BAD_LANGUAGE',
           content: 'tedadadasst',
@@ -573,7 +573,7 @@ describe('Client controller validator', () => {
           reportReasons: {
             BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
           },
-        },
+        } as any,
         {
           reason: 'BAD_LANGUAGE',
           content: 'tedadadasst',
@@ -593,7 +593,7 @@ describe('Client controller validator', () => {
           reportReasons: {
             BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
           },
-        },
+        } as any,
         {
           reason: 'BAD_LANGUAGE',
           content: 'tedadadasst',
@@ -614,7 +614,7 @@ describe('Client controller validator', () => {
           reportReasons: {
             BAD_LANGUAGE: REPORT_REASON.BAD_LANGUAGE,
           },
-        },
+        } as any,
         {
           reason: 'BAD_LANGUAGE',
           content: 'tedadadasst',

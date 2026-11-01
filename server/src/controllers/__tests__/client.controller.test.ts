@@ -78,7 +78,7 @@ describe('Client controller', () => {
         params: { relation: 'test' },
         request: { body: { content: 'Test comment' } },
         state: { user: { id: 1 } }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validatedData = { content: 'Test comment', relation: 'test' };
       const expectedResult = { id: 1, content: 'Test comment' };
@@ -97,7 +97,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { relation: 'test' },
         request: { body: {} }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const error = new Error('Config validation failed');
 
       mockStoreRepository.get.mockResolvedValue({ left: error });
@@ -110,7 +110,7 @@ describe('Client controller', () => {
         params: { relation: 'test' },
         request: { body: {} },
         state: { user: { id: 1 } }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const error = new Error('Validation failed');
 
@@ -126,7 +126,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { relation: 'test' },
         query: { page: 1 }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validatedData = { 
         relation: 'test', 
@@ -172,7 +172,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { relation: 'test' },
         query: { page: 1 }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const error = new Error('Config validation failed');
 
       mockStoreRepository.get.mockResolvedValue({ left: error });
@@ -184,7 +184,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { relation: 'test' },
         query: { page: 1 }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const error = new Error('Validation failed');
 
@@ -200,7 +200,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { relation: 'test' },
         query: { page: 1 }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validatedData = { 
         relation: 'test',
@@ -250,7 +250,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { relation: 'test' },
         query: { page: 1 }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const error = new Error('Config validation failed');
 
       mockStoreRepository.get.mockResolvedValue({ left: error });
@@ -262,7 +262,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { relation: 'test' },
         query: { page: 1 }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const error = new Error('Validation failed');
 
@@ -278,7 +278,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { authorId: '1', type: 'user' },
         query: { page: 1 }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const validatedData = { 
         authorId: '1', 
         type: 'user',
@@ -322,7 +322,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { authorId: '1' },
         query: { page: 1 }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const validatedData = {
         authorId: '1',
         page: 1,
@@ -349,7 +349,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { authorId: '1', type: 'generic' },
         query: { page: 1 }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const validatedData = {
         authorId: '1',
         type: 'generic',
@@ -377,7 +377,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { authorId: '1', type: AUTHOR_TYPE.GENERIC },
         query: { page: 1 }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const validatedData = { 
         authorId: '1',
         type: AUTHOR_TYPE.GENERIC,
@@ -417,7 +417,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { authorId: '1', type: 'user' },
         query: { page: 1 }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const error = new Error('Validation failed');
 
       caster<jest.Mock>(clientValidator.findAllPerAuthorValidator).mockReturnValue({ left: error });
@@ -530,7 +530,7 @@ describe('Client controller', () => {
         params: { id: '1' },
         request: { body: { reason: 'spam' } },
         state: { user: { id: 1 } }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validatedData = { id: '1', reason: 'spam' };
       const expectedResult = { success: true };
@@ -550,7 +550,7 @@ describe('Client controller', () => {
         params: { id: '1' },
         request: { body: { reason: 'spam' } },
         state: { user: { id: 1 } }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const error = new Error('Config validation failed');
 
       mockStoreRepository.get.mockResolvedValue({ left: error });
@@ -563,7 +563,7 @@ describe('Client controller', () => {
         params: { id: '1' },
         request: { body: { reason: 'spam' } },
         state: { user: { id: 1 } }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const error = new Error('Validation failed');
 
@@ -580,7 +580,7 @@ describe('Client controller', () => {
         params: { id: '1' },
         query: {},
         state: { user: { id: 1 } }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validatedData = { id: '1' };
       const expectedResult = { success: true };
@@ -600,7 +600,7 @@ describe('Client controller', () => {
         params: { id: '1' },
         query: {},
         state: { user: { id: 1 } }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const error = new Error('Config validation failed');
 
       mockStoreRepository.get.mockResolvedValue({ left: error });
@@ -613,7 +613,7 @@ describe('Client controller', () => {
         params: { id: '1' },
         query: {},
         state: { user: { id: 1 } }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const error = new Error('Validation failed');
 
@@ -628,7 +628,7 @@ describe('Client controller', () => {
     it('should block comment when validation passes', async () => {
       const ctx = {
         params: { relation: 'test', commentId: '1' },
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validatedData = { relation: 'test', commentId: '1' };
       const expectedResult = { id: 1, blocked: true };
@@ -646,7 +646,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when store config fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext<any, any, any>;
 
       mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
 
@@ -654,7 +654,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when validator fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
@@ -670,7 +670,7 @@ describe('Client controller', () => {
     it('should unblock comment when validation passes', async () => {
       const ctx = {
         params: { relation: 'test', commentId: '2' },
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validatedData = { relation: 'test', commentId: '2' };
       const expectedResult = { id: 2, blocked: false };
@@ -688,7 +688,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when store config fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext<any, any, any>;
 
       mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
 
@@ -696,7 +696,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when validator fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
@@ -712,7 +712,7 @@ describe('Client controller', () => {
     it('should block thread when validation passes', async () => {
       const ctx = {
         params: { relation: 'test', commentId: '3' },
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validatedData = { relation: 'test', commentId: '3' };
       const expectedResult = { id: 3, blocked: true, blockedThread: true };
@@ -730,7 +730,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when store config fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext<any, any, any>;
 
       mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
 
@@ -738,7 +738,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when validator fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
@@ -754,7 +754,7 @@ describe('Client controller', () => {
     it('should unblock thread when validation passes', async () => {
       const ctx = {
         params: { relation: 'test', commentId: '4' },
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validatedData = { relation: 'test', commentId: '4' };
       const expectedResult = { id: 4, blocked: false, blockedThread: false };
@@ -772,7 +772,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when store config fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext<any, any, any>;
 
       mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
 
@@ -780,7 +780,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when validator fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
@@ -796,7 +796,7 @@ describe('Client controller', () => {
     it('should approve comment when validation passes', async () => {
       const ctx = {
         params: { relation: 'test', commentId: '5' },
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validatedData = { relation: 'test', commentId: '5' };
       const expectedResult = { id: 5, approvalStatus: 'APPROVED' };
@@ -814,7 +814,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when store config fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext<any, any, any>;
 
       mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
 
@@ -822,7 +822,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when validator fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
@@ -838,7 +838,7 @@ describe('Client controller', () => {
     it('should reject comment when validation passes', async () => {
       const ctx = {
         params: { relation: 'test', commentId: '6' },
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validatedData = { relation: 'test', commentId: '6' };
       const expectedResult = { id: 6, approvalStatus: 'REJECTED' };
@@ -856,7 +856,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when store config fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext<any, any, any>;
 
       mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
 
@@ -864,7 +864,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when validator fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '1' } } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
@@ -880,7 +880,7 @@ describe('Client controller', () => {
     it('should resolve single report when validation passes', async () => {
       const ctx = {
         params: { relation: 'test', commentId: '1', reportId: '9' },
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validated = { relation: 'test', commentId: 1, reportId: 9 };
       const expected = { count: 1 };
@@ -898,7 +898,7 @@ describe('Client controller', () => {
     it('should throw when store config fails', async () => {
       const ctx = {
         params: { relation: 'test', commentId: '1', reportId: '9' },
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
 
       mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
 
@@ -908,7 +908,7 @@ describe('Client controller', () => {
     it('should throw when validator fails', async () => {
       const ctx = {
         params: { relation: 'test', commentId: '1', reportId: '9' },
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
@@ -925,7 +925,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { relation: 'test', commentId: '2' },
         request: { body: { reportIds: [10, 11] } },
-      } as RequestContext<{ reportIds: number[] }>;
+      } as RequestContext<{ reportIds: number[] }, any>;
       const config = { enabledCollections: ['test'] };
       const validated = { relation: 'test', commentId: 2, reportIds: [10, 11] };
       const expected = { count: 2 };
@@ -946,7 +946,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { relation: 'test', commentId: '2' },
         request: { body: { reportIds: [10, 11] } },
-      } as RequestContext<{ reportIds: number[] }>;
+      } as RequestContext<{ reportIds: number[] }, any>;
 
       mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
 
@@ -957,7 +957,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { relation: 'test', commentId: '2' },
         request: { body: { reportIds: [10, 11] } },
-      } as RequestContext<{ reportIds: number[] }>;
+      } as RequestContext<{ reportIds: number[] }, any>;
       const config = { enabledCollections: ['test'] };
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
@@ -971,7 +971,7 @@ describe('Client controller', () => {
 
   describe('resolveAllAbuseReportsForComment', () => {
     it('should delegate to common when validation passes', async () => {
-      const ctx = { params: { relation: 'test', commentId: '3' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '3' } } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validated = { relation: 'test', commentId: 3 };
       const expected = { count: 3 };
@@ -987,7 +987,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when store config fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '3' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '3' } } as RequestContext<any, any, any>;
 
       mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
 
@@ -995,7 +995,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when validator fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '3' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '3' } } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
@@ -1009,7 +1009,7 @@ describe('Client controller', () => {
 
   describe('resolveAllAbuseReportsForThread', () => {
     it('should delegate to common when validation passes', async () => {
-      const ctx = { params: { relation: 'test', commentId: '4' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '4' } } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
       const validated = { relation: 'test', commentId: 4 };
       const expected = { count: 1 };
@@ -1025,7 +1025,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when store config fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '4' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '4' } } as RequestContext<any, any, any>;
 
       mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
 
@@ -1033,7 +1033,7 @@ describe('Client controller', () => {
     });
 
     it('should throw when validator fails', async () => {
-      const ctx = { params: { relation: 'test', commentId: '4' } } as RequestContext;
+      const ctx = { params: { relation: 'test', commentId: '4' } } as RequestContext<any, any, any>;
       const config = { enabledCollections: ['test'] };
 
       mockStoreRepository.get.mockResolvedValue({ right: config });
@@ -1050,7 +1050,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { relation: 'test' },
         request: { body: { reportIds: [20, 21] } },
-      } as RequestContext<{ reportIds: number[] }>;
+      } as RequestContext<{ reportIds: number[] }, any>;
       const config = { enabledCollections: ['test'] };
       const validated = { relation: 'test', reportIds: [20, 21] };
       const expected = { count: 2 };
@@ -1071,7 +1071,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { relation: 'test' },
         request: { body: { reportIds: [20, 21] } },
-      } as RequestContext<{ reportIds: number[] }>;
+      } as RequestContext<{ reportIds: number[] }, any>;
 
       mockStoreRepository.get.mockResolvedValue({ left: new Error('fail') });
 
@@ -1082,7 +1082,7 @@ describe('Client controller', () => {
       const ctx = {
         params: { relation: 'test' },
         request: { body: { reportIds: [20, 21] } },
-      } as RequestContext<{ reportIds: number[] }>;
+      } as RequestContext<{ reportIds: number[] }, any>;
       const config = { enabledCollections: ['test'] };
 
       mockStoreRepository.get.mockResolvedValue({ right: config });

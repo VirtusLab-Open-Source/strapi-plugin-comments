@@ -3,7 +3,7 @@ import { get, isEmpty, isObject } from 'lodash';
 import { AdminUser, CommentAuthor, Id } from '../../@types';
 import { REGEX } from '../../utils/constants';
 import PluginError from '../../utils/error';
-import { Comment, CommentWithRelated } from '../../validators/repositories';
+import { Comment, CommentInput, CommentWithRelated } from '../../validators/repositories';
 
 type Avatar = {
   url: string;
@@ -38,7 +38,7 @@ export const filterOurResolvedReports = (item: Comment): Comment =>
     : item;
 
 export const buildAuthorModel = (
-  item: Comment | CommentWithRelated,
+  item: CommentInput | CommentWithRelated,
   blockedAuthorProps: Array<string>,
   fieldsToPopulate: Array<string> = [],
 ): Comment => {

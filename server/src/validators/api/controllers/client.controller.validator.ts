@@ -73,6 +73,7 @@ const paginationSchema = z.object({
 // TODO when Strapi will use zod v4 we can change it to the z.stringbool()
 const populateSchema = z
   .record(
+    z.string(),
     z.union([
       z.union([
         z.boolean(),
@@ -80,7 +81,7 @@ const populateSchema = z
         z.literal('false').transform(() => false),
         z.literal('*'),
       ]),
-      z.record(z.any()),
+      z.record(z.string(), z.any()),
     ])
   )
   .optional();
@@ -139,7 +140,14 @@ export const findAllFlatValidator = (
   );
 };
 
-export type FindAllFlatSchema = ExtractRightEither<ReturnType<typeof findAllFlatValidator>>;
+// zod v4 types fields with `.default()` as required in the output.
+// Internal callers build these params by hand, so keep the defaulted fields optional.
+type WithOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+export type FindAllFlatSchema = WithOptional<
+  ExtractRightEither<ReturnType<typeof findAllFlatValidator>>,
+  'sort' | 'isAdmin' | 'relation'
+>;
 
 export const findAllInHierarchyValidator = (
   enabledCollections: string[],
@@ -175,8 +183,9 @@ export const findAllInHierarchyValidator = (
   );
 };
 
-export type FindAllInHierarchyValidatorSchema = ExtractRightEither<
-  ReturnType<typeof findAllInHierarchyValidator>
+export type FindAllInHierarchyValidatorSchema = WithOptional<
+  ExtractRightEither<ReturnType<typeof findAllInHierarchyValidator>>,
+  'sort' | 'isAdmin' | 'dropBlockedThreads' | 'relation'
 >;
 
 export const findAllPerAuthorValidator = (params: object, payload: object) => {
@@ -215,8 +224,9 @@ export const findAllPerAuthorValidator = (params: object, payload: object) => {
   );
 };
 
-export type FindAllPerAuthorValidatorSchema = ExtractRightEither<
-  ReturnType<typeof findAllPerAuthorValidator>
+export type FindAllPerAuthorValidatorSchema = WithOptional<
+  ExtractRightEither<ReturnType<typeof findAllPerAuthorValidator>>,
+  'sort' | 'isAdmin'
 >;
 
 const getReportAbuseSchema = (config: CommentsPluginConfig) => {

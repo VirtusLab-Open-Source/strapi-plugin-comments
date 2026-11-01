@@ -261,7 +261,7 @@ describe('Store repository', () => {
       const strapi = getStrapi();
       const newConfig = { entryLabel: { test: ['test'] } };
 
-      await getRepository(strapi).update(newConfig);
+      await getRepository(strapi).update(newConfig as any);
 
       expect(mockStore.set).toHaveBeenCalledWith({
         key: 'config',
@@ -287,7 +287,7 @@ describe('Store repository', () => {
         },
       } as any;
 
-      await getRepository(strapi).update(newConfig);
+      await getRepository(strapi).update(newConfig as any);
 
       expect(mockStore.set).toHaveBeenCalledWith({
         key: 'config',
