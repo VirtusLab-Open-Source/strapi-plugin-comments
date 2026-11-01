@@ -435,7 +435,7 @@ describe('common.service', () => {
 
       await service.findAllFlat({
         fields: ['id', 'content'],
-        pagination: { pageSize: 20, page: 3 },
+        pagination: { pageSize: 20, page: 3 } as any,
       });
 
       expect(mockCommentRepository.findWithCount).toHaveBeenCalledWith(
@@ -519,7 +519,7 @@ describe('common.service', () => {
       const service = getService(strapi);
       const entity = { id: 1, content: 'Test', authorName: 'John' };
 
-      const result = service.sanitizeCommentEntity(entity, [], [], ['authorUser']);
+      const result = service.sanitizeCommentEntity(entity as any, [], [], ['authorUser']);
 
       expect(result).toBeDefined();
       expect(result.id).toBe(1);
@@ -529,7 +529,7 @@ describe('common.service', () => {
       const service = getService(strapi);
       const entity = { id: 1, content: 'Test', authorName: 'John' };
 
-      const result = service.sanitizeCommentEntity(entity, [], [], { authorUser: true });
+      const result = service.sanitizeCommentEntity(entity as any, [], [], { authorUser: true });
 
       expect(result).toBeDefined();
       expect(result.id).toBe(1);
@@ -783,7 +783,7 @@ describe('common.service', () => {
       expect(
         await service.findAllInHierarchy({
           ...query,
-          pagination: { page: 1, pageSize: 10 },
+          pagination: { page: 1, pageSize: 10 } as any,
         }),
       ).toEqual({
         data: [expect.objectContaining({ id: 1 })],
@@ -798,7 +798,7 @@ describe('common.service', () => {
       expect(
         await service.findAllInHierarchy({
           ...query,
-          pagination: { page: 1, pageSize: 10 },
+          pagination: { page: 1, pageSize: 10 } as any,
         }),
       ).toEqual({
         data: [expect.objectContaining({ id: 1, reactions: { like: 1 } })],
@@ -989,7 +989,7 @@ describe('common.service', () => {
         { uid: 'api::test.test', documentId: '1', locale: 'en', title: 'Test Title' },
       ];
 
-      const result = service.mergeRelatedEntityTo(comment, relatedEntities);
+      const result = service.mergeRelatedEntityTo(comment as any, relatedEntities as any);
 
       expect(result).toEqual({
         ...comment,
@@ -1005,7 +1005,7 @@ describe('common.service', () => {
         { uid: 'api::test.test', documentId: '2', locale: 'en', title: 'Test Title' },
       ];
 
-      const result = service.mergeRelatedEntityTo(comment, relatedEntities);
+      const result = service.mergeRelatedEntityTo(comment as any, relatedEntities as any);
 
       expect(result).toEqual({ ...comment, related: undefined });
     });
@@ -1015,7 +1015,7 @@ describe('common.service', () => {
       const service = getService(strapi);
       const comment = { id: 1, related: 'api::test.test:1', locale: 'en' };
 
-      const result = service.mergeRelatedEntityTo(comment, []);
+      const result = service.mergeRelatedEntityTo(comment as any, []);
 
       expect(result).toEqual({ ...comment, related: undefined });
     });
@@ -1026,7 +1026,7 @@ describe('common.service', () => {
       const comment = { id: 1, related: 'api::test.test:1' };
       const relatedEntities = [{ uid: 'api::test.test', documentId: '1', title: 'Test Title' }];
 
-      const result = service.mergeRelatedEntityTo(comment, relatedEntities);
+      const result = service.mergeRelatedEntityTo(comment as any, relatedEntities as any);
 
       expect(result).toEqual({
         ...comment,
@@ -1182,7 +1182,7 @@ describe('common.service', () => {
 
       mockFindOne.mockResolvedValue(mockRelatedEntities);
 
-      const result = await service.findRelatedEntitiesFor(mockComments);
+      const result = await service.findRelatedEntitiesFor(mockComments as any);
 
       expect(result).toHaveLength(mockComments.length);
       expect(result).toEqual(expect.arrayContaining([mockRelatedEntities]));
@@ -1195,7 +1195,7 @@ describe('common.service', () => {
 
       mockFindOne.mockResolvedValue(undefined);
 
-      const result = await service.findRelatedEntitiesFor(mockComments);
+      const result = await service.findRelatedEntitiesFor(mockComments as any);
 
       expect(result).toHaveLength(0);
     });
@@ -1211,7 +1211,7 @@ describe('common.service', () => {
         title: 'Test',
       });
 
-      await service.findRelatedEntitiesFor(mockComments);
+      await service.findRelatedEntitiesFor(mockComments as any);
 
       expect(mockFindOne).toHaveBeenCalledWith(
         expect.objectContaining({

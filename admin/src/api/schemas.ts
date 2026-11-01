@@ -3,11 +3,11 @@ import { COMMENT_STATUS } from '../utils/constants';
 import { ORIGIN_SOURCE } from '../../../shared/constants';
 
 export const configSchema = z.object({
-  entryLabel: z.record(z.array(z.string())),
+  entryLabel: z.record(z.string(), z.array(z.string())),
   approvalFlow: z.array(z.string()),
   blockedAuthorProps: z.array(z.string()),
   reactionsEnabled: z.boolean().optional().default(false),
-  reportReasons: z.record(z.string()),
+  reportReasons: z.record(z.string(), z.string()),
   regex: z.object({
     uid: z.string(),
     relatedUid: z.string(),
@@ -46,7 +46,7 @@ const relatedSchema = z.intersection(
     publishedAt: z.string().nullable(),
     locale: z.string().nullable().optional(),
   }),
-  z.record(z.unknown()),
+  z.record(z.string(), z.unknown()),
 );
 
 const authorSchema = z.object({
@@ -176,7 +176,7 @@ const singleContentTypeSchema = z.object({
   apiID: z.string(),
   uid: z.string(),
   schema: z.object({
-    attributes: z.record(z.object({ type: z.union([z.literal('string'), z.string()]) })),
+    attributes: z.record(z.string(), z.object({ type: z.union([z.literal('string'), z.string()]) })),
     collectionName: z.string(),
     description: z.string(),
     displayName: z.string(),

@@ -454,7 +454,7 @@ describe('client.service', () => {
       mockCommentRepository.update.mockResolvedValue(mockEntity);
       mockCommonService.sanitizeCommentEntity.mockReturnValue(mockSanitizedEntity);
 
-      const result = await service.update(mockPayload, mockUser);
+      const result = await service.update(mockPayload as any, mockUser);
 
       expect(result).toEqual(mockSanitizedEntity);
       expect(mockCommentRepository.update).toHaveBeenCalledWith({
@@ -477,7 +477,7 @@ describe('client.service', () => {
       mockCommentRepository.update.mockResolvedValue(mockEntity);
       mockCommonService.sanitizeCommentEntity.mockReturnValue(mockSanitizedEntity);
 
-      const result = await service.update(mockPayload, undefined);
+      const result = await service.update(mockPayload as any, undefined);
 
       expect(result).toEqual(mockSanitizedEntity);
       expect(mockCommentRepository.update).toHaveBeenCalledWith({
@@ -504,7 +504,7 @@ describe('client.service', () => {
       mockCommonService.checkBadWords.mockResolvedValue(true);
       mockCommonService.findOne.mockResolvedValue(null);
 
-      await expect(service.update(mockPayload, mockUser)).resolves.toBeUndefined();
+      await expect(service.update(mockPayload as any, mockUser)).resolves.toBeUndefined();
     });
 
     it('should throw error when author id does not match comment author', async () => {
@@ -515,7 +515,7 @@ describe('client.service', () => {
       mockCommonService.checkBadWords.mockResolvedValue(true);
       mockCommonService.findOne.mockResolvedValue({ id: 1, author: { id: 2 } });
 
-      await expect(service.update(mockPayload, mockUser)).resolves.toBeUndefined();
+      await expect(service.update(mockPayload as any, mockUser)).resolves.toBeUndefined();
     });
 
     it('should throw error when bad words check fails', async () => {
@@ -525,7 +525,7 @@ describe('client.service', () => {
       mockCommonService.isValidUserContext.mockReturnValue(true);
       mockCommonService.checkBadWords.mockResolvedValue(false);
 
-      await expect(service.update(mockPayload, mockUser)).resolves.toBeUndefined();
+      await expect(service.update(mockPayload as any, mockUser)).resolves.toBeUndefined();
     });
   });
 
@@ -548,7 +548,7 @@ describe('client.service', () => {
       mockCommonService.findOne.mockResolvedValue(mockComment);
       mockReportCommentRepository.create.mockResolvedValue(mockReport);
 
-      const result = await service.reportAbuse(mockPayload, mockUser);
+      const result = await service.reportAbuse(mockPayload as any, mockUser);
 
       expect(result).toEqual({
         ...mockReport,
@@ -603,7 +603,7 @@ describe('client.service', () => {
       mockCommonService.isValidUserContext.mockReturnValue(true);
       mockCommonService.findOne.mockResolvedValue(mockComment);
 
-      await expect(service.reportAbuse(mockPayload, mockUser)).rejects.toThrow(PluginError);
+      await expect(service.reportAbuse(mockPayload as any, mockUser)).rejects.toThrow(PluginError);
     });
 
     it('should throw error when user context is invalid', async () => {
@@ -612,7 +612,7 @@ describe('client.service', () => {
 
       mockCommonService.isValidUserContext.mockReturnValue(false);
 
-      await expect(service.reportAbuse(mockPayload, mockUser)).rejects.toThrow(PluginError);
+      await expect(service.reportAbuse(mockPayload as any, mockUser)).rejects.toThrow(PluginError);
       expect(mockCommonService.findOne).not.toHaveBeenCalled();
     });
 
@@ -627,7 +627,7 @@ describe('client.service', () => {
       mockReportCommentRepository.create.mockResolvedValue(mockReport);
       jest.spyOn(service, 'sendAbuseReportEmail').mockRejectedValue(new Error('Email failed'));
 
-      const result = await service.reportAbuse(mockPayload, mockUser);
+      const result = await service.reportAbuse(mockPayload as any, mockUser);
 
       expect(result).toEqual({
         ...mockReport,
@@ -644,7 +644,7 @@ describe('client.service', () => {
       mockCommonService.findOne.mockResolvedValue(mockComment);
       mockReportCommentRepository.create.mockResolvedValue(null);
 
-      await expect(service.reportAbuse(mockPayload, mockUser)).rejects.toMatchObject({
+      await expect(service.reportAbuse(mockPayload as any, mockUser)).rejects.toMatchObject({
         status: 500,
         message: 'Report cannot be created',
       });

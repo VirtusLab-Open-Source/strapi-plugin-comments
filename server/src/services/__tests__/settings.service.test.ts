@@ -94,7 +94,7 @@ describe('settings.service', () => {
   });
 
   describe('update', () => {
-    const mockConfig: CommentsPluginConfig = {
+    const mockConfig = caster<CommentsPluginConfig>({
       isValidationEnabled: true,
       moderatorRoles: ['admin'],
       enabledCollections: [],
@@ -106,7 +106,7 @@ describe('settings.service', () => {
         OTHER: REPORT_REASON.OTHER,
       },
       blockedAuthorProps: [],
-    };
+    });
 
     it('should update config when repository returns right value', async () => {
       const strapi = getStrapi();

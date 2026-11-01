@@ -56,6 +56,10 @@ export const findWithCountSchema = z.object({
 
 export type Comment = z.infer<typeof commentSchema>;
 
+// `reports` has a zod default, so zod v4 types it as required in the output.
+// Raw DB entities passed to the sanitizers can omit it.
+export type CommentInput = Omit<Comment, 'reports'> & Partial<Pick<Comment, 'reports'>>;
+
 export type CommentResultValidator = {
   findMany: z.infer<typeof findManySchema>;
   findWithCount: z.infer<typeof findWithCountSchema>;

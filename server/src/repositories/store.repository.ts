@@ -70,7 +70,7 @@ export const getStoreRepositorySource = (strapi: CoreStrapi) => {
           moderatorRoles,
           isGQLPluginEnabled,
           isReactionsPluginInstalled,
-        });
+        }) as unknown as Either<unknown, T extends true ? CommentsPluginConfig : Omit<CommentsPluginConfig, 'enabledCollections' | 'moderatorRoles' | 'isGQLPluginEnabled' | 'isReactionsPluginInstalled'>>;
       }
 
       return makeRight(result) as unknown as Either<unknown, T extends true ? CommentsPluginConfig : Omit<CommentsPluginConfig, 'enabledCollections' | 'moderatorRoles' | 'isGQLPluginEnabled' | 'isReactionsPluginInstalled'>>;

@@ -151,7 +151,7 @@ export const queryPaginationSchema = z
     })
   );
 
-export const validate = <I, O>(result: z.SafeParseReturnType<I, O>) => {
+export const validate = <O,>(result: z.ZodSafeParseResult<O>) => {
   if (!result.success) {
     const message = result.error.issues
       .map((i) => `Path: ${i.path.join('.')} Code: ${i.code} Message: ${i.message}`)
@@ -170,7 +170,7 @@ export const getRelationValidator = (enabledCollections: string[]) =>
     .refine(
       (v) => enabledCollections.some((ct) => v.startsWith(ct)),
       'Invalid relation or not enabled collections'
-    ) as z.ZodEffects<z.ZodString, `${string}::${string}.${string}`, string>;
+    ) as unknown as z.ZodType<`${string}::${string}.${string}`, string>;
 
 export const externalAuthorSchema = z.object({
   id: z.union([z.number(), z.string()]),

@@ -30,7 +30,7 @@ describe('Settings controller', () => {
 
   describe('get', () => {
     it('should return config when successful', async () => {
-      const ctx = {} as RequestContext;
+      const ctx = {} as RequestContext<any, any, any>;
       const expectedResult = { enabledCollections: ['test'] };
 
       mockSettingsService.getConfig.mockResolvedValue(expectedResult);
@@ -42,7 +42,7 @@ describe('Settings controller', () => {
     });
 
     it('should throw error when service fails', async () => {
-      const ctx = {} as RequestContext;
+      const ctx = {} as RequestContext<any, any, any>;
       const error = new Error('Service error');
 
       mockSettingsService.getConfig.mockRejectedValue(error);
@@ -53,7 +53,7 @@ describe('Settings controller', () => {
 
   describe('getForSettingsPage', () => {
     it('should return config with isSettingsPage flag when successful', async () => {
-      const ctx = {} as RequestContext;
+      const ctx = {} as RequestContext<any, any, any>;
       const expectedResult = { enabledCollections: ['test'], isSettingsPage: true };
 
       mockSettingsService.getConfig.mockResolvedValue(expectedResult);
@@ -65,7 +65,7 @@ describe('Settings controller', () => {
     });
 
     it('should throw error when service fails', async () => {
-      const ctx = {} as RequestContext;
+      const ctx = {} as RequestContext<any, any, any>;
       const error = new Error('Service error');
 
       mockSettingsService.getConfig.mockRejectedValue(error);
@@ -79,7 +79,7 @@ describe('Settings controller', () => {
       const config = { enabledCollections: ['test'] };
       const ctx = {
         request: { body: config }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const expectedResult = { success: true };
 
       caster<jest.Mock>(validateConfig).mockReturnValue({ right: config });
@@ -95,7 +95,7 @@ describe('Settings controller', () => {
       const config = { enabledCollections: ['invalid'] };
       const ctx = {
         request: { body: config }
-      } as RequestContext;
+      } as RequestContext<any, any, any>;
       const error = new Error('Validation failed');
 
       caster<jest.Mock>(validateConfig).mockReturnValue({ left: error });
@@ -106,7 +106,7 @@ describe('Settings controller', () => {
 
   describe('restore', () => {
     it('should restore config when successful', async () => {
-      const ctx = {} as RequestContext;
+      const ctx = {} as RequestContext<any, any, any>;
       const expectedResult = { success: true };
 
       mockSettingsService.restore.mockResolvedValue(expectedResult);
@@ -118,7 +118,7 @@ describe('Settings controller', () => {
     });
 
     it('should throw error when service fails', async () => {
-      const ctx = {} as RequestContext;
+      const ctx = {} as RequestContext<any, any, any>;
       const error = new Error('Service error');
 
       mockSettingsService.restore.mockRejectedValue(error);
@@ -131,7 +131,7 @@ describe('Settings controller', () => {
     it('should restart and return success message', async () => {
       const ctx = {
         send: jest.fn()
-      } as unknown as RequestContext;
+      } as unknown as RequestContext<any, any, any>;
       const expectedResult = { message: 'Restarted', status: 200 };
 
       const result = await getController(getStrapi()).restart(ctx);
@@ -143,7 +143,7 @@ describe('Settings controller', () => {
     it('should throw error when service fails', async () => {
       const ctx = {
         send: jest.fn()
-      } as unknown as RequestContext;
+      } as unknown as RequestContext<any, any, any>;
       const error = new Error('Service error');
 
       mockSettingsService.restart.mockImplementation(() => {

@@ -12,7 +12,7 @@ import { getOrderBy } from '../repositories/utils';
 import { CONFIG_PARAMS } from '../utils/constants';
 import PluginError from '../utils/PluginError';
 import { client as clientValidator } from '../validators/api';
-import { Comment, CommentRelated, CommentWithRelated } from '../validators/repositories';
+import { Comment, CommentInput, CommentRelated, CommentWithRelated } from '../validators/repositories';
 import { Pagination } from '../validators/repositories/utils';
 import { buildAuthorModel, filterOurResolvedReports, getRelatedGroups } from './utils/functions';
 import { getPluginService } from '../utils/getPluginService';
@@ -68,7 +68,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
   },
 
   sanitizeCommentEntity(
-    entity: Comment | CommentWithRelated,
+    entity: CommentInput | CommentWithRelated,
     blockedAuthors: string[],
     omitProps: Array<keyof Comment> = [],
     populate: any = {}
