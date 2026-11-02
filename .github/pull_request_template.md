@@ -1,6 +1,6 @@
 ## Ticket
 
-https://github.com/VirtusLab/strapi-plugin-comments/issues/-<your-ticket-#>
+https://github.com/Sensinum/strapi-plugin-comments/issues/-<your-ticket-#>
 
 ## Summary
 

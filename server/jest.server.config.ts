@@ -24,6 +24,7 @@ const config: JestConfigWithTsJest = {
   ],
   preset: "ts-jest",
   coverageDirectory: "./coverage/",
+  coverageReporters: ["lcov", "text"],
   collectCoverage: true,
   reporters: [ "default", "jest-junit" ],
   globals: {
