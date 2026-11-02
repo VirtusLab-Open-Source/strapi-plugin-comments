@@ -2,6 +2,29 @@
   "name": "strapi-plugin-comments",
   "version": "3.2.5-beta.1",
   "description": "Strapi - Comments plugin",
+  "keywords": [
+    "strapi",
+    "plugin",
+    "comments"
+  ],
+  "license": "MIT",
+  "author": "Sensinum <hello@sensinum.com>",
+  "contributors": [
+    "Mateusz Ziarko <mziarko@virtuslab.com>",
+    "Maksymilian Pamuła <mpamula@virtuslab.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sensinum/strapi-plugin-comments.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sensinum/strapi-plugin-comments/issues"
+  },
+  "homepage": "https://github.com/Sensinum/strapi-plugin-comments#readme",
+  "engines": {
+    "node": ">=22.0.0 <=26.x.x",
+    "npm": ">=6.0.0"
+  },
   "strapi": {
     "name": "comments",
     "displayName": "Comments",
@@ -37,6 +60,7 @@
     "test:unit": "jest --verbose --coverage",
     "test:unit:watch": "jest --verbose --watch",
     "test:unit:ci": "CI=true jest --ci --runInBand --verbose --coverage",
+    "coverage": "CI=true jest --ci --runInBand --verbose --coverage",
     "lint": "prettier --check .",
     "format": "prettier --write .",
     "build:admin:watch": "tsc -p ./admin/tsconfig.json --watch",
@@ -44,10 +68,6 @@
     "verify": "strapi-plugin verify",
     "watch": "strapi-plugin watch",
     "watch:link": "strapi-plugin watch:link"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/VirtusLab-Open-Source/strapi-plugin-comments"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.40.0",
@@ -109,33 +129,6 @@
       "pre-commit": "yarn format && yarn test:unit"
     }
   },
-  "author": {
-    "name": "VirtusLab",
-    "email": "strapi@virtuslab.com",
-    "url": "https://virtuslab.com"
-  },
-  "maintainers": [
-    {
-      "name": "VirtusLab // Mateusz Ziarko",
-      "email": "mziarko@virtuslab.com",
-      "url": "https://virtuslab.com"
-    },
-    {
-      "name": "VirtusLab // Maksymilian Pamuła",
-      "email": "mpamula@virtuslab.com",
-      "url": "https://virtuslab.com"
-    }
-  ],
-  "engines": {
-    "node": ">=22.13.0 <=26.x.x",
-    "npm": ">=6.0.0"
-  },
-  "keywords": [
-    "strapi",
-    "plugin",
-    "comments"
-  ],
-  "license": "MIT",
   "jest": {
     "projects": [
       "<rootDir>/server/jest.server.config.ts",
@@ -145,6 +138,5 @@
   "resolutions": {
     "minimatch": "^3.0.0",
     "@types/minimatch": "^3.0.0"
-  },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  }
 }

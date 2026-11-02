@@ -5,16 +5,16 @@
   <h1>Strapi - Comments plugin</h1>
   <p>Powerful Strapi based comments moderation tool for you and your users</p>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
-    <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/VirtusLab-Open-Source/strapi-plugin-comments?label=npm&logo=npm">
+    <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/Sensinum/strapi-plugin-comments?label=npm&logo=npm">
   </a>
   <a href="https://www.npmjs.org/package/strapi-plugin-comments">
     <img src="https://img.shields.io/npm/dm/strapi-plugin-comments.svg" alt="Monthly download on NPM" />
   </a>
-  <a href="https://circleci.com/gh/VirtusLab-Open-Source/strapi-plugin-comments">
-    <img src="https://circleci.com/gh/VirtusLab-Open-Source/strapi-plugin-comments.svg?style=shield" alt="CircleCI" />
+  <a href="https://github.com/Sensinum/strapi-plugin-comments/actions/workflows/ci.yml">
+    <img src="https://github.com/Sensinum/strapi-plugin-comments/actions/workflows/ci.yml/badge.svg" alt="CI" />
   </a>
-  <a href="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments">
-    <img src="https://codecov.io/gh/VirtusLab-Open-Source/strapi-plugin-comments/coverage.svg?branch=master" alt="codecov.io" />
+  <a href="https://codecov.io/gh/Sensinum/strapi-plugin-comments">
+    <img src="https://codecov.io/gh/Sensinum/strapi-plugin-comments/coverage.svg?branch=master" alt="codecov.io" />
   </a>
 </div>
 
@@ -46,9 +46,9 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 
 ## 💎 Versions
 
-- **Strapi v5** - (current) [v3.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments)
-- **Strapi v4** - [v2.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v4)
-- **Strapi v3** - [v1.x](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/tree/strapi-v3)
+- **Strapi v5** - (current) [v3.x](https://github.com/Sensinum/strapi-plugin-comments)
+- **Strapi v4** - [v2.x](https://github.com/Sensinum/strapi-plugin-comments/tree/strapi-v4)
+- **Strapi v3** - [v1.x](https://github.com/Sensinum/strapi-plugin-comments/tree/strapi-v3)
 
 ## ✨ Features
 
@@ -98,7 +98,7 @@ Complete installation requirements are exact same as for Strapi itself and can b
 
 **Minimum environment requirements**
 
-- Node.js `>=22.13.0 <=26.x.x`
+- Node.js `>=22.0.0 <=26.x.x`
 - NPM `>=6.x.x`
 
 In our minimum support we're following [official Node.js releases timelines](https://nodejs.org/en/about/releases/).
@@ -1269,7 +1269,7 @@ _Available reason enums:_ `BAD_WORDS`, `OTHER`, `DISCRIMINATION` (want more? See
 
 ## 🧩 Examples
 
-Live example of plugin usage can be found in the [VirtusLab Strapi Examples](https://github.com/VirtusLab/strapi-examples/tree/master/strapi-plugin-comments) repository.
+Live example of plugin usage can be found in the [Sensinum Strapi Examples](https://github.com/Sensinum/strapi-examples/tree/master/strapi-plugin-comments) repository.
 
 ## ⚗️ Custom fields
 
@@ -1346,11 +1346,10 @@ Feel free to fork and make a Pull Request to this plugin project. All the input 
 
 For general help using Strapi, please refer to [the official Strapi documentation](https://strapi.io/documentation/). For additional help, you can use one of these channels to ask a question:
 
-- [Discord](https://discord.strapi.io/) We're present on official Strapi Discord workspace. Find us by `[VirtusLab]` prefix and DM.
-- [Slack - VirtusLab Open Source](https://virtuslab-oss.slack.com) We're present on a public channel #strapi-molecules
-- [GitHub](https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/issues) (Bug reports, Contributions, Questions and Discussions)
-- [E-mail](mailto:strapi@virtuslab.com) - we will respond back as soon as possible
+- [Discord](https://discord.strapi.io/) We're present on official Strapi Discord workspace. Find us by `[Sensinum]` prefix and DM.
+- [GitHub](https://github.com/Sensinum/strapi-plugin-comments/issues) (Bug reports, Contributions, Questions and Discussions)
+- [E-mail](mailto:hello@sensinum.com) - we will respond back as soon as possible
 
 ## 📝 License
 
-[MIT License](LICENSE.md) Copyright (c) [VirtusLab Sp. z o.o.](https://virtuslab.com/) &amp; [Strapi Solutions](https://strapi.io/).
+[MIT License](LICENSE.md) Copyright (c) [Sensinum Sp. z o.o.](https://www.sensinum.com/).

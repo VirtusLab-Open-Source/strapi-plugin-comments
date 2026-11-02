@@ -1,0 +1,242 @@
+name: Release
+
+# 1) GitHub Release published → open version bump PR (no npm publish).
+# 2) That PR merged into master/main → retag + test/build/npm publish.
+# 3) workflow_dispatch → manual publish (e.g. recover a failed merge publish).
+# Kept in one workflow file so npm Trusted Publisher (OIDC) can stay on release.yml.
+
+on:
+  release:
+    types: [published]
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g. 3.4.1 or 3.4.1-beta.1)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Publish to npm with --tag beta'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  NODE_VERSION: '22'
+  HUSKY: '0'
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write # Required for npm Trusted Publisher (OIDC)
+
+jobs:
+  prepare:
+    name: Open version bump PR
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve target ref
+        id: target
+        env:
+          TARGET_COMMITISH: ${{ github.event.release.target_commitish }}
+          TAG_NAME: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="${TAG_NAME#v}"
+          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-beta\.[0-9]+)?$'; then
+            echo "Invalid release tag: $TAG_NAME (expected X.Y.Z or X.Y.Z-beta.N, optional leading v)"
+            exit 1
+          fi
+          BRANCH="chore/version-${VERSION}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG_NAME" >> "$GITHUB_OUTPUT"
+          echo "ref=$TARGET_COMMITISH" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.target.outputs.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump package version
+        id: bump
+        env:
+          VERSION: ${{ steps.target.outputs.version }}
+          BRANCH: ${{ steps.target.outputs.branch }}
+        run: |
+          git checkout -B "$BRANCH"
+          npm version "$VERSION" --no-git-tag-version
+          git add package.json
+          if [ -f yarn.lock ]; then
+            git add yarn.lock
+          fi
+          if git diff --cached --quiet; then
+            echo "package.json already at version $VERSION — nothing to PR"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit -m "chore: version ${VERSION}"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Push version branch
+        if: steps.bump.outputs.changed == 'true'
+        env:
+          BRANCH: ${{ steps.target.outputs.branch }}
+        run: git push origin "HEAD:${BRANCH}" --force
+
+      - name: Open version bump PR
+        if: steps.bump.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.target.outputs.version }}
+          BRANCH: ${{ steps.target.outputs.branch }}
+          BASE_REF: ${{ steps.target.outputs.ref }}
+          TAG_NAME: ${{ steps.target.outputs.tag }}
+        run: |
+          EXISTING="$(gh pr list --head "$BRANCH" --base "$BASE_REF" --state open --json number --jq '.[0].number // empty')"
+          BODY=$(cat <<EOF
+          Automated version bump for release \`${TAG_NAME}\`.
+
+          **Merge this PR** (bypass branch protection if needed) to publish.
+          After merge, the Release workflow will retag \`${TAG_NAME}\` onto \`${BASE_REF}\` and run \`npm publish\`.
+
+          Prefer **Create a merge commit** (not squash).
+          EOF
+          )
+          BODY="$(printf '%s\n' "$BODY" | sed -e 's/^[[:space:]]*//')"
+          if [ -n "$EXISTING" ]; then
+            echo "PR #${EXISTING} already open for ${BRANCH}"
+            gh pr edit "$EXISTING" --title "chore: version ${VERSION}" --body "$BODY"
+            echo "https://github.com/${GITHUB_REPOSITORY}/pull/${EXISTING}"
+          else
+            gh pr create \
+              --base "$BASE_REF" \
+              --head "$BRANCH" \
+              --title "chore: version ${VERSION}" \
+              --body "$BODY"
+          fi
+
+  publish:
+    name: Test, build and publish
+    if: >
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.merged == true &&
+       startsWith(github.event.pull_request.head.ref, 'chore/version-')) ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    steps:
+      - name: Resolve version and tag
+        id: target
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            VERSION="${INPUT_VERSION#v}"
+            if [ "$INPUT_PRERELEASE" = "true" ]; then
+              IS_PRERELEASE=true
+            else
+              IS_PRERELEASE=false
+            fi
+          else
+            VERSION="${HEAD_REF#chore/version-}"
+            if [[ "$VERSION" == *-beta.* ]]; then
+              IS_PRERELEASE=true
+            else
+              IS_PRERELEASE=false
+            fi
+          fi
+
+          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-beta\.[0-9]+)?$'; then
+            echo "Invalid version: $VERSION"
+            exit 1
+          fi
+
+          # Repo convention: GitHub Release tags use a leading v (no gh release API needed —
+          # GITHUB_TOKEN on pull_request often cannot read releases via `gh release view`).
+          TAG_NAME="v${VERSION}"
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG_NAME" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$IS_PRERELEASE" >> "$GITHUB_OUTPUT"
+          echo "Resolved version=$VERSION tag=$TAG_NAME prerelease=$IS_PRERELEASE"
+
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref || github.ref_name }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify package.json version
+        env:
+          VERSION: ${{ steps.target.outputs.version }}
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          if [ "$PKG_VERSION" != "$VERSION" ]; then
+            echo "package.json version ($PKG_VERSION) != expected ($VERSION)"
+            exit 1
+          fi
+
+      - name: Move release tag to HEAD
+        env:
+          TAG_NAME: ${{ steps.target.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f "$TAG_NAME"
+          git push origin "refs/tags/${TAG_NAME}" --force
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+          registry-url: https://registry.npmjs.org
+
+      # Trusted publishing needs npm >= 11.5.1 (Node 22 image may ship an older CLI)
+      - name: Ensure npm supports OIDC trusted publishing
+        run: npm install -g npm@^11.5.1
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests with coverage
+        run: yarn coverage
+
+      - name: Upload coverage to Codecov
+        if: ${{ env.CODECOV_TOKEN != '' }}
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: server/coverage/lcov.info,admin/coverage/lcov.info
+          flags: unittest
+          fail_ci_if_error: true
+
+      - name: Build
+        run: yarn build
+
+      - name: Publish to npm
+        env:
+          IS_PRERELEASE: ${{ steps.target.outputs.prerelease }}
+        run: |
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            npm publish --access public --tag beta
+          else
+            npm publish --access public --tag latest
+          fi
