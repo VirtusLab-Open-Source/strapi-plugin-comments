@@ -10,9 +10,7 @@ on:
     types: [published]
   pull_request:
     types: [closed]
-    branches:
-      - master
-      - main
+    # Any base branch — stable publish still gated to main/master in the job.
   workflow_dispatch:
     inputs:
       version:
@@ -51,11 +49,31 @@ jobs:
             echo "Invalid release tag: $TAG_NAME (expected X.Y.Z or X.Y.Z-beta.N, optional leading v)"
             exit 1
           fi
+
+          if [[ "$VERSION" == *-beta.* ]]; then
+            IS_PRERELEASE=true
+          else
+            IS_PRERELEASE=false
+          fi
+
+          # Stable releases must target main/master; beta may use any branch.
+          if [ "$IS_PRERELEASE" != "true" ]; then
+            case "$TARGET_COMMITISH" in
+              main|master) ;;
+              *)
+                echo "Stable release ($VERSION) must target main or master (got: $TARGET_COMMITISH)."
+                echo "Use a *-beta.N tag (and Pre-release) to publish from another branch."
+                exit 1
+                ;;
+            esac
+          fi
+
           BRANCH="chore/version-${VERSION}"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG_NAME" >> "$GITHUB_OUTPUT"
           echo "ref=$TARGET_COMMITISH" >> "$GITHUB_OUTPUT"
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$IS_PRERELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Checkout target branch
         uses: actions/checkout@v4
@@ -80,6 +98,12 @@ jobs:
           git add package.json
           if [ -f yarn.lock ]; then
             git add yarn.lock
+          fi
+          if [ -f pnpm-lock.yaml ]; then
+            git add pnpm-lock.yaml
+          fi
+          if [ -f package-lock.json ]; then
+            git add package-lock.json
           fi
           if git diff --cached --quiet; then
             echo "package.json already at version $VERSION — nothing to PR"
@@ -143,6 +167,7 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          BASE_REF: ${{ github.event.pull_request.base.ref || github.ref_name }}
           INPUT_VERSION: ${{ inputs.version }}
           INPUT_PRERELEASE: ${{ inputs.prerelease }}
         run: |
@@ -167,6 +192,18 @@ jobs:
             exit 1
           fi
 
+          # Stable publish only from main/master; beta may publish from any base branch.
+          if [ "$IS_PRERELEASE" != "true" ]; then
+            case "$BASE_REF" in
+              main|master) ;;
+              *)
+                echo "Stable publish ($VERSION) must merge into (or dispatch from) main or master (got: $BASE_REF)."
+                echo "Use a *-beta.N version to publish from another branch."
+                exit 1
+                ;;
+            esac
+          fi
+
           # Repo convention: GitHub Release tags use a leading v (no gh release API needed —
           # GITHUB_TOKEN on pull_request often cannot read releases via `gh release view`).
           TAG_NAME="v${VERSION}"
@@ -174,9 +211,10 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG_NAME" >> "$GITHUB_OUTPUT"
           echo "prerelease=$IS_PRERELEASE" >> "$GITHUB_OUTPUT"
-          echo "Resolved version=$VERSION tag=$TAG_NAME prerelease=$IS_PRERELEASE"
+          echo "base=$BASE_REF" >> "$GITHUB_OUTPUT"
+          echo "Resolved version=$VERSION tag=$TAG_NAME prerelease=$IS_PRERELEASE base=$BASE_REF"
 
-      - name: Checkout default branch
+      - name: Checkout release base
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.base.ref || github.ref_name }}
