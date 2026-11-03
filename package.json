@@ -138,6 +138,13 @@
   "resolutions": {
     "minimatch": "^3.0.0",
     "@types/minimatch": "^3.0.0",
-    "follow-redirects": "1.16.2"
+    "follow-redirects": "1.16.2",
+    "dompurify": "3.4.17",
+    "body-parser": "1.20.9",
+    "markdown-it": "14.3.3",
+    "undici": "6.29.1",
+    "qs": "6.16.1",
+    "nodemailer": "10.1.4",
+    "zod": "4.6.7"
   }
 }
