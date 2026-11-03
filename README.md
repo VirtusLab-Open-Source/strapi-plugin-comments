@@ -59,7 +59,7 @@ A plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that provid
 - **Moderation Panel:** Search & Filter through the bucket with your auditory comments. Manage them by blocking single ones or full threads. All in combined list &amp; hierarchical tree view of threads.
 - **Automated Bad Words filtering:** By default end users are not allowed to post abusing comments where bad words have been used.
 - **Abuse Reporting & Reviewing:** Don't allow inferior language, react to reports from your community, send email notifications about issued reports
-- **Reactions plugin integration:** Optional integration with [`strapi-plugin-reactions`](https://github.com/VirtusLab-Open-Source/strapi-plugin-reactions) to expose reaction counts on comments in REST & GraphQL APIs and in the moderation panel (see [Reactions integration](#reactions-integration)).
+- **Reactions plugin integration:** Optional integration with [`strapi-plugin-reactions`](https://github.com/Sensinum/strapi-plugin-reactions) to expose reaction counts on comments in REST & GraphQL APIs and in the moderation panel (see [Reactions integration](#reactions-integration)).
 
 ## ⏳ Installation
 
@@ -116,7 +116,7 @@ In our minimum support we're following [official Node.js releases timelines](htt
 
 **Optional plugin integrations**
 
-- [`strapi-plugin-reactions`](https://github.com/VirtusLab-Open-Source/strapi-plugin-reactions) - required only if you want comment reaction counts in public APIs and the admin UI. Enable it with **`reactionsEnabled`** on the Comments **Settings** page (see [Reactions integration](#reactions-integration)).
+- [`strapi-plugin-reactions`](https://github.com/Sensinum/strapi-plugin-reactions) - required only if you want comment reaction counts in public APIs and the admin UI. Enable it with **`reactionsEnabled`** on the Comments **Settings** page (see [Reactions integration](#reactions-integration)).
 
 **We recommend always using the latest version of Strapi to start your new projects**.
 
@@ -128,7 +128,7 @@ To start your journey with **Comments plugin** you must first setup it using the
 
 On the dedicated page, you will be able to set up all crucial properties which drive the plugin and customize each individual collection for which **Comments plugin** should be enabled.
 
-When [`strapi-plugin-reactions`](https://github.com/VirtusLab-Open-Source/strapi-plugin-reactions) is installed, an additional **Reactions integration** toggle (`reactionsEnabled`) appears in the global settings section. It controls whether comment payloads include reaction counts (see [Reactions integration](#reactions-integration)).
+When [`strapi-plugin-reactions`](https://github.com/Sensinum/strapi-plugin-reactions) is installed, an additional **Reactions integration** toggle (`reactionsEnabled`) appears in the global settings section. It controls whether comment payloads include reaction counts (see [Reactions integration](#reactions-integration)).
 
 <div style="margin: 20px 0" align="center">
   <img style="width: 100%; height: auto;" src="https://www.sensinum.com/img/open-source/strapi-plugin-comments/configuration.png" alt="Plugin configuration" />
