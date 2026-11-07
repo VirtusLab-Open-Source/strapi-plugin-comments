@@ -142,6 +142,74 @@ describe('common.service', () => {
       expect(result).toBe(false);
       expect(mockStoreRepository.getLocalConfig).not.toHaveBeenCalled();
     });
+
+    it('should fall back to local config for a prop when nothing is saved in store', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const localConfig: Partial<CommentsPluginConfig> = {
+        approvalFlow: ['api::blog.blog'],
+        blockedAuthorProps: ['email'],
+      };
+
+      mockStoreRepository.getConfig.mockResolvedValue(null);
+      mockStoreRepository.getLocalConfig.mockImplementation((prop?: string, defaultValue?: unknown) =>
+        prop ? (localConfig[prop as keyof CommentsPluginConfig] ?? defaultValue) : localConfig
+      );
+
+      await expect(service.getConfig('approvalFlow', [])).resolves.toEqual(['api::blog.blog']);
+      await expect(service.getConfig('blockedAuthorProps', [])).resolves.toEqual(['email']);
+      await expect(service.getConfig('moderatorRoles', ['fallback'])).resolves.toEqual(['fallback']);
+    });
+
+    it('should fall back to full local config when nothing is saved in store and no prop is specified', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const localConfig: Partial<CommentsPluginConfig> = {
+        enabledCollections: ['api::blog.blog'],
+      };
+
+      mockStoreRepository.getConfig.mockResolvedValue(undefined);
+      mockStoreRepository.getLocalConfig.mockImplementation((prop?: string) =>
+        prop ? undefined : localConfig
+      );
+
+      await expect(service.getConfig()).resolves.toEqual(localConfig);
+    });
+
+    it('should keep the caller default when nothing is saved in store and the local value is not configured', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      // Plugin defaults merged into strapi.config when the app does not set these props
+      const localConfig: Record<string, unknown> = {
+        moderatorRoles: [],
+        'client.contactEmail': null,
+        'client.url': null,
+        reactionsEnabled: true,
+      };
+
+      mockStoreRepository.getConfig.mockResolvedValue(null);
+      mockStoreRepository.getLocalConfig.mockImplementation((prop?: string) => localConfig[prop as string]);
+
+      await expect(service.getConfig('moderatorRoles', ['strapi-super-admin'])).resolves.toEqual(['strapi-super-admin']);
+      await expect(service.getConfig('client.contactEmail', 'admin@example.com')).resolves.toBe('admin@example.com');
+      await expect(service.getConfig('client.url', 'our site')).resolves.toBe('our site');
+      await expect(service.getConfig('reactionsEnabled', false)).resolves.toBe(false);
+    });
+
+    it('should use configured local values over the caller default when nothing is saved in store', async () => {
+      const strapi = getStrapi();
+      const service = getService(strapi);
+      const localConfig: Record<string, unknown> = {
+        moderatorRoles: ['Editor'],
+        'client.contactEmail': 'comments@example.com',
+      };
+
+      mockStoreRepository.getConfig.mockResolvedValue(null);
+      mockStoreRepository.getLocalConfig.mockImplementation((prop?: string) => localConfig[prop as string]);
+
+      await expect(service.getConfig('moderatorRoles', ['strapi-super-admin'])).resolves.toEqual(['Editor']);
+      await expect(service.getConfig('client.contactEmail', 'admin@example.com')).resolves.toBe('comments@example.com');
+    });
   });
 
   describe('parseRelationString', () => {

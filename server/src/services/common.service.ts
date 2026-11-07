@@ -28,6 +28,9 @@ const lifecycleHookListeners: Record<ContentType, LifecycleHookRecord> = {
   'comment-report': {},
 };
 
+// Documented as Settings page options: config/plugins.ts does not turn them on (see README "reactionsEnabled")
+const SETTINGS_PAGE_ONLY_PROPS: ReadonlyArray<string> = [CONFIG_PARAMS.REACTIONS_ENABLED];
+
 const PAGE_SIZE = 10;
 const REQUIRED_FIELDS = ['id', 'documentId'];
 
@@ -46,7 +49,7 @@ const commonService = ({ strapi }: StrapiContext) => ({
   ): Promise<PathValue<CommentsPluginConfig, T>> {
     const storeRepository = getStoreRepository(strapi);
     const config = await storeRepository.getConfig();
-    if (prop && !useLocal) {
+    if (prop && !useLocal && !isNil(config)) {
       return get(config, prop, defaultValue) as PathValue<CommentsPluginConfig, T>;
     }
     if (useLocal) {
@@ -54,6 +57,21 @@ const commonService = ({ strapi }: StrapiContext) => ({
         CommentsPluginConfig,
         T
       >;
+    }
+    if (isNil(config)) {
+      // Nothing saved via the Settings page yet (or restored to defaults): use config/plugins.ts.
+      if (!prop) {
+        return storeRepository.getLocalConfig() as PathValue<CommentsPluginConfig, T>;
+      }
+      if (SETTINGS_PAGE_ONLY_PROPS.includes(prop)) {
+        return defaultValue as PathValue<CommentsPluginConfig, T>;
+      }
+      const localValue = storeRepository.getLocalConfig(prop);
+      // null, undefined and [] are the plugin defaults ("not configured"), so the caller default still applies
+      if (isNil(localValue) || (Array.isArray(localValue) && localValue.length === 0 && !isNil(defaultValue))) {
+        return defaultValue as PathValue<CommentsPluginConfig, T>;
+      }
+      return localValue as PathValue<CommentsPluginConfig, T>;
     }
     return config as PathValue<CommentsPluginConfig, T>;
   },
